@@ -6,16 +6,16 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QProcess>
+//  #include <GLib.Process>
 //  #include <GLib.Settings>
 //  #include <GLib.Dir>
-//  #include <QDesktopServices>
-//  #include <Gtk.Application>
+//  #include <GLib.DesktopServices>
+//  #include <GLib.Application>
 
-//  const int QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
+//  const int GLib.TLEGACY (GLib.T_VERSION < GLib.T_VERSION_CHECK (5,9,0))
 
-//  #if ! (QTLEGACY)
-//  #include <QOperatingSystemVersion>
+//  #if ! (GLib.TLEGACY)
+//  #include <GLib.OperatingSystemVersion>
 //  #endif
 
 namespace Occ {
@@ -73,7 +73,7 @@ public class OpenFileManager : GLib.Object {
         }
 
         if (OpenFileManager.name == "") {
-            OpenFileManager.name = desktop_file.value ("Desktop Entry/Name[%1]".printf (Gtk.Application.property ("ui_lang").to_string ())).to_string ();
+            OpenFileManager.name = desktop_file.value ("Desktop Entry/Name[%1]".printf (GLib.Application.property ("ui_lang").to_string ())).to_string ();
             if (OpenFileManager.name == "") {
                 OpenFileManager.name = desktop_file.value ("Desktop Entry/Name").to_string ();
             }
@@ -98,15 +98,15 @@ public class OpenFileManager : GLib.Object {
 
         if (app == "" || args.length () == 0 || !can_handle_file) {
             // fallback: open the default file manager, without ever selecting the file
-            QDesktopServices.open_url (GLib.Uri.from_local_file (path_to_open));
+            GLib.DesktopServices.open_url (GLib.Uri.from_local_file (path_to_open));
         } else {
-            QProcess.start_detached (app, args);
+            GLib.Process.start_detached (app, args);
         }
     }
 
 
     /***********************************************************
-    According to the QStandardDir implementation from Qt5
+    According to the GLib.StandardDir implementation from Qt5
     ***********************************************************/
     public static GLib.List<string> xdg_data_dirs () {
         GLib.List<string> dirs = new GLib.List<string> ();
@@ -133,7 +133,7 @@ public class OpenFileManager : GLib.Object {
     which might be returned
     ***********************************************************/
     public static string find_default_file_manager () {
-        QProcess p;
+        GLib.Process p;
         p.on_signal_start (
             "xdg-mime",
             {
@@ -170,7 +170,7 @@ public class OpenFileManager : GLib.Object {
     Early dolphin versions did not have --select
     ***********************************************************/
     public static bool check_dolphin_can_select () {
-        QProcess p;
+        GLib.Process p;
         p.on_signal_start ("dolphin", { "--help", GLib.File.ReadOnly });
         p.wait_for_finished ();
         return p.read_all ().contains ("--select");

@@ -134,12 +134,12 @@ public class FakeSearchResultsStorage : GLib.Object {
             }
         );
 
-        this.providers_response = QJsonDocument.from_variant (
+        this.providers_response = GLib.JsonDocument.from_variant (
             new GLib.VariantMap ({
                 {
                     "ocs", ocs_map
                 }
-            }).to_json (QJsonDocument.Compact)
+            }).to_json (GLib.JsonDocument.Compact)
         );
     }
 
@@ -255,7 +255,7 @@ public class FakeSearchResultsStorage : GLib.Object {
                     "cursor", 0
                 },
                 {
-                    "entries", new QVariantList ()
+                    "entries", new GLib.VariantList ()
                 }
             };
 
@@ -268,13 +268,13 @@ public class FakeSearchResultsStorage : GLib.Object {
                 }
             };
 
-            return QJsonDocument.from_variant (
+            return GLib.JsonDocument.from_variant (
                 new GLib.VariantMap (
                     {
                         "ocs", ocs_map
                     }
                 )
-            ).to_json (QJsonDocument.Compact);
+            ).to_json (GLib.JsonDocument.Compact);
         }
 
         var provider = this.search_results_data.value (provider_id, Provider ());
@@ -305,13 +305,13 @@ public class FakeSearchResultsStorage : GLib.Object {
             }
         };
 
-        return new QJsonDocument.from_variant (
+        return new GLib.JsonDocument.from_variant (
             new GLib.VariantMap (
                 {
                     "ocs", ocs_map
                 }
             )
-        ).to_json (QJsonDocument.Compact);
+        ).to_json (GLib.JsonDocument.Compact);
     }
 
 

@@ -49,7 +49,7 @@ public class JsonApiJob : AbstractNetworkJob {
         }
     }
 
-    private QUrlQuery additional_params;
+    private GLib.UrlQuery additional_params;
     private Soup.Request request = new Soup.Request ();
 
     /***********************************************************
@@ -66,7 +66,7 @@ public class JsonApiJob : AbstractNetworkJob {
     @param json - the parsed json document
     @param status_code - the OCS status code : 100 (!) for on_signal_success
     ***********************************************************/
-    internal signal void signal_json_received (QJsonDocument json, int return_code);
+    internal signal void signal_json_received (GLib.JsonDocument json, int return_code);
 
 
     /***********************************************************
@@ -102,7 +102,7 @@ public class JsonApiJob : AbstractNetworkJob {
 
     This function needs to be called before start () obviously.
     ***********************************************************/
-    public void add_query_params (QUrlQuery parameters) {
+    public void add_query_params (GLib.UrlQuery parameters) {
         this.additional_params = parameters;
     }
 
@@ -142,7 +142,7 @@ public class JsonApiJob : AbstractNetworkJob {
         if (this.reply.error != GLib.InputStream.NoError) {
             GLib.warning ("Network error: " + this.path + this.error_string + this.reply.attribute (Soup.Request.HttpStatusCodeAttribute));
             status_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-            /* emit */ signal_json_received (QJsonDocument (), status_code);
+            /* emit */ signal_json_received (GLib.JsonDocument (), status_code);
             return true;
         }
 
@@ -176,7 +176,7 @@ public class JsonApiJob : AbstractNetworkJob {
         }
 
         Json.ParserError error;
-        var json = QJsonDocument.from_json (json_str.to_utf8 (), error);
+        var json = GLib.JsonDocument.from_json (json_str.to_utf8 (), error);
         // empty or invalid response and status code is != 304 because json_str is expected to be empty
         if ( (error.error != Json.ParserError.NoError || json == null) && http_status_code != NOT_MODIFIED_STATUS_CODE) {
             GLib.warning ("Invalid JSON! " + json_str + error.error_string);

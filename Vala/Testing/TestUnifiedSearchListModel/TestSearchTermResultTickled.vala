@@ -20,7 +20,7 @@ public class TestSearchTermResultTickled : AbstractTestUnifiedSearchListmodel {
         // test that search term gets set, search gets started and enough results get returned
         model.set_search_term (model.search_term () + "discuss");
 
-        QSignalSpy search_in_progress_changed = new QSignalSpy (
+        GLib.SignalSpy search_in_progress_changed = new GLib.SignalSpy (
             model, UnifiedSearchResultsListModel.is_search_in_progress_changed);
 
         GLib.assert_true (search_in_progress_changed.wait ());
@@ -36,10 +36,10 @@ public class TestSearchTermResultTickled : AbstractTestUnifiedSearchListmodel {
 
         GLib.assert_true (model.row_count () != 0);
 
-        QDesktopServices.set_url_handler ("http", fake_desktop_services_url_handler, "signal_result_clicked");
-        QDesktopServices.set_url_handler ("https", fake_desktop_services_url_handler, "signal_result_clicked");
+        GLib.DesktopServices.set_url_handler ("http", fake_desktop_services_url_handler, "signal_result_clicked");
+        GLib.DesktopServices.set_url_handler ("https", fake_desktop_services_url_handler, "signal_result_clicked");
 
-        QSignalSpy signal_result_clicked = new QSignalSpy (fake_desktop_services_url_handler, &FakeDesktopServicesUrlHandler.signal_result_clicked);
+        GLib.SignalSpy signal_result_clicked = new GLib.SignalSpy (fake_desktop_services_url_handler, &FakeDesktopServicesUrlHandler.signal_result_clicked);
 
         //  test click on a result item
         string url_for_clicked_result;

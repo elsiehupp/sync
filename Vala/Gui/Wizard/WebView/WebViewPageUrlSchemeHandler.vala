@@ -3,7 +3,7 @@
 namespace Occ {
 namespace Ui {
 
-public class WebViewPageUrlSchemeHandler : QWebEngineUrlSchemeHandler {
+public class WebViewPageUrlSchemeHandler : GLib.WebEngineUrlSchemeHandler {
 
     internal signal void signal_url_catched (string user, string pass, string host);
 
@@ -16,11 +16,11 @@ public class WebViewPageUrlSchemeHandler : QWebEngineUrlSchemeHandler {
 
     /***********************************************************
     ***********************************************************/
-    public void request_started (QWebEngineUrlRequestJob request) {
+    public void request_started (GLib.WebEngineUrlRequestJob request) {
         GLib.Uri url = request.request_url ();
 
         string path = url.path.mid (1); // get undecoded path
-        const GLib.List<string> parts = path.split ("&");
+        GLib.List<string> parts = path.split ("&");
 
         string server;
         string user;

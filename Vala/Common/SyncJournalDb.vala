@@ -110,7 +110,7 @@ public class SyncJournalDb : GLib.Object {
         Returns none on database error.
         ***********************************************************/
         Optional<PinState> raw_for_path (string path) {
-            QMutexLocker lock = new QMutexLocker (this.database.mutex);
+            GLib.MutexLocker lock = new GLib.MutexLocker (this.database.mutex);
             if (!this.database.check_connect ())
                 return {};
 
@@ -148,7 +148,7 @@ public class SyncJournalDb : GLib.Object {
         Returns none on database error.
         ***********************************************************/
         public Optional<PinState> effective_for_path (string path) {
-            QMutexLocker lock = new QMutexLocker (this.database.mutex);
+            GLib.MutexLocker lock = new GLib.MutexLocker (this.database.mutex);
             if (!this.database.check_connect ())
                 return {};
 
@@ -196,7 +196,7 @@ public class SyncJournalDb : GLib.Object {
             if (!base_pin)
                 return {};
 
-            QMutexLocker lock = new QMutexLocker (this.database.mutex);
+            GLib.MutexLocker lock = new GLib.MutexLocker (this.database.mutex);
             if (!this.database.check_connect ())
                 return {};
 
@@ -234,7 +234,7 @@ public class SyncJournalDb : GLib.Object {
         It's valid to use the root path "".
         ***********************************************************/
         public void for_path (string path, PinState state) {
-            QMutexLocker lock = new QMutexLocker (this.database.mutex);
+            GLib.MutexLocker lock = new GLib.MutexLocker (this.database.mutex);
             if (!this.database.check_connect ())
                 return;
 
@@ -262,7 +262,7 @@ public class SyncJournalDb : GLib.Object {
         The path "" wipes every entry.
         ***********************************************************/
         public void wipe_for_path_and_below (string path) {
-            QMutexLocker lock = new QMutexLocker (this.database.mutex);
+            GLib.MutexLocker lock = new GLib.MutexLocker (this.database.mutex);
             if (!this.database.check_connect ())
                 return;
 
@@ -283,15 +283,15 @@ public class SyncJournalDb : GLib.Object {
         Returns nothing on database error.
         Note that this will have an entry for "".
         ***********************************************************/
-        Optional<GLib.List<QPair<string, PinState>>> raw_list () {
-            QMutexLocker lock = new QMutexLocker (this.database.mutex);
+        Optional<GLib.List<GLib.Pair<string, PinState>>> raw_list () {
+            GLib.MutexLocker lock = new GLib.MutexLocker (this.database.mutex);
             if (!this.database.check_connect ())
                 return {};
 
             SqlQuery query = new SqlQuery ("SELECT path, pin_state FROM flags;", this.database.database);
             query.exec ();
 
-            GLib.List<QPair<string, PinState>> result;
+            GLib.List<GLib.Pair<string, PinState>> result;
             while (true) {
                 var next = query.next ();
                 if (!next.ok)
@@ -315,7 +315,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     Public functions are protected with the mutex.
     ***********************************************************/
-    private QRecursiveMutex mutex;
+    private GLib.RecursiveMutex mutex;
 
     private GLib.HashTable<string, int> checksym_type_cache;
     private int transaction;
@@ -394,7 +394,7 @@ public class SyncJournalDb : GLib.Object {
 
         string key = "%1@%2:%3".printf (user, remote_url.to_string (), remote_path);
 
-        string ba = QCryptographicHash.hash (key.to_utf8 (), GLib.ChecksumType.MD5);
+        string ba = GLib.CryptographicHash.hash (key.to_utf8 (), GLib.ChecksumType.MD5);
         journal_path += ba.left (6).to_hex () + ".db";
 
         // If it exists already, the path is clearly usable
@@ -404,7 +404,7 @@ public class SyncJournalDb : GLib.Object {
         }
 
         // Try to create a file there
-        if (file.open (QIODevice.ReadWrite)) {
+        if (file.open (GLib.IODevice.ReadWrite)) {
             // Ok, all good.
             file.close ();
             file.remove ();
@@ -502,7 +502,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool get_file_record (string filename, SyncJournalFileRecord record) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
 
         // Reset the output var in case the caller is reusing it.
         //  Q_ASSERT (record);
@@ -546,7 +546,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool get_file_record_by_e2e_mangled_name (string mangled_name, SyncJournalFileRecord record) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
 
         // Reset the output var in case the caller is reusing it.
         //  Q_ASSERT (record);
@@ -595,7 +595,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool get_file_record_by_inode (uint64 inode, SyncJournalFileRecord record) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
 
         // Reset the output var in case the caller is reusing it.
         //  Q_ASSERT (record);
@@ -636,7 +636,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool get_file_records_by_file_id (string file_id, RowCallback row_callback) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
 
         if (file_id == "" || this.metadata_table_is_empty)
             return true; // no error, yet nothing found (record.is_valid == false)
@@ -676,7 +676,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool get_files_below_path (string path, RowCallback row_callback) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
 
         if (this.metadata_table_is_empty) {
             return true; // no error, yet nothing found
@@ -745,7 +745,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool list_files_in_path (string path, RowCallback row_callback) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
 
         if (this.metadata_table_is_empty)
             return true;
@@ -789,7 +789,7 @@ public class SyncJournalDb : GLib.Object {
     ***********************************************************/
     public Result<void, string> file_record (SyncJournalFileRecord record) {
         SyncJournalFileRecord record = this.record;
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
 
         if (this.etag_storage_filter != null) {
             // If we are a directory that should not be read from database next time, don't write the etag
@@ -869,7 +869,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void key_value_store_set (string key, GLib.Variant value) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
         if (!check_connect ()) {
             return;
         }
@@ -888,7 +888,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public int64 key_value_store_get_int (string key, int64 default_value) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
         if (!check_connect ()) {
             return default_value;
         }
@@ -927,10 +927,10 @@ public class SyncJournalDb : GLib.Object {
 
 
     /***********************************************************
-    TODO: filename -> QBytearray?
+    TODO: filename -> GLib.Bytearray?
     ***********************************************************/
     public bool delete_file_record (string filename, bool recursively = false) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
 
         if (check_connect ()) {
             // if (!recursively) {
@@ -974,7 +974,7 @@ public class SyncJournalDb : GLib.Object {
     public bool update_file_record_checksum (string filename,
         string content_checksum,
         string content_checksum_type) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
 
         GLib.info ("Updating file checksum" + filename + content_checksum + content_checksum_type);
 
@@ -1006,7 +1006,7 @@ public class SyncJournalDb : GLib.Object {
     ***********************************************************/
     public bool update_local_metadata (string filename,
         int64 modtime, int64 size, uint64 inode) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
 
         GLib.info ("Updating local metadata for:" + filename + modtime.to_string () + size.to_string () + inode.to_string ());
 
@@ -1038,7 +1038,7 @@ public class SyncJournalDb : GLib.Object {
     Returns whether the item or any subitems are dehydrated
     ***********************************************************/
     public Optional<HasHydratedDehydrated> has_hydrated_or_dehydrated_files (string filename) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
         if (!check_connect ())
             return {};
 
@@ -1076,7 +1076,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool exists () {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
         return (this.database_file != "" && GLib.File.exists (this.database_file));
     }
 
@@ -1119,7 +1119,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void error_blocklist_entry_for_item (SyncJournalErrorBlocklistRecord item) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
 
         GLib.info ("Setting blocklist entry for" + item.file + item.retry_count.to_string ()
                     + item.error_string + item.last_try_time.to_string () + item.ignore_duration.to_string ()
@@ -1161,7 +1161,7 @@ public class SyncJournalDb : GLib.Object {
             return;
         }
 
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
         if (check_connect ()) {
             SqlQuery query = new SqlQuery (this.database);
 
@@ -1177,7 +1177,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void wipe_error_blocklist_category (SyncJournalErrorBlocklistRecord.Category category) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
         if (check_connect ()) {
             SqlQuery query = new SqlQuery (this.database);
 
@@ -1193,7 +1193,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public int wipe_error_blocklist () {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
         if (check_connect ()) {
             SqlQuery query = new SqlQuery (this.database);
 
@@ -1214,7 +1214,7 @@ public class SyncJournalDb : GLib.Object {
     public int on_signal_error_block_list_entry_count () {
         int re = 0;
 
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
         if (check_connect ()) {
             SqlQuery query = new SqlQuery ("SELECT count (*) FROM blocklist", this.database);
 
@@ -1232,7 +1232,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public DownloadInfo get_download_info (string file) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
 
         DownloadInfo download_info;
 
@@ -1259,7 +1259,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void download_info (string file, DownloadInfo i) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
 
         if (!check_connect ()) {
             return;
@@ -1301,9 +1301,9 @@ public class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.List<DownloadInfo> get_and_delete_stale_download_infos (GLib.Set<string> keep) {
+    public GLib.List<DownloadInfo> get_and_delete_stale_download_infos (GLib.List<string> keep) {
         GLib.List<SyncJournalDb.DownloadInfo> empty_result;
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
 
         if (!check_connect ()) {
             return empty_result;
@@ -1345,7 +1345,7 @@ public class SyncJournalDb : GLib.Object {
     public int on_signal_download_info_count () {
         int re = 0;
 
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
         if (check_connect ()) {
             SqlQuery query = new SqlQuery ("SELECT count (*) FROM downloadinfo", this.database);
 
@@ -1363,7 +1363,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public UploadInfo get_upload_info (string file) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
 
         UploadInfo upload_info;
 
@@ -1400,7 +1400,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void upload_info (string file, UploadInfo i) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
 
         if (!check_connect ()) {
             return;
@@ -1442,8 +1442,8 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     Return the list of transfer ids that were removed.
     ***********************************************************/
-    public GLib.List<uint32> delete_stale_upload_infos (GLib.Set<string> keep) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+    public GLib.List<uint32> delete_stale_upload_infos (GLib.List<string> keep) {
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
         GLib.List<uint32> ids;
 
         if (!check_connect ()) {
@@ -1476,7 +1476,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public SyncJournalErrorBlocklistRecord error_blocklist_entry_for_file (string file) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
         SyncJournalErrorBlocklistRecord entry;
 
         if (file == "")
@@ -1508,8 +1508,8 @@ public class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public bool delete_stale_error_blocklist_entries (GLib.Set<string> keep) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+    public bool delete_stale_error_blocklist_entries (GLib.List<string> keep) {
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
 
         if (!check_connect ()) {
             return false;
@@ -1541,7 +1541,7 @@ public class SyncJournalDb : GLib.Object {
     Delete flags table entries that have no metadata correspondent
     ***********************************************************/
     public void delete_stale_flags_entries () {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
         if (!check_connect ())
             return;
 
@@ -1558,7 +1558,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void avoid_renames_on_signal_next_sync (string path) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
 
         if (!check_connect ()) {
             return;
@@ -1578,7 +1578,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void poll_info (PollInfo poll_info) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
         if (!check_connect ()) {
             return;
         }
@@ -1602,7 +1602,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public GLib.List<PollInfo> get_poll_infos () {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
 
         GLib.List<SyncJournalDb.PollInfo> poll_info_list;
 
@@ -1657,7 +1657,7 @@ public class SyncJournalDb : GLib.Object {
         GLib.List<string> result = new GLib.List<string> ()
         //  ASSERT (ok);
 
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
         if (!check_connect ()) {
             *ok = false;
             return result;
@@ -1699,7 +1699,7 @@ public class SyncJournalDb : GLib.Object {
     Write the selective sync list (remove all other entries of that list
     ***********************************************************/
     public void selective_sync_list (SelectiveSyncListType type, GLib.List<string> list) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
         if (!check_connect ()) {
             return;
         }
@@ -1751,7 +1751,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void schedule_path_for_remote_discovery (string filename) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
 
         if (!check_connect ()) {
             return;
@@ -1791,7 +1791,7 @@ public class SyncJournalDb : GLib.Object {
     for all files.
     ***********************************************************/
     public void force_remote_discovery_next_sync () {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
 
         if (!check_connect ()) {
             return;
@@ -1807,7 +1807,7 @@ public class SyncJournalDb : GLib.Object {
     Commit will actually commit the transaction and create a new one.
     ***********************************************************/
     public void commit (string context, bool start_trans = true) {
-        QMutexLocker lock = new QMutexLocker (this.mutex);
+        GLib.MutexLocker lock = new GLib.MutexLocker (this.mutex);
         commit_internal (context, start_trans);
     }
 
@@ -1815,7 +1815,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void commit_if_needed_and_start_new_transaction (string context) {
-        QMutexLocker lock = new QMutexLocker (this.mutex);
+        GLib.MutexLocker lock = new GLib.MutexLocker (this.mutex);
         if (this.transaction == 1) {
             commit_internal (context, true);
         } else {
@@ -1833,7 +1833,7 @@ public class SyncJournalDb : GLib.Object {
     returns true if it could be openend or is currently opened.
     ***********************************************************/
     public bool open () {
-        QMutexLocker lock = new QMutexLocker (this.mutex);
+        GLib.MutexLocker lock = new GLib.MutexLocker (this.mutex);
         return check_connect ();
     }
 
@@ -1843,7 +1843,7 @@ public class SyncJournalDb : GLib.Object {
     ***********************************************************/
     public bool is_open {
         public get {
-            QMutexLocker lock = new QMutexLocker (this.mutex);
+            GLib.MutexLocker lock = new GLib.MutexLocker (this.mutex);
             return this.database.is_open;
         }
     }
@@ -1853,7 +1853,7 @@ public class SyncJournalDb : GLib.Object {
     Close the database
     ***********************************************************/
     public void close () {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
         GLib.info ("Closing DB" + this.database_file);
 
         commit_transaction ();
@@ -1868,7 +1868,7 @@ public class SyncJournalDb : GLib.Object {
     Returns the checksum type for an identifier.
     ***********************************************************/
     public string get_checksum_type (int checksum_type_id) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
         if (!check_connect ()) {
             return "";
         }
@@ -1896,7 +1896,7 @@ public class SyncJournalDb : GLib.Object {
     ***********************************************************/
     string data_fingerprint {
         set {
-            QMutexLocker locker = new QMutexLocker (this.mutex);
+            GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
             if (!check_connect ()) {
                 return;
             }
@@ -1913,7 +1913,7 @@ public class SyncJournalDb : GLib.Object {
             data_fingerprint_query2.exec ();
         }
         get {
-            QMutexLocker locker = new QMutexLocker (this.mutex);
+            GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
             if (!check_connect ()) {
                 return "";
             }
@@ -1943,7 +1943,7 @@ public class SyncJournalDb : GLib.Object {
     Store a new or updated record in the database
     ***********************************************************/
     public void store_conflict_record (ConflictRecord record) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
         if (!check_connect ())
             return;
 
@@ -1969,7 +1969,7 @@ public class SyncJournalDb : GLib.Object {
     public ConflictRecord conflict_record_for_path (string path) {
         ConflictRecord entry;
 
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
         if (!check_connect ()) {
             return entry;
         }
@@ -1994,7 +1994,7 @@ public class SyncJournalDb : GLib.Object {
     conflict tag
     ***********************************************************/
     public void delete_conflict_record (string path) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
         if (!check_connect ())
             return;
 
@@ -2009,7 +2009,7 @@ public class SyncJournalDb : GLib.Object {
     Return all paths of files with a conflict tag in the name and records in the database
     ***********************************************************/
     public GLib.List<string> conflict_record_paths () {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
         if (!check_connect ()) {
             return new GLib.List<string> ();
         }
@@ -2057,7 +2057,7 @@ public class SyncJournalDb : GLib.Object {
     it will be a conflict that will be automatically resolved if the file is the same.
     ***********************************************************/
     public void clear_file_table () {
-        QMutexLocker lock = new QMutexLocker (this.mutex);
+        GLib.MutexLocker lock = new GLib.MutexLocker (this.mutex);
         SqlQuery query = new SqlQuery (this.database);
         query.prepare ("DELETE FROM metadata;");
         query.exec ();
@@ -2071,7 +2071,7 @@ public class SyncJournalDb : GLib.Object {
     The path "" marks everything.
     ***********************************************************/
     public void mark_virtual_file_for_download_recursively (string path) {
-        QMutexLocker lock = new QMutexLocker (this.mutex);
+        GLib.MutexLocker lock = new GLib.MutexLocker (this.mutex);
         if (!check_connect ())
             return;
 
@@ -2116,7 +2116,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private int get_file_record_count () {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
+        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
 
         SqlQuery query = new SqlQuery (this.database);
         query.prepare ("SELECT COUNT (*) FROM metadata");
@@ -2529,8 +2529,9 @@ public class SyncJournalDb : GLib.Object {
         // With WAL journal the NORMAL sync mode is safe from corruption,
         // otherwise use the standard FULL mode.
         string synchronous_mode = "FULL";
-        if (string.from_utf8 (this.journal_mode).compare ("wal", Qt.CaseInsensitive) == 0)
+        if (this.journal_mode.down () == "wal") {
             synchronous_mode = "NORMAL";
+        }
         pragma1.prepare ("PRAGMA synchronous = " + synchronous_mode + ";");
         if (!pragma1.exec ()) {
             return sql_fail ("Set PRAGMA synchronous", pragma1);
@@ -2759,7 +2760,7 @@ public class SyncJournalDb : GLib.Object {
             }
 
             // Not comparing the BUILD identifier here, correct?
-            if (! (major == MIRALL_VERSION_MAJOR && minor == MIRALL_VERSION_MINOR && patch == MIRALL_VERSION_PATCH)) {
+            if (! (major == Common.Version.MIRALL_VERSION_MAJOR && minor == Common.Version.MIRALL_VERSION_MINOR && patch == Common.Version.MIRALL_VERSION_PATCH)) {
                 create_query.prepare (
                     "UPDATE version SET major=?1, minor=?2, patch =?3, custom=?4 "
                     + "WHERE major=?5 AND minor=?6 AND patch=?7;");

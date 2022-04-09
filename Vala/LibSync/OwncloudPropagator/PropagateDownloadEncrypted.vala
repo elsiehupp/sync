@@ -134,14 +134,14 @@ public class PropagateDownloadEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_check_folder_encrypted_metadata (QJsonDocument json) {
+    public void on_signal_check_folder_encrypted_metadata (GLib.JsonDocument json) {
         GLib.debug ("Metadata Received reading: "
                    + this.item.instruction
                    + this.item.file
                    + this.item.encrypted_filename);
         const string filename = this.info.filename ();
-        var meta = new FolderMetadata (this.propagator.account, json.to_json (QJsonDocument.Compact));
-        const GLib.List<EncryptedFile> files = meta.files ();
+        var meta = new FolderMetadata (this.propagator.account, json.to_json (GLib.JsonDocument.Compact));
+        GLib.List<EncryptedFile> files = meta.files ();
 
         const string encrypted_filename = this.item.encrypted_filename.section ("/", -1);
         foreach (EncryptedFile file in files) {

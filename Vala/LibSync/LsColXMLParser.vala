@@ -36,8 +36,8 @@ public class LscolXMLParser : GLib.Object {
 
     bool LscolXMLParser.parse (string xml, GLib.HashTable<string, ExtraFolderInfo> *file_info, string expected_path) {
         // Parse DAV response
-        QXmlStreamReader reader = new QXmlStreamReader (xml);
-        reader.add_extra_namespace_declaration (QXmlStreamNamespaceDeclaration ("d", "DAV:"));
+        GLib.XmlStreamReader reader = new GLib.XmlStreamReader (xml);
+        reader.add_extra_namespace_declaration (GLib.XmlStreamNamespaceDeclaration ("d", "DAV:"));
 
         GLib.List<string> folders = new GLib.List<string> ();
         string current_href;
@@ -49,12 +49,12 @@ public class LscolXMLParser : GLib.Object {
         bool inside_multi_status = false;
 
         while (!reader.at_end ()) {
-            QXmlStreamReader.TokenType type = reader.read_next ();
+            GLib.XmlStreamReader.TokenType type = reader.read_next ();
             string name = reader.name ().to_string ();
             // Start elements with DAV:
-            if (type == QXmlStreamReader.StartElement && reader.namespace_uri () == "DAV:") {
+            if (type == GLib.XmlStreamReader.StartElement && reader.namespace_uri () == "DAV:") {
                 if (name == "href") {
-                    // We don't use URL encoding in our request URL (which is the expected path) (QNAM will do it for us)
+                    // We don't use URL encoding in our request URL (which is the expected path) (GLib.NAM will do it for us)
                     // but the result will have URL encoding..
                     string href_string = GLib.Uri.from_local_file (GLib.Uri.from_percent_encoding (reader.read_element_text ().to_utf8 ()))
                             .adjusted (GLib.Uri.NormalizePathSegments)
@@ -83,7 +83,7 @@ public class LscolXMLParser : GLib.Object {
                 }
             }
 
-            if (type == QXmlStreamReader.StartElement && inside_propstat && inside_prop) {
+            if (type == GLib.XmlStreamReader.StartElement && inside_propstat && inside_prop) {
                 // All those elements are properties
                 string property_content = read_contents_as_string (reader);
                 if (name == "resourcetype" && property_content.contains ("collection")) {
@@ -101,7 +101,7 @@ public class LscolXMLParser : GLib.Object {
             }
 
             // End elements with DAV:
-            if (type == QXmlStreamReader.EndElement) {
+            if (type == GLib.XmlStreamReader.EndElement) {
                 if (reader.namespace_uri () == "DAV:") {
                     if (reader.name () == "response") {
                         if (current_href.has_suffix ("/")) {
@@ -143,17 +143,17 @@ public class LscolXMLParser : GLib.Object {
     supposed to read <D:collection> when pointing to
     <D:resourcetype><D:collection></D:resourcetype>..
     ***********************************************************/
-    private static string read_contents_as_string (QXmlStreamReader reader) {
+    private static string read_contents_as_string (GLib.XmlStreamReader reader) {
         string result;
         int level = 0;
         do {
-            QXmlStreamReader.TokenType type = reader.read_next ();
-            if (type == QXmlStreamReader.StartElement) {
+            GLib.XmlStreamReader.TokenType type = reader.read_next ();
+            if (type == GLib.XmlStreamReader.StartElement) {
                 level++;
                 result += "<" + reader.name ().to_string () + ">";
-            } else if (type == QXmlStreamReader.Characters) {
+            } else if (type == GLib.XmlStreamReader.Characters) {
                 result += reader.text ();
-            } else if (type == QXmlStreamReader.EndElement) {
+            } else if (type == GLib.XmlStreamReader.EndElement) {
                 level--;
                 if (level < 0) {
                     break;

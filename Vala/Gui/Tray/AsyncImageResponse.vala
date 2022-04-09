@@ -5,15 +5,15 @@
 ***********************************************************/
 
 //  #include <Gtk.Image>
-//  #include <QPainter>
-//  #include <QSvgRenderer>
+//  #include <GLib.Painter>
+//  #include <GLib.SvgRenderer>
 //  #include <QtCore>
-//  #include <QQuickImageProvider>
+//  #include <GLib.QuickImageProvider>
 
 namespace Occ {
 namespace Ui {
 
-public class AsyncImageResponse : QQuickImageResponse {
+public class AsyncImageResponse : GLib.QuickImageResponse {
 
     Gtk.Image image;
     GLib.List<string> image_paths;
@@ -47,8 +47,8 @@ public class AsyncImageResponse : QQuickImageResponse {
 
     /***********************************************************
     ***********************************************************/
-    public override QQuickTextureFactory texture_factory () {
-        return QQuickTextureFactory.texture_factory_for_image (this.image);
+    public override GLib.QuickTextureFactory texture_factory () {
+        return GLib.QuickTextureFactory.texture_factory_for_image (this.image);
     }
 
 
@@ -99,12 +99,12 @@ public class AsyncImageResponse : QQuickImageResponse {
             process_next_image ();
         } else {
             if (image_data.has_prefix ("<svg")) {
-                // SVG image needs proper scaling, let's do it with QPainter and QSvgRenderer
-                QSvgRenderer svg_renderer;
+                // SVG image needs proper scaling, let's do it with GLib.Painter and GLib.SvgRenderer
+                GLib.SvgRenderer svg_renderer;
                 if (svg_renderer.on_signal_load (image_data)) {
                     Gtk.Image scaled_svg = new Gtk.Image (this.requested_image_size, Gtk.Image.FormatARGB32);
                     scaled_svg.fill ("transparent");
-                    QPainter painter_for_svg = new QPainter (scaled_svg);
+                    GLib.Painter painter_for_svg = new GLib.Painter (scaled_svg);
                     svg_renderer.render (painter_for_svg);
                     image_and_emit_finished (scaled_svg);
                     return;

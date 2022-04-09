@@ -117,10 +117,10 @@
 			<code>QNetworkReply *</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#post-2"><code>post</code></a><code>(const QNetworkRequest &<i>request</i>, QHttpMultiPart *<i>multiPart</i>)</code>
 		</p>
 		<p>
-			<code>QNetworkProxy</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxy"><code>proxy()</code></a> <code>const</code>
+			<code>Soup.NetworkProxy</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxy"><code>proxy()</code></a> <code>const</code>
 		</p>
 		<p>
-			<code>QNetworkProxyFactory *</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxyFactory"><code>proxyFactory()</code></a> <code>const</code>
+			<code>Soup.NetworkProxyFactory *</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxyFactory"><code>proxyFactory()</code></a> <code>const</code>
 		</p>
 		<p>
 			<code>QNetworkReply *</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#put"><code>put</code></a><code>(const QNetworkRequest &<i>request</i>, QIODevice *<i>data</i>)</code>
@@ -153,10 +153,10 @@
 			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setCookieJar"><code>setCookieJar</code></a><code>(QNetworkCookieJar *<i>cookieJar</i>)</code>
 		</p>
 		<p>
-			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setProxy"><code>setProxy</code></a><code>(const QNetworkProxy &<i>proxy</i>)</code>
+			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setProxy"><code>setProxy</code></a><code>(const Soup.NetworkProxy &<i>proxy</i>)</code>
 		</p>
 		<p>
-			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setProxyFactory"><code>setProxyFactory</code></a><code>(QNetworkProxyFactory *<i>factory</i>)</code>
+			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setProxyFactory"><code>setProxyFactory</code></a><code>(Soup.NetworkProxyFactory *<i>factory</i>)</code>
 		</p>
 		<p>
 			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setRedirectPolicy"><code>setRedirectPolicy</code></a><code>(QNetworkRequest::RedirectPolicy <i>policy</i>)</code>
@@ -192,7 +192,7 @@
 			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#preSharedKeyAuthenticationRequired"><code>preSharedKeyAuthenticationRequired</code></a><code>(QNetworkReply *<i>reply</i>, QSslPreSharedKeyAuthenticator *<i>authenticator</i>)</code>
 		</p>
 		<p>
-			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxyAuthenticationRequired"><code>proxyAuthenticationRequired</code></a><code>(const QNetworkProxy &<i>proxy</i>, QAuthenticator *<i>authenticator</i>)</code>
+			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxyAuthenticationRequired"><code>proxyAuthenticationRequired</code></a><code>(const Soup.NetworkProxy &<i>proxy</i>, QAuthenticator *<i>authenticator</i>)</code>
 		</p>
 		<p>
 			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#sslErrors"><code>sslErrors</code></a><code>(QNetworkReply *<i>reply</i>, const QList&lt;QSslError&gt; &<i>errors</i>)</code>
@@ -253,7 +253,7 @@ connect(reply, &amp;QNetworkReply::sslErrors,
 	this, &amp;MyClass::slotSslErrors);
 		</pre>
 		<p>
-			See also <a href="https://doc.qt.io/qt-5/qnetworkrequest.html"><code>QNetworkRequest</code></a>, <a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a>, and <a href="https://doc.qt.io/qt-5/qnetworkproxy.html"><code>QNetworkProxy</code></a>.
+			See also <a href="https://doc.qt.io/qt-5/qnetworkrequest.html"><code>QNetworkRequest</code></a>, <a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a>, and <a href="https://doc.qt.io/qt-5/qnetworkproxy.html"><code>Soup.NetworkProxy</code></a>.
 		</p>
 		<h2>
 			Member Type Documentation
@@ -428,7 +428,7 @@ connect(reply, &amp;QNetworkReply::sslErrors,
 			See also <a href="https://doc.qt.io/qt-5/qsslpresharedkeyauthenticator.html"><code>QSslPreSharedKeyAuthenticator</code></a>.
 		</p>
 		<h3>
-			<code>[signal] void QNetworkAccessManager::proxyAuthenticationRequired(const</code> <a href="https://doc.qt.io/qt-5/qnetworkproxy.html"><code>QNetworkProxy</code></a> <code>&<i>proxy</i>,</code> <a href="https://doc.qt.io/qt-5/qauthenticator.html"><code>QAuthenticator</code></a> <code>*<i>authenticator</i>)</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxyAuthenticationRequired">¶</a>
+			<code>[signal] void QNetworkAccessManager::proxyAuthenticationRequired(const</code> <a href="https://doc.qt.io/qt-5/qnetworkproxy.html"><code>Soup.NetworkProxy</code></a> <code>&<i>proxy</i>,</code> <a href="https://doc.qt.io/qt-5/qauthenticator.html"><code>QAuthenticator</code></a> <code>*<i>authenticator</i>)</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxyAuthenticationRequired">¶</a>
 		</h3>
 		<p>
 			This signal is emitted whenever a proxy requests authentication and <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> cannot find a valid, cached credential. The slot connected to this signal should fill in the credentials for the proxy <i>proxy</i> in the <i>authenticator</i> object.
@@ -746,16 +746,16 @@ connect(reply, &amp;QNetworkReply::sslErrors,
 			See also <a href="https://doc.qt.io/qt-5/qhttpmultipart.html"><code>QHttpMultiPart</code></a>, <a href="https://doc.qt.io/qt-5/qhttppart.html"><code>QHttpPart</code></a>, and <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#put"><code>put</code></a><code>()</code>.
 		</p>
 		<h3>
-			<a href="https://doc.qt.io/qt-5/qnetworkproxy.html"><code>QNetworkProxy</code></a> QNetworkAccessManager::proxy() const <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxy">¶</a>
+			<a href="https://doc.qt.io/qt-5/qnetworkproxy.html"><code>Soup.NetworkProxy</code></a> QNetworkAccessManager::proxy() const <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxy">¶</a>
 		</h3>
 		<p>
-			Returns the <a href="https://doc.qt.io/qt-5/qnetworkproxy.html"><code>QNetworkProxy</code></a> that the requests sent using this <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> object will use. The default value for the proxy is <a href="https://doc.qt.io/qt-5/qnetworkproxy.html#ProxyType-enum"><code>QNetworkProxy::DefaultProxy</code></a>.
+			Returns the <a href="https://doc.qt.io/qt-5/qnetworkproxy.html"><code>Soup.NetworkProxy</code></a> that the requests sent using this <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> object will use. The default value for the proxy is <a href="https://doc.qt.io/qt-5/qnetworkproxy.html#ProxyType-enum"><code>Soup.NetworkProxy::DefaultProxy</code></a>.
 		</p>
 		<p>
 			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setProxy"><code>setProxy</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setProxyFactory"><code>setProxyFactory</code></a><code>()</code>, and <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxyAuthenticationRequired"><code>proxyAuthenticationRequired</code></a><code>()</code>.
 		</p>
 		<h3>
-			<a href="https://doc.qt.io/qt-5/qnetworkproxyfactory.html"><code>QNetworkProxyFactory</code></a> *QNetworkAccessManager::proxyFactory() const <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxyFactory">¶</a>
+			<a href="https://doc.qt.io/qt-5/qnetworkproxyfactory.html"><code>Soup.NetworkProxyFactory</code></a> *QNetworkAccessManager::proxyFactory() const <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxyFactory">¶</a>
 		</h3>
 		<p>
 			Returns the proxy factory that this <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> object is using to determine the proxies to be used for requests.
@@ -941,7 +941,7 @@ connect(reply, &amp;QNetworkReply::sslErrors,
 			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#cookieJar"><code>cookieJar</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkcookiejar.html#cookiesForUrl"><code>QNetworkCookieJar::cookiesForUrl</code></a><code>()</code>, and <a href="https://doc.qt.io/qt-5/qnetworkcookiejar.html#setCookiesFromUrl"><code>QNetworkCookieJar::setCookiesFromUrl</code></a><code>()</code>.
 		</p>
 		<h3>
-			<code>void QNetworkAccessManager::setProxy(const</code> <a href="https://doc.qt.io/qt-5/qnetworkproxy.html"><code>QNetworkProxy</code></a> <code>&<i>proxy</i>) <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setProxy">¶</a></code>
+			<code>void QNetworkAccessManager::setProxy(const</code> <a href="https://doc.qt.io/qt-5/qnetworkproxy.html"><code>Soup.NetworkProxy</code></a> <code>&<i>proxy</i>) <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setProxy">¶</a></code>
 		</h3>
 		<p>
 			<code>Sets the proxy to be used in future requests to be <i>proxy</i>. This does not affect requests that have already been sent. The <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxyAuthenticationRequired"><code>proxyAuthenticationRequired()</code></a> signal will be emitted if the proxy requests authentication.</code>
@@ -953,7 +953,7 @@ connect(reply, &amp;QNetworkReply::sslErrors,
 			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxy"><code>proxy()</code></a> and <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxyAuthenticationRequired"><code>proxyAuthenticationRequired</code></a><code>()</code>.
 		</p>
 		<h3>
-			<code>void QNetworkAccessManager::setProxyFactory(</code><a href="https://doc.qt.io/qt-5/qnetworkproxyfactory.html"><code>QNetworkProxyFactory</code></a> *<i>factory</i>) <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setProxyFactory">¶</a>
+			<code>void QNetworkAccessManager::setProxyFactory(</code><a href="https://doc.qt.io/qt-5/qnetworkproxyfactory.html"><code>Soup.NetworkProxyFactory</code></a> *<i>factory</i>) <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setProxyFactory">¶</a>
 		</h3>
 		<p>
 			Sets the proxy factory for this class to be <i>factory</i>. A proxy factory is used to determine a more specific list of proxies to be used for a given request, instead of trying to use the same proxy value for all requests.
@@ -965,7 +965,7 @@ connect(reply, &amp;QNetworkReply::sslErrors,
 			For example, a proxy factory could apply the following rules:
 		</p>
 		<ul>
-			<li>if the target address is in the local network (for example, if the hostname contains no dots or if it's an IP address in the organization's range), return <a href="https://doc.qt.io/qt-5/qnetworkproxy.html#ProxyType-enum"><code>QNetworkProxy::NoProxy</code></a>
+			<li>if the target address is in the local network (for example, if the hostname contains no dots or if it's an IP address in the organization's range), return <a href="https://doc.qt.io/qt-5/qnetworkproxy.html#ProxyType-enum"><code>Soup.NetworkProxy::NoProxy</code></a>
 			</li>
 			<li>if the request is FTP, return an FTP proxy
 			</li>

@@ -13,8 +13,8 @@ public class TestFolder : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private TestFolder () {
-        QFETCH (string, folder);
-        QFETCH (string, expected_folder);
+        GLib.FETCH (string, folder);
+        GLib.FETCH (string, expected_folder);
         FolderConnection f = new FolderConnection ("alias", folder, "http://foo.bar.net");
         GLib.assert_true (f.path == expected_folder);
         delete f;
@@ -24,16 +24,16 @@ public class TestFolder : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private TestFolderData () {
-        QTest.add_column<string> ("folder");
-        QTest.add_column<string> ("expected_folder");
+        GLib.Test.add_column<string> ("folder");
+        GLib.Test.add_column<string> ("expected_folder");
 
-        QTest.new_row ("unixcase") + "/foo/bar" + "/foo/bar";
-        QTest.new_row ("doubleslash") + "/foo//bar" + "/foo/bar";
-        QTest.new_row ("tripleslash") + "/foo///bar" + "/foo/bar";
-        QTest.new_row ("mixedslash") + "/foo/\\bar" + "/foo/bar";
-        QTest.new_row ("windowsfwslash") + "C:/foo/bar" + "C:/foo/bar";
-        QTest.new_row ("windowsbwslash") + "C:\\foo" + "C:/foo";
-        QTest.new_row ("windowsbwslash2") + "C:\\foo\\bar" + "C:/foo/bar";
+        GLib.Test.new_row ("unixcase") + "/foo/bar" + "/foo/bar";
+        GLib.Test.new_row ("doubleslash") + "/foo//bar" + "/foo/bar";
+        GLib.Test.new_row ("tripleslash") + "/foo///bar" + "/foo/bar";
+        GLib.Test.new_row ("mixedslash") + "/foo/\\bar" + "/foo/bar";
+        GLib.Test.new_row ("windowsfwslash") + "C:/foo/bar" + "C:/foo/bar";
+        GLib.Test.new_row ("windowsbwslash") + "C:\\foo" + "C:/foo";
+        GLib.Test.new_row ("windowsbwslash2") + "C:\\foo\\bar" + "C:/foo/bar";
     }
 
 } // class TestFolder

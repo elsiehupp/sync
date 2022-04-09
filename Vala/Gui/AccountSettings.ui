@@ -286,7 +286,7 @@
   </customwidget>
   <customwidget>
    <class>OCC::FolderStatusView</class>
-   <extends>QTreeView</extends>
+   <extends>GLib.TreeView</extends>
    <header>folderstatusview.h</header>
   </customwidget>
   <customwidget>

@@ -5,9 +5,9 @@
 ***********************************************************/
 
 //  #include <GLib.FileInfo>
-//  #include <QJsonArray>
+//  #include <GLib.JsonArray>
 //  #include <GLib.Regex>
-//  #include <QTemporaryFile>
+//  #include <GLib.TemporaryFile>
 
 namespace Occ {
 namespace Ui {
@@ -20,7 +20,7 @@ public class SocketUploadJob : GLib.Object {
     private string local_path;
     private string remote_path;
     private string pattern;
-    private QTemporaryFile temporary;
+    private GLib.TemporaryFile temporary;
     private SyncJournalDb database;
     private SyncEngine sync_engine;
     private GLib.List<string> synced_files = new GLib.List<string> ();
@@ -89,7 +89,7 @@ public class SocketUploadJob : GLib.Object {
                     },
                     {
                         "synced_files",
-                        QJsonArray.from_string_list (this.synced_files)
+                        GLib.JsonArray.from_string_list (this.synced_files)
                     }
                 }
             );

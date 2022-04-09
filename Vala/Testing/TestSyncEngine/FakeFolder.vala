@@ -24,7 +24,7 @@ public class FakeFolder : GLib.Object {
         }
     }
 
-    QTemporaryDir temporary_directory;
+    GLib.TemporaryDir temporary_directory;
     public DiskFileModifier local_modifier;
 
     // FIXME: Clarify ownership, double delete
@@ -255,7 +255,7 @@ public class FakeFolder : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void exec_until_before_propagation () {
-        QSignalSpy spy = new QSignalSpy (
+        GLib.SignalSpy spy = new GLib.SignalSpy (
             this.sync_engine.get (),
             this.sync_engine.signal_about_to_propagate
         );
@@ -266,7 +266,7 @@ public class FakeFolder : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void exec_until_item_completed (string relative_path) {
-        QSignalSpy spy = new QSignalSpy (
+        GLib.SignalSpy spy = new GLib.SignalSpy (
             this.sync_engine.get (),
             this.sync_engine.signal_item_completed
         );
@@ -288,7 +288,7 @@ public class FakeFolder : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool exec_until_finished () {
-        QSignalSpy spy = new QSignalSpy (this.sync_engine.get (), SIGNAL (on_signal_finished (bool)));
+        GLib.SignalSpy spy = new GLib.SignalSpy (this.sync_engine.get (), SIGNAL (on_signal_finished (bool)));
         bool ok = spy.wait (3600000);
         GLib.assert_true (ok && "Sync timed out");
         return spy[0][0].to_bool ();

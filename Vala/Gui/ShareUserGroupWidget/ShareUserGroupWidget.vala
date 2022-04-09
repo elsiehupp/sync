@@ -5,27 +5,27 @@
 ***********************************************************/
 
 //  #include <GLib.OutputStream>
-//  #include <QFileIconProvider>
-//  #include <QClipboard>
+//  #include <GLib.FileIconProvider>
+//  #include <GLib.Clipboard>
 //  #include <GLib.FileInfo>
-//  #include <QAbstract_proxy_model>
-//  #include <QCompleter>
-//  #include <QBox_layout>
+//  #include <GLib.Abstract_proxy_model>
+//  #include <GLib.Completer>
+//  #include <GLib.Box_layout>
 //  #include <Gtk.Icon>
-//  #include <QLayout>
-//  #include <QPropertyAnimation>
+//  #include <GLib.Layout>
+//  #include <GLib.PropertyAnimation>
 //  #include <GLib.Menu>
-//  #include <QAction>
-//  #include <QDesktopServices>
-//  #include <QInputDialog>
+//  #include <GLib.Action>
+//  #include <GLib.DesktopServices>
+//  #include <GLib.InputDialog>
 //  #include <Gtk.MessageBox>
-//  #include <QCryptographicHash>
+//  #include <GLib.CryptographicHash>
 //  #include <Gdk.RGBA>
-//  #include <QPainter>
-//  #include <QList_widget>
-//  #include <QSvgRenderer>
-//  #include <QPushButton>
-//  #include <QContext_menu_event>
+//  #include <GLib.Painter>
+//  #include <GLib.List_widget>
+//  #include <GLib.SvgRenderer>
+//  #include <GLib.PushButton>
+//  #include <GLib.Context_menu_event>
 //  #include <cstring>
 //  #include <Gtk.Dialog
 //  #include <Gtk.Wid
@@ -47,7 +47,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private ShareUserGroupWidget instance;
-    private QScroll_area parent_scroll_area;
+    private GLib.Scroll_area parent_scroll_area;
     private unowned Account account;
     private string share_path;
     private string local_path;
@@ -56,7 +56,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private QCompleter completer;
+    private GLib.Completer completer;
     private ShareeModel completer_model;
     private GLib.Timeout completion_timer;
 
@@ -72,7 +72,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private QProgressIndicator pi_sharee;
+    private GLib.ProgressIndicator pi_sharee;
 
     /***********************************************************
     ***********************************************************/
@@ -106,7 +106,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         //Is this a file or folder?
         this.is_file = new GLib.FileInfo (local_path).is_file ();
 
-        this.completer = new QCompleter (this);
+        this.completer = new GLib.Completer (this);
         this.completer_model = new ShareeModel (this.account,
             this.is_file
                 ? "file"
@@ -122,10 +122,10 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
         this.completer.model (this.completer_model);
         this.completer.case_sensitivity (Qt.CaseInsensitive);
-        this.completer.completion_mode (QCompleter.Unfiltered_popup_completion);
+        this.completer.completion_mode (GLib.Completer.Unfiltered_popup_completion);
         this.instance.sharee_line_edit.completer (this.completer);
 
-        var search_globally_action = new QAction (this.instance.sharee_line_edit);
+        var search_globally_action = new GLib.Action (this.instance.sharee_line_edit);
         search_globally_action.icon (Gtk.Icon (":/client/theme/magnifying-glass.svg"));
         search_globally_action.tool_tip (_("Search globally"));
 
@@ -133,7 +133,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
             this.on_search_globally_action
         );
 
-        this.instance.sharee_line_edit.add_action (search_globally_action, QLineEdit.Leading_position);
+        this.instance.sharee_line_edit.add_action (search_globally_action, GLib.LineEdit.Leading_position);
 
         this.manager = new ShareManager (this.account, this);
         this.manager.signal_shares_fetched.connect (
@@ -183,7 +183,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         // Setup the sharee search progress indicator
         //this.instance.sharee_horizontal_layout.add_widget (this.pi_sharee);
 
-        this.parent_scroll_area = parent_widget ().find_child<QScroll_area> ("scroll_area");
+        this.parent_scroll_area = parent_widget ().find_child<GLib.Scroll_area> ("scroll_area");
 
         customize_style ();
     }
@@ -235,10 +235,10 @@ public class ShareUserGroupWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_shares_fetched (GLib.List<unowned Share> shares) {
-        QScroll_area scroll_area = this.parent_scroll_area;
+        GLib.Scroll_area scroll_area = this.parent_scroll_area;
 
         var new_view_port = new Gtk.Widget (scroll_area);
-        var layout = new QVBoxLayout (new_view_port);
+        var layout = new GLib.VBoxLayout (new_view_port);
         layout.contents_margins (0, 0, 0, 0);
         int x = 0;
         int height = 0;
@@ -395,10 +395,10 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_completer_activated (QModelIndex index) {
+    private void on_signal_completer_activated (GLib.ModelIndex index) {
         if (this.disable_completer_activated)
             return;
-        // The index is an index from the QCompletion model which is itelf a proxy
+        // The index is an index from the GLib.Completion model which is itelf a proxy
         // model proxying the this.completer_model
         var sharee = qvariant_cast<unowned Sharee> (index.data (Qt.USER_ROLE));
         if (sharee == null) {
@@ -406,7 +406,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         }
 
     // TODO Progress Indicator where should it go?
-    //    var indicator = new QProgressIndicator (view_port);
+    //    var indicator = new GLib.ProgressIndicator (view_port);
     //    indicator.on_signal_start_animation ();
     //    if (layout.length == 1) {
     //        // No shares yet! Remove the label, add some stretch.
@@ -430,11 +430,11 @@ public class ShareUserGroupWidget : Gtk.Widget {
             bool ok = false;
 
             do {
-                password = QInputDialog.text (
+                password = GLib.InputDialog.text (
                     this,
                     _("Password for share required"),
                     _("Please enter a password for your email share:"),
-                    QLineEdit.Password,
+                    GLib.LineEdit.Password,
                     "",
                     ok);
             } while (password == "" && ok);
@@ -457,7 +457,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_completer_highlighted (QModelIndex index) {
+    private void on_signal_completer_highlighted (GLib.ModelIndex index) {
         // By default the completer would set the text to EditRole,
         // override that here.
         this.instance.sharee_line_edit.on_signal_text (index.data (Qt.Display_role).to_string ());
@@ -482,7 +482,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_adjust_scroll_widget_size () {
-        QScroll_area scroll_area = this.parent_scroll_area;
+        GLib.Scroll_area scroll_area = this.parent_scroll_area;
         const ShareUserLine share_user_line_childs = scroll_area.find_children<ShareUserLine> ();
 
         // Ask the child widgets to calculate their size
@@ -513,7 +513,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
             on_signal_private_link_copy ()
         );
 
-        menu.exec (QCursor.position ());
+        menu.exec (GLib.Cursor.position ());
     }
 
 
@@ -523,7 +523,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         this.pi_sharee.on_signal_stop_animation ();
 
         // Also remove the spinner in the widget list, if any
-        foreach (var progress_indicator in this.parent_scroll_area.find_children<QProgressIndicator> ()) {
+        foreach (var progress_indicator in this.parent_scroll_area.find_children<GLib.ProgressIndicator> ()) {
             delete progress_indicator;
         }
 
@@ -544,7 +544,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_private_link_copy () {
-        Gtk.Application.clipboard ().on_signal_text (this.private_link_url);
+        GLib.Application.clipboard ().on_signal_text (this.private_link_url);
     }
 
 
@@ -563,10 +563,10 @@ public class ShareUserGroupWidget : Gtk.Widget {
     private void customize_style () {
         this.instance.confirm_share.icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
 
-        this.pi_sharee.on_signal_color (Gtk.Application.palette ().color (Gtk.Palette.Text));
+        this.pi_sharee.on_signal_color (GLib.Application.palette ().color (Gtk.Palette.Text));
 
-        foreach (var progress_indicator in this.parent_scroll_area.find_children<QProgressIndicator> ()) {
-            progress_indicator.on_signal_color (Gtk.Application.palette ().color (Gtk.Palette.Text));;
+        foreach (var progress_indicator in this.parent_scroll_area.find_children<GLib.ProgressIndicator> ()) {
+            progress_indicator.on_signal_color (GLib.Application.palette ().color (Gtk.Palette.Text));;
         }
     }
 

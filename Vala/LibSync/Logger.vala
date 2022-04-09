@@ -22,7 +22,7 @@ public class Logger : GLib.Object {
             return this.log_file_object.filename ();
         }
         public set {
-            QMutexLocker locker = new QMutexLocker (&this.mutex);
+            GLib.MutexLocker locker = new GLib.MutexLocker (&this.mutex);
             if (this.logstream != null) {
                 this.logstream.reset (null);
                 this.log_file_object.close ();
@@ -34,10 +34,10 @@ public class Logger : GLib.Object {
 
             bool open_succeeded = false;
             if (value == "-") {
-                open_succeeded = this.log_file_object.open (stdout, QIODevice.WriteOnly);
+                open_succeeded = this.log_file_object.open (stdout, GLib.IODevice.WriteOnly);
             } else {
                 this.log_file_object.filename (value);
-                open_succeeded = this.log_file_object.open (QIODevice.WriteOnly);
+                open_succeeded = this.log_file_object.open (GLib.IODevice.WriteOnly);
             }
 
             if (!open_succeeded) {
@@ -61,7 +61,7 @@ public class Logger : GLib.Object {
             return this.log_debug;
         }
         public set {
-            const GLib.List<string> rules = {value ? "nextcloud.*.debug=true": ""};
+            GLib.List<string> rules = {value ? "nextcloud.*.debug=true": ""};
             if (value) {
                 add_log_rule (rules);
             } else {
@@ -72,7 +72,7 @@ public class Logger : GLib.Object {
     }
 
     private GLib.OutputStream logstream;
-    private /*mutable*/ QMutex mutex;
+    private /*mutable*/ GLib.Mutex mutex;
     public string log_directory;
     private bool temporary_folder_log_dir = false;
 
@@ -88,7 +88,7 @@ public class Logger : GLib.Object {
                 output += p + "\n";
             }
             GLib.debug (temporary);
-            QLoggingCategory.filter_rules (temporary);
+            GLib.LoggingCategory.filter_rules (temporary);
         }
     }
 
@@ -116,7 +116,7 @@ public class Logger : GLib.Object {
     }
 
 
-    private void message_handler (QtMsgType type, QMessageLogContext context, string message) {
+    private void message_handler (QtMsgType type, GLib.MessageLogContext context, string message) {
         Logger.instance.do_log (type, context, message);
     }
 
@@ -139,17 +139,17 @@ public class Logger : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool is_logging_to_file () {
-        QMutexLocker lock = new QMutexLocker (this.mutex);
+        GLib.MutexLocker lock = new GLib.MutexLocker (this.mutex);
         return this.logstream;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void do_log (QtMsgType type, QMessageLogContext context, string message) {
+    public void do_log (QtMsgType type, GLib.MessageLogContext context, string message) {
         const string message = q_format_log_message (type, context, message);
         {
-            QMutexLocker lock = new QMutexLocker (this.mutex);
+            GLib.MutexLocker lock = new GLib.MutexLocker (this.mutex);
             this.crash_log_index = (this.crash_log_index + 1) % CRASH_LOG_SIZE;
             this.crash_log[this.crash_log_index] = message;
             if (this.logstream != null) {
@@ -320,7 +320,7 @@ public class Logger : GLib.Object {
     private static bool compress_log (string original_name, string target_name) {
     // #ifdef ZLIB_FOUND
         GLib.File original = GLib.File.new_for_path (original_name);
-        if (!original.open (QIODevice.ReadOnly))
+        if (!original.open (GLib.IODevice.ReadOnly))
             return false;
         var compressed = gzopen (target_name.to_utf8 (), "wb");
         if (!compressed) {
@@ -346,7 +346,7 @@ public class Logger : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void dump_crash_log () {
-        GLib.File log_file = GLib.File.new_for_path (GLib.Dir.temp_path + "/" + APPLICATION_NAME + "-crash.log");
+        GLib.File log_file = GLib.File.new_for_path (GLib.Dir.temp_path + "/" + Common.Config.APPLICATION_NAME + "-crash.log");
         if (log_file_object.open (GLib.File.WriteOnly)) {
             GLib.OutputStream output = new GLib.OutputStream (&log_file);
             for (int i = 1; i <= CRASH_LOG_SIZE; ++i) {

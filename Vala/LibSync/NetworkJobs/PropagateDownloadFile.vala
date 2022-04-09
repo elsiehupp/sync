@@ -254,7 +254,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
         // file writable if it exists.
         if (this.temporary_file.exists ())
             FileSystem.file_read_only (this.temporary_file.filename (), false);
-        if (!this.temporary_file.open (QIODevice.Append | QIODevice.Unbuffered)) {
+        if (!this.temporary_file.open (GLib.IODevice.Append | GLib.IODevice.Unbuffered)) {
             GLib.warning ("could not open temporary file" + this.temporary_file.filename ());
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR, this.temporary_file.error_string);
             return;
@@ -373,7 +373,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
                 return;
             }
 
-            // This gives a custom QNAM (by the user of libowncloudsync) to abort () a GLib.InputStream in its meta_data_changed () slot and
+            // This gives a custom GLib.NAM (by the user of libowncloudsync) to abort () a GLib.InputStream in its meta_data_changed () slot and
             // set a custom error string to make this a soft error. In contrast to the default hard error this won't bring down
             // the whole sync and allows for a custom error message.
             GLib.InputStream reply = get_file_job.input_stream;
@@ -437,7 +437,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
 
         // Qt removes the content-length header for transparently decompressed HTTP1 replies
         // but not for HTTP2 or SPDY replies. For these it remains and contains the size
-        // of the compressed data. See QTBUG-73364.
+        // of the compressed data. See GLib.TBUG-73364.
         var content_encoding = get_file_job.input_stream.raw_header ("content-encoding").down ();
         if ( (content_encoding == "gzip" || content_encoding == "deflate")
             && (get_file_job.input_stream.attribute (Soup.Request.HTTP2WasUsedAttribute).to_bool ()
@@ -932,7 +932,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
         GLib.debug ("Handling recall file: " + file_path);
 
         GLib.File file = GLib.File.new_for_path (file_path);
-        if (!file.open (QIODevice.ReadOnly)) {
+        if (!file.open (GLib.IODevice.ReadOnly)) {
             GLib.warning ("Could not open recall file: " + file.error_string);
             return;
         }

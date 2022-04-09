@@ -16,7 +16,7 @@ public class PushNotificationManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private Account account = null;
-    private QWebSocket web_socket;
+    private GLib.WebSocket web_socket;
     private uint8 failed_authentication_attempts_count = 0;
     private GLib.Timeout reconnect_timer = null;
 
@@ -83,7 +83,7 @@ public class PushNotificationManager : GLib.Object {
         this.account = account;
         this.reconnect_timer_interval = 20 * 1000;
         this.is_ready = false;
-        this.web_socket = new QWebSocket ("", QWeb_socket_protocol.Version_latest, this);
+        this.web_socket = new GLib.WebSocket ("", GLib.Web_socket_protocol.Version_latest, this);
         this.web_socket.error.connect (
             this.on_signal_web_socket_error
         );
@@ -186,11 +186,11 @@ public class PushNotificationManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_web_socket_error (QAbstractSocket.SocketError error) {
+    private void on_signal_web_socket_error (GLib.AbstractSocket.SocketError error) {
         // This error gets thrown in test_setup_max_connection_attempts_reached_delete_push_notifications after
         // the second connection attempt. I have no idea why this happens. Maybe the socket gets not closed correctly?
         // I think it's fine to ignore this error.
-        if (error == QAbstractSocket.UnfinishedSocketOperationError) {
+        if (error == GLib.AbstractSocket.UnfinishedSocketOperationError) {
             return;
         }
 
@@ -274,8 +274,8 @@ public class PushNotificationManager : GLib.Object {
             this.reconnect_timer.stop ();
         }
 
-        disconnect (this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWebSocket.error), this, PushNotificationManager.on_signal_web_socket_error);
-        disconnect (this.web_socket, QWebSocket.signal_ssl_errors, this, PushNotificationManager.on_signal_web_socket_ssl_errors);
+        disconnect (this.web_socket, GLib.Overload<GLib.AbstractSocket.SocketError>.of (&GLib.WebSocket.error), this, PushNotificationManager.on_signal_web_socket_error);
+        disconnect (this.web_socket, GLib.WebSocket.signal_ssl_errors, this, PushNotificationManager.on_signal_web_socket_ssl_errors);
 
         this.web_socket.close ();
     }

@@ -1,6 +1,6 @@
 
 //  #include <QtCore>
-//  #include <QJsonDocument>
+//  #include <GLib.JsonDocument>
 //  #include <Json.Object>
 
 namespace Occ {
@@ -68,7 +68,7 @@ public class ServerNotificationHandler : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_notifications_received (QJsonDocument json, int status_code) {
+    private void on_signal_notifications_received (GLib.JsonDocument json, int status_code) {
         if (status_code != SUCCESS_STATUS_CODE && status_code != NOT_MODIFIED_STATUS_CODE) {
             GLib.warning ("Notifications failed with status code " + status_code.to_string ());
             delete_later ();

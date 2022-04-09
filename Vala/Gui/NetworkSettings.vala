@@ -4,7 +4,7 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QNetworkProxy>
+//  #include <Soup.NetworkProxy>
 //  #include <Gtk.Widget>
 
 namespace Occ {
@@ -31,8 +31,8 @@ public class NetworkSettings : Gtk.Widget {
         this.instance.user_line_edit.placeholder_text (_("Username for proxy server"));
         this.instance.password_line_edit.placeholder_text (_("Password for proxy server"));
 
-        this.instance.type_combo_box.add_item (_("HTTP (S) proxy"), QNetworkProxy.HttpProxy);
-        this.instance.type_combo_box.add_item (_("SOCKS5 proxy"), QNetworkProxy.Socks5Proxy);
+        this.instance.type_combo_box.add_item (_("HTTP (S) proxy"), Soup.NetworkProxy.HttpProxy);
+        this.instance.type_combo_box.add_item (_("SOCKS5 proxy"), Soup.NetworkProxy.Socks5Proxy);
 
         this.instance.auth_requiredcheck_box.enabled (true);
 
@@ -115,10 +115,10 @@ public class NetworkSettings : Gtk.Widget {
     }
 
 
-    private delegate void CurrentIndexChanged (QComboBox box, int index);
-    private delegate void ProxyButtonGroupClicked (QButtonGroup group, int index);
-    private delegate void DownloadSpinBoxValueChanged (QSpinBox spin_box, int value);
-    private delegate void UploadSpinBoxValueChanged (QSpinBox spin_box, int value);
+    private delegate void CurrentIndexChanged (GLib.ComboBox box, int index);
+    private delegate void ProxyButtonGroupClicked (GLib.ButtonGroup group, int index);
+    private delegate void DownloadSpinBoxValueChanged (GLib.SpinBox spin_box, int value);
+    private delegate void UploadSpinBoxValueChanged (GLib.SpinBox spin_box, int value);
 
 
     override ~NetworkSettings () {
@@ -170,14 +170,14 @@ public class NetworkSettings : Gtk.Widget {
 
         on_signal_check_empty_proxy_host ();
         if (this.instance.no_proxy_radio_button.is_checked ()) {
-            config_file.proxy_type (QNetworkProxy.NoProxy);
+            config_file.proxy_type (Soup.NetworkProxy.NoProxy);
         } else if (this.instance.system_proxy_radio_button.is_checked ()) {
-            config_file.proxy_type (QNetworkProxy.DefaultProxy);
+            config_file.proxy_type (Soup.NetworkProxy.DefaultProxy);
         } else if (this.instance.manual_proxy_radio_button.is_checked ()) {
             int type = this.instance.type_combo_box.item_data (this.instance.type_combo_box.current_index ()).to_int ();
             string host = this.instance.host_line_edit.text ();
             if (host == "")
-                type = QNetworkProxy.NoProxy;
+                type = Soup.NetworkProxy.NoProxy;
             bool needs_auth = this.instance.auth_requiredcheck_box.is_checked ();
             string user = this.instance.user_line_edit.text ();
             string pass = this.instance.password_line_edit.text ();
@@ -259,7 +259,7 @@ public class NetworkSettings : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    protected override void show_event (QShowEvent event) {
+    protected override void show_event (GLib.ShowEvent event) {
         if (!event.spontaneous ()
             && this.instance.manual_proxy_radio_button.is_checked ()
             && this.instance.host_line_edit.text () == "") {
@@ -285,14 +285,14 @@ public class NetworkSettings : Gtk.Widget {
         ConfigFile config_file;
         int type = config_file.proxy_type ();
         switch (type) {
-        case QNetworkProxy.NoProxy:
+        case Soup.NetworkProxy.NoProxy:
             this.instance.no_proxy_radio_button.checked (true);
             break;
-        case QNetworkProxy.DefaultProxy:
+        case Soup.NetworkProxy.DefaultProxy:
             this.instance.system_proxy_radio_button.checked (true);
             break;
-        case QNetworkProxy.Socks5Proxy:
-        case QNetworkProxy.HttpProxy:
+        case Soup.NetworkProxy.Socks5Proxy:
+        case Soup.NetworkProxy.HttpProxy:
             this.instance.type_combo_box.current_index (this.instance.type_combo_box.find_data (type));
             this.instance.manual_proxy_radio_button.checked (true);
             break;

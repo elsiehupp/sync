@@ -12,47 +12,47 @@ This file is part of the Qt Library
 public class TestTokenizer : GLib.Object {
 
     const string SIMPLE = "A SIMPLE tokenizer test";
-    const string QUOTED = "\"Wait for me!\" he shouted";
+    const string GLib.UOTED = "\"Wait for me!\" he shouted";
 
     /***********************************************************
     ***********************************************************/
     private void on_tokenize_q_string_SIMPLE () {
-        QStringTokenizer tokenizer = new QStringTokenizer (SIMPLE, " ");
+        GLib.StringTokenizer tokenizer = new GLib.StringTokenizer (SIMPLE, " ");
 
-        QCOMPARE (tokenizer.has_next (), true);
-        QCOMPARE (tokenizer.next (), "A");
+        GLib.COMPARE (tokenizer.has_next (), true);
+        GLib.COMPARE (tokenizer.next (), "A");
 
-        QCOMPARE (tokenizer.has_next (), true);
-        QCOMPARE (tokenizer.next (), "SIMPLE");
+        GLib.COMPARE (tokenizer.has_next (), true);
+        GLib.COMPARE (tokenizer.next (), "SIMPLE");
 
-        QCOMPARE (tokenizer.has_next (), true);
-        QCOMPARE (tokenizer.next (), "tokenizer");
+        GLib.COMPARE (tokenizer.has_next (), true);
+        GLib.COMPARE (tokenizer.next (), "tokenizer");
 
-        QCOMPARE (tokenizer.has_next (), true);
-        QCOMPARE (tokenizer.next (), "test");
+        GLib.COMPARE (tokenizer.has_next (), true);
+        GLib.COMPARE (tokenizer.next (), "test");
 
-        QCOMPARE (tokenizer.has_next (), false);
+        GLib.COMPARE (tokenizer.has_next (), false);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_tokenize_q_string_SIMPLE_ref () {
-        QStringTokenizer tokenizer = new QStringTokenizer (SIMPLE, " ");
+        GLib.StringTokenizer tokenizer = new GLib.StringTokenizer (SIMPLE, " ");
 
-        QCOMPARE (tokenizer.has_next (), true);
-        QVERIFY (tokenizer.string_ref () == "A");
+        GLib.COMPARE (tokenizer.has_next (), true);
+        GLib.VERIFY (tokenizer.string_ref () == "A");
 
-        QCOMPARE (tokenizer.has_next (), true);
-        QVERIFY (tokenizer.string_ref () == "SIMPLE");
+        GLib.COMPARE (tokenizer.has_next (), true);
+        GLib.VERIFY (tokenizer.string_ref () == "SIMPLE");
 
-        QCOMPARE (tokenizer.has_next (), true);
-        QVERIFY (tokenizer.string_ref () == "tokenizer");
+        GLib.COMPARE (tokenizer.has_next (), true);
+        GLib.VERIFY (tokenizer.string_ref () == "tokenizer");
 
-        QCOMPARE (tokenizer.has_next (), true);
-        QVERIFY (tokenizer.string_ref () == "test");
+        GLib.COMPARE (tokenizer.has_next (), true);
+        GLib.VERIFY (tokenizer.string_ref () == "test");
 
-        QCOMPARE (tokenizer.has_next (), false);
+        GLib.COMPARE (tokenizer.has_next (), false);
     }
 
 
@@ -60,14 +60,14 @@ public class TestTokenizer : GLib.Object {
     ***********************************************************/
     private void on_tokenize_q_string_quoted () {
         const string multiquote = "\"'Billy - the Kid' is dead!\"";
-        QStringTokenizer tokenizer = new QStringTokenizer (multiquote, " -");
+        GLib.StringTokenizer tokenizer = new GLib.StringTokenizer (multiquote, " -");
         tokenizer.set_quote_characters ("\"");
         tokenizer.set_return_quote_characters (true);
 
-        QCOMPARE (tokenizer.has_next (), true);
-        QCOMPARE (tokenizer.next (), "\"'Billy - the Kid' is dead!\"");
+        GLib.COMPARE (tokenizer.has_next (), true);
+        GLib.COMPARE (tokenizer.next (), "\"'Billy - the Kid' is dead!\"");
 
-        QCOMPARE (tokenizer.has_next (), false);
+        GLib.COMPARE (tokenizer.has_next (), false);
     }
 
 
@@ -75,15 +75,15 @@ public class TestTokenizer : GLib.Object {
     ***********************************************************/
     private void on_tokenize_q_string_skip_quotes () {
         const string multiquote = "\"'Billy - the Kid' is dead!\"";
-        QStringTokenizer tokenizer = new QStringTokenizer (multiquote, " ");
+        GLib.StringTokenizer tokenizer = new GLib.StringTokenizer (multiquote, " ");
         tokenizer.set_quote_characters ("\"");
         tokenizer.set_return_quote_characters (false);
 
-        QCOMPARE (tokenizer.has_next (), true);
-        QCOMPARE (tokenizer.next (), "'Billy - the Kid' is dead!");
-        QCOMPARE (tokenizer.string_ref ().to_string (), "'Billy - the Kid' is dead!");
+        GLib.COMPARE (tokenizer.has_next (), true);
+        GLib.COMPARE (tokenizer.next (), "'Billy - the Kid' is dead!");
+        GLib.COMPARE (tokenizer.string_ref ().to_string (), "'Billy - the Kid' is dead!");
 
-        QCOMPARE (tokenizer.has_next (), false);
+        GLib.COMPARE (tokenizer.has_next (), false);
     }
 
 
@@ -91,37 +91,37 @@ public class TestTokenizer : GLib.Object {
     ***********************************************************/
     private void on_tokenize_q_string_with_delims () {
         const string delims = "I;Insist,On/a-Delimiter";
-        QStringTokenizer tokenizer = new QStringTokenizer (delims, ";,/-");
+        GLib.StringTokenizer tokenizer = new GLib.StringTokenizer (delims, ";,/-");
         tokenizer.set_return_delimiters (true);
 
-        QCOMPARE (tokenizer.has_next (), true);
-        QCOMPARE (tokenizer.is_delimiter (), false);
+        GLib.COMPARE (tokenizer.has_next (), true);
+        GLib.COMPARE (tokenizer.is_delimiter (), false);
 
-        QCOMPARE (tokenizer.has_next (), true);
-        QCOMPARE (tokenizer.is_delimiter (), true);
+        GLib.COMPARE (tokenizer.has_next (), true);
+        GLib.COMPARE (tokenizer.is_delimiter (), true);
 
-        QCOMPARE (tokenizer.has_next (), true);
-        QCOMPARE (tokenizer.is_delimiter (), false);
+        GLib.COMPARE (tokenizer.has_next (), true);
+        GLib.COMPARE (tokenizer.is_delimiter (), false);
 
-        QCOMPARE (tokenizer.has_next (), true);
-        QCOMPARE (tokenizer.is_delimiter (), true);
+        GLib.COMPARE (tokenizer.has_next (), true);
+        GLib.COMPARE (tokenizer.is_delimiter (), true);
 
-        QCOMPARE (tokenizer.has_next (), true);
-        QCOMPARE (tokenizer.is_delimiter (), false);
+        GLib.COMPARE (tokenizer.has_next (), true);
+        GLib.COMPARE (tokenizer.is_delimiter (), false);
 
-        QCOMPARE (tokenizer.has_next (), true);
-        QCOMPARE (tokenizer.is_delimiter (), true);
+        GLib.COMPARE (tokenizer.has_next (), true);
+        GLib.COMPARE (tokenizer.is_delimiter (), true);
 
-        QCOMPARE (tokenizer.has_next (), true);
-        QCOMPARE (tokenizer.is_delimiter (), false);
+        GLib.COMPARE (tokenizer.has_next (), true);
+        GLib.COMPARE (tokenizer.is_delimiter (), false);
 
-        QCOMPARE (tokenizer.has_next (), true);
-        QCOMPARE (tokenizer.is_delimiter (), true);
+        GLib.COMPARE (tokenizer.has_next (), true);
+        GLib.COMPARE (tokenizer.is_delimiter (), true);
 
-        QCOMPARE (tokenizer.has_next (), true);
-        QCOMPARE (tokenizer.is_delimiter (), false);
+        GLib.COMPARE (tokenizer.has_next (), true);
+        GLib.COMPARE (tokenizer.is_delimiter (), false);
 
-        QCOMPARE (tokenizer.has_next (), false);
+        GLib.COMPARE (tokenizer.has_next (), false);
     }
 
 
@@ -129,21 +129,21 @@ public class TestTokenizer : GLib.Object {
     ***********************************************************/
     private void on_reset_tokenizer () {
         for (int i = 0; i < 2; i++) {
-            QStringTokenizer tokenizer = new QStringTokenizer (SIMPLE, " ");
+            GLib.StringTokenizer tokenizer = new GLib.StringTokenizer (SIMPLE, " ");
 
-            QCOMPARE (tokenizer.has_next (), true);
-            QCOMPARE (tokenizer.next (), "A");
+            GLib.COMPARE (tokenizer.has_next (), true);
+            GLib.COMPARE (tokenizer.next (), "A");
 
-            QCOMPARE (tokenizer.has_next (), true);
-            QCOMPARE (tokenizer.next (), "SIMPLE");
+            GLib.COMPARE (tokenizer.has_next (), true);
+            GLib.COMPARE (tokenizer.next (), "SIMPLE");
 
-            QCOMPARE (tokenizer.has_next (), true);
-            QCOMPARE (tokenizer.next (), "tokenizer");
+            GLib.COMPARE (tokenizer.has_next (), true);
+            GLib.COMPARE (tokenizer.next (), "tokenizer");
 
-            QCOMPARE (tokenizer.has_next (), true);
-            QCOMPARE (tokenizer.next (), "test");
+            GLib.COMPARE (tokenizer.has_next (), true);
+            GLib.COMPARE (tokenizer.next (), "test");
 
-            QCOMPARE (tokenizer.has_next (), false);
+            GLib.COMPARE (tokenizer.has_next (), false);
 
             tokenizer.on_reset ();
         }

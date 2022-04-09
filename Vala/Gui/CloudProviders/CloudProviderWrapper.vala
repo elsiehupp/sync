@@ -10,7 +10,7 @@
 //  #include <account.h
 //  #include <folder_connection.h>
 //  #include <accountstate.h>
-//  #include <QDesktopServices>
+//  #include <GLib.DesktopServices>
 
 namespace Occ {
 namespace Ui {
@@ -111,7 +111,7 @@ public class CloudProviderWrapper : GLib.Object {
 
     private CloudProvidersProviderExporter cloud_provider;
     private CloudProvidersAccountExporter cloud_provider_account;
-    private GLib.List<QPair<string, string>> recently_changed;
+    private GLib.List<GLib.Pair<string, string>> recently_changed;
     private bool paused;
     private GLib.Menu main_menu = null;
     private GLib.Menu recent_menu = null;
@@ -282,7 +282,7 @@ public class CloudProviderWrapper : GLib.Object {
         // Build recently changed files list
         if (!progress.last_completed_item == "" && should_show_in_recents_menu (progress.last_completed_item)) {
             string kind_str = Progress.as_result_string (progress.last_completed_item);
-            string time_str = QTime.current_time ().to_string ("hh:mm");
+            string time_str = GLib.Time.current_time ().to_string ("hh:mm");
             string action_text = _("%1 (%2, %3)").printf (progress.last_completed_item.file, kind_str, time_str);
             if (f) {
                 string full_path = f.path + "/" + progress.last_completed_item.file;
@@ -420,7 +420,7 @@ public class CloudProviderWrapper : GLib.Object {
         }
 
         if (g_str_equal (name, "openwebsite")) {
-            QDesktopServices.open_url (self.folder_connection.account_state.account.url);
+            GLib.DesktopServices.open_url (self.folder_connection.account_state.account.url);
         }
 
         if (g_str_equal (name, "openfolder")) {
@@ -449,7 +449,7 @@ public class CloudProviderWrapper : GLib.Object {
         //  Q_UNUSED (action);
         //  Q_UNUSED (parameter);
         var self = static_cast<CloudProviderWrapper> (user_data);
-        QDesktopServices.open_url (self.folder_connection.account_state.account.url);
+        GLib.DesktopServices.open_url (self.folder_connection.account_state.account.url);
     }
 
 } // class CloudProviderWrapper

@@ -16,13 +16,13 @@ public class TestSha1Calc : AbstractTestChecksumValidator {
         GLib.assert_true (file_info.exists ());
 
         GLib.File file_device = new GLib.File (file);
-        file_device.open (QIODevice.ReadOnly);
+        file_device.open (GLib.IODevice.ReadOnly);
         string sum = calc_sha1 (file_device);
         file_device.close ();
 
         string s_sum = shell_sum ("sha1sum", file);
         if (s_sum == "") {
-            QSKIP ("Couldn't execute sha1sum to calculate checksum, executable missing?", SkipSingle);
+            GLib.SKIP ("Couldn't execute sha1sum to calculate checksum, executable missing?", SkipSingle);
         }
 
         GLib.assert_true (sum != "");

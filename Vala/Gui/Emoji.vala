@@ -19,13 +19,13 @@ public class Emoji : GLib.Object {
         this.is_custom = is_custom;
     }
 
-    //  friend QDataStream operator<< (QDataStream arch, Emoji object) {
+    //  friend GLib.DataStream operator<< (GLib.DataStream arch, Emoji object) {
     //      arch + object.unicode;
     //      arch + object.shortname;
     //      return arch;
     //  }
 
-    //  friend QDataStream operator>> (QDataStream arch, Emoji object) {
+    //  friend GLib.DataStream operator>> (GLib.DataStream arch, Emoji object) {
     //      arch >> object.unicode;
     //      arch >> object.shortname;
     //      object.is_custom = object.unicode.has_prefix ("image://");

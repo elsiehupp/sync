@@ -4,17 +4,17 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QQuickImageProvider>
+//  #include <GLib.QuickImageProvider>
 
 namespace Occ {
 namespace Ui {
 
-public class SvgImageProvider : QQuickImageProvider {
+public class SvgImageProvider : GLib.QuickImageProvider {
 
     /***********************************************************
     ***********************************************************/
     public SvgImageProvider () {
-        base (QQuickImageProvider.Image);
+        base (GLib.QuickImageProvider.Image);
     }
 
 
@@ -31,7 +31,7 @@ public class SvgImageProvider : QQuickImageProvider {
         }
 
         const var pixmap_name = id_split.at (0);
-        const var pixmap_color = id_split.size () > 1 ? Gdk.RGBA (id_split.at (1)) : QColor_constants.Svg.black;
+        const var pixmap_color = id_split.size () > 1 ? Gdk.RGBA (id_split.at (1)) : GLib.Color_constants.Svg.black;
 
         if (pixmap_name == "" || !pixmap_color.is_valid) {
             GLib.warning ("Image identifier is incorrect!");

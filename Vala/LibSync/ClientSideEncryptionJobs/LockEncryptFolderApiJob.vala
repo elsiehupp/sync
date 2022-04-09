@@ -29,7 +29,7 @@ public class LockEncryptFolderApiJob : AbstractNetworkJob {
     public new void start () {
         Soup.Request request = new Soup.Request ();
         request.raw_header ("OCS-APIREQUEST", "true");
-        QUrlQuery query;
+        GLib.UrlQuery query;
         query.add_query_item ("format", "json");
         GLib.Uri url = Utility.concat_url_path (account.url, this.path);
         url.query (query);
@@ -48,7 +48,7 @@ public class LockEncryptFolderApiJob : AbstractNetworkJob {
         }
 
         Json.ParserError error;
-        var json = QJsonDocument.from_json (this.reply.read_all (), error);
+        var json = GLib.JsonDocument.from_json (this.reply.read_all (), error);
         var object = json.object ().to_variant_map ();
         var token = object["ocs"].to_map ()["data"].to_map ()["e2e-token"].to_byte_array ();
         GLib.info ("Got json: " + token);

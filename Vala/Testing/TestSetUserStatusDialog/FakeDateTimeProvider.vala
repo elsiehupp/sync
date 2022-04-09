@@ -25,8 +25,8 @@ public class AbstractDateTimeProvider : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public virtual QDate current_date () {
-        return QDate.current_date ();
+    public virtual GLib.Date current_date () {
+        return GLib.Date.current_date ();
     }
 
 } // class GLib.DateTime
@@ -50,7 +50,7 @@ public class FakeDateTimeProvider : AbstractDateTimeProvider {
 
     /***********************************************************
     ***********************************************************/
-    public override QDate current_date () {
+    public override GLib.Date current_date () {
         return this.date_time.date ();
     }
 
@@ -83,8 +83,8 @@ public class FakeDateTimeProvider : AbstractDateTimeProvider {
     static GLib.DateTime create_date_time (
         int year = 2021, int month = 7, int day = 27,
         int hour = 12, int minute = 0, int second = 0) {
-        QDate fake_date = new QDate (year, month, day);
-        QTime fake_time = new QTime (hour, minute, second);
+        GLib.Date fake_date = new GLib.Date (year, month, day);
+        GLib.Time fake_time = new GLib.Time (hour, minute, second);
         GLib.DateTime fake_date_time;
 
         fake_date_time.set_date (fake_date);

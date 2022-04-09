@@ -15,7 +15,7 @@ public class QtLocalPeer : GLib.Object {
 
     protected string identifier;
     protected string socket_name;
-    protected QLocalServer server;
+    protected GLib.LocalServer server;
 
     internal signal void signal_message_received (string message, GLib.Object socket);
 
@@ -25,18 +25,18 @@ public class QtLocalPeer : GLib.Object {
         base (parent);
         this.identifier = app_id;
         if (identifier == "") {
-            identifier = Gtk.Application.application_file_path;  //### On win, check if this returns .../argv[0] without casefolding; .\MYAPP == .\myapp on Win
+            identifier = GLib.Application.application_file_path;  //### On win, check if this returns .../argv[0] without casefolding; .\MYAPP == .\myapp on Win
         }
 
         socket_name = app_session_id (identifier);
-        server = new QLocalServer (this);
+        server = new GLib.LocalServer (this);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool is_client () {
-        if (!QLocalServer.remove_server (socket_name)) {
+        if (!GLib.LocalServer.remove_server (socket_name)) {
             GLib.warning ("QtSingleCoreApplication: could not on_cleanup socket");
         }
         bool res = server.listen (socket_name);
@@ -56,7 +56,7 @@ public class QtLocalPeer : GLib.Object {
         if (!is_client ())
             return false;
 
-        QLocalSocket socket;
+        GLib.LocalSocket socket;
         bool conn_ok = false;
         for (int i = 0; i < 2; i++) {
             // Try twice, in case the other instance is just starting up
@@ -76,7 +76,7 @@ public class QtLocalPeer : GLib.Object {
         }
 
         string u_msg = message.to_utf8 ();
-        QDataStream ds = new QDataStream (socket);
+        GLib.DataStream ds = new GLib.DataStream (socket);
         ds.write_bytes (u_msg.const_data (), u_msg.length);
         bool res = socket.wait_for_bytes_written (timeout);
         res &= socket.wait_for_ready_read (timeout); // wait for ACK
@@ -110,7 +110,7 @@ public class QtLocalPeer : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_receive_connection () {
-        QLocalSocket socket = server.next_pending_connection ();
+        GLib.LocalSocket socket = server.next_pending_connection ();
         if (!socket) {
             return;
         }
@@ -121,7 +121,7 @@ public class QtLocalPeer : GLib.Object {
                 return;
             socket.wait_for_ready_read (1000);
         }
-        QDataStream ds = new QDataStream (socket);
+        GLib.DataStream ds = new GLib.DataStream (socket);
         string u_msg;
         uint32 remaining = 0;
         ds >> remaining;

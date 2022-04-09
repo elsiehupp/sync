@@ -64,10 +64,10 @@ public class AvatarJob : AbstractNetworkJob {
         Gtk.Image avatar = new Gtk.Image (dim, dim, Gtk.Image.FormatARGB32);
         avatar.fill (Qt.transparent);
 
-        QPainter painter = new QPainter (&avatar);
-        painter.render_hint (QPainter.Antialiasing);
+        GLib.Painter painter = new GLib.Painter (&avatar);
+        painter.render_hint (GLib.Painter.Antialiasing);
 
-        QPainterPath path;
+        GLib.PainterPath path;
         path.add_ellipse (0, 0, dim, dim);
         painter.clip_path (path);
 

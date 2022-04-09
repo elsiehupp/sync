@@ -13,7 +13,7 @@ namespace Ui {
 @brief The FormatWarningsWizardPage class
 @ingroup gui
 ***********************************************************/
-public class FormatWarningsWizardPage : QWizardPage {
+public class FormatWarningsWizardPage : GLib.WizardPage {
 
     protected static string format_warnings (GLib.List<string> warnings) {
         string ret;

@@ -53,7 +53,7 @@ public class SqliteDatabase : GLib.Object {
     /***********************************************************
     ***********************************************************/
     //  private friend class SqlQuery;
-    private GLib.Set<SqlQuery> queries;
+    private GLib.List<SqlQuery> queries;
 
     /***********************************************************
     ***********************************************************/

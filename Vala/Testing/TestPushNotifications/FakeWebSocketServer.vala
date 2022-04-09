@@ -13,21 +13,21 @@ public class FakeWebSocketServer : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private QWebSocketServer web_socket_server;
+    private GLib.WebSocketServer web_socket_server;
 
     /***********************************************************
     ***********************************************************/
-    private QSignalSpy process_text_message_spy;
+    private GLib.SignalSpy process_text_message_spy;
 
     internal signal void signal_closed ();
-    internal signal void signal_process_text_message (QWebSocket sender, string message);
+    internal signal void signal_process_text_message (GLib.WebSocket sender, string message);
 
     /***********************************************************
     ***********************************************************/
     public FakeWebSocketServer (uint16 port = 12345, GLib.Object parent = new GLib.Object ()) {
         base (parent);
-        this.web_socket_server = new QWebSocketServer ("Fake Server", QWebSocketServer.NonSecureMode, this);
-        if (!this.web_socket_server.listen (QHostAddress.Any, port)) {
+        this.web_socket_server = new GLib.WebSocketServer ("Fake Server", GLib.WebSocketServer.NonSecureMode, this);
+        if (!this.web_socket_server.listen (GLib.HostAddress.Any, port)) {
             Q_UNREACHABLE ();
         }
         this.web_socket_server.new_connection.connect (
@@ -37,7 +37,7 @@ public class FakeWebSocketServer : GLib.Object {
             this.signal_closed
         );
         GLib.info ("Open fake websocket server on port: " + port.to_string ());
-        this.process_text_message_spy = std.make_unique<QSignalSpy> (this, &FakeWebSocketServer.signal_process_text_message);
+        this.process_text_message_spy = std.make_unique<GLib.SignalSpy> (this, &FakeWebSocketServer.signal_process_text_message);
     }
 
     ~FakeWebSocketServer () {
@@ -49,10 +49,10 @@ public class FakeWebSocketServer : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public QWebSocket authenticate_account (Account account, BeforeAuthentication before_authentication, AfterAuthentication after_authentication) {
+    public GLib.WebSocket authenticate_account (Account account, BeforeAuthentication before_authentication, AfterAuthentication after_authentication) {
         var push_notifications = account.push_notifications ();
         GLib.assert_true (push_notifications);
-        QSignalSpy ready_spy = new QSignalSpy (push_notifications, &PushNotificationManager.ready);
+        GLib.SignalSpy ready_spy = new GLib.SignalSpy (push_notifications, &PushNotificationManager.ready);
 
         before_authentication (push_notifications);
 
@@ -127,9 +127,9 @@ public class FakeWebSocketServer : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public QWebSocket socket_for_text_message (int message_number) {
+    public GLib.WebSocket socket_for_text_message (int message_number) {
         GLib.assert_true (0 <= message_number && message_number < this.process_text_message_spy.length);
-        return this.process_text_message_spy.at (message_number).at (0).value<QWebSocket> ();
+        return this.process_text_message_spy.at (message_number).at (0).value<GLib.WebSocket> ();
     }
 
 
@@ -174,7 +174,7 @@ public class FakeWebSocketServer : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_process_next_message_internal (string message) {
-        var client = (QWebSocket) sender ();
+        var client = (GLib.WebSocket) sender ();
         /* emit */ signal_process_text_message (client, message);
     }
 
@@ -202,7 +202,7 @@ public class FakeWebSocketServer : GLib.Object {
     private void on_signal_socket_disconnected () {
         GLib.info ("Socket disconnected");
 
-        var client = (QWebSocket) sender ();
+        var client = (GLib.WebSocket) sender ();
 
         if (client) {
             this.clients.remove_all (client);

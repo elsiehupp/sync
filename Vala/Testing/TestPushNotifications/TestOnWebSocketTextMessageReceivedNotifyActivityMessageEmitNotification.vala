@@ -17,7 +17,7 @@ public class TestOnWebSocketTextMessageReceivedNotifyActivityMessageEmitNotifica
         var account = FakeWebSocketServer.create_account ();
         var socket = fake_server.authenticate_account (account);
         GLib.assert_true (socket);
-        QSignalSpy activity_spy = new QSignalSpy (account.push_notifications (), &PushNotificationManager.activities_changed);
+        GLib.SignalSpy activity_spy = new GLib.SignalSpy (account.push_notifications (), &PushNotificationManager.activities_changed);
         GLib.assert_true (activity_spy.is_valid);
 
         // Send notify_file push notification

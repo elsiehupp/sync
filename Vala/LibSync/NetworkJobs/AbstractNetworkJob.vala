@@ -91,7 +91,7 @@ public class AbstractNetworkJob : GLib.Object {
     public bool ignore_credential_failure;
 
     /***********************************************************
-    (QPointer because the NetworkManager may be destroyed before
+    (GLib.Pointer because the NetworkManager may be destroyed before
     the jobs at exit)
     ***********************************************************/
     public GLib.InputStream input_stream {
@@ -457,7 +457,7 @@ public class AbstractNetworkJob : GLib.Object {
         if (this.input_stream.error == GLib.InputStream.NoError) {
             return "OK";
         } else {
-            string enumber_of_str = QMetaEnum.from_type<GLib.InputStream.NetworkError> ().value_to_key (static_cast<int> (this.input_stream.error));
+            string enumber_of_str = GLib.MetaEnum.from_type<GLib.InputStream.NetworkError> ().value_to_key (static_cast<int> (this.input_stream.error));
             return "%1 %2".printf (enumber_of_str, this.error_string);
         }
     }
@@ -505,7 +505,7 @@ public class AbstractNetworkJob : GLib.Object {
                 reset_timeout ();
                 if (this.request_body != null) {
                     if (!this.request_body.is_open) {
-                        this.request_body.open (QIODevice.ReadOnly);
+                        this.request_body.open (GLib.IODevice.ReadOnly);
                     }
                     this.request_body.seek (0);
                 }
@@ -578,8 +578,8 @@ public class AbstractNetworkJob : GLib.Object {
                     reset_timeout ();
                     if (this.request_body != null) {
                         if (!this.request_body.is_open) {
-                            // Avoid the QIODevice.seek (Soup.Buffer) : The device is not open warning message
-                            this.request_body.open (QIODevice.ReadOnly);
+                            // Avoid the GLib.IODevice.seek (Soup.Buffer) : The device is not open warning message
+                            this.request_body.open (GLib.IODevice.ReadOnly);
                         }
                         this.request_body.seek (0);
                     }
@@ -614,7 +614,7 @@ public class AbstractNetworkJob : GLib.Object {
     Returns a null string if no message was found.
     ***********************************************************/
     private static string extract_error_message (string error_response) {
-        QXmlStreamReader reader = new QXmlStreamReader (error_response);
+        GLib.XmlStreamReader reader = new GLib.XmlStreamReader (error_response);
         reader.read_next_start_element ();
         if (reader.name () != "error") {
             return "";

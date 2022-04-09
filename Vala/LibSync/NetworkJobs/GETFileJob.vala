@@ -431,7 +431,7 @@ public class GETFileJob : AbstractNetworkJob {
             if (ranges == "") {
                 // device doesn't support range, just try again from scratch
                 this.device.close ();
-                if (!this.device.open (QIODevice.WriteOnly)) {
+                if (!this.device.open (GLib.IODevice.WriteOnly)) {
                     this.error_string = this.device.error_string;
                     this.error_status = SyncFileItem.Status.NORMAL_ERROR;
                     this.input_stream.abort ();

@@ -23,7 +23,7 @@ public class FakeGetReply : FakeReply {
         set_request (request);
         set_url (request.url);
         set_operation (operation);
-        open (QIODevice.ReadOnly);
+        open (GLib.IODevice.ReadOnly);
 
         string filename = get_file_path_from_url (request.url);
         GLib.assert_true (!filename == "");
@@ -74,7 +74,7 @@ public class FakeGetReply : FakeReply {
         if (aborted) {
             return 0;
         }
-        return size + QIODevice.bytes_available ();
+        return size + GLib.IODevice.bytes_available ();
     }
 
 

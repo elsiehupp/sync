@@ -6,7 +6,7 @@
 ***********************************************************/
 
 //  #include <accountmanager.h>
-//  #include <QWizardPage>
+//  #include <GLib.WizardPage>
 
 namespace Occ {
 namespace Ui {
@@ -15,7 +15,7 @@ namespace Ui {
 @brief The AbstractCredentialsWizardPage class
 @ingroup gui
 ***********************************************************/
-public class AbstractCredentialsWizardPage : QWizardPage {
+public class AbstractCredentialsWizardPage : GLib.WizardPage {
 
     /***********************************************************
     ***********************************************************/

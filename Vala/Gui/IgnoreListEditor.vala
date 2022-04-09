@@ -5,10 +5,10 @@
 ***********************************************************/
 
 //  #include <GLib.Dir>
-//  #include <QList_widget>
-//  #include <QListWidgetTtem>
+//  #include <GLib.List_widget>
+//  #include <GLib.ListWidgetTtem>
 //  #include <Gtk.MessageBox>
-//  #include <QInputDialog>
+//  #include <GLib.InputDialog>
 //  #include <Gtk.Dialog>
 
 namespace Occ {
@@ -83,8 +83,8 @@ public class IgnoreListEditor : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_restore_defaults (QAbstractButton button) {
-        if (instance.button_box.button_role (button) != QDialogButtonBox.Reset_role)
+    private void on_signal_restore_defaults (GLib.AbstractButton button) {
+        if (instance.button_box.button_role (button) != GLib.DialogButtonBox.Reset_role)
             return;
 
         instance.ignore_table_widget.on_signal_remove_all_items ();

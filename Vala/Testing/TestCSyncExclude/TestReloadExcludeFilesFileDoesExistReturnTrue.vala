@@ -13,7 +13,7 @@ public class TestReloadExcludeFilesFileDoesExistReturnTrue : AbstractTestCSyncEx
     /***********************************************************
     ***********************************************************/
     private TestReloadExcludeFilesFileDoesExistReturnTrue () {
-        var temporary_directory = QStandardPaths.writable_location (QStandardPaths.TempLocation);
+        var temporary_directory = GLib.StandardPaths.writable_location (GLib.StandardPaths.TempLocation);
         excluded_files.on_signal_reset (new ExcludedFiles (temporary_directory + "/"));
 
         const string sub_temp_dir = "exclude";

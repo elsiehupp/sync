@@ -221,7 +221,7 @@ static void ensureInitialized()
     can be:
     \snippet code/src_network_access_qnetworkaccessmanager.cpp 1
 
-    \sa QNetworkRequest, QNetworkReply, QNetworkProxy
+    \sa QNetworkRequest, QNetworkReply, Soup.NetworkProxy
 */
 
 /*!
@@ -266,7 +266,7 @@ static void ensureInitialized()
 */
 
 /*!
-    \fn void QNetworkAccessManager::proxyAuthenticationRequired(const QNetworkProxy &proxy, QAuthenticator *authenticator)
+    \fn void QNetworkAccessManager::proxyAuthenticationRequired(const Soup.NetworkProxy &proxy, QAuthenticator *authenticator)
 
     This signal is emitted whenever a proxy requests authentication
     and QNetworkAccessManager cannot find a valid, cached
@@ -413,7 +413,7 @@ QNetworkAccessManager::QNetworkAccessManager(QObject *parent)
 
     qRegisterMetaType<QNetworkReply::NetworkError>();
 #ifndef QT_NO_NETWORKPROXY
-    qRegisterMetaType<QNetworkProxy>();
+    qRegisterMetaType<Soup.NetworkProxy>();
 #endif
 #ifndef QT_NO_SSL
     qRegisterMetaType<QList<QSslError> >();
@@ -453,13 +453,13 @@ QNetworkAccessManager::~QNetworkAccessManager()
 
 #ifndef QT_NO_NETWORKPROXY
 /*!
-    Returns the QNetworkProxy that the requests sent using this
+    Returns the Soup.NetworkProxy that the requests sent using this
     QNetworkAccessManager object will use. The default value for the
-    proxy is QNetworkProxy::DefaultProxy.
+    proxy is Soup.NetworkProxy::DefaultProxy.
 
     \sa setProxy(), setProxyFactory(), proxyAuthenticationRequired()
 */
-QNetworkProxy QNetworkAccessManager::proxy() const
+Soup.NetworkProxy QNetworkAccessManager::proxy() const
 {
     return d_func()->proxy;
 }
@@ -478,7 +478,7 @@ QNetworkProxy QNetworkAccessManager::proxy() const
 
     \sa proxy(), proxyAuthenticationRequired()
 */
-void QNetworkAccessManager::setProxy(const QNetworkProxy &proxy)
+void QNetworkAccessManager::setProxy(const Soup.NetworkProxy &proxy)
 {
     Q_D(QNetworkAccessManager);
     delete d->proxyFactory;
@@ -487,7 +487,7 @@ void QNetworkAccessManager::setProxy(const QNetworkProxy &proxy)
 }
 
 /*!
-    \fn QNetworkProxyFactory *QNetworkAccessManager::proxyFactory() const
+    \fn Soup.NetworkProxyFactory *QNetworkAccessManager::proxyFactory() const
     \since 4.5
 
     Returns the proxy factory that this QNetworkAccessManager object
@@ -498,7 +498,7 @@ void QNetworkAccessManager::setProxy(const QNetworkProxy &proxy)
 
     \sa setProxyFactory(), proxy()
 */
-QNetworkProxyFactory *QNetworkAccessManager::proxyFactory() const
+Soup.NetworkProxyFactory *QNetworkAccessManager::proxyFactory() const
 {
     return d_func()->proxyFactory;
 }
@@ -518,7 +518,7 @@ QNetworkProxyFactory *QNetworkAccessManager::proxyFactory() const
     \list
       \li if the target address is in the local network (for example,
          if the hostname contains no dots or if it's an IP address in
-         the organization's range), return QNetworkProxy::NoProxy
+         the organization's range), return Soup.NetworkProxy::NoProxy
       \li if the request is FTP, return an FTP proxy
       \li if the request is HTTP or HTTPS, then return an HTTP proxy
       \li otherwise, return a SOCKSv5 proxy server
@@ -532,12 +532,12 @@ QNetworkProxyFactory *QNetworkAccessManager::proxyFactory() const
 
     \sa proxyFactory(), setProxy(), QNetworkProxyQuery
 */
-void QNetworkAccessManager::setProxyFactory(QNetworkProxyFactory *factory)
+void QNetworkAccessManager::setProxyFactory(Soup.NetworkProxyFactory *factory)
 {
     Q_D(QNetworkAccessManager);
     delete d->proxyFactory;
     d->proxyFactory = factory;
-    d->proxy = QNetworkProxy();
+    d->proxy = Soup.NetworkProxy();
 }
 #endif
 
@@ -1548,10 +1548,10 @@ void QNetworkAccessManagerPrivate::authenticationRequired(QAuthenticator *authen
 
 #ifndef QT_NO_NETWORKPROXY
 void QNetworkAccessManagerPrivate::proxyAuthenticationRequired(const QUrl &url,
-                                                               const QNetworkProxy &proxy,
+                                                               const Soup.NetworkProxy &proxy,
                                                                bool synchronous,
                                                                QAuthenticator *authenticator,
-                                                               QNetworkProxy *lastProxyAuthentication)
+                                                               Soup.NetworkProxy *lastProxyAuthentication)
 {
     Q_Q(QNetworkAccessManager);
     QAuthenticatorPrivate *priv = QAuthenticatorPrivate::getPrivate(*authenticator);
@@ -1594,19 +1594,19 @@ void QNetworkAccessManagerPrivate::proxyAuthenticationRequired(const QUrl &url,
     authenticationManager->cacheProxyCredentials(proxy, authenticator);
 }
 
-QList<QNetworkProxy> QNetworkAccessManagerPrivate::queryProxy(const QNetworkProxyQuery &query)
+QList<Soup.NetworkProxy> QNetworkAccessManagerPrivate::queryProxy(const QNetworkProxyQuery &query)
 {
-    QList<QNetworkProxy> proxies;
+    QList<Soup.NetworkProxy> proxies;
     if (proxyFactory) {
         proxies = proxyFactory->queryProxy(query);
         if (proxies.isEmpty()) {
             qWarning("QNetworkAccessManager: factory %p has returned an empty result set",
                      proxyFactory);
-            proxies << QNetworkProxy::NoProxy;
+            proxies << Soup.NetworkProxy::NoProxy;
         }
-    } else if (proxy.type() == QNetworkProxy::DefaultProxy) {
+    } else if (proxy.type() == Soup.NetworkProxy::DefaultProxy) {
         // no proxy set, query the application
-        return QNetworkProxyFactory::proxyForQuery(query);
+        return Soup.NetworkProxyFactory::proxyForQuery(query);
     } else {
         proxies << proxy;
     }

@@ -6,16 +6,16 @@
 ***********************************************************/
 
 //  #include <GLib.Dir>
-//  #include <QFileDialog>
-//  #include <QPushButton>
+//  #include <GLib.FileDialog>
+//  #include <GLib.PushButton>
 //  #include <Gtk.MessageBox>
-//  #include <QSsl>
-//  #include <QSslCertificate>
+//  #include <GLib.Ssl>
+//  #include <GLib.SslCertificate>
 //  #include <Soup.Context>
-//  #include <QPropertyAnimation>
-//  #include <QGraphics_pixmap_item>
+//  #include <GLib.PropertyAnimation>
+//  #include <GLib.Graphics_pixmap_item>
 //  #include <GLib.OutputStream>
-//  #include <QWizard>
+//  #include <GLib.Wizard>
 
 namespace Occ {
 namespace Ui {
@@ -24,7 +24,7 @@ namespace Ui {
 @brief The OwncloudSetupPage class
 @ingroup gui
 ***********************************************************/
-public class OwncloudSetupPage : QWizardPage {
+public class OwncloudSetupPage : GLib.WizardPage {
     /***********************************************************
     ***********************************************************/
     private OwncloudeSetupPage instance;
@@ -39,7 +39,7 @@ public class OwncloudSetupPage : QWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    private QProgressIndicator progress_indicator;
+    private GLib.ProgressIndicator progress_indicator;
     private OwncloudWizard oc_wizard;
     private AddCertificateDialog add_certificate_dialog = null;
 
@@ -51,7 +51,7 @@ public class OwncloudSetupPage : QWizardPage {
     ***********************************************************/
     public OwncloudSetupPage (Gtk.Widget parent = new Gtk.Widget ()) {
         base ();
-        this.progress_indicator = new QProgressIndicator (this);
+        this.progress_indicator = new GLib.ProgressIndicator (this);
         this.oc_wizard = (OwncloudWizard)parent;
         this.instance.up_ui (this);
 
@@ -111,8 +111,8 @@ public class OwncloudSetupPage : QWizardPage {
         this.auth_type_known = false;
         this.checking = false;
 
-        QAbstractButton next_button = wizard ().button (QWizard.NextButton);
-        var push_button = qobject_cast<QPushButton> (next_button);
+        GLib.AbstractButton next_button = wizard ().button (GLib.Wizard.NextButton);
+        var push_button = qobject_cast<GLib.PushButton> (next_button);
         if (push_button) {
             push_button.default (true);
         }
@@ -132,7 +132,7 @@ public class OwncloudSetupPage : QWizardPage {
             // immediately.
             commit_page (true);
             // Hack : commit_page () changes caption, but after an error this page could still be visible
-            button_text (QWizard.Commit_button, _("&Next >"));
+            button_text (GLib.Wizard.Commit_button, _("&Next >"));
             validate_page ();
             visible (false);
         }
@@ -306,8 +306,8 @@ public class OwncloudSetupPage : QWizardPage {
         string cert_password = add_certificate_dialog.certificate_password ().to_local8Bit ();
 
         GLib.OutputStream cert_data_buffer = new GLib.OutputStream (cert_data);
-        cert_data_buffer.open (QIODevice.ReadOnly);
-        if (QSslCertificate.import_pkcs12 (cert_data_buffer,
+        cert_data_buffer.open (GLib.IODevice.ReadOnly);
+        if (GLib.SslCertificate.import_pkcs12 (cert_data_buffer,
                 this.oc_wizard.client_ssl_key, this.oc_wizard.client_ssl_certificate,
                 this.oc_wizard.client_ssl_ca_certificates, cert_password)) {
             this.oc_wizard.client_cert_bundle = cert_data;
@@ -315,7 +315,7 @@ public class OwncloudSetupPage : QWizardPage {
 
             add_certificate_dialog.reinit (); // FIXME: Why not just have this only created on use?
 
-            // The extracted SSL key and cert gets added to the QSslConfiguration in check_server ()
+            // The extracted SSL key and cert gets added to the GLib.SslConfiguration in check_server ()
             validate_page ();
         } else {
             add_certificate_dialog.show_error_message (_("Could not load certificate. Maybe wrong password?"));
@@ -338,7 +338,7 @@ public class OwncloudSetupPage : QWizardPage {
         // Need to set next button as default button here because
         // otherwise the on OSX the next button does not stay the default
         // button
-        var next_button = qobject_cast<QPushButton> (this.oc_wizard.button (QWizard.NextButton));
+        var next_button = qobject_cast<GLib.PushButton> (this.oc_wizard.button (GLib.Wizard.NextButton));
         if (next_button) {
             next_button.default (true);
         }
@@ -437,7 +437,7 @@ public class OwncloudSetupPage : QWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    private static string subject_info_helper (QSslCertificate cert, string qa) {
+    private static string subject_info_helper (GLib.SslCertificate cert, string qa) {
         return cert.subject_info (qa).join ("/");
     }
 

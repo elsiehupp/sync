@@ -4,21 +4,21 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QStandard_item_model>
-//  #include <QStacked_widget>
-//  #include <QPushButton>
+//  #include <GLib.Standard_item_model>
+//  #include <GLib.Stacked_widget>
+//  #include <GLib.PushButton>
 //  #include <GLib.Settings>
-//  #include <QToolBar>
-//  #include <QToolButton>
-//  #include <QLayout>
-//  #include <QVBoxLayout>
+//  #include <GLib.ToolBar>
+//  #include <GLib.ToolButton>
+//  #include <GLib.Layout>
+//  #include <GLib.VBoxLayout>
 //  #include <Gdk.Pixbuf>
 //  #include <Gtk.Image>
-//  #include <QWidgetAction>
-//  #include <QPainter>
-//  #include <QPainterPath>
+//  #include <GLib.WidgetAction>
+//  #include <GLib.Painter>
+//  #include <GLib.PainterPath>
 //  #include <Gtk.Dialog>
-//  #include <QStyled_item_delegate>
+//  #include <GLib.Styled_item_delegate>
 
 namespace Occ {
 namespace Ui {
@@ -29,7 +29,7 @@ namespace Ui {
 ***********************************************************/
 public class SettingsDialog : Gtk.Dialog {
 
-    class ToolButtonAction : QWidgetAction {
+    class ToolButtonAction : GLib.WidgetAction {
 
         /***********************************************************
         ***********************************************************/
@@ -43,20 +43,20 @@ public class SettingsDialog : Gtk.Dialog {
         /***********************************************************
         ***********************************************************/
         public override Gtk.Widget create_widget (Gtk.Widget parent) {
-            var toolbar = qobject_cast<QToolBar> (parent);
+            var toolbar = qobject_cast<GLib.ToolBar> (parent);
             if (!toolbar) {
                 // this means we are in the extention menu, no special action here
                 return null;
             }
 
-            var btn = new QToolButton (parent);
+            var btn = new GLib.ToolButton (parent);
             string object_name = "settingsdialog_toolbutton_";
             object_name += text ();
             btn.object_name (object_name);
 
             btn.default_action (this);
             btn.tool_button_style (Qt.Tool_button_text_under_icon);
-            btn.size_policy (QSizePolicy.Fixed, QSizePolicy.Expanding);
+            btn.size_policy (GLib.SizePolicy.Fixed, GLib.SizePolicy.Expanding);
             return btn;
         }
     }
@@ -64,10 +64,10 @@ public class SettingsDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private const string TOOLBAR_CSS =
-        "QToolBar { background : %1; margin : 0; padding : 0; border : none; border-bottom : 1px solid %2; spacing : 0; } "
-        + "QToolBar QToolButton { background : %1; border : none; border-bottom : 1px solid %2; margin : 0; padding : 5px; } "
-        + "QToolBar QTool_bar_extension { padding:0; } "
-        + "QToolBar QToolButton:checked { background : %3; color : %4; }";
+        "GLib.ToolBar { background : %1; margin : 0; padding : 0; border : none; border-bottom : 1px solid %2; spacing : 0; } "
+        + "GLib.ToolBar GLib.ToolButton { background : %1; border : none; border-bottom : 1px solid %2; margin : 0; padding : 5px; } "
+        + "GLib.ToolBar GLib.Tool_bar_extension { padding:0; } "
+        + "GLib.ToolBar GLib.ToolButton:checked { background : %3; color : %4; }";
 
     /***********************************************************
     golden ratio
@@ -82,17 +82,17 @@ public class SettingsDialog : Gtk.Dialog {
     Maps the actions from the action group to the corresponding
     widgets
     ***********************************************************/
-    private GLib.HashTable<QAction *, Gtk.Widget> action_group_widgets;
+    private GLib.HashTable<GLib.Action *, Gtk.Widget> action_group_widgets;
 
     /***********************************************************
     Maps the action in the dialog to their according account.
     Needed in case the account avatar changes.
     ***********************************************************/
-    private GLib.HashTable<Account *, QAction> action_for_account;
+    private GLib.HashTable<Account *, GLib.Action> action_for_account;
 
     /***********************************************************
     ***********************************************************/
-    private QToolBar tool_bar;
+    private GLib.ToolBar tool_bar;
 
     /***********************************************************
     ***********************************************************/
@@ -110,14 +110,14 @@ public class SettingsDialog : Gtk.Dialog {
         ConfigFile config;
 
         this.instance.up_ui (this);
-        this.tool_bar = new QToolBar ();
+        this.tool_bar = new GLib.ToolBar ();
         this.tool_bar.icon_size (Gdk.Rectangle (32, 32));
         this.tool_bar.tool_button_style (Qt.Tool_button_text_under_icon);
         layout ().menu_bar (this.tool_bar);
 
         // People perceive this as a Window, so also make Ctrl+W work
-        var close_window_action = new QAction (this);
-        close_window_action.shortcut (QKeySequence ("Ctrl+W"));
+        var close_window_action = new GLib.Action (this);
+        close_window_action.shortcut (GLib.KeySequence ("Ctrl+W"));
         close_window_action.triggered.connect (
             this.accept
         );
@@ -144,10 +144,10 @@ public class SettingsDialog : Gtk.Dialog {
         // Adds space between users + activities and general + network actions
         var spacer = new Gtk.Widget ();
         spacer.minimum_width (10);
-        spacer.size_policy (QSizePolicy.Minimum_expanding, QSizePolicy.Minimum);
+        spacer.size_policy (GLib.SizePolicy.Minimum_expanding, GLib.SizePolicy.Minimum);
         this.tool_bar.add_widget (spacer);
 
-        QAction general_action = create_color_aware_action (":/client/theme/settings.svg", _("General"));
+        GLib.Action general_action = create_color_aware_action (":/client/theme/settings.svg", _("General"));
         this.action_group.add_action (general_action);
         this.tool_bar.add_action (general_action);
         var general_settings = new GeneralSettings ();
@@ -158,7 +158,7 @@ public class SettingsDialog : Gtk.Dialog {
             general_settings.on_signal_style_changed
         );
 
-        QAction network_action = create_color_aware_action (":/client/theme/network.svg", _("Network"));
+        GLib.Action network_action = create_color_aware_action (":/client/theme/network.svg", _("Network"));
         this.action_group.add_action (network_action);
         this.tool_bar.add_action (network_action);
         var network_settings = new NetworkSettings ();
@@ -173,15 +173,15 @@ public class SettingsDialog : Gtk.Dialog {
 
         GLib.Timeout.single_shot (1, this, SettingsDialog.show_first_page);
 
-        var show_log_window = new QAction (this);
-        show_log_window.shortcut (QKeySequence ("F12"));
+        var show_log_window = new GLib.Action (this);
+        show_log_window.shortcut (GLib.KeySequence ("F12"));
         show_log_window.triggered.connect (
             gui.on_signal_toggle_log_browser
         );
         add_action (show_log_window);
 
-        var show_log_window2 = new QAction (this);
-        show_log_window2.shortcut (QKeySequence (Qt.CTRL + Qt.Key_L));
+        var show_log_window2 = new GLib.Action (this);
+        show_log_window2.shortcut (GLib.KeySequence (Qt.CTRL + Qt.Key_L));
         show_log_window2.triggered.connect (
             gui.on_signal_toggle_log_browser
         );
@@ -212,7 +212,7 @@ public class SettingsDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_switch_page (QAction action) {
+    public void on_signal_switch_page (GLib.Action action) {
         this.instance.stack.current_widget (this.action_group_widgets.value (action));
     }
 
@@ -220,7 +220,7 @@ public class SettingsDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     public void show_first_page () {
-        GLib.List<QAction> actions = this.tool_bar.actions ();
+        GLib.List<GLib.Action> actions = this.tool_bar.actions ();
         if (!actions.empty ()) {
             actions.first ().trigger ();
         }
@@ -242,7 +242,7 @@ public class SettingsDialog : Gtk.Dialog {
     public void on_signal_account_avatar_changed () {
         var account = static_cast<Account> (sender ());
         if (account && this.action_for_account.contains (account)) {
-            QAction action = this.action_for_account[account];
+            GLib.Action action = this.action_for_account[account];
             if (action) {
                 Gtk.Image pix = account.avatar ();
                 if (!pix == null) {
@@ -258,7 +258,7 @@ public class SettingsDialog : Gtk.Dialog {
     public void on_signal_account_display_name_changed () {
         var account = static_cast<Account> (sender ());
         if (account && this.action_for_account.contains (account)) {
-            QAction action = this.action_for_account[account];
+            GLib.Action action = this.action_for_account[account];
             if (action) {
                 string display_name = account.display_name;
                 action.on_signal_text (display_name);
@@ -290,17 +290,17 @@ public class SettingsDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    protected override void change_event (QEvent e) {
+    protected override void change_event (GLib.Event e) {
         switch (e.type ()) {
-        case QEvent.StyleChange:
-        case QEvent.PaletteChange:
-        case QEvent.ThemeChange:
+        case GLib.Event.StyleChange:
+        case GLib.Event.PaletteChange:
+        case GLib.Event.ThemeChange:
             customize_style ();
 
             // Notify the other widgets (Dark-/Light-Mode switching)
             /* emit */ signal_style_changed ();
             break;
-        case QEvent.ActivationChange:
+        case GLib.Event.ActivationChange:
             if (is_active_window ())
                 /* emit */ activate ();
             break;
@@ -318,7 +318,7 @@ public class SettingsDialog : Gtk.Dialog {
         var height = this.tool_bar.size_hint ().height ();
         bool branding_single_account = !Theme.multi_account;
 
-        QAction account_action = null;
+        GLib.Action account_action = null;
         Gtk.Image avatar = account_state.account.avatar ();
         const string action_text = branding_single_account ? _("Account") : account_state.account.display_name;
         if (avatar == null) {
@@ -413,10 +413,10 @@ public class SettingsDialog : Gtk.Dialog {
         string background = palette ().base ().color ().name ();
         this.tool_bar.style_sheet (TOOLBAR_CSS ().printf (background, dark, highlight_color, highlight_text_color));
 
-        foreach (QAction a in this.action_group.actions ()) {
+        foreach (GLib.Action a in this.action_group.actions ()) {
             Gtk.Icon icon = Theme.create_color_aware_icon (a.property ("icon_path").to_string (), palette ());
             a.icon (icon);
-            var btn = qobject_cast<QToolButton> (this.tool_bar.widget_for_action (a));
+            var btn = qobject_cast<GLib.ToolButton> (this.tool_bar.widget_for_action (a));
             if (btn) {
                 btn.icon (icon);
             }
@@ -426,7 +426,7 @@ public class SettingsDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private QAction create_color_aware_action (string icon_name, string filename) {
+    private GLib.Action create_color_aware_action (string icon_name, string filename) {
         // all buttons must have the same size in order to keep a good layout
         Gtk.Icon colored_icon = Theme.create_color_aware_icon (icon_path, palette ());
         return create_action_with_icon (colored_icon, filename, icon_path);
@@ -435,8 +435,8 @@ public class SettingsDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private QAction create_action_with_icon (Gtk.Icon icon, string text, string icon_path) {
-        QAction action = new ToolButtonAction (icon, text, this);
+    private GLib.Action create_action_with_icon (Gtk.Icon icon, string text, string icon_path) {
+        GLib.Action action = new ToolButtonAction (icon, text, this);
         action.checkable (true);
         if (!icon_path == "") {
             action.property ("icon_path", icon_path);

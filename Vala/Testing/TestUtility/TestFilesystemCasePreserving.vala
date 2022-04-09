@@ -14,7 +14,7 @@ public class TestFilesystemCasePreserving : AbstractTestUtility {
     ***********************************************************/
     private TestFilesystemCasePreserving () {
         GLib.assert_true (is_mac () || is_windows () ? filesystem_case_preserving () : ! filesystem_case_preserving ());
-        QScopedValueRollback<bool> scope = new QScopedValueRollback<bool> (filesystem_case_preserving_override);
+        GLib.ScopedValueRollback<bool> scope = new GLib.ScopedValueRollback<bool> (filesystem_case_preserving_override);
         filesystem_case_preserving_override = true;
         GLib.assert_true (filesystem_case_preserving ());
         filesystem_case_preserving_override = false;

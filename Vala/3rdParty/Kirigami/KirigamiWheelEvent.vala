@@ -13,8 +13,8 @@ public class KirigamiWheelEvent : GLib.Object {
     ***********************************************************/
     private double m_x = 0;
     private double m_y = 0;
-    private QPointF m_angle_delta;
-    private QPointF m_pixel_delta;
+    private GLib.PointF m_angle_delta;
+    private GLib.PointF m_pixel_delta;
     private Qt.MouseButtons m_buttons = Qt.NoButton;
     private Qt.KeyboardModifiers m_modifiers = Qt.NoModifier;
     private bool m_inverted = false;
@@ -42,14 +42,14 @@ public class KirigamiWheelEvent : GLib.Object {
     A positive value indicates it was rotated up/right, negative, bottom/left
     This value is more likely to be set in traditional mice.
     ***********************************************************/
-    //  Q_PROPERTY (QPointF angle_delta READ angle_delta CONSTANT)
+    //  Q_PROPERTY (GLib.PointF angle_delta READ angle_delta CONSTANT)
 
     /***********************************************************
     pixel_delta : point
 
     provides the delta in screen pixels available on high resolution trackpads
     ***********************************************************/
-    //  Q_PROPERTY (QPointF pixel_delta READ pixel_delta CONSTANT)
+    //  Q_PROPERTY (GLib.PointF pixel_delta READ pixel_delta CONSTANT)
 
     /***********************************************************
     buttons : int
@@ -113,7 +113,7 @@ public class KirigamiWheelEvent : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void initialize_from_event (QWheelEvent event) {
+    public void initialize_from_event (GLib.WheelEvent event) {
         m_x = event.position ().x ();
         m_y = event.position ().y ();
         m_angle_delta = event.angle_delta ();
@@ -141,14 +141,14 @@ public class KirigamiWheelEvent : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public QPointF angle_delta () {
+    public GLib.PointF angle_delta () {
         return m_angle_delta;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public QPointF pixel_delta () {
+    public GLib.PointF pixel_delta () {
         return m_pixel_delta;
     }
 

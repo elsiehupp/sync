@@ -153,7 +153,7 @@ public class CheckServerJob : AbstractNetworkJob {
             /* emit */ instance_not_found (this.input_stream);
         } else {
             Json.ParserError error;
-            var status = QJsonDocument.from_json (body, error);
+            var status = GLib.JsonDocument.from_json (body, error);
             // empty or invalid response
             if (error.error != Json.ParserError.NoError || status == null) {
                 GLib.warning ("status.php from server is not valid JSON!" + body + this.input_stream.request ().url + error.error_string);
@@ -206,7 +206,7 @@ public class CheckServerJob : AbstractNetworkJob {
     }
 
 
-    private static void merge_ssl_configuration_for_ssl_button (QSslConfiguration config, Account account) {
+    private static void merge_ssl_configuration_for_ssl_button (GLib.SslConfiguration config, Account account) {
         if (config.peer_certificate_chain ().length > 0) {
             account.peer_certificate_chain = config.peer_certificate_chain ();
         }

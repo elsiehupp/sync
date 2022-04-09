@@ -18,7 +18,7 @@ public class TestErrorMessage : GLib.Object {
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine.set_ignore_hidden_files (true);
-        QSignalSpy complete_spy = new QSignalSpy (
+        GLib.SignalSpy complete_spy = new GLib.SignalSpy (
             fake_folder.sync_engine,
             signal_item_completed (SyncFileItem)
         );

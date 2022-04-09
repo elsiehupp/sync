@@ -1,6 +1,6 @@
 
 
-//  #include <QBox_layout>
+//  #include <GLib.Box_layout>
 //  #include <account.h>
 //  #include <GLib.Menu>
 //  #include <cstddef>
@@ -32,7 +32,7 @@ public class ProfilePageMenu : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public void exec (QPoint global_position) {
+    public void exec (GLib.Point global_position) {
         this.menu.exec (global_position);
     }
 

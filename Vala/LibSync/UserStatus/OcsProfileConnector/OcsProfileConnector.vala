@@ -40,7 +40,7 @@ public class OcsProfileConnector : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_hovercard_fetched (QJsonDocument json, int status_code) {
+    private void on_signal_hovercard_fetched (GLib.JsonDocument json, int status_code) {
         GLib.debug ("Hovercard fetched: " + json.to_string ());
 
         if (status_code != 200) {
@@ -93,7 +93,7 @@ public class OcsProfileConnector : GLib.Object {
     ***********************************************************/
     private void hovercard_action_icon (size_t index, Gdk.Pixbuf pixmap) {
         var hovercard_action = this.current_hovercard.actions[index];
-        QPixmapCache.insert (hovercard_action.icon_url.to_string (), pixmap);
+        GLib.PixmapCache.insert (hovercard_action.icon_url.to_string (), pixmap);
         hovercard_action.icon = pixmap;
         /* emit */ icon_loaded (index);
     }
@@ -122,14 +122,14 @@ public class OcsProfileConnector : GLib.Object {
             json_action_object.value ("title").to_string ("No title"), icon_url,
             json_action_object.value ("hyperlink").to_string ("no-link")
         );
-        if (QPixmapCache.find (icon_url, icon_pixmap)) {
+        if (GLib.PixmapCache.find (icon_url, icon_pixmap)) {
             hovercard_action.icon = icon_pixmap;
         }
         return hovercard_action;
     }
 
 
-    private static Hovercard json_to_hovercard (QJsonArray json_data_array) {
+    private static Hovercard json_to_hovercard (GLib.JsonArray json_data_array) {
         Hovercard hovercard;
         hovercard.actions.reserve (json_data_array.size ());
         foreach (var json_entry in json_data_array) {
@@ -144,7 +144,7 @@ public class OcsProfileConnector : GLib.Object {
 
 
     private static Optional<Gdk.Pixbuf> create_pixmap_from_svg_data (string icon_data) {
-        QSvgRenderer svg_renderer;
+        GLib.SvgRenderer svg_renderer;
         if (!svg_renderer.on_signal_load (icon_data)) {
             return {};
         }
@@ -154,7 +154,7 @@ public class OcsProfileConnector : GLib.Object {
         }
         Gtk.Image scaled_svg = new Gtk.Image (image_size, Gtk.Image.FormatARGB32);
         scaled_svg.fill ("transparent");
-        QPainter svg_painter = new QPainter (scaled_svg);
+        GLib.Painter svg_painter = new GLib.Painter (scaled_svg);
         svg_renderer.render (&svg_painter);
         return Gdk.Pixbuf.from_image (scaled_svg);
     }

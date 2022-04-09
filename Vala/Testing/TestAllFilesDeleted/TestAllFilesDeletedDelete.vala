@@ -13,7 +13,7 @@ public class TestAllFilesDeletedDelete : AbstractTestAllFilesDeleted {
     This test is like the previous one but we simulate that the user presses "delete"
     ***********************************************************/
     private TestAllFilesDeletedDelete () {
-        QFETCH (
+        GLib.FETCH (
             bool,
             delete_on_remote
         );

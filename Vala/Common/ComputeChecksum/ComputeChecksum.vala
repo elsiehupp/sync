@@ -71,7 +71,7 @@ public class ComputeChecksum : AbstractComputeChecksum {
     /***********************************************************
     Watcher for the checksum calculation thread
     ***********************************************************/
-    private QFutureWatcher<string> watcher;
+    private GLib.FutureWatcher<string> watcher;
 
     /***********************************************************
     ***********************************************************/
@@ -122,11 +122,11 @@ public class ComputeChecksum : AbstractComputeChecksum {
         } else if (checksum_type == CHECKSUM_SHA1C) {
             return calc_sha1 (device);
         } else if (checksum_type == CHECKSUM_SHA2C) {
-            return calc_crypto_hash (device, QCryptographicHash.Sha256);
+            return calc_crypto_hash (device, GLib.CryptographicHash.Sha256);
         }
-    //  #if QT_VERSION >= QT_VERSION_CHECK (5, 9, 0)
+    //  #if GLib.T_VERSION >= GLib.T_VERSION_CHECK (5, 9, 0)
         else if (checksum_type == CHECKSUM_SHA3C) {
-            return calc_crypto_hash (device, QCryptographicHash.Sha3_256);
+            return calc_crypto_hash (device, GLib.CryptographicHash.Sha3_256);
         }
     //  #endif
     //  #ifdef ZLIB_FOUND
@@ -147,7 +147,7 @@ public class ComputeChecksum : AbstractComputeChecksum {
     ***********************************************************/
     public static string compute_now_on_signal_file (string file_path, string checksum_type) {
         GLib.File file = GLib.File.new_for_path (file_path);
-        if (!file.open (QIODevice.ReadOnly)) {
+        if (!file.open (GLib.IODevice.ReadOnly)) {
             GLib.warning ("Could not open file " + file_path + " for reading and computing checksum " + file.error_string);
             return "";
         }
@@ -191,7 +191,7 @@ public class ComputeChecksum : AbstractComputeChecksum {
 
 
     private static void on_watcher_run (GLib.OutputStream shared_device, string type) {
-        if (!shared_device.open (QIODevice.ReadOnly)) {
+        if (!shared_device.open (GLib.IODevice.ReadOnly)) {
             var file = qobject_cast<GLib.File> (shared_device);
             if (file) {
                 GLib.warning ("Could not open file " + file.filename ()

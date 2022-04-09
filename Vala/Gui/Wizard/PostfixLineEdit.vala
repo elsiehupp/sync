@@ -4,11 +4,11 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QStyle>
-//  #include <QStyle_option_frame>
-//  #include <QLineEdit>
-//  #include <QPaintEvent>
-//  #include <QPainter>
+//  #include <GLib.Style>
+//  #include <GLib.Style_option_frame>
+//  #include <GLib.LineEdit>
+//  #include <GLib.PaintEvent>
+//  #include <GLib.Painter>
 
 namespace Occ {
 namespace Ui {
@@ -18,7 +18,7 @@ namespace Ui {
 
 Useful e.g. for setting a fixed domain name.
 ***********************************************************/
-public class PostfixLineEdit : QLineEdit {
+public class PostfixLineEdit : GLib.LineEdit {
 
     const int HORIZONTAL_MARGIN = 4;
     const int VERTICAL_MARGIN = 4;
@@ -32,8 +32,8 @@ public class PostfixLineEdit : QLineEdit {
         }
         public set {
             this.postfix = value;
-            QFontMetricsF font_options = new QFontMetricsF (font ());
-            QMargins text_margins_i = text_margins ();
+            GLib.FontMetricsF font_options = new GLib.FontMetricsF (font ());
+            GLib.Margins text_margins_i = text_margins ();
             text_margins_i.right (text_margins_i.right () + q_round (font_options.width (this.postfix)) + VERTICAL_MARGIN);
             text_margins (text_margins_i);
         }
@@ -67,18 +67,18 @@ public class PostfixLineEdit : QLineEdit {
 
     /***********************************************************
     ***********************************************************/
-    protected void paint_event (QPaintEvent event) {
-        QLineEdit.paint_event (event);
-        QPainter p = new QPainter (this);
+    protected void paint_event (GLib.PaintEvent event) {
+        GLib.LineEdit.paint_event (event);
+        GLib.Painter p = new GLib.Painter (this);
 
         p.pen (palette ().color (Gtk.Palette.Disabled, Gtk.Palette.Text));
-        QFontMetricsF font_options = new QFontMetricsF (font ());
+        GLib.FontMetricsF font_options = new GLib.FontMetricsF (font ());
         int on_signal_start = rect ().right () - q_round (font_options.width (this.postfix));
-        QStyle_option_frame panel;
+        GLib.Style_option_frame panel;
         init_style_option (panel);
-        QRect r = this.style.sub_element_rect (QStyle.SE_Line_edit_contents, panel, this);
+        GLib.Rect r = this.style.sub_element_rect (GLib.Style.SE_Line_edit_contents, panel, this);
         r.top (r.top () + HORIZONTAL_MARGIN - 1);
-        QRect postfix_rect = new QRect (r);
+        GLib.Rect postfix_rect = new GLib.Rect (r);
 
         postfix_rect.left (on_signal_start - VERTICAL_MARGIN);
         p.draw_text (postfix_rect, this.postfix);

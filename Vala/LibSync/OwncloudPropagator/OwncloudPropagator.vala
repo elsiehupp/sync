@@ -176,11 +176,11 @@ public class OwncloudPropagator : GLib.Object {
 
         var regular_expression = sync_options.file_regex;
         if (regular_expression.is_valid) {
-            GLib.List</* QStringRef */ string> names;
+            GLib.List</* GLib.StringRef */ string> names;
             foreach (var i in synced_items) {
                 if (regular_expression.match (i.file).has_match ()) {
                     int index = -1;
-                    /* QStringRef */ string string_ref;
+                    /* GLib.StringRef */ string string_ref;
                     do {
                         string_ref = i.file.mid_ref (0, index);
                         names.insert (string_ref);
@@ -198,7 +198,7 @@ public class OwncloudPropagator : GLib.Object {
 
         reset_delayed_upload_tasks ();
         this.propagate_root_directory_job.reset (new PropagateRootDirectory (this));
-        GLib.List<QPair<string /* directory name */, PropagateDirectory /* job */>> directories; // should be a LIFO stack
+        GLib.List<GLib.Pair<string /* directory name */, PropagateDirectory /* job */>> directories; // should be a LIFO stack
         directories.push (q_make_pair ("", this.propagate_root_directory_job));
         GLib.List<AbstractPropagatorJob> directories_to_remove;
         string removed_directory;
@@ -285,8 +285,8 @@ public class OwncloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static erase_filter (GLib.List</* QStringRef */ string> names, SyncFileItem item) {
-        return !names.contains (new /* QStringRef */ string (
+    private static erase_filter (GLib.List</* GLib.StringRef */ string> names, SyncFileItem item) {
+        return !names.contains (new /* GLib.StringRef */ string (
             item.file
         ));
     }
@@ -296,7 +296,7 @@ public class OwncloudPropagator : GLib.Object {
     ***********************************************************/
     public void start_directory_propagation (
         SyncFileItem item,
-        GLib.List<QPair<string, PropagateDirectory>> directories, // should be a LIFO stack
+        GLib.List<GLib.Pair<string, PropagateDirectory>> directories, // should be a LIFO stack
         GLib.List<AbstractPropagatorJob> directories_to_remove,
         string removed_directory,
         GLib.List<unowned SyncFileItem> synced_items) {
@@ -344,7 +344,7 @@ public class OwncloudPropagator : GLib.Object {
     ***********************************************************/
     public void start_file_propagation (
         SyncFileItem item,
-        GLib.List<QPair<string, PropagateDirectory>> directories, // should be a LIFO stack
+        GLib.List<GLib.Pair<string, PropagateDirectory>> directories, // should be a LIFO stack
         GLib.List<AbstractPropagatorJob> directories_to_remove,
         string removed_directory,
         string maybe_conflict_directory) {
@@ -421,7 +421,7 @@ public class OwncloudPropagator : GLib.Object {
             // Just check that there is no other file with the same name and different casing.
             GLib.FileInfo file_info = GLib.File.new_for_path (file);
             const string fn = file_info.filename ();
-            const GLib.List<string> list = file_info.directory ().entry_list ({
+            GLib.List<string> list = file_info.directory ().entry_list ({
                 fn
             });
             if (list.length > 1 || (list.length == 1 && list[0] != fn)) {

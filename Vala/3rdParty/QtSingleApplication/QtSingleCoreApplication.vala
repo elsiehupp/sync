@@ -9,7 +9,7 @@ This file is part of Qt Creator.
 
 @copyright LGPLv2.1 or later
 ***********************************************************/
-public class QtSingleCoreApplication : Gtk.Application {
+public class QtSingleCoreApplication : GLib.Application {
 
     /***********************************************************
     ***********************************************************/

@@ -21,31 +21,31 @@ public class TestSyncFileItem : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private TestComparatorData () {
-        QTest.add_column<SyncFileItem> ("a");
-        QTest.add_column<SyncFileItem> ("b");
-        QTest.add_column<SyncFileItem> ("c");
+        GLib.Test.add_column<SyncFileItem> ("a");
+        GLib.Test.add_column<SyncFileItem> ("b");
+        GLib.Test.add_column<SyncFileItem> ("c");
 
-        QTest.new_row ("a1") + create_item ("client") + create_item ("client/build") + create_item ("client-build") ;
-        QTest.new_row ("a2") + create_item ("test/t1") + create_item ("test/t2") + create_item ("test/t3") ;
-        QTest.new_row ("a3") + create_item ("ABCD") + create_item ("abcd") + create_item ("zzzz");
+        GLib.Test.new_row ("a1") + create_item ("client") + create_item ("client/build") + create_item ("client-build") ;
+        GLib.Test.new_row ("a2") + create_item ("test/t1") + create_item ("test/t2") + create_item ("test/t3") ;
+        GLib.Test.new_row ("a3") + create_item ("ABCD") + create_item ("abcd") + create_item ("zzzz");
 
         SyncFileItem moved_item1;
         moved_item1.file = "folder/source/file.f";
         moved_item1.rename_target = "folder/destination/file.f";
         moved_item1.instruction = CSync.SyncInstructions.RENAME;
 
-        QTest.new_row ("move1") + create_item ("folder/destination") + moved_item1 << create_item ("folder/destination-2");
-        QTest.new_row ("move2") + create_item ("folder/destination/1") + moved_item1 << create_item ("folder/source");
-        QTest.new_row ("move3") + create_item ("abc") + moved_item1 << create_item ("ijk");
+        GLib.Test.new_row ("move1") + create_item ("folder/destination") + moved_item1 << create_item ("folder/destination-2");
+        GLib.Test.new_row ("move2") + create_item ("folder/destination/1") + moved_item1 << create_item ("folder/source");
+        GLib.Test.new_row ("move3") + create_item ("abc") + moved_item1 << create_item ("ijk");
     }
 
 
     /***********************************************************
     ***********************************************************/
     private TestComparator () {
-        QFETCH ( SyncFileItem , a );
-        QFETCH ( SyncFileItem , b );
-        QFETCH ( SyncFileItem , c );
+        GLib.FETCH ( SyncFileItem , a );
+        GLib.FETCH ( SyncFileItem , b );
+        GLib.FETCH ( SyncFileItem , c );
 
         GLib.assert_true (a < b);
         GLib.assert_true (b < c);

@@ -5,7 +5,7 @@
 ***********************************************************/
 
 //  #include <GLib.Dir>
-//  #include <Gtk.Application>
+//  #include <GLib.Application>
 
 namespace Occ {
 namespace Ui {
@@ -28,7 +28,7 @@ public class NavigationPaneHelper : GLib.Object {
             // Re-generate a new CLSID when enabling, possibly throwing away the old one.
             // update_cloud_storage_registry will take care of removing any unknown CLSID our application owns from the registry.
             foreach (FolderConnection folder_connection in this.folder_man.map ()) {
-                folder_connection.navigation_pane_clsid (value ? QUuid.create_uuid () : QUuid ());
+                folder_connection.navigation_pane_clsid (value ? GLib.Uuid.create_uuid () : GLib.Uuid ());
             }
 
             schedule_update_cloud_storage_registry ();
@@ -74,7 +74,7 @@ public class NavigationPaneHelper : GLib.Object {
     private void update_cloud_storage_registry () {
         // Start by looking at every registered namespace extension for the sidebar, and look for an "Application_name" value
         // that matches ours when we saved.
-        GLib.List<QUuid> entries_to_remove;
+        GLib.List<GLib.Uuid> entries_to_remove;
 
         // Only save folder_connection entries if the option is enabled.
         if (this.show_in_explorer_navigation_pane) {
@@ -96,7 +96,7 @@ public class NavigationPaneHelper : GLib.Object {
                     if (AccountManager.instance.accounts.size () > 1) {
                         title = title % " - " % folder_connection.account_state.account.display_name;
                     }
-                    string icon_path = GLib.Dir.to_native_separators (Gtk.Application.application_file_path);
+                    string icon_path = GLib.Dir.to_native_separators (GLib.Application.application_file_path);
                     string target_folder_path = GLib.Dir.to_native_separators (folder_connection.clean_path);
 
                     GLib.info ("Explorer Cloud storage provider: saving path " + target_folder_path + " to CLSID " + clsid_str);

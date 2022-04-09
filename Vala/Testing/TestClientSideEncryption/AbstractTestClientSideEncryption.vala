@@ -16,7 +16,7 @@ public abstract class AbstractTestClientSideEncryption : GLib.Object {
 
 
     protected static HashResult hash_from_string (string data) {
-        QCryptographicHash hash = new QCryptographicHash (GLib.ChecksumType.SHA1);
+        GLib.CryptographicHash hash = new GLib.CryptographicHash (GLib.ChecksumType.SHA1);
         hash.add_data (data);
         return hash.result ();
     }

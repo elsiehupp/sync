@@ -13,8 +13,8 @@ public class TestSanitizeForFilename : AbstractTestUtility {
     /***********************************************************
     ***********************************************************/
     private TestSanitizeForFilename () {
-        QFETCH (string, input);
-        QFETCH (string, output);
+        GLib.FETCH (string, input);
+        GLib.FETCH (string, output);
         GLib.assert_true (sanitize_for_filename (input), output);
     }
 

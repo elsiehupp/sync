@@ -6,9 +6,9 @@
 ***********************************************************/
 
 //  #include <theme.h>
-//  #include <QJsonDocument
-//  #include <QJsonObje
-//  #include <QPointer>
+//  #include <GLib.JsonDocument
+//  #include <GLib.JsonObje
+//  #include <GLib.Pointer>
 
 namespace Occ {
 namespace Ui {
@@ -149,7 +149,7 @@ public class UserInfo : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_update_last_info (QJsonDocument json) {
+    private void on_signal_update_last_info (GLib.JsonDocument json) {
         var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
 
         unowned Account account = this.account_state.account;

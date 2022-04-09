@@ -5,9 +5,9 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QVBoxLayout>
-//  #include <QNetworkCookie>
-//  #include <QPointer>
+//  #include <GLib.VBoxLayout>
+//  #include <GLib.NetworkCookie>
+//  #include <GLib.Pointer>
 
 namespace Occ {
 namespace Ui {
@@ -22,7 +22,7 @@ public class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
     /***********************************************************
     ***********************************************************/
     private Flow2AuthWidget flow_2_auth_widget = null;
-    private QVBoxLayout layout = null;
+    private GLib.VBoxLayout layout = null;
 
     internal signal void connect_to_oc_url (string value);
     internal signal void poll_now ();
@@ -32,7 +32,7 @@ public class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
     ***********************************************************/
     public Flow2AuthCredsPage () {
         base ();
-        this.layout = new QVBoxLayout (this);
+        this.layout = new GLib.VBoxLayout (this);
 
         this.flow_2_auth_widget = new Flow2AuthWidget ();
         this.layout.add_widget (this.flow_2_auth_widget);

@@ -139,15 +139,15 @@ public class DetermineAuthTypeJob : AbstractNetworkJob {
     }
 
 
-    private void on_signal_json_received (QJsonDocument json, int status_code) {
+    private void on_signal_json_received (GLib.JsonDocument json, int status_code) {
         if (status_code == 200) {
             this.result_old_flow = LoginFlowV2;
 
             var data = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
             var gs = data.value ("globalscale");
-            if (gs != QJsonValue.Undefined) {
+            if (gs != GLib.JsonValue.Undefined) {
                 var flow = gs.to_object ().value ("desktoplogin");
-                if (flow != QJsonValue.Undefined) {
+                if (flow != GLib.JsonValue.Undefined) {
                     if (flow.to_int () == 1) {
 // #ifdef WITH_WEBENGINE
                         this.result_old_flow = WEB_VIEW_FLOW;

@@ -323,7 +323,7 @@ public class FileInfo : AbstractFileModifier {
 
     /***********************************************************
     ***********************************************************/
-    //  public QDebug operator<< (QDebug dbg, FileInfo& file_info) {
+    //  public GLib.Debug operator<< (GLib.Debug dbg, FileInfo& file_info) {
     //      return dbg + "{ " + file_info.path (": " + file_info.children;
     //  }
 

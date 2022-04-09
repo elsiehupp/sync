@@ -4,7 +4,7 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QJsonDocument>
+//  #include <GLib.JsonDocument>
 //  #include <Json.Object>
 //  #include <Soup.Request>
 //  #include <GLib.OutputStream>
@@ -94,11 +94,11 @@ public class RemoteWipe : GLib.Object {
         request.url (request_url);
         request.ssl_configuration (this.account.or_create_ssl_config ());
         var request_body = new GLib.OutputStream ();
-        QUrlQuery arguments = new QUrlQuery ("token=%1".printf (this.app_password));
+        GLib.UrlQuery arguments = new GLib.UrlQuery ("token=%1".printf (this.app_password));
         request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
         this.network_reply_check = this.network_manager.post (request, request_body);
-        this.network_manager.ssl_errors.connect ( // (GLib.InputStream reply, GLib.List<QSslError> error_list),
-            this.account.on_signal_handle_ssl_errors // (GLib.InputStream reply, GLib.List<QSslError> error_list)
+        this.network_manager.ssl_errors.connect ( // (GLib.InputStream reply, GLib.List<GLib.SslError> error_list),
+            this.account.on_signal_handle_ssl_errors // (GLib.InputStream reply, GLib.List<GLib.SslError> error_list)
         );
         this.network_reply_check.signal_finished.connect (
             this.on_signal_check_job_slot
@@ -113,7 +113,7 @@ public class RemoteWipe : GLib.Object {
     private void on_signal_check_job_slot () {
         var json_data = this.network_reply_check.read_all ();
         Json.ParserError json_parse_error;
-        Json.Object json = QJsonDocument.from_json (json_data, json_parse_error).object ();
+        Json.Object json = GLib.JsonDocument.from_json (json_data, json_parse_error).object ();
         bool wipe = false;
 
         // check for errors
@@ -191,7 +191,7 @@ public class RemoteWipe : GLib.Object {
             request.url (request_url);
             request.ssl_configuration (this.account.or_create_ssl_config ());
             var request_body = new GLib.OutputStream ();
-            QUrlQuery arguments = new QUrlQuery ("token=%1".printf (this.app_password));
+            GLib.UrlQuery arguments = new GLib.UrlQuery ("token=%1".printf (this.app_password));
             request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
             this.network_reply_success = this.network_manager.post (request, request_body);
             this.network_reply_success.on_signal_finished.connect (
@@ -204,7 +204,7 @@ public class RemoteWipe : GLib.Object {
     private void on_signal_notify_server_success_job_slot () {
         var json_data = this.network_reply_success.read_all ();
         Json.ParserError json_parse_error;
-        Json.Object json = QJsonDocument.from_json (json_data, json_parse_error).object ();
+        Json.Object json = GLib.JsonDocument.from_json (json_data, json_parse_error).object ();
         if (this.network_reply_success.error != GLib.InputStream.NoError ||
                 json_parse_error.error != Json.ParserError.NoError) {
             string error_reason;

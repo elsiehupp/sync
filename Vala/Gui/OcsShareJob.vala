@@ -5,8 +5,8 @@
 ***********************************************************/
 
 //  #include <GLib.OutputStream>
-//  #include <QJsonDocument>
-//  #include <QPair>
+//  #include <GLib.JsonDocument>
+//  #include <GLib.Pair>
 
 namespace Occ {
 namespace Ui {
@@ -36,7 +36,7 @@ public class OcsShareJob : OcsJob {
     @param reply The reply
     @param value To what did we set a variable (if we set any).
     ***********************************************************/
-    internal signal void signal_finished (QJsonDocument reply, GLib.Variant value);
+    internal signal void signal_finished (GLib.JsonDocument reply, GLib.Variant value);
 
 
     /***********************************************************
@@ -84,7 +84,7 @@ public class OcsShareJob : OcsJob {
     @param date The expire date, if this date is invalid the
     expire date will be removed
     ***********************************************************/
-    public void expire_date (string share_id, QDate date) {
+    public void expire_date (string share_id, GLib.Date date) {
         append_path (share_id);
         verb ("PUT");
 
@@ -265,7 +265,7 @@ public class OcsShareJob : OcsJob {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_job_finished (QJsonDocument reply) {
+    private void on_signal_job_finished (GLib.JsonDocument reply) {
         /* emit */ signal_finished (reply, this.value);
     }
 

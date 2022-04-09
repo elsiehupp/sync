@@ -56,11 +56,11 @@ public class LegalNotice : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    protected override void change_event (QEvent e) {
+    protected override void change_event (GLib.Event e) {
         switch (e.type ()) {
-        case QEvent.StyleChange:
-        case QEvent.PaletteChange:
-        case QEvent.ThemeChange:
+        case GLib.Event.StyleChange:
+        case GLib.Event.PaletteChange:
+        case GLib.Event.ThemeChange:
             customize_style ();
             break;
         default:

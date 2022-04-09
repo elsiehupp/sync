@@ -7,11 +7,11 @@
 
 //  #include <theme.h>
 //  #include <account.h>
-//  #include <QFile_ico
-//  #include <QPainter>
-//  #include <Gtk.Application>
-//  #include <QMouseEvent>
-//  #include <QStyled_item_delegate>
+//  #include <GLib.File_ico
+//  #include <GLib.Painter>
+//  #include <GLib.Application>
+//  #include <GLib.MouseEvent>
+//  #include <GLib.Styled_item_delegate>
 
 namespace Occ {
 namespace Ui {
@@ -20,7 +20,7 @@ namespace Ui {
 @brief The FolderStatusDelegate class
 @ingroup gui
 ***********************************************************/
-public class FolderStatusDelegate : QStyledItemDelegate {
+public class FolderStatusDelegate : GLib.StyledItemDelegate {
 
     /***********************************************************
     ***********************************************************/
@@ -64,12 +64,12 @@ public class FolderStatusDelegate : QStyledItemDelegate {
 
     /***********************************************************
     ***********************************************************/
-    public void paint (QPainter painter, QStyleOptionViewItem option, QModelIndex index) {
+    public void paint (GLib.Painter painter, GLib.StyleOptionViewItem option, GLib.ModelIndex index) {
         if (index.data (ItemType.ADD_BUTTON).to_bool ()) {
-            ((QStyleOptionViewItem) option).show_decoration_selected = false;
+            ((GLib.StyleOptionViewItem) option).show_decoration_selected = false;
         }
 
-        QStyled_item_delegate.paint (painter, option, index);
+        GLib.Styled_item_delegate.paint (painter, option, index);
 
         var text_align = Qt.Align_left;
 
@@ -88,17 +88,17 @@ public class FolderStatusDelegate : QStyledItemDelegate {
         int margin = sub_font_metrics.height () / 4;
 
         if (index.data (ItemType.ADD_BUTTON).to_bool ()) {
-            QStyleOptionButton opt = (QStyleOption) option;
-            if (opt.state & QStyle.State_Enabled && opt.state & QStyle.State_Mouse_over && index == this.pressed_index) {
-                opt.state |= QStyle.State_Sunken;
+            GLib.StyleOptionButton opt = (GLib.StyleOption) option;
+            if (opt.state & GLib.Style.State_Enabled && opt.state & GLib.Style.State_Mouse_over && index == this.pressed_index) {
+                opt.state |= GLib.Style.State_Sunken;
             } else {
-                opt.state |= QStyle.State_Raised;
+                opt.state |= GLib.Style.State_Raised;
             }
             opt.text = add_folder_text ();
             opt.rect = add_button_rect (option.rect, option.direction);
             painter.save ();
-            painter.font (Gtk.Application.font ("QPushButton"));
-            Gtk.Application.this.style.draw_control (QStyle.CE_Push_button, opt, painter, option.widget);
+            painter.font (GLib.Application.font ("GLib.PushButton"));
+            GLib.Application.this.style.draw_control (GLib.Style.CE_Push_button, opt, painter, option.widget);
             painter.restore ();
             return;
         }
@@ -158,13 +158,13 @@ public class FolderStatusDelegate : QStyledItemDelegate {
         var options_button_visual_rect = options_button_rect (option.rect, option.direction);
 
         Gdk.Pixbuf pm = status_icon.pixmap (icon_size, icon_size, sync_enabled ? Gtk.Icon.Normal : Gtk.Icon.Disabled);
-        painter.draw_pixmap (QStyle.visual_rect (option.direction, option.rect, icon_rect).left (),
+        painter.draw_pixmap (GLib.Style.visual_rect (option.direction, option.rect, icon_rect).left (),
             icon_rect.top (), pm);
 
         // only show the warning icon if the sync is running. Otherwise its
         // encoded in the status icon.
         if (warning_count > 0 && sync_ongoing) {
-            QRect warn_rect;
+            GLib.Rect warn_rect;
             warn_rect.left (icon_rect.left ());
             warn_rect.top (icon_rect.bottom () - 17);
             warn_rect.width (16);
@@ -172,34 +172,34 @@ public class FolderStatusDelegate : QStyledItemDelegate {
 
             Gtk.Icon warn_icon = new Gtk.Icon (":/client/theme/warning");
             Gdk.Pixbuf pm = warn_icon.pixmap (16, 16, sync_enabled ? Gtk.Icon.Normal : Gtk.Icon.Disabled);
-            warn_rect = QStyle.visual_rect (option.direction, option.rect, warn_rect);
-            painter.draw_pixmap (QPoint (warn_rect.left (), warn_rect.top ()), pm);
+            warn_rect = GLib.Style.visual_rect (option.direction, option.rect, warn_rect);
+            painter.draw_pixmap (GLib.Point (warn_rect.left (), warn_rect.top ()), pm);
         }
 
         var palette = option.palette;
 
-        if (Gtk.Application.this.style.inherits ("QWindows_vista_style")) {
+        if (GLib.Application.this.style.inherits ("GLib.Windows_vista_style")) {
             // Hack : Windows Vista's light blue is not contrasting enough for white
 
-            // (code from QWindows_vista_style.draw_control for CE_Item_view_item)
+            // (code from GLib.Windows_vista_style.draw_control for CE_Item_view_item)
             palette.on_signal_color (Gtk.Palette.All, Gtk.Palette.HighlightedText, palette.color (Gtk.Palette.Active, Gtk.Palette.Text));
             palette.on_signal_color (Gtk.Palette.All, Gtk.Palette.Highlight, palette.base ().color ().darker (108));
         }
 
-        Gtk.Palette.ColorGroup cg = option.state & QStyle.State_Enabled
+        Gtk.Palette.ColorGroup cg = option.state & GLib.Style.State_Enabled
             ? Gtk.Palette.Normal
             : Gtk.Palette.Disabled;
-        if (cg == Gtk.Palette.Normal && ! (option.state & QStyle.State_Active))
+        if (cg == Gtk.Palette.Normal && ! (option.state & GLib.Style.State_Active))
             cg = Gtk.Palette.Inactive;
 
-        if (option.state & QStyle.State_Selected) {
+        if (option.state & GLib.Style.State_Selected) {
             painter.pen (palette.color (cg, Gtk.Palette.HighlightedText));
         } else {
             painter.pen (palette.color (cg, Gtk.Palette.Text));
         }
         string elided_alias = alias_font_metrics.elided_text (alias_text, Qt.Elide_right, alias_rect.width ());
         painter.font (alias_font);
-        painter.draw_text (QStyle.visual_rect (option.direction, option.rect, alias_rect), text_align, elided_alias);
+        painter.draw_text (GLib.Style.visual_rect (option.direction, option.rect, alias_rect), text_align, elided_alias);
 
         const bool show_progess = !overall_string == "" || !item_string == "";
         if (!show_progess) {
@@ -207,11 +207,11 @@ public class FolderStatusDelegate : QStyledItemDelegate {
             string elided_remote_path_text = sub_font_metrics.elided_text (
                 sync_text,
                 Qt.Elide_right, remote_path_rect.width ());
-            painter.draw_text (QStyle.visual_rect (option.direction, option.rect, remote_path_rect),
+            painter.draw_text (GLib.Style.visual_rect (option.direction, option.rect, remote_path_rect),
                 text_align, elided_remote_path_text);
 
             string elided_path_text = sub_font_metrics.elided_text (path_text, Qt.Elide_middle, local_path_rect.width ());
-            painter.draw_text (QStyle.visual_rect (option.direction, option.rect, local_path_rect),
+            painter.draw_text (GLib.Style.visual_rect (option.direction, option.rect, local_path_rect),
                 text_align, elided_path_text);
         }
 
@@ -233,31 +233,31 @@ public class FolderStatusDelegate : QStyledItemDelegate {
             painter.save ();
 
             // Overall Progress Bar.
-            QRect p_bRect;
+            GLib.Rect p_bRect;
             p_bRect.top (remote_path_rect.top ());
             p_bRect.left (next_to_icon);
             p_bRect.height (bar_height);
             p_bRect.width (overall_width - 2 * margin);
 
-            QStyle_option_progress_bar p_bar_opt;
+            GLib.Style_option_progress_bar p_bar_opt;
 
-            p_bar_opt.state = option.state | QStyle.State_Horizontal;
+            p_bar_opt.state = option.state | GLib.Style.State_Horizontal;
             p_bar_opt.minimum = 0;
             p_bar_opt.maximum = 100;
             p_bar_opt.progress = overall_percent;
             p_bar_opt.orientation = Qt.Horizontal;
-            p_bar_opt.rect = QStyle.visual_rect (option.direction, option.rect, p_bRect);
-            Gtk.Application.this.style.draw_control (QStyle.CE_Progress_bar, p_bar_opt, painter, option.widget);
+            p_bar_opt.rect = GLib.Style.visual_rect (option.direction, option.rect, p_bRect);
+            GLib.Application.this.style.draw_control (GLib.Style.CE_Progress_bar, p_bar_opt, painter, option.widget);
 
             // Overall Progress Text
-            QRect overall_progress_rect;
+            GLib.Rect overall_progress_rect;
             overall_progress_rect.top (p_bRect.bottom () + margin);
             overall_progress_rect.height (filename_text_height);
             overall_progress_rect.left (p_bRect.left ());
             overall_progress_rect.width (p_bRect.width ());
             painter.font (progress_font);
 
-            painter.draw_text (QStyle.visual_rect (option.direction, option.rect, overall_progress_rect),
+            painter.draw_text (GLib.Style.visual_rect (option.direction, option.rect, overall_progress_rect),
                 Qt.Align_left | Qt.Align_vCenter, overall_string);
             // painter.draw_rect (overall_progress_rect);
 
@@ -266,17 +266,17 @@ public class FolderStatusDelegate : QStyledItemDelegate {
 
         painter.restore ();
         {
-            QStyle_option_tool_button btn_opt;
+            GLib.Style_option_tool_button btn_opt;
             btn_opt.state = option.state;
-            btn_opt.state &= ~ (QStyle.State_Selected | QStyle.State_Has_focus);
-            btn_opt.state |= QStyle.State_Raised;
+            btn_opt.state &= ~ (GLib.Style.State_Selected | GLib.Style.State_Has_focus);
+            btn_opt.state |= GLib.Style.State_Raised;
             btn_opt.arrow_type = Qt.No_arrow;
-            btn_opt.sub_controls = QStyle.SC_Tool_button;
+            btn_opt.sub_controls = GLib.Style.SC_Tool_button;
             btn_opt.rect = options_button_visual_rect;
             btn_opt.icon = this.icon_more;
-            int e = Gtk.Application.this.style.pixel_metric (QStyle.PM_Button_icon_size);
+            int e = GLib.Application.this.style.pixel_metric (GLib.Style.PM_Button_icon_size);
             btn_opt.icon_size = Gdk.Rectangle (e,e);
-            Gtk.Application.this.style.draw_complex_control (QStyle.CC_Tool_button, btn_opt, painter);
+            GLib.Application.this.style.draw_complex_control (GLib.Style.CC_Tool_button, btn_opt, painter);
         }
     }
 
@@ -287,7 +287,7 @@ public class FolderStatusDelegate : QStyledItemDelegate {
     conflict string
     ***********************************************************/
     private void draw_text_box (GLib.List<string> texts, Gdk.RGBA color) {
-        QRect rect = local_path_rect;
+        GLib.Rect rect = local_path_rect;
         rect.left (icon_rect.left ());
         rect.top (h);
         rect.height (texts.length * sub_font_metrics.height () + 2 * margin);
@@ -297,11 +297,11 @@ public class FolderStatusDelegate : QStyledItemDelegate {
         painter.save ();
         painter.brush (color);
         painter.pen (Gdk.RGBA (0xaa, 0xaa, 0xaa));
-        painter.draw_rounded_rect (QStyle.visual_rect (option.direction, option.rect, rect),
+        painter.draw_rounded_rect (GLib.Style.visual_rect (option.direction, option.rect, rect),
             4, 4);
         painter.pen (Qt.white);
         painter.font (error_font);
-        QRect text_rect = new QRect (
+        GLib.Rect text_rect = new GLib.Rect (
             rect.left () + margin,
             rect.top () + margin,
             rect.width () - 2 * margin,
@@ -309,7 +309,7 @@ public class FolderStatusDelegate : QStyledItemDelegate {
         );
 
         foreach (string e_text in texts) {
-            painter.draw_text (QStyle.visual_rect (option.direction, option.rect, text_rect), text_align,
+            painter.draw_text (GLib.Style.visual_rect (option.direction, option.rect, text_rect), text_align,
                 sub_font_metrics.elided_text (e_text, Qt.Elide_left, text_rect.width ()));
             text_rect.translate (0, text_rect.height ());
         }
@@ -323,7 +323,7 @@ public class FolderStatusDelegate : QStyledItemDelegate {
     /***********************************************************
     allocate each item size in listview.
     ***********************************************************/
-    public Gdk.Rectangle size_hint (QStyleOptionViewItem option, QModelIndex index) {
+    public Gdk.Rectangle size_hint (GLib.StyleOptionViewItem option, GLib.ModelIndex index) {
         Cairo.FontFace alias_font = make_alias_font (option.font);
         Cairo.FontFace font = option.font;
 
@@ -333,17 +333,17 @@ public class FolderStatusDelegate : QStyledItemDelegate {
         var classif = ((FolderStatusModel) index.model ()).classify (index);
         if (classif == FolderStatusModel.ItemType.ADD_BUTTON) {
             const int margins = alias_font_metrics.height (); // same as 2*alias_margin of paint
-            Cairo.FontOptions font_options = new Cairo.FontOptions (Gtk.Application.font ("QPushButton"));
-            QStyleOptionButton opt = (QStyleOption) option;
+            Cairo.FontOptions font_options = new Cairo.FontOptions (GLib.Application.font ("GLib.PushButton"));
+            GLib.StyleOptionButton opt = (GLib.StyleOption) option;
             opt.text = add_folder_text ();
-            return Gtk.Application.this.style.size_from_contents (
-                QStyle.CT_Push_button, opt, font_options.size (Qt.Text_single_line, opt.text))
-                    .expanded_to (Gtk.Application.global_strut ())
+            return GLib.Application.this.style.size_from_contents (
+                GLib.Style.CT_Push_button, opt, font_options.size (Qt.Text_single_line, opt.text))
+                    .expanded_to (GLib.Application.global_strut ())
                 + Gdk.Rectangle (0, margins);
         }
 
         if (classif != FolderStatusModel.ItemType.ROOT_FOLDER) {
-            return QStyled_item_delegate.size_hint (option, index);
+            return GLib.Styled_item_delegate.size_hint (option, index);
         }
 
         // calc height
@@ -365,15 +365,15 @@ public class FolderStatusDelegate : QStyledItemDelegate {
 
     /***********************************************************
     ***********************************************************/
-    public bool editor_event (QEvent event, QAbstractItemModel model,
-        QStyleOptionViewItem option, QModelIndex index) {
+    public bool editor_event (GLib.Event event, GLib.AbstractItemModel model,
+        GLib.StyleOptionViewItem option, GLib.ModelIndex index) {
         switch (event.type ()) {
-        case QEvent.Mouse_button_press:
-        case QEvent.Mouse_move:
-            var view = (QAbstractItemView) option.widget;
+        case GLib.Event.Mouse_button_press:
+        case GLib.Event.Mouse_move:
+            var view = (GLib.AbstractItemView) option.widget;
             if (view) {
-                var mouse_event = (QMouseEvent) event;
-                QModelIndex index;
+                var mouse_event = (GLib.MouseEvent) event;
+                GLib.ModelIndex index;
                 if (mouse_event.buttons ()) {
                     index = view.index_at (mouse_event.position ());
                 }
@@ -383,60 +383,60 @@ public class FolderStatusDelegate : QStyledItemDelegate {
                 }
             }
             break;
-        case QEvent.Mouse_button_release:
-            this.pressed_index = QModelIndex ();
+        case GLib.Event.Mouse_button_release:
+            this.pressed_index = GLib.ModelIndex ();
             break;
         default:
             break;
         }
-        return QStyled_item_delegate.editor_event (event, model, option, index);
+        return GLib.Styled_item_delegate.editor_event (event, model, option, index);
     }
 
 
     /***********************************************************
     Return the position of the option button within the item
     ***********************************************************/
-    public static QRect options_button_rect (QRect within, Qt.Layout_direction direction) {
+    public static GLib.Rect options_button_rect (GLib.Rect within, Qt.Layout_direction direction) {
         Cairo.FontFace font = new Cairo.FontFace ();
         Cairo.FontFace alias_font = make_alias_font (font);
         Cairo.FontOptions font_options = new Cairo.FontOptions (font);
         Cairo.FontOptions alias_font_metrics = new Cairo.FontOptions (alias_font);
         within.height (FolderStatusDelegate.root_folder_height_without_errors (font_options, alias_font_metrics));
 
-        QStyle_option_tool_button opt;
-        int e = Gtk.Application.this.style.pixel_metric (QStyle.PM_Button_icon_size);
+        GLib.Style_option_tool_button opt;
+        int e = GLib.Application.this.style.pixel_metric (GLib.Style.PM_Button_icon_size);
         opt.rect.size (Gdk.Rectangle (e,e));
-        Gdk.Rectangle size = Gtk.Application.this.style.size_from_contents (QStyle.CT_Tool_button, opt, opt.rect.size ()).expanded_to (Gtk.Application.global_strut ());
+        Gdk.Rectangle size = GLib.Application.this.style.size_from_contents (GLib.Style.CT_Tool_button, opt, opt.rect.size ()).expanded_to (GLib.Application.global_strut ());
 
-        int margin = Gtk.Application.this.style.pixel_metric (QStyle.PM_Default_layout_spacing);
-        QRect rectangle = new QRect (
-            QPoint (within.right () - size.width () - margin,
+        int margin = GLib.Application.this.style.pixel_metric (GLib.Style.PM_Default_layout_spacing);
+        GLib.Rect rectangle = new GLib.Rect (
+            GLib.Point (within.right () - size.width () - margin,
             within.top () + within.height () / 2 - size.height () / 2),
             size
         );
-        return QStyle.visual_rect (direction, within, rectangle);
+        return GLib.Style.visual_rect (direction, within, rectangle);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public static QRect add_button_rect (QRect within, Qt.Layout_direction direction) {
-        Cairo.FontOptions font_options = new Cairo.FontOptions (Gtk.Application.font ("QPushButton"));
-        QStyleOptionButton opt;
+    public static GLib.Rect add_button_rect (GLib.Rect within, Qt.Layout_direction direction) {
+        Cairo.FontOptions font_options = new Cairo.FontOptions (GLib.Application.font ("GLib.PushButton"));
+        GLib.StyleOptionButton opt;
         opt.text = add_folder_text ();
-        Gdk.Rectangle size = Gtk.Application.this.style.size_from_contents (QStyle.CT_Push_button, opt, font_options.size (Qt.Text_single_line, opt.text)).expanded_to (Gtk.Application.global_strut ());
-        QRect rectangle = new QRect (
-            QPoint (within.left (),
+        Gdk.Rectangle size = GLib.Application.this.style.size_from_contents (GLib.Style.CT_Push_button, opt, font_options.size (Qt.Text_single_line, opt.text)).expanded_to (GLib.Application.global_strut ());
+        GLib.Rect rectangle = new GLib.Rect (
+            GLib.Point (within.left (),
             within.top () + within.height () / 2 - size.height () / 2),
             size
         );
-        return QStyle.visual_rect (direction, within, rectangle);
+        return GLib.Style.visual_rect (direction, within, rectangle);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public QRect errors_list_rect (QRect within) {
+    public GLib.Rect errors_list_rect (GLib.Rect within) {
         Cairo.FontFace font = Cairo.FontFace ();
         Cairo.FontFace alias_font = make_alias_font (font);
         Cairo.FontOptions font_options = new Cairo.FontOptions (font);

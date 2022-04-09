@@ -10,17 +10,17 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public class TestConcatenateUrl : GLib.Object {
 
-    class QueryItems : GLib.List<QPair<string, string>> { }
+    class QueryItems : GLib.List<GLib.Pair<string, string>> { }
 
     /***********************************************************
     ***********************************************************/
     private TestConcatenateUrl () {
-        QFETCH (string, base);
-        QFETCH (string, concat);
-        QFETCH (QueryItems, query);
-        QFETCH (string, expected);
+        GLib.FETCH (string, base);
+        GLib.FETCH (string, concat);
+        GLib.FETCH (QueryItems, query);
+        GLib.FETCH (string, expected);
         GLib.Uri base_url = new GLib.Uri ("http://example.com" + base);
-        QUrlQuery url_query;
+        GLib.UrlQuery url_query;
         url_query.set_query_items (query);
         GLib.Uri result_url = Utility.concat_url_path (base_url, concat, url_query);
         string result = result_url.to_string ();
@@ -32,40 +32,40 @@ public class TestConcatenateUrl : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private TestConcatenateUrlData () {
-        QTest.add_column<string> ("base");
-        QTest.add_column<string> ("concat");
-        QTest.add_column<QueryItems> ("query");
-        QTest.add_column<string> ("expected");
+        GLib.Test.add_column<string> ("base");
+        GLib.Test.add_column<string> ("concat");
+        GLib.Test.add_column<QueryItems> ("query");
+        GLib.Test.add_column<string> ("expected");
 
         // Tests about slashes
-        QTest.new_row ("noslash1")  + "/baa"  + "foo"  + make ("/baa/foo");
-        QTest.new_row ("noslash2")  + ""      + "foo"  + make ("/foo");
-        QTest.new_row ("noslash3")  + "/foo"  + ""     + make ("/foo");
-        QTest.new_row ("noslash4")  + ""      + ""     + make ("");
-        QTest.new_row ("oneslash1") + "/bar/" + "foo"  + make ("/bar/foo");
-        QTest.new_row ("oneslash2") + "/"     + "foo"  + make ("/foo");
-        QTest.new_row ("oneslash3") + "/foo"  + "/"    + make ("/foo/");
-        QTest.new_row ("oneslash4") + ""      + "/"    + make ("/");
-        QTest.new_row ("twoslash1") + "/bar/" + "/foo" + make ("/bar/foo");
-        QTest.new_row ("twoslash2") + "/"     + "/foo" + make ("/foo");
-        QTest.new_row ("twoslash3") + "/foo/" + "/"    + make ("/foo/");
-        QTest.new_row ("twoslash4") + "/"     + "/"    + make ("/");
+        GLib.Test.new_row ("noslash1")  + "/baa"  + "foo"  + make ("/baa/foo");
+        GLib.Test.new_row ("noslash2")  + ""      + "foo"  + make ("/foo");
+        GLib.Test.new_row ("noslash3")  + "/foo"  + ""     + make ("/foo");
+        GLib.Test.new_row ("noslash4")  + ""      + ""     + make ("");
+        GLib.Test.new_row ("oneslash1") + "/bar/" + "foo"  + make ("/bar/foo");
+        GLib.Test.new_row ("oneslash2") + "/"     + "foo"  + make ("/foo");
+        GLib.Test.new_row ("oneslash3") + "/foo"  + "/"    + make ("/foo/");
+        GLib.Test.new_row ("oneslash4") + ""      + "/"    + make ("/");
+        GLib.Test.new_row ("twoslash1") + "/bar/" + "/foo" + make ("/bar/foo");
+        GLib.Test.new_row ("twoslash2") + "/"     + "/foo" + make ("/foo");
+        GLib.Test.new_row ("twoslash3") + "/foo/" + "/"    + make ("/foo/");
+        GLib.Test.new_row ("twoslash4") + "/"     + "/"    + make ("/");
 
         // Tests about path encoding
-        QTest.new_row ("encodepath")
+        GLib.Test.new_row ("encodepath")
                 + "/a f/b"
                 + "/a f/c"
                 + make ()
                 + "/a%20f/b/a%20f/c";
 
         // Tests about query args
-        QTest.new_row ("query1")
+        GLib.Test.new_row ("query1")
                 + "/baa"
                 + "/foo"
                 + make_keys_values ("a=a", "b=b",
                         "c", "d")
                 + "/baa/foo?a%3Da=b%3Db&c=d";
-        QTest.new_row ("query2")
+        GLib.Test.new_row ("query2")
                 + ""
                 + ""
                 + make_key_value ("foo", "bar")

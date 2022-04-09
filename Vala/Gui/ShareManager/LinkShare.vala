@@ -63,7 +63,7 @@ public class LinkShare : Share {
     }
 
 
-    public QDate expire_date {
+    public GLib.Date expire_date {
         /***********************************************************
         Get the expiration date
         ***********************************************************/
@@ -130,7 +130,7 @@ public class LinkShare : Share {
         Permissions permissions,
         bool password_is_set,
         GLib.Uri url,
-        QDate expire_date,
+        GLib.Date expire_date,
         string note,
         string label) {
         base (account, identifier, owner_uid, owner_display_name, path, Share.Type.LINK, password_is_set, permissions);
@@ -189,7 +189,7 @@ public class LinkShare : Share {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_link_share_note_set (QJsonDocument reply, GLib.Variant value) {
+    private void on_signal_link_share_note_set (GLib.JsonDocument reply, GLib.Variant value) {
         this.note = note.to_string ();
         /* emit */ signal_note_set ();
     }
@@ -197,7 +197,7 @@ public class LinkShare : Share {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_expire_date_set (QJsonDocument reply, GLib.Variant value) {
+    private void on_signal_expire_date_set (GLib.JsonDocument reply, GLib.Variant value) {
         var data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
 
         /***********************************************************
@@ -205,7 +205,7 @@ public class LinkShare : Share {
         they use this date.
         ***********************************************************/
         if (data.value ("expiration").is_string ()) {
-            this.expire_date = QDate.from_string (data.value ("expiration").to_string (), "yyyy-MM-dd 00:00:00");
+            this.expire_date = GLib.Date.from_string (data.value ("expiration").to_string (), "yyyy-MM-dd 00:00:00");
         } else {
             this.expire_date = value.to_date ();
         }
@@ -215,7 +215,7 @@ public class LinkShare : Share {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_name_set (QJsonDocument reply, GLib.Variant value) {
+    private void on_signal_name_set (GLib.JsonDocument reply, GLib.Variant value) {
         this.name = value.to_string ();
         /* emit */ signal_name_set ();
     }
@@ -223,7 +223,7 @@ public class LinkShare : Share {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_link_share_label_set (QJsonDocument reply, GLib.Variant value) {
+    private void on_signal_link_share_label_set (GLib.JsonDocument reply, GLib.Variant value) {
         if (this.label != label.to_string ()) {
             this.label = label.to_string ();
             /* emit */ signal_label_set ();

@@ -15,7 +15,7 @@ public class TestDirectoryEtagAfterIncompleteSync : AbstractTestSyncEngine {
     ***********************************************************/
     private TestDirectoryEtagAfterIncompleteSync () {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
-        QSignalSpy finished_spy = new QSignalSpy (
+        GLib.SignalSpy finished_spy = new GLib.SignalSpy (
             fake_folder.sync_engine,
             SIGNAL (on_signal_finished (bool))
         );

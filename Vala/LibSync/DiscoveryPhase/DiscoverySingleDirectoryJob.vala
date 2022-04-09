@@ -168,7 +168,7 @@ public class DiscoverySingleDirectoryJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_metadata_received (QJsonDocument json, int status_code);
+    private void on_signal_metadata_received (GLib.JsonDocument json, int status_code);
 
 
     /***********************************************************

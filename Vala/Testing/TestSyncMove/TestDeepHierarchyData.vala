@@ -12,9 +12,9 @@ public class TestDeepHierarchyData : AbstractTestSyncMove {
     /***********************************************************
     ***********************************************************/
     private TestDeepHierarchyData () {
-        QTest.add_column<bool> ("local");
-        QTest.new_row ("remote") + false;
-        QTest.new_row ("local") + true;
+        GLib.Test.add_column<bool> ("local");
+        GLib.Test.new_row ("remote") + false;
+        GLib.Test.new_row ("local") + true;
     }
 
 } // class TestDeepHierarchyData

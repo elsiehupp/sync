@@ -29,9 +29,9 @@ public class TestDirectoryDownloadWithError : AbstractTestSyncEngine {
         fake_folder.server_error_paths ().append ("Y/Z/d2", 503);
         fake_folder.server_error_paths ().append ("Y/Z/d3", 503);
         GLib.assert_true (!fake_folder.sync_once ());
-        Gtk.Application.process_events (); // should not crash
+        GLib.Application.process_events (); // should not crash
 
-        GLib.Set<string> seen;
+        GLib.List<string> seen;
         foreach (GLib.List<GLib.Variant> args in complete_spy) {
             var item = args[0].value<SyncFileItem> ();
             GLib.debug () + item.file + item.is_directory () + item.status;

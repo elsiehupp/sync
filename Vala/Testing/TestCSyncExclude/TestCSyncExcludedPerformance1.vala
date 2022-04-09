@@ -11,14 +11,14 @@ implied, as to its usefulness for any purpose.
 public class TestCSyncExcludedPerformance1 : AbstractTestCSyncExclude {
 
     /***********************************************************
-    QT_ENABLE_REGEXP_JIT=0 to get slower results :-)
+    GLib.T_ENABLE_REGEXP_JIT=0 to get slower results :-)
     ***********************************************************/
     private TestCSyncExcludedPerformance1 () {
         base ();
         const int N = 1000;
         int total_rc = 0;
 
-        //  QBENCHMARK {
+        //  GLib.BENCHMARK {
 
             for (int i = 0; i < N; ++i) {
                 total_rc += check_dir_full ("/this/is/quite/a/long/path/with/many/components");

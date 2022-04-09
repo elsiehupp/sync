@@ -7,9 +7,9 @@
 //  #include <GLib.Regex>
 //  #include <qfileinfo.h>
 //  #include <GLib.OutputStream>
-//  #include <QScopedPointer>
+//  #include <GLib.ScopedPointer>
 //  #include <GLib.Timer>
-//  #include <QStandardPaths>
+//  #include <GLib.StandardPaths>
 //  #include <GLib.Dir>
 
 namespace Occ {
@@ -38,7 +38,7 @@ public class SyncRunFileLog : GLib.Object {
     public void on_signal_start (string folder_path) {
         const int64 logfile_max_size = 10 * 1024 * 1024; // 10Mi_b
 
-        const string logpath = QStandardPaths.writable_location (QStandardPaths.AppDataLocation);
+        const string logpath = GLib.StandardPaths.writable_location (GLib.StandardPaths.AppDataLocation);
         if (!new GLib.Dir (logpath).exists ()) {
             new GLib.Dir ().mkdir (logpath);
         }
@@ -51,7 +51,7 @@ public class SyncRunFileLog : GLib.Object {
         while (GLib.File.exists (filename)) {
 
             GLib.File file = GLib.File.new_for_path (filename);
-            file.open (QIODevice.ReadOnly | QIODevice.Text);
+            file.open (GLib.IODevice.ReadOnly | GLib.IODevice.Text);
             string line = new GLib.OutputStream (file).read_line ();
 
             if (string.compare (folder_path,line,Qt.CaseSensitive)!=0) {
@@ -83,7 +83,7 @@ public class SyncRunFileLog : GLib.Object {
         }
         this.file.on_signal_reset (GLib.File.new_for_path (filename));
 
-        this.file.open (QIODevice.WriteOnly | QIODevice.Append | QIODevice.Text);
+        this.file.open (GLib.IODevice.WriteOnly | GLib.IODevice.Append | GLib.IODevice.Text);
         this.out.device (this.file);
 
         if (!exists) {

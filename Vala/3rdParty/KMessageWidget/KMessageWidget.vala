@@ -233,7 +233,7 @@ public class KMessageWidget : Gdk.Frame {
     @param action the action to add
     @see remove_action (), Gtk.Widget.actions ()
     ***********************************************************/
-    public void add_action (QAction action) {
+    public void add_action (GLib.Action action) {
         Gdk.Frame.add_action (action);
         d.update_layout ();
     }
@@ -245,7 +245,7 @@ public class KMessageWidget : Gdk.Frame {
     @param action the action to remove
     @see KMessageWidget.MessageType, add_action (), on_signal_set_message_type ()
     ***********************************************************/
-    public void remove_action (QAction action) {
+    public void remove_action (GLib.Action action) {
         Gdk.Frame.remove_action (action);
         d.update_layout ();
     }
@@ -297,8 +297,8 @@ public class KMessageWidget : Gdk.Frame {
     @since 5.0
     ***********************************************************/
     public bool is_hide_animation_running () {
-        return (d.time_line.direction () == QTimeLine.Backward)
-            && (d.time_line.state == QTimeLine.Running);
+        return (d.time_line.direction () == GLib.TimeLine.Backward)
+            && (d.time_line.state == GLib.TimeLine.Running);
     }
 
 
@@ -311,8 +311,8 @@ public class KMessageWidget : Gdk.Frame {
     @since 5.0
     ***********************************************************/
     public bool is_show_animation_running () {
-        return (d.time_line.direction () == QTimeLine.Forward)
-            && (d.time_line.state == QTimeLine.Running);
+        return (d.time_line.direction () == GLib.TimeLine.Forward)
+            && (d.time_line.state == GLib.TimeLine.Running);
     }
 
 
@@ -341,7 +341,7 @@ public class KMessageWidget : Gdk.Frame {
     public void on_signal_set_word_wrap (bool word_wrap) {
         d.word_wrap = word_wrap;
         d.text_label.on_signal_set_word_wrap (word_wrap);
-        QSizePolicy policy = size_policy ();
+        GLib.SizePolicy policy = size_policy ();
         policy.set_height_for_width (word_wrap);
         set_size_policy (policy);
         d.update_layout ();
@@ -390,14 +390,14 @@ public class KMessageWidget : Gdk.Frame {
             /* emit */ hide_animation_finished ();
         }
 
-        if (!this.style.style_hint (QStyle.SH_WidgetAnimate, null, this)
+        if (!this.style.style_hint (GLib.Style.SH_WidgetAnimate, null, this)
          || (parent_widget () && !parent_widget ().is_visible ())) {
             show ();
             /* emit */ show_animation_finished ();
             return;
         }
 
-        if (is_visible () && (d.time_line.state == QTimeLine.NotRunning) && (height () == d.best_content_height ()) && (d.content.position ().y () == 0)) {
+        if (is_visible () && (d.time_line.state == GLib.TimeLine.NotRunning) && (height () == d.best_content_height ()) && (d.content.position ().y () == 0)) {
             /* emit */ show_animation_finished ();
             return;
         }
@@ -411,8 +411,8 @@ public class KMessageWidget : Gdk.Frame {
 
         d.update_snap_shot ();
 
-        d.time_line.set_direction (QTimeLine.Forward);
-        if (d.time_line.state == QTimeLine.NotRunning) {
+        d.time_line.set_direction (GLib.TimeLine.Forward);
+        if (d.time_line.state == GLib.TimeLine.NotRunning) {
             d.time_line.on_start ();
         }
     }
@@ -430,7 +430,7 @@ public class KMessageWidget : Gdk.Frame {
             /* emit */ show_animation_finished ();
         }
 
-        if (!this.style.style_hint (QStyle.SH_WidgetAnimate, null, this)) {
+        if (!this.style.style_hint (GLib.Style.SH_WidgetAnimate, null, this)) {
             hide ();
             /* emit */ hide_animation_finished ();
             return;
@@ -446,8 +446,8 @@ public class KMessageWidget : Gdk.Frame {
         d.content.move (0, -d.content.height ());
         d.update_snap_shot ();
 
-        d.time_line.set_direction (QTimeLine.Backward);
-        if (d.time_line.state == QTimeLine.NotRunning) {
+        d.time_line.set_direction (GLib.TimeLine.Backward);
+        if (d.time_line.state == GLib.TimeLine.NotRunning) {
             d.time_line.on_start ();
         }
     }
@@ -462,7 +462,7 @@ public class KMessageWidget : Gdk.Frame {
         if (d.icon == null) {
             d.icon_label.hide ();
         } else {
-            const int size = this.style.pixel_metric (QStyle.PM_ToolBarIconSize);
+            const int size = this.style.pixel_metric (GLib.Style.PM_ToolBarIconSize);
             d.icon_label.set_pixmap (d.icon.pixmap (size));
             d.icon_label.show ();
         }
@@ -471,10 +471,10 @@ public class KMessageWidget : Gdk.Frame {
 
     /***********************************************************
     ***********************************************************/
-    protected override void paint_event (QPaintEvent event) {
+    protected override void paint_event (GLib.PaintEvent event) {
         Gdk.Frame.paint_event (event);
-        if (d.time_line.state == QTimeLine.Running) {
-            QPainter painter = new QPainter (this);
+        if (d.time_line.state == GLib.TimeLine.Running) {
+            GLib.Painter painter = new GLib.Painter (this);
             painter.set_opacity (d.time_line.current_value () * d.time_line.current_value ());
             painter.draw_pixmap (0, 0, d.content_snap_shot);
         }
@@ -483,12 +483,12 @@ public class KMessageWidget : Gdk.Frame {
 
     /***********************************************************
     ***********************************************************/
-    protected override bool event (QEvent event) {
-        if (event.type () == QEvent.Polish && !d.content.layout ()) {
+    protected override bool event (GLib.Event event) {
+        if (event.type () == GLib.Event.Polish && !d.content.layout ()) {
             d.create_layout ();
-        } else if (event.type () == QEvent.PaletteChange) {
+        } else if (event.type () == GLib.Event.PaletteChange) {
             d.apply_style_sheet ();
-        } else if (event.type () == QEvent.Show && !d.ignore_show_event_doing_animated_show) {
+        } else if (event.type () == GLib.Event.Show && !d.ignore_show_event_doing_animated_show) {
             if ( (height () != d.content.height ()) || (d.content.position ().y () != 0)) {
                 d.content.move (0, 0);
                 set_fixed_height (d.content.height ());
@@ -500,10 +500,10 @@ public class KMessageWidget : Gdk.Frame {
 
     /***********************************************************
     ***********************************************************/
-    protected override void resize_event (QResizeEvent event) {
+    protected override void resize_event (GLib.ResizeEvent event) {
         Gdk.Frame.resize_event (event);
 
-        if (d.time_line.state == QTimeLine.NotRunning) {
+        if (d.time_line.state == GLib.TimeLine.NotRunning) {
             d.content.resize (width (), d.best_content_height ());
         }
     }

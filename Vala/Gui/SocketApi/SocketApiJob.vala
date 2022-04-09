@@ -32,7 +32,7 @@ public class SocketApiJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void resolve (Json.Object response) {
-        resolve (QJsonDocument {
+        resolve (GLib.JsonDocument {
             response
         }.to_json ());
     }

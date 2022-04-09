@@ -12,10 +12,10 @@ public class TestMovedWithErrorData : AbstractTestSyncMove {
     /***********************************************************
     ***********************************************************/
     private TestMovedWithErrorData () {
-        QTest.add_column<Common.VfsMode> ("vfs_mode");
+        GLib.Test.add_column<Common.VfsMode> ("vfs_mode");
 
-        QTest.new_row ("AbstractVfs.Off") + AbstractVfs.Off;
-        QTest.new_row ("AbstractVfs.WithSuffix") + AbstractVfs.WithSuffix;
+        GLib.Test.new_row ("AbstractVfs.Off") + AbstractVfs.Off;
+        GLib.Test.new_row ("AbstractVfs.WithSuffix") + AbstractVfs.WithSuffix;
     }
 
 } // class TestMovedWithErrorData

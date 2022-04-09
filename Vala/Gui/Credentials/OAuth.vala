@@ -4,13 +4,13 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QDesktopServices>
+//  #include <GLib.DesktopServices>
 //  #include <GLib.OutputStream>
 //  #include <Json.Object>
-//  #include <QJsonDocument>
+//  #include <GLib.JsonDocument>
 
-//  #include <QPointer>
-//  #include <QTcpServer>
+//  #include <GLib.Pointer>
+//  #include <GLib.TcpServer>
 
 namespace Occ {
 namespace Ui {
@@ -71,7 +71,7 @@ public class OAuth : GLib.Object {
     ***********************************************************/
     public void on_signal_start () {
         // Listen on the socket to get a port which will be used in the redirect_uri
-        if (!this.server.listen (QHostAddress.LocalLost)) {
+        if (!this.server.listen (GLib.HostAddress.LocalLost)) {
             /* emit */ signal_result (Result.NOT_SUPPORTED, "");
             return;
         }
@@ -89,7 +89,7 @@ public class OAuth : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_new_connection () {
-        QTcpSocket socket = this.server.next_pending_connection ();
+        GLib.TcpSocket socket = this.server.next_pending_connection ();
         while (socket) {
             socket.disconnected.connect (
                 socket.delete_later
@@ -103,7 +103,7 @@ public class OAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_ready_read (QTcpSocket socket) {
+    private void on_signal_ready_read (GLib.TcpSocket socket) {
         string peek = socket.peek (q_min (socket.bytes_available (), 4000LL)); //The code should always be within the first 4K
         if (peek.index_of ("\n") < 0)
             return; // wait until we find a \n
@@ -129,7 +129,7 @@ public class OAuth : GLib.Object {
         req.attribute (HttpCredentials.DontAddCredentialsAttribute, true);
 
         var request_body = new GLib.OutputStream ();
-        QUrlQuery arguments = new QUrlQuery (
+        GLib.UrlQuery arguments = new GLib.UrlQuery (
             "grant_type=authorization_code&code=%1&redirect_uri=http://localhost:%2"
                 .printf (code, string.number (this.server.server_port ())));
         request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
@@ -144,10 +144,10 @@ public class OAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_simple_network_job_finished (QTcpSocket socket, GLib.InputStream reply) {
+    private void on_signal_simple_network_job_finished (GLib.TcpSocket socket, GLib.InputStream reply) {
         var json_data = reply.read_all ();
         Json.ParserError json_parse_error;
-        Json.Object json = QJsonDocument.from_json (json_data, json_parse_error).object ();
+        Json.Object json = GLib.JsonDocument.from_json (json_data, json_parse_error).object ();
         string access_token = json["access_token"].to_string ();
         string refresh_token = json["refresh_token"].to_string ();
         string user = json["user_id"].to_string ();
@@ -222,7 +222,7 @@ public class OAuth : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private static void http_reply_and_close (
-        QTcpSocket socket,
+        GLib.TcpSocket socket,
         string code,
         string html,
         string more_headers = "") {
@@ -250,7 +250,7 @@ public class OAuth : GLib.Object {
     ***********************************************************/
     public GLib.Uri authorisation_link () {
         //  Q_ASSERT (this.server.is_listening ());
-        QUrlQuery query;
+        GLib.UrlQuery query;
         query.query_items ({
             {
                 "response_type",

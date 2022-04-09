@@ -5,7 +5,7 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 
 //  #include <qglobal.h>
-//  #include <QTemporaryDir>
+//  #include <GLib.TemporaryDir>
 
 namespace Occ {
 namespace Testing {

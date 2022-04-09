@@ -4,11 +4,11 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QClipboard>
-//  #include <Gtk.Application>
-//  #include <QDesktopServices>
+//  #include <GLib.Clipboard>
+//  #include <GLib.Application>
+//  #include <GLib.DesktopServices>
 //  #include <Gtk.MessageBox>
-//  #include <QUrlQuery>
+//  #include <GLib.UrlQuery>
 
 //  #include <Gtk.Widget>
 
@@ -28,7 +28,7 @@ public class OpenExternal : GLib.Object {
     If launching the browser fails, display a message.
     ***********************************************************/
     public static void open_browser (GLib.Uri url, Gtk.Widget error_widget_parent = new Gtk.Widget ()) throws OpenExternalError {
-        const GLib.List<string> allowed_url_schemes = {
+        GLib.List<string> allowed_url_schemes = {
             "http",
             "https",
             "oauthtest"
@@ -39,7 +39,7 @@ public class OpenExternal : GLib.Object {
             throw new OpenExternalError.INVALID_URL_SCHEME ("URL format is not supported, or it has been compromised for: " + url.to_string ());
         }
 
-        if (!QDesktopServices.open_url (url)) {
+        if (!GLib.DesktopServices.open_url (url)) {
             if (error_widget_parent != null) {
                 Gtk.MessageBox.warning (
                     error_widget_parent,
@@ -49,8 +49,8 @@ public class OpenExternal : GLib.Object {
                     + "URL %1. Maybe no default browser is configured?")
                         .printf (url.to_string ()));
             }
-            GLib.warning ("QDesktopServices.open_url failed for " + url.to_string ());
-            throw new OpenExternalError.OPEN_EXTERNAL_FAILED ("QDesktopServices.open_url failed for " + url.to_string ());
+            GLib.warning ("GLib.DesktopServices.open_url failed for " + url.to_string ());
+            throw new OpenExternalError.OPEN_EXTERNAL_FAILED ("GLib.DesktopServices.open_url failed for " + url.to_string ());
         }
         return;
     }
@@ -65,7 +65,7 @@ public class OpenExternal : GLib.Object {
         string subject, string body,
         Gtk.Widget error_widget_parent) throws OpenExternalError {
         GLib.Uri url = new GLib.Uri ("mailto:");
-        QUrlQuery query;
+        GLib.UrlQuery query;
         query.query_items (
             {
                 {
@@ -80,7 +80,7 @@ public class OpenExternal : GLib.Object {
         );
         url.query (query);
 
-        if (!QDesktopServices.open_url (url)) {
+        if (!GLib.DesktopServices.open_url (url)) {
             if (error_widget_parent != null) {
                 Gtk.MessageBox.warning (
                     error_widget_parent,
@@ -90,8 +90,8 @@ public class OpenExternal : GLib.Object {
                     + "create a new message. Maybe no default email client is "
                     + "configured?"));
             }
-            GLib.warning ("QDesktopServices.open_url failed for " + url);
-            throw new OpenExternalError.INVALID_URL_SCHEME ("QDesktopServices.open_url failed for " + url.to_string ());
+            GLib.warning ("GLib.DesktopServices.open_url failed for " + url);
+            throw new OpenExternalError.INVALID_URL_SCHEME ("GLib.DesktopServices.open_url failed for " + url.to_string ());
         }
     }
 

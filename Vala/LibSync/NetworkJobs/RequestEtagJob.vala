@@ -37,7 +37,7 @@ public class RequestEtagJob : AbstractNetworkJob {
                            + "</d:propfind>\n";
         var buf = new Soup.Buffer (this);
         buf.data (xml);
-        buf.open (QIODevice.ReadOnly);
+        buf.open (GLib.IODevice.ReadOnly);
         // assumes ownership
         send_request ("PROPFIND", make_dav_url (path), request, buf);
 
@@ -57,12 +57,12 @@ public class RequestEtagJob : AbstractNetworkJob {
         var http_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (http_code == 207) {
             // Parse DAV response
-            QXmlStreamReader reader = new QXmlStreamReader (this.reply);
-            reader.add_extra_namespace_declaration (QXmlStreamNamespaceDeclaration ("d", "DAV:"));
+            GLib.XmlStreamReader reader = new GLib.XmlStreamReader (this.reply);
+            reader.add_extra_namespace_declaration (GLib.XmlStreamNamespaceDeclaration ("d", "DAV:"));
             string etag;
             while (!reader.at_end ()) {
-                QXmlStreamReader.TokenType type = reader.read_next ();
-                if (type == QXmlStreamReader.StartElement && reader.namespace_uri () == "DAV:") {
+                GLib.XmlStreamReader.TokenType type = reader.read_next ();
+                if (type == GLib.XmlStreamReader.StartElement && reader.namespace_uri () == "DAV:") {
                     string name = reader.name ().to_string ();
                     if (name == "getetag") {
                         var etag_text = reader.read_element_text ();

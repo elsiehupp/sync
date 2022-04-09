@@ -121,9 +121,9 @@ public class TokenCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_authentication (GLib.InputStream reply, QAuthenticator authenticator) {
+    private void on_signal_authentication (GLib.InputStream reply, GLib.Authenticator authenticator) {
         //  Q_UNUSED (authenticator)
-        // we cannot use QAuthenticator, because it sends username and passwords with latin1
+        // we cannot use GLib.Authenticator, because it sends username and passwords with latin1
         // instead of utf8 encoding. Instead, we send it manually. Thus, if we reach this signal,
         // those credentials were invalid and we terminate.
         GLib.warning ("Stop request: Authentication failed for " + reply.url.to_string ());

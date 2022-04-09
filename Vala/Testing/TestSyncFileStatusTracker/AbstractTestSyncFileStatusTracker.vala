@@ -11,7 +11,7 @@ public abstract class AbstractTestSyncFileStatusTracker : GLib.Object {
 
     protected static void verify_that_push_matches_pull (FakeFolder fake_folder, StatusPushSpy status_spy) {
         string root = fake_folder.local_path;
-        QDirIterator it = new QDirIterator (root, GLib.Dir.AllEntries | GLib.Dir.NoDotAndDotDot, QDirIterator.Subdirectories);
+        GLib.DirIterator it = new GLib.DirIterator (root, GLib.Dir.AllEntries | GLib.Dir.NoDotAndDotDot, GLib.DirIterator.Subdirectories);
         while (it.has_next ()) {
             string file_path = it.next ().mid (root.size ());
             SyncFileStatus pushed_status = status_spy.status_of (file_path);

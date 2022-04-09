@@ -4,15 +4,15 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <Gtk.Application>
+//  #include <GLib.Application>
 //  #include <qt5keychain/keychain.h>
 
 using Secret.Collection;
 
-//  #include <QNetworkProxy>
-//  #include <QAuthenticator>
-//  #include <QPointer>
-//  #include <QScopedPointer>
+//  #include <Soup.NetworkProxy>
+//  #include <GLib.Authenticator>
+//  #include <GLib.Pointer>
+//  #include <GLib.ScopedPointer>
 //  #include <GLib.Settings>
 
 namespace Occ {
@@ -20,7 +20,7 @@ namespace Ui {
 
 /***********************************************************
 @brief Handle proxy_authentication_required signals from
-our QNetwork_access_managers.
+our GLib.Network_access_managers.
 
 The main complication here is that the slot needs to return
 credential informa
@@ -80,8 +80,8 @@ public class ProxyAuthHandler : GLib.Object {
     private ConfigFile config_file;
 
     /***********************************************************
-    To distinguish between a new QNAM asking for credentials and
-    credentials failing for an existing QNAM, we keep track of
+    To distinguish between a new GLib.NAM asking for credentials and
+    credentials failing for an existing GLib.NAM, we keep track of
     the senders of the proxy_auth_required signal here.
     ***********************************************************/
     private GLib.List<GLib.Object> gave_credentials_to;
@@ -95,8 +95,8 @@ public class ProxyAuthHandler : GLib.Object {
     Intended for Soup.Context.proxy_authentication_required ()
     ***********************************************************/
     public void on_signal_handle_proxy_authentication_required (
-        QNetworkProxy proxy,
-        QAuthenticator authenticator) {
+        Soup.NetworkProxy proxy,
+        GLib.Authenticator authenticator) {
         if (this.dialog == null) {
             return;
         }
@@ -113,8 +113,8 @@ public class ProxyAuthHandler : GLib.Object {
 
             // If the user explicitly configured the proxy in the
             // network settings, don't ask about it.
-            if (this.config_file.proxy_type () == QNetworkProxy.HttpProxy
-                || this.config_file.proxy_type () == QNetworkProxy.Socks5Proxy) {
+            if (this.config_file.proxy_type () == Soup.NetworkProxy.HttpProxy
+                || this.config_file.proxy_type () == Soup.NetworkProxy.Socks5Proxy) {
                 this.blocked = true;
             }
         }
@@ -123,7 +123,7 @@ public class ProxyAuthHandler : GLib.Object {
             return;
         }
 
-        // Find the responsible QNAM if possible.
+        // Find the responsible GLib.NAM if possible.
         Soup.Context sending_access_manager = null;
         var account = (Account) sender ();
         if (account) {
@@ -133,7 +133,7 @@ public class ProxyAuthHandler : GLib.Object {
             sending_access_manager = account.shared_network_access_manager;
         }
         if (sending_access_manager == null) {
-            GLib.warning ("Could not get the sending QNAM for " + sender ());
+            GLib.warning ("Could not get the sending GLib.NAM for " + sender ());
         }
 
         GLib.info ("Proxy auth required for " + key + proxy.type ());
@@ -141,7 +141,7 @@ public class ProxyAuthHandler : GLib.Object {
         // If we already had a username but auth still failed,
         // invalidate the old credentials! Unfortunately, authenticator.user ()
         // isn't reliable, so we also invalidate credentials if we previously
-        // gave presumably valid credentials to the same QNAM.
+        // gave presumably valid credentials to the same GLib.NAM.
         bool invalidated = false;
         if (this.waiting_for_dialog <= 0 && this.waiting_for_keychain <= 0 && (
             authenticator.user () != "" || (

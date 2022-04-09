@@ -4,11 +4,11 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QDebug>
-//  #include <QDesktopServices>
+//  #include <GLib.Debug>
+//  #include <GLib.DesktopServices>
 //  #include <GLib.FileInfo>
-//  #include <QMimeDatabase>
-//  #include <QPushButton>
+//  #include <GLib.MimeDatabase>
+//  #include <GLib.PushButton>
 //  #include <Gtk.Dialog>
 
 namespace Occ {
@@ -49,8 +49,8 @@ public class ConflictDialog : Gtk.Dialog {
         this.solver = new ConflictSolver (this);
         this.instance.up_ui (this);
         force_header_font (this.instance.conflict_message);
-        this.instance.button_box.button (QDialogButtonBox.Ok).enabled (false);
-        this.instance.button_box.button (QDialogButtonBox.Ok).on_signal_text (_("Keep selected version"));
+        this.instance.button_box.button (GLib.DialogButtonBox.Ok).enabled (false);
+        this.instance.button_box.button (GLib.DialogButtonBox.Ok).on_signal_text (_("Keep selected version"));
 
         this.instance.local_version_radio.toggled.connect (
             this.update_button_states
@@ -76,14 +76,14 @@ public class ConflictDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void on_local_version_button_clicked () {
-        QDesktopServices.open_url (GLib.Uri.from_local_file (this.solver.local_version_filename));
+        GLib.DesktopServices.open_url (GLib.Uri.from_local_file (this.solver.local_version_filename));
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_remote_version_button_clicked () {
-        QDesktopServices.open_url (GLib.Uri.from_local_file (this.solver.remote_version_filename));
+        GLib.DesktopServices.open_url (GLib.Uri.from_local_file (this.solver.remote_version_filename));
     }
 
 
@@ -136,7 +136,7 @@ public class ConflictDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void update_widgets () {
-        QMimeDatabase mime_database;
+        GLib.MimeDatabase mime_database;
 
         string local_version = this.solver.local_version_filename;
         update_group (local_version,
@@ -166,7 +166,7 @@ public class ConflictDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private void update_group (QMimeDatabase mime_database, string filename, Gtk.Label link_label, string link_text, Gtk.Label mtime_label, Gtk.Label size_label, QToolButton button) {
+    private void update_group (GLib.MimeDatabase mime_database, string filename, Gtk.Label link_label, string link_text, Gtk.Label mtime_label, Gtk.Label size_label, GLib.ToolButton button) {
         const string file_url = GLib.Uri.from_local_file (filename).to_string ();
         link_label.on_signal_text ("<a href='%1'>%2</a>".printf (file_url).printf (link_text));
 
@@ -188,13 +188,13 @@ public class ConflictDialog : Gtk.Dialog {
     private void update_button_states () {
         const var is_local_picked = this.instance.local_version_radio.is_checked ();
         const var is_remote_picked = this.instance.remote_version_radio.is_checked ();
-        this.instance.button_box.button (QDialogButtonBox.Ok).enabled (is_local_picked || is_remote_picked);
+        this.instance.button_box.button (GLib.DialogButtonBox.Ok).enabled (is_local_picked || is_remote_picked);
 
         const var text = is_local_picked && is_remote_picked ? _("Keep both versions")
                         : is_local_picked ? _("Keep local version")
                         : is_remote_picked ? _("Keep server version")
                         : _("Keep selected version");
-        this.instance.button_box.button (QDialogButtonBox.Ok).on_signal_text (text);
+        this.instance.button_box.button (GLib.DialogButtonBox.Ok).on_signal_text (text);
     }
 
 

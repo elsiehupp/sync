@@ -4,11 +4,11 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QJsonDocument>
+//  #include <GLib.JsonDocument>
 //  #include <Json.Object>
-//  #include <QJsonArray>
-//  #include <QNetworkProxyFacto
-//  #include <QXmlStreamReader>
+//  #include <GLib.JsonArray>
+//  #include <GLib.NetworkProxyFacto
+//  #include <GLib.XmlStreamReader>
 //  #include <creds/abstractcredentials.h>
 
 //  #include <GLib.VariantMap>
@@ -159,10 +159,10 @@ public class ConnectionValidator : GLib.Object {
         if (ClientProxy.is_using_system_default ()) {
             GLib.debug ("Trying to look up system proxy.");
             ClientProxy.lookup_system_proxy_async (this.account.url,
-                this, SLOT (on_signal_system_proxy_lookup_done (QNetworkProxy)));
+                this, SLOT (on_signal_system_proxy_lookup_done (Soup.NetworkProxy)));
         } else {
-            // We want to reset the QNAM proxy so that the global proxy settings are used (via ClientProxy settings)
-            this.account.network_access_manager.proxy (QNetworkProxy (QNetworkProxy.DefaultProxy));
+            // We want to reset the GLib.NAM proxy so that the global proxy settings are used (via ClientProxy settings)
+            this.account.network_access_manager.proxy (Soup.NetworkProxy (Soup.NetworkProxy.DefaultProxy));
             // use a queued invocation so we're as asynchronous as with the other code path
             GLib.Object.invoke_method (this, "on_signal_actual_check", Qt.QueuedConnection);
         }
@@ -171,14 +171,14 @@ public class ConnectionValidator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_system_proxy_lookup_done (QNetworkProxy proxy) {
+    public void on_signal_system_proxy_lookup_done (Soup.NetworkProxy proxy) {
         if (this.account == null) {
             GLib.warning ("Bailing out, Account had been deleted.");
             return;
         }
 
-        if (proxy.type () != QNetworkProxy.NoProxy) {
-            GLib.info ("Setting QNAM proxy to be system proxy " + ClientProxy.print_q_network_proxy (proxy));
+        if (proxy.type () != Soup.NetworkProxy.NoProxy) {
+            GLib.info ("Setting GLib.NAM proxy to be system proxy " + ClientProxy.print_q_network_proxy (proxy));
         } else {
             GLib.info ("No system proxy set by OS.");
         }
@@ -352,7 +352,7 @@ public class ConnectionValidator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_capabilities_recieved (QJsonDocument json) {
+    protected void on_signal_capabilities_recieved (GLib.JsonDocument json) {
         var capabilities = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
         GLib.info ("Server capabilities: " + capabilities);
         this.account.capabilities (capabilities.to_variant_map ());
@@ -453,7 +453,7 @@ public class ConnectionValidator : GLib.Object {
         // We attempt to work with servers >= 7.0.0 but warn users.
         // Check usages of Account.server_version_unsupported for details.
 
-    //  #if QT_VERSION >= QT_VERSION_CHECK (5, 9, 0)
+    //  #if GLib.T_VERSION >= GLib.T_VERSION_CHECK (5, 9, 0)
         // Record that the server supports HTTP/2
         // Actual decision if we should use HTTP/2 is done in AccessManager.create_request
         var abstract_network_job = (AbstractNetworkJob) sender ();

@@ -7,13 +7,13 @@
 //  #include <QtGlobal>
 //  #include <memory>
 
-//  #include <QQmlEngine>
-//  #include <QAbstractItemModel>
+//  #include <GLib.QmlEngine>
+//  #include <GLib.AbstractItemModel>
 
 namespace Occ {
 namespace Ui {
 
-public class EmojiCategoriesModel : QAbstractListModel {
+public class EmojiCategoriesModel : GLib.AbstractListModel {
 
 
     /***********************************************************
@@ -34,7 +34,7 @@ public class EmojiCategoriesModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private const GLib.List<Category> CATEGORIES = {
+    private GLib.List<Category> CATEGORIES = {
         {
             "⌛️",
             "history"
@@ -75,7 +75,7 @@ public class EmojiCategoriesModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public override GLib.Variant data (QModelIndex index, int role) {
+    public override GLib.Variant data (GLib.ModelIndex index, int role) {
         if (!index.is_valid) {
             return {};
         }
@@ -94,7 +94,7 @@ public class EmojiCategoriesModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public override int row_count (QModelIndex parent = QModelIndex ()) {
+    public override int row_count (GLib.ModelIndex parent = GLib.ModelIndex ()) {
         //  Q_UNUSED (parent);
         return static_cast<int> (CATEGORIES.size ());
     }

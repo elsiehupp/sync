@@ -121,8 +121,8 @@ public class ConfigFile : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public ConfigFile () {
-        // QDesktopServices uses the application name to create a config path
-        Gtk.Application.application_name (Theme.app_name_gui);
+        // GLib.DesktopServices uses the application name to create a config path
+        GLib.Application.application_name (Theme.app_name_gui);
 
         GLib.Settings.default_format (GLib.Settings.IniFormat);
 
@@ -196,12 +196,12 @@ public class ConfigFile : GLib.Object {
         if (!file_info.exists ()) {
             // Prefer to return the preferred path! Only use the fallback location
             // if the other path does not exist and the fallback is valid.
-            GLib.FileInfo next_to_binary = GLib.File.new_for_path (Gtk.Application.application_dir_path, EXCL_FILE);
+            GLib.FileInfo next_to_binary = GLib.File.new_for_path (GLib.Application.application_dir_path, EXCL_FILE);
             if (next_to_binary.exists ()) {
                 file_info = next_to_binary;
             } else {
                 // For AppImage, the file might reside under a temporary mount path
-                GLib.Dir d = new GLib.Dir (Gtk.Application.application_dir_path); // supposed to be /temporary/mount.xyz/usr/bin
+                GLib.Dir d = new GLib.Dir (GLib.Application.application_dir_path); // supposed to be /temporary/mount.xyz/usr/bin
                 d.cd_up (); // go out of bin
                 d.cd_up (); // go out of usr
                 if (!d.is_root ()) { // it is really a mountpoint
@@ -907,7 +907,7 @@ public class ConfigFile : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    void ConfigFile.save_geometry_header (QHeaderView header) {
+    void ConfigFile.save_geometry_header (GLib.HeaderView header) {
     // #ifndef TOKEN_AUTH_ONLY
         if (!header)
             return;
@@ -923,7 +923,7 @@ public class ConfigFile : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    void ConfigFile.restore_geometry_header (QHeaderView header) {
+    void ConfigFile.restore_geometry_header (GLib.HeaderView header) {
     // #ifndef TOKEN_AUTH_ONLY
         if (!header)
             return;
@@ -1047,7 +1047,7 @@ public class ConfigFile : GLib.Object {
     public string update_channel {
         public get {
             string default_update_channel = "stable";
-            string suffix = MIRALL_STRINGIFY (MIRALL_VERSION_SUFFIX);
+            string suffix = Common.Version.MIRALL_VERSION_SUFFIX;
             if (suffix.has_prefix ("daily")
                 || suffix.has_prefix ("nightly")
                 || suffix.has_prefix ("alpha")
@@ -1234,7 +1234,7 @@ public class ConfigFile : GLib.Object {
         GLib.Variant default_value = new GLib.Variant (param, group)) {
         GLib.Variant system_setting;
         if (Utility.is_mac ()) {
-            GLib.Settings system_settings = new GLib.Settings ("/Library/Preferences/" + APPLICATION_REV_DOMAIN + ".plist", GLib.Settings.NativeFormat);
+            GLib.Settings system_settings = new GLib.Settings ("/Library/Preferences/" + Common.Config.APPLICATION_REV_DOMAIN + ".plist", GLib.Settings.NativeFormat);
             if (group != "") {
                 system_settings.begin_group (group);
             }
@@ -1248,7 +1248,7 @@ public class ConfigFile : GLib.Object {
         } else { // Windows
             GLib.Settings system_settings = new GLib.Settings (
                 " (HKEY_LOCAL_MACHINE\\Software\\%1\\%2)"
-                    .printf (APPLICATION_VENDOR, Theme.app_name_gui),
+                    .printf (Common.Config.APPLICATION_VENDOR, Theme.app_name_gui),
                 GLib.Settings.NativeFormat);
             if (group != "") {
                 system_settings.begin_group (group);

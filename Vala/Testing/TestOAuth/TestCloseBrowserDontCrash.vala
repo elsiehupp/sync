@@ -22,7 +22,7 @@ class TestCloseBrowserDontCrash : AbstractTestOAuth {
         //  ASSERT (browser_reply);
         // simulate the fact that the browser is closing the connection
         browser_reply.on_signal_abort ();
-        Gtk.Application.process_events ();
+        GLib.Application.process_events ();
 
         //  ASSERT (state == AbstractTestOAuth.State.BROWSER_OPENED);
         state = AbstractTestOAuth.State.TOKEN_ASKED;

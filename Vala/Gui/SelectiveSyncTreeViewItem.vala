@@ -7,25 +7,25 @@
 namespace Occ {
 namespace Ui {
 
-public class SelectiveSyncTreeViewItem : QTreeWidgetItem {
+public class SelectiveSyncTreeViewItem : GLib.TreeWidgetItem {
 
     /***********************************************************
     ***********************************************************/
-    public SelectiveSyncTreeViewItem (int type = QTreeWidgetItem.Type) {
+    public SelectiveSyncTreeViewItem (int type = GLib.TreeWidgetItem.Type) {
         base (type);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public SelectiveSyncTreeViewItem.with_parent (QTreeWidgetItem parent, int type = QTreeWidgetItem.Type) {
+    public SelectiveSyncTreeViewItem.with_parent (GLib.TreeWidgetItem parent, int type = GLib.TreeWidgetItem.Type) {
         base (parent, type);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public SelectiveSyncTreeViewItem.for_string_list (GLib.List<string> strings, int type = QTreeWidgetItem.Type) {
+    public SelectiveSyncTreeViewItem.for_string_list (GLib.List<string> strings, int type = GLib.TreeWidgetItem.Type) {
 
     }
 
@@ -39,12 +39,12 @@ public class SelectiveSyncTreeViewItem : QTreeWidgetItem {
 
     /***********************************************************
     ***********************************************************/
-    //  private bool operator< (QTreeWidgetItem other) override {
+    //  private bool operator< (GLib.TreeWidgetItem other) override {
     //      int column = tree_widget ().sort_column ();
     //      if (column == 1) {
     //          return data (1, Qt.USER_ROLE).to_long_long () < other.data (1, Qt.USER_ROLE).to_long_long ();
     //      }
-    //      return QTreeWidgetItem.operator< (other);
+    //      return GLib.TreeWidgetItem.operator< (other);
     //  }
 
 } // class SelectiveSyncTreeViewItem

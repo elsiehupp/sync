@@ -378,7 +378,7 @@ public class SyncEngine : GLib.Object {
         string version_string = "Using Qt ";
         version_string += q_version ();
 
-        version_string += " SSL library " + QSslSocket.ssl_library_version_string ().to_utf8 ();
+        version_string += " SSL library " + GLib.SslSocket.ssl_library_version_string ().to_utf8 ();
         version_string += " on " + Common.Utility.platform_name ();
         GLib.info (version_string);
 
@@ -993,7 +993,7 @@ public class SyncEngine : GLib.Object {
             var script_args = script.split (GLib.Regex ("\\s+"), Qt.SkipEmptyParts);
             if (script_args.size () > 0) {
                 var script_executable = script_args.take_first ();
-                QProcess.execute (script_executable, script_args);
+                GLib.Process.execute (script_executable, script_args);
             }
     // #else
             GLib.warning ("**** Attention : POST_UPDATE_SCRIPT installed, but not executed because compiled with NDEBUG");
@@ -1280,7 +1280,7 @@ public class SyncEngine : GLib.Object {
         }
 
         // Delete from journal and from filesystem.
-        const GLib.List<Common.SyncJournalDb.DownloadInfo> deleted_infos =
+        GLib.List<Common.SyncJournalDb.DownloadInfo> deleted_infos =
             this.journal.get_and_delete_stale_download_infos (download_file_paths);
         foreach (Common.SyncJournalDb.DownloadInfo deleted_info in deleted_infos) {
             const string temporary_path = this.propagator.full_local_path (deleted_info.temporaryfile);
@@ -1334,7 +1334,7 @@ public class SyncEngine : GLib.Object {
         this.journal.delete_stale_error_blocklist_entries (blocklist_file_paths);
     }
 
-    // #if (QT_VERSION < 0x050600)
+    // #if (GLib.T_VERSION < 0x050600)
     //  template <typename T>
     //  const std.add_const<T>.type q_as_const (T t) noexcept {
     //      return t;

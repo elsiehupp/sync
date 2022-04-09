@@ -5,9 +5,9 @@
 ***********************************************************/
 
 //  #include <GLib.Menu>
-//  #include <QClipboard>
-//  #include <QNetworkCookie>
-//  #include <QPointer>
+//  #include <GLib.Clipboard>
+//  #include <GLib.NetworkCookie>
+//  #include <GLib.Pointer>
 
 namespace Occ {
 namespace Ui {
@@ -168,7 +168,7 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
     ***********************************************************/
     protected void on_signal_copy_link_to_clipboard () {
         if (this.async_auth)
-            Gtk.Application.clipboard ().on_signal_text (this.async_auth.authorisation_link ().to_string (GLib.Uri.FullyEncoded));
+            GLib.Application.clipboard ().on_signal_text (this.async_auth.authorisation_link ().to_string (GLib.Uri.FullyEncoded));
     }
 
 } // class OwncloudOAuthCredsPage

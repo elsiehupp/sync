@@ -22,7 +22,7 @@ public class AccessManager : Soup.Session {
     /***********************************************************
     ***********************************************************/
     public static string generate_request_id () {
-        return QUuid.create_uuid ().to_byte_array (QUuid.WithoutBraces);
+        return GLib.Uuid.create_uuid ().to_byte_array (GLib.Uuid.WithoutBraces);
     }
 
 
@@ -51,9 +51,9 @@ public class AccessManager : Soup.Session {
         GLib.info (operation + verb + new_request.url.to_string () + "has X-Request-ID " + request_id);
         new_request.raw_header ("X-Request-ID", request_id);
 
-    // #if QT_VERSION >= QT_VERSION_CHECK (5, 9, 4)
-        // only enable HTTP2 with Qt 5.9.4 because old Qt have too many bugs (e.g. QTBUG-64359 is fixed in >= Qt 5.9.4)
-        if (new_request.url.scheme () == "https") { // Not for "http" : QTBUG-61397
+    // #if GLib.T_VERSION >= GLib.T_VERSION_CHECK (5, 9, 4)
+        // only enable HTTP2 with Qt 5.9.4 because old Qt have too many bugs (e.g. GLib.TBUG-64359 is fixed in >= Qt 5.9.4)
+        if (new_request.url.scheme () == "https") { // Not for "http" : GLib.TBUG-61397
             // http2 seems to cause issues, as with our recommended server setup we don't support http2, disable it by default for now
             const bool http2_enabled_env = q_environment_variable_int_value ("OWNCLOUD_HTTP2_ENABLED") == 1;
 

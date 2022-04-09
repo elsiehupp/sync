@@ -563,7 +563,7 @@ public class ProgressInfo : GLib.Object {
         this.file_progress.update ();
 
         // Update progress of all running items.
-        QMutable_hash_iterator<string, ProgressItem> it = new QMutable_hash_iterator (this.current_items);
+        GLib.Mutable_hash_iterator<string, ProgressItem> it = new GLib.Mutable_hash_iterator (this.current_items);
         while (it.has_next ()) {
             it.next ();
             it.value ().progress.update ();

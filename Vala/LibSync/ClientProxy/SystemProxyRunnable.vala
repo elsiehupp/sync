@@ -8,7 +8,7 @@ namespace LibSync {
 
 @copyright GPLv3 or Later
 ***********************************************************/
-public class SystemProxyRunnable : GLib.Object /*, QRunnable*/ {
+public class SystemProxyRunnable : GLib.Object /*, GLib.Runnable*/ {
 
     /***********************************************************
     ***********************************************************/
@@ -30,7 +30,7 @@ public class SystemProxyRunnable : GLib.Object /*, QRunnable*/ {
     ***********************************************************/
     public void run () {
         q_register_meta_type<Soup.ProxyResolverDefault> ("Soup.ProxyResolverDefault");
-        GLib.List<Soup.ProxyResolverDefault> proxies = QNetworkProxyFactory.system_proxy_for_query (QNetworkProxyQuery (this.url));
+        GLib.List<Soup.ProxyResolverDefault> proxies = Soup.NetworkProxyFactory.system_proxy_for_query (GLib.NetworkProxyQuery (this.url));
 
         if (proxies == "") {
             /* emit */ system_proxy_looked_up (new Soup.ProxyResolverDefault (Soup.ProxyResolverDefault.NoProxy));

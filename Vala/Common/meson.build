@@ -8,6 +8,7 @@ srcs = files([
     'ComputeChecksum/CSyncChecksumHook.vala',
     'ComputeChecksum/ValidateChecksumHeader.vala',
 
+    'Config.vala',
     'Constants.vala',
 
     'Errors/InvalidParameterError.vala',
@@ -33,6 +34,7 @@ srcs = files([
     'SyncJournalFileRecord/SyncJournalFileRecord.vala',
 
     'Utility.vala',
+    'Version.vala',
 
     'Vfs/AbstractVfs.vala',
     'Vfs/ItemAvailability.vala',

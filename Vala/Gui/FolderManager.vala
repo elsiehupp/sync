@@ -6,11 +6,11 @@
 
 //  #include <pushnotifications.h>
 //  #include <syncengine.h>
-//  #include <QMessag
+//  #include <GLib.Messag
 //  #include <QtCore>
-//  #include <QMutableSetIter
-//  #include <QNetwor
-//  #include <QQueue>
+//  #include <GLib.MutableSetIter
+//  #include <GLib.Networ
+//  #include <GLib.Queue>
 
 namespace Occ {
 namespace Ui {
@@ -50,12 +50,12 @@ public class FolderManager : GLib.Object {
 
     private const string SLASH_TAG = "__SLASH__";
     private const string BSLASH_TAG = "__BSLASH__";
-    private const string QMARK_TAG = "__QMARK__";
+    private const string GLib.MARK_TAG = "__QMARK__";
     private const string PERCENT_TAG = "__PERCENT__";
     private const string STAR_TAG = "__STAR__";
     private const string COLON_TAG = "__COLON__";
     private const string PIPE_TAG = "__PIPE__";
-    private const string QUOTE_TAG = "__QUOTE__";
+    private const string GLib.UOTE_TAG = "__QUOTE__";
     private const string LT_TAG = "__LESS_THAN__";
     private const string GT_TAG = "__GREATER_THAN__";
     private const string PAR_O_TAG = "__PAR_OPEN__";
@@ -157,7 +157,7 @@ public class FolderManager : GLib.Object {
     /***********************************************************
     Scheduled folders that should be synced as soon as possible
     ***********************************************************/
-    private QQueue<FolderConnection> scheduled_folders;
+    private GLib.Queue<FolderConnection> scheduled_folders;
 
     /***********************************************************
     Picks the next scheduled folder_connection and starts the sync
@@ -864,12 +864,12 @@ public class FolderManager : GLib.Object {
 
         a.replace ("/", SLASH_TAG);
         a.replace ('\\', BSLASH_TAG);
-        a.replace ('?', QMARK_TAG);
+        a.replace ('?', GLib.MARK_TAG);
         a.replace ('%', PERCENT_TAG);
         a.replace ('*', STAR_TAG);
         a.replace (':', COLON_TAG);
         a.replace ('|', PIPE_TAG);
-        a.replace ("\", QUOTE_TAG);
+        a.replace ("\", GLib.UOTE_TAG);
         a.replace ('<', LT_TAG);
         a.replace ('>', GT_TAG);
         a.replace ('[', PAR_O_TAG);
@@ -885,12 +885,12 @@ public class FolderManager : GLib.Object {
 
         a.replace (SLASH_TAG, "/");
         a.replace (BSLASH_TAG, "\\");
-        a.replace (QMARK_TAG, "?");
+        a.replace (GLib.MARK_TAG, "?");
         a.replace (PERCENT_TAG, "%");
         a.replace (STAR_TAG, "*");
         a.replace (COLON_TAG, ":");
         a.replace (PIPE_TAG, "|");
-        a.replace (QUOTE_TAG, "\"");
+        a.replace (GLib.UOTE_TAG, "\"");
         a.replace (LT_TAG, "<");
         a.replace (GT_TAG, ">");
         a.replace (PAR_O_TAG, "[");
@@ -1025,7 +1025,7 @@ public class FolderManager : GLib.Object {
     /***********************************************************
     Access to the current queue of scheduled folders.
     ***********************************************************/
-    public QQueue<FolderConnection> schedule_queue () {
+    public GLib.Queue<FolderConnection> schedule_queue () {
         return this.scheduled_folders;
     }
 
@@ -1066,7 +1066,7 @@ public class FolderManager : GLib.Object {
 
         this.last_sync_folder = null;
         this.current_sync_folder = null;
-        this.scheduled_folders = new QQueue<FolderConnection> ();
+        this.scheduled_folders = new GLib.Queue<FolderConnection> ();
         /* emit */ signal_folder_list_changed (this.folder_map);
         /* emit */ signal_schedule_queue_changed ();
 
@@ -1149,7 +1149,7 @@ public class FolderManager : GLib.Object {
                     && folder_connection.account_state.account.network_access_manager) {
                     // Need to do this so we do not use the old determined system proxy
                     folder_connection.account_state.account.network_access_manager.proxy (
-                        QNetworkProxy (QNetworkProxy.DefaultProxy));
+                        Soup.NetworkProxy (Soup.NetworkProxy.DefaultProxy));
                 }
             }
         }
@@ -1240,7 +1240,7 @@ public class FolderManager : GLib.Object {
     Wipe folder_connection
     ***********************************************************/
     public void on_signal_wipe_folder_for_account (AccountState account_state) {
-        GLib.List<FolderConnection> folders_to_remove; // QVarLengthArray<FolderConnection *, 16>
+        GLib.List<FolderConnection> folders_to_remove; // GLib.VarLengthArray<FolderConnection *, 16>
 
         foreach (FolderConnection folder_connection in this.folder_map) {
             if (folder_connection.account_state == account_state) {
@@ -1667,7 +1667,7 @@ public class FolderManager : GLib.Object {
         var folder_connection = new FolderConnection (folder_definition, account_state, std.move (vfs), this);
 
         if (this.navigation_pane_helper.show_in_explorer_navigation_pane && folder_definition.navigation_pane_clsid == null) {
-            folder_connection.navigation_pane_clsid (QUuid.create_uuid ());
+            folder_connection.navigation_pane_clsid (GLib.Uuid.create_uuid ());
             folder_connection.save_to_settings ();
         }
 
@@ -1846,12 +1846,12 @@ public class FolderManager : GLib.Object {
     private void restart_application () {
         if (Utility.is_linux ()) {
             // restart:
-            GLib.info ("Restarting application NOW, PID " + Gtk.Application.application_pid () + " is ending.");
+            GLib.info ("Restarting application NOW, PID " + GLib.Application.application_pid () + " is ending.");
             GLib.Application.quit ();
-            GLib.List<string> args = Gtk.Application.arguments ();
+            GLib.List<string> args = GLib.Application.arguments ();
             string prg = args.take_first ();
 
-            QProcess.start_detached (prg, args);
+            GLib.Process.start_detached (prg, args);
         } else {
             GLib.debug ("On this platform we do not restart.");
         }

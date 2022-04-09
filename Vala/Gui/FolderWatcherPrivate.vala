@@ -6,8 +6,8 @@
 
 //  #include <sys/inotify.h>
 //  #include <cerrno>
-//  #include <QVarLengthArray>
-//  #include <QSocketNotifier>
+//  #include <GLib.VarLengthArray>
+//  #include <GLib.SocketNotifier>
 //  #include <GLib.Dir>
 
 namespace Occ {
@@ -33,7 +33,7 @@ public class FolderWatcherPrivate : GLib.Object {
     private string folder;
     private GLib.HashTable<int, string> watch_to_path;
     private GLib.HashTable<string, int> path_to_watch;
-    private QSocketNotifier socket_notifier;
+    private GLib.SocketNotifier socket_notifier;
     private int fd;
 
     /***********************************************************
@@ -44,7 +44,7 @@ public class FolderWatcherPrivate : GLib.Object {
         this.folder = path;
         this.fd = inotify_init ();
         if (this.fd != -1) {
-            this.socket_notifier = new QSocketNotifier (this.fd, QSocketNotifier.Read);
+            this.socket_notifier = new GLib.SocketNotifier (this.fd, GLib.SocketNotifier.Read);
             this.socket_notifier.activated.connect (
                 this.on_signal_received_notification
             );
@@ -70,7 +70,7 @@ public class FolderWatcherPrivate : GLib.Object {
         INotifyEvent event = null;
         size_t i = 0;
         int error = 0;
-        char[] buffer = char[2048]; // previously QVarLengthArray<char, 2048>
+        char[] buffer = char[2048]; // previously GLib.VarLengthArray<char, 2048>
 
         len = read (fd, buffer, buffer.size ());
         error = errno;
@@ -144,7 +144,7 @@ public class FolderWatcherPrivate : GLib.Object {
         if (!find_folders_below (new GLib.Dir (path), all_subfolders)) {
             GLib.warning ("Could not traverse all subfolders.");
         }
-        var subfolders_it = new QStringListIterator (all_subfolders);
+        var subfolders_it = new GLib.StringListIterator (all_subfolders);
         while (subfolders_it.has_next ()) {
             string subfolder = subfolders_it.next ();
             GLib.Dir folder = new GLib.Dir (subfolder);
@@ -178,7 +178,7 @@ public class FolderWatcherPrivate : GLib.Object {
             GLib.List<string> name_filter;
             name_filter += "*";
             GLib.Dir.Filters filter = GLib.Dir.Dirs | GLib.Dir.NoDotAndDotDot | GLib.Dir.No_sym_links | GLib.Dir.Hidden;
-            const GLib.List<string> pathes = directory.entry_list (name_filter, filter);
+            GLib.List<string> pathes = directory.entry_list (name_filter, filter);
 
             // FIXME: need to iterate through GLib.List<string>
             //  GLib.List<string>.ConstIterator ConstIterator;

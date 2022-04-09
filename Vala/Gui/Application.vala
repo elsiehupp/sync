@@ -16,16 +16,16 @@
 //  #include <libcrashreporter-handler/Handler.h>
 //  #endif
 
-//  #include <QTranslator>
+//  #include <GLib.Translator>
 //  #include <GLib.Menu>
 //  #include <Gtk.MessageBox>
-//  #include <QDesktopServices>
-//  #include <Gtk.Application>
-//  #include <QApplicat
-//  #include <QPointe
-//  #include <QQueue>
+//  #include <GLib.DesktopServices>
+//  #include <GLib.Application>
+//  #include <GLib.Applicat
+//  #include <GLib.Pointe
+//  #include <GLib.Queue>
 //  #include <GLib.Timer>
-//  #include <QNetworkConfigurationManager>
+//  #include <GLib.NetworkConfigurationManager>
 
 namespace Occ {
 namespace Ui {
@@ -34,11 +34,11 @@ namespace Ui {
 @brief The Application class
 @ingroup gui
 ***********************************************************/
-public class Application : Gtk.Application {
+public class Application : GLib.Application {
 
     /***********************************************************
     ***********************************************************/
-    const GLib.List<string> OPTIONS = {
+    GLib.List<string> OPTIONS = {
         "Options:\n",
         "  --help, -h           : show this help screen.\n",
         "  --version, -v        : show version information.\n",
@@ -141,7 +141,7 @@ public class Application : Gtk.Application {
 
     /***********************************************************
     ***********************************************************/
-    private QNetworkConfigurationManager network_configuration_manager;
+    private GLib.NetworkConfigurationManager network_configuration_manager;
 
     /***********************************************************
     ***********************************************************/
@@ -186,8 +186,8 @@ public class Application : Gtk.Application {
 
         // desktop_filename to provide wayland compatibility (in general : conformance with naming standards)
         // but only on Qt >= 5.7, where desktop_filename was introduced
-    //  #if (QT_VERSION >= 0x050700)
-        string desktop_filename = LINUX_APPLICATION_ID + ".desktop";
+    //  #if (GLib.T_VERSION >= 0x050700)
+        string desktop_filename = Common.Config.LINUX_APPLICATION_ID + ".desktop";
         desktop_filename (desktop_filename);
     //  #endif
 
@@ -197,19 +197,19 @@ public class Application : Gtk.Application {
         if (!ConfigFile ().exists ()) {
             // Migrate from version <= 2.4
             application_name (this.theme.app_name_gui);
-    //  #ifndef QT_WARNING_DISABLE_DEPRECATED // Was added in Qt 5.9
-        //  const int QT_WARNING_DISABLE_DEPRECATED = QT_WARNING_DISABLE_GCC ("-Wdeprecated-declarations")
+    //  #ifndef GLib.T_WARNING_DISABLE_DEPRECATED // Was added in Qt 5.9
+        //  const int GLib.T_WARNING_DISABLE_DEPRECATED = GLib.T_WARNING_DISABLE_GCC ("-Wdeprecated-declarations")
     //  #endif
-            //  QT_WARNING_PUSH
-            //  QT_WARNING_DISABLE_DEPRECATED
-            // We need to use the deprecated QDesktopServices.storage_location because of its Qt4
+            //  GLib.T_WARNING_PUSH
+            //  GLib.T_WARNING_DISABLE_DEPRECATED
+            // We need to use the deprecated GLib.DesktopServices.storage_location because of its Qt4
             // behavior of adding "data" to the path
-            string old_dir = QDesktopServices.storage_location (QDesktopServices.DataLocation);
+            string old_dir = GLib.DesktopServices.storage_location (GLib.DesktopServices.DataLocation);
             if (old_dir.has_suffix ("/")) {
                 // macOS 10.11.x does not like trailing slash for rename/move.
                 old_dir.chop (1);
             }
-            //  QT_WARNING_POP
+            //  GLib.T_WARNING_POP
             application_name (this.theme.app_name);
             if (new GLib.FileInfo (old_dir).is_dir ()) {
                 var configuration_directory = ConfigFile ().config_path;
@@ -224,7 +224,7 @@ public class Application : Gtk.Application {
 
                     // Try to move the files one by one
                     if (new GLib.FileInfo (configuration_directory).is_dir () || new GLib.Dir ().mkdir (configuration_directory)) {
-                        const GLib.List<string> files_list = GLib.Dir (old_dir).entry_list (GLib.Dir.Files);
+                        GLib.List<string> files_list = GLib.Dir (old_dir).entry_list (GLib.Dir.Files);
                         GLib.info ("Will move the individual files " + files_list);
                         foreach (var name in files_list) {
                             if (!GLib.File.rename (old_dir + "/" + name, configuration_directory + "/" + name)) {
@@ -242,7 +242,7 @@ public class Application : Gtk.Application {
             return;
 
         if (this.quit_instance) {
-            GLib.Timeout.single_shot (0, Gtk.Application, GLib.Application.quit);
+            GLib.Timeout.single_shot (0, GLib.Application, GLib.Application.quit);
             return;
         }
 
@@ -297,7 +297,7 @@ public class Application : Gtk.Application {
                     "file at %1. Please make sure the file can be accessed by your user.")
                         .printf (ConfigFile ().config_file ()),
                     _("Quit %1").printf (Theme.app_name_gui));
-                GLib.Timeout.single_shot (0, Gtk.Application, SLOT (quit ()));
+                GLib.Timeout.single_shot (0, GLib.Application, SLOT (quit ()));
                 return;
             }
         }
@@ -428,7 +428,7 @@ public class Application : Gtk.Application {
     ***********************************************************/
     public void show_hint (string error_hint) {
         std.cerr += error_hint + std.endl;
-        std.cerr += "Try '" + Application.GLib.FileInfo (Gtk.Application.application_file_path).filename ().to_std_string () + " --help' for more information" + std.endl;
+        std.cerr += "Try '" + Application.GLib.FileInfo (GLib.Application.application_file_path).filename ().to_std_string () + " --help' for more information" + std.endl;
         std.GLib.Application.quit (1);
     }
 
@@ -487,7 +487,7 @@ public class Application : Gtk.Application {
             on_signal_check_connection ();
 
             // If one account is configured : enable autostart
-    //  #ifndef QT_DEBUG
+    //  #ifndef GLib.T_DEBUG
             bool should_auto_start = AccountManager.instance.accounts.length () == 1;
     //  #else
             //  bool should_auto_start = false;
@@ -514,7 +514,7 @@ public class Application : Gtk.Application {
     the extension)
     ***********************************************************/
     public void on_signal_open_virtual_file (string filename) {
-        string virtual_file_ext = APPLICATION_DOTVIRTUALFILE_SUFFIX;
+        string virtual_file_ext = Common.Config.APPLICATION_DOTVIRTUALFILE_SUFFIX;
         if (!filename.has_suffix (virtual_file_ext)) {
             GLib.warning ("Can only handle file ending in .owncloud. Unable to open " + filename);
             return;
@@ -541,7 +541,7 @@ public class Application : Gtk.Application {
     private void on_signal_sync_finished (FolderConnection folder_connection, GLib.Object con, string normal_name) {
         folder_connection.disconnect (con);
         if (GLib.File.exists (normal_name)) {
-            QDesktopServices.open_url (GLib.Uri.from_local_file (normal_name));
+            GLib.DesktopServices.open_url (GLib.Uri.from_local_file (normal_name));
         }
     }
 
@@ -551,7 +551,7 @@ public class Application : Gtk.Application {
     was available initially.
     ***********************************************************/
     public void on_signal_try_tray_again () {
-        GLib.info ("Trying tray icon, tray available: " + QSystemTrayIcon.is_system_tray_available ());
+        GLib.info ("Trying tray icon, tray available: " + GLib.SystemTrayIcon.is_system_tray_available ());
         this.gui.hide_and_show_tray ();
     }
 
@@ -559,7 +559,7 @@ public class Application : Gtk.Application {
     /***********************************************************
     ***********************************************************/
     protected void parse_options (GLib.List<string> options) {
-        QStringListIterator iterator = new QStringListIterator (options);
+        GLib.StringListIterator iterator = new GLib.StringListIterator (options);
         // skip file name;
         if (iterator.has_next ()) {
             iterator.next ();
@@ -631,18 +631,18 @@ public class Application : Gtk.Application {
     ***********************************************************/
     protected void setup_translations () {
         GLib.List<string> ui_languages;
-        ui_languages = QLocale.system ().ui_languages ();
+        ui_languages = GLib.Locale.system ().ui_languages ();
 
         string enforced_locale = Theme.enforced_locale;
         if (!enforced_locale == "")
             ui_languages.prepend (enforced_locale);
 
-        var translator = new QTranslator (this);
-        var qt_translator = new QTranslator (this);
-        var qtkeychain_translator = new QTranslator (this);
+        var translator = new GLib.Translator (this);
+        var qt_translator = new GLib.Translator (this);
+        var qtkeychain_translator = new GLib.Translator (this);
 
         foreach (string lang in ui_languages) {
-            lang.replace ('-', '_'); // work around QTBUG-25973
+            lang.replace ('-', '_'); // work around GLib.TBUG-25973
             lang = subst_lang (lang);
             string tr_path = application_tr_path;
             string tr_file = "client_" + lang;
@@ -654,7 +654,7 @@ public class Application : Gtk.Application {
                 // have a translation file provided.
                 GLib.info ("Using " + lang + " translation");
                 property ("ui_lang", lang);
-                const string qt_tr_path = QLibraryInfo.location (QLibraryInfo.TranslationsPath);
+                const string qt_tr_path = GLib.LibraryInfo.location (GLib.LibraryInfo.TranslationsPath);
                 string qt_tr_file = "qt_" + lang;
                 string qt_base_tr_file = "qtbase_" + lang;
                 if (!qt_translator.on_signal_load (qt_tr_file, qt_tr_path)) {
@@ -702,18 +702,18 @@ public class Application : Gtk.Application {
 
         GLib.info ("##################"
             this.theme.app_name
-            "locale:" + QLocale.system ().name ()
+            "locale:" + GLib.Locale.system ().name ()
             "ui_lang:" + property ("ui_lang")
             "version:" + this.theme.version
             "os:" + Utility.platform_name ()
         );
-        GLib.info ("Arguments: " + Gtk.Application.arguments ());
+        GLib.info ("Arguments: " + GLib.Application.arguments ());
     }
 
 
     /***********************************************************
     ***********************************************************/
-    protected override bool event (QEvent event) {
+    protected override bool event (GLib.Event event) {
         return SharedTools.SingleApplication.event (event);
     }
 
@@ -850,8 +850,8 @@ public class Application : Gtk.Application {
     some seconds. Maybe we need 2 validators, one triggered by
     timer, one by network configuration changes?
     ***********************************************************/
-    protected void on_signal_system_online_configuration_changed (QNetworkConfiguration cnf) {
-        if (cnf.state & QNetworkConfiguration.Active) {
+    protected void on_signal_system_online_configuration_changed (GLib.NetworkConfiguration cnf) {
+        if (cnf.state & GLib.NetworkConfiguration.Active) {
             GLib.Object.invoke_method (this, "on_signal_check_connection", Qt.QueuedConnection);
         }
     }
@@ -888,7 +888,7 @@ public class Application : Gtk.Application {
 
         // Did the client version change?
         // (The client version is adjusted further down)
-        bool version_changed = config_file.client_version_string != MIRALL_VERSION_STRING;
+        bool version_changed = config_file.client_version_string != Common.Version.MIRALL_VERSION_STRING;
 
         // We want to message the user either for destructive changes,
         // or if we're ignoring something and the client version changed.
@@ -922,7 +922,7 @@ public class Application : Gtk.Application {
 
             box.exec ();
             if (box.clicked_button () != continue_btn) {
-                GLib.Timeout.single_shot (0, Gtk.Application, SLOT (quit ()));
+                GLib.Timeout.single_shot (0, GLib.Application, SLOT (quit ()));
                 return false;
             }
 
@@ -942,7 +942,7 @@ public class Application : Gtk.Application {
     /***********************************************************
     ***********************************************************/
     private static string application_tr_path {
-        string dev_tr_path = Gtk.Application.application_dir_path + "/../src/gui/";
+        string dev_tr_path = GLib.Application.application_dir_path + "/../src/gui/";
         if (GLib.Dir (dev_tr_path).exists ()) {
             // might miss Qt, QtKeyChain, etc.
             GLib.warning ("Running from build location! Translations may be incomplete!");

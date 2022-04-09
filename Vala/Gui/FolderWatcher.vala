@@ -210,7 +210,7 @@ public class FolderWatcher : GLib.Object {
             FileSystem.mod_time (path, mtime + 1);
         } else {
             GLib.File f = new GLib.File (path);
-            f.open (QIODevice.WriteOnly | QIODevice.Append);
+            f.open (GLib.IODevice.WriteOnly | GLib.IODevice.Append);
         }
 
         GLib.Timeout.single_shot (5000, this, on_timer);

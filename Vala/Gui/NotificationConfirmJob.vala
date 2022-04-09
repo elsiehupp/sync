@@ -5,7 +5,7 @@
 ***********************************************************/
 
 //  #include <GLib.OutputStream>
-//  #include <QPair>
+//  #include <GLib.Pair>
 
 namespace Occ {
 namespace Ui {

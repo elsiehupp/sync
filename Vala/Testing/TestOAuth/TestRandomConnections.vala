@@ -34,7 +34,7 @@ class TestRandomConnections : AbstractTestOAuth {
                 "\n\n\n\n",
             };
             foreach (var x in payloads) {
-                var socket = new QTcpSocket (this);
+                var socket = new GLib.TcpSocket (this);
                 socket.connect_to_host ("localhost", port);
                 GLib.assert_true (socket.wait_for_connected ());
                 socket.write (x);

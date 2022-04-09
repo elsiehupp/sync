@@ -4,12 +4,12 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QWizardPage>
+//  #include <GLib.WizardPage>
 
 namespace Occ {
 namespace Ui {
 
-public class WelcomePage : QWizardPage {
+public class WelcomePage : GLib.WizardPage {
 
     /***********************************************************
     ***********************************************************/

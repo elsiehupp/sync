@@ -83,7 +83,7 @@ public abstract class AbstractTestSyncMove : GLib.Object {
     ***********************************************************/
     private static string get_name (Common.VfsMode vfs_mode, string s) {
         if (vfs_mode == AbstractVfs.WithSuffix) {
-            return s + APPLICATION_DOTVIRTUALFILE_SUFFIX;
+            return s + Common.Config.APPLICATION_DOTVIRTUALFILE_SUFFIX;
         }
         return s;
     }

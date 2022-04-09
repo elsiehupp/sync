@@ -1,5 +1,5 @@
 /***********************************************************
-@class QStringTokenizer
+@class GLib.StringTokenizer
 
 @author 2014 Daniel Molkentin <daniel@molkentin.de>
 
@@ -9,11 +9,11 @@ This file is part of the Qt Library
 
 @copyright GPLv3.0 only
 ***********************************************************/
-public class QStringTokenizer : QTokenizer<string> {
+public class GLib.StringTokenizer : GLib.Tokenizer<string> {
 
     /***********************************************************
     ***********************************************************/
-    public QStringTokenizer (string string, string delim) {
+    public GLib.StringTokenizer (string string, string delim) {
         base (string, delim);
     }
 
@@ -22,7 +22,7 @@ public class QStringTokenizer : QTokenizer<string> {
     @brief Like \see next (), but returns a lightweight string reference
     @return A reference to the token within the string
     ***********************************************************/
-    public /* QStringRef */ string string_ref () {
+    public /* GLib.StringRef */ string string_ref () {
         // If those differences overflow an int we'd have a veeeeeery long string in memory
         int begin = std.distance (d.begin, d.token_begin);
         int end = std.distance (d.token_begin, d.token_end);
@@ -30,6 +30,6 @@ public class QStringTokenizer : QTokenizer<string> {
             begin++;
             end -= 2;
         }
-        return /* QStringRef */ string (&d.string, begin, end);
+        return /* GLib.StringRef */ string (&d.string, begin, end);
     }
 }

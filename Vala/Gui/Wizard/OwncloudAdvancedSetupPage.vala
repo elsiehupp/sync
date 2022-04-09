@@ -6,13 +6,13 @@
 ***********************************************************/
 
 //  #include <GLib.Dir>
-//  #include <QFileDialog>
-//  #include <QStorageInfo>
+//  #include <GLib.FileDialog>
+//  #include <GLib.StorageInfo>
 //  #include <Gtk.MessageBox>
 //  #include <Json.Object>
 //  #include <folderman.h>
 
-//  #include <QWizard>
+//  #include <GLib.Wizard>
 
 namespace Occ {
 namespace Ui {
@@ -21,7 +21,7 @@ namespace Ui {
 @brief The OwncloudAdvancedSetupPage class
 @ingroup gui
 ***********************************************************/
-public class OwncloudAdvancedSetupPage : QWizardPage {
+public class OwncloudAdvancedSetupPage : GLib.WizardPage {
 
     /***********************************************************
     ***********************************************************/
@@ -29,7 +29,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     private bool checking = false;
     private bool created = false;
     private bool local_folder_valid = false;
-    private QProgressIndicator progress_indicator;
+    private GLib.ProgressIndicator progress_indicator;
     private string remote_folder;
     public GLib.List<string> selective_sync_blocklist { public get; private set; }
     private int64 r_size = -1;
@@ -44,7 +44,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     ***********************************************************/
     public OwncloudAdvancedSetupPage (OwncloudWizard wizard) {
         base ();
-        this.progress_indicator = new QProgressIndicator (this);
+        this.progress_indicator = new GLib.ProgressIndicator (this);
         this.oc_wizard = wizard;
         this.instance.up_ui (this);
 
@@ -63,7 +63,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         this.instance.pb_select_local_folder.clicked.connect (
             this.on_signal_select_folder
         );
-        button_text (QWizard.FinishButton, _("Connect"));
+        button_text (GLib.Wizard.FinishButton, _("Connect"));
 
         if (Theme.enforce_virtual_files_sync_folder) {
             this.instance.r_sync_everything.disabled (true);
@@ -148,7 +148,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         update_status ();
 
         // ensure "next" gets the focus, not ob_select_local_folder
-        GLib.Timeout.single_shot (0, wizard ().button (QWizard.FinishButton), Gtk.Widget.focus);
+        GLib.Timeout.single_shot (0, wizard ().button (GLib.Wizard.FinishButton), Gtk.Widget.focus);
 
         var acc = static_cast<OwncloudWizard> (wizard ()).account;
         var quota_job = new PropfindJob (acc, this.remote_folder, this);
@@ -178,7 +178,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
 
         customize_style ();
 
-        var next_button = qobject_cast<QPushButton> (this.oc_wizard.button (QWizard.NextButton));
+        var next_button = qobject_cast<GLib.PushButton> (this.oc_wizard.button (GLib.Wizard.NextButton));
         if (next_button) {
             next_button.default (true);
         }
@@ -303,7 +303,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void on_signal_select_folder () {
-        string directory = QFileDialog.existing_directory (null, _("Local Sync FolderConnection"), GLib.Dir.home_path);
+        string directory = GLib.FileDialog.existing_directory (null, _("Local Sync FolderConnection"), GLib.Dir.home_path);
         if (!directory == "") {
             // TODO: remove when UX decision is made
             refresh_virtual_files_availibility (directory);
@@ -420,7 +420,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    private void radio_checked (QRadioButton radio) {
+    private void radio_checked (GLib.RadioButton radio) {
         // We don't want clicking the radio buttons to immediately adjust the checked state
         // for selective sync and virtual file sync, so we keep them uncheckable until
         // they should be checked.
@@ -559,7 +559,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         string local_dir = local_folder ();
         string path = !GLib.Dir (local_dir).exists () && local_dir.contains (GLib.Dir.home_path) ?
                     GLib.Dir.home_path : local_dir;
-        QStorageInfo storage = new QStorageInfo (GLib.Dir.to_native_separators (path));
+        GLib.StorageInfo storage = new GLib.StorageInfo (GLib.Dir.to_native_separators (path));
 
         return storage.bytes_available ();
     }

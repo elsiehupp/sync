@@ -7,7 +7,7 @@ namespace LibSync {
 public class EncryptionHelper : GLib.Object {
 
     public static string generate_random_filename () {
-        return QUuid.create_uuid ().to_rfc4122 ().to_hex ();
+        return GLib.Uuid.create_uuid ().to_rfc4122 ().to_hex ();
     }
 
 
@@ -419,7 +419,7 @@ public class EncryptionHelper : GLib.Object {
 
 
     /***********************************************************
-    TODO: change those two EVP_PKEY into QSslKey.
+    TODO: change those two EVP_PKEY into GLib.SslKey.
     ***********************************************************/
     public static string encrypt_string_asymmetric (
         EVP_PKEY public_key,
@@ -539,10 +539,10 @@ public class EncryptionHelper : GLib.Object {
     public static bool file_encryption (
         string key, string initialization_vector,
         GLib.File input, GLib.File output, string return_tag) {
-        if (!input.open (QIODevice.ReadOnly)) {
+        if (!input.open (GLib.IODevice.ReadOnly)) {
             GLib.debug ("Could not open input file for reading " + input.error_string);
         }
-        if (!output.open (QIODevice.WriteOnly)) {
+        if (!output.open (GLib.IODevice.WriteOnly)) {
             GLib.debug ("Could not oppen output file for writing " + output.error_string);
         }
 
@@ -624,8 +624,8 @@ public class EncryptionHelper : GLib.Object {
     public static bool file_decryption (
         string key, string initialization_vector,
         GLib.File input, GLib.File output) {
-        input.open (QIODevice.ReadOnly);
-        output.open (QIODevice.WriteOnly);
+        input.open (GLib.IODevice.ReadOnly);
+        output.open (GLib.IODevice.WriteOnly);
 
         // Init
         CipherContext context = new CipherContext ();

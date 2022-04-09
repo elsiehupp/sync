@@ -23,7 +23,7 @@ public class FakeGetWithDataReply : FakeReply {
         set_request (request);
         set_url (request.url);
         set_operation (operation);
-        open (QIODevice.ReadOnly);
+        open (GLib.IODevice.ReadOnly);
 
         GLib.assert_true (!data == "");
         payload = data;
@@ -35,7 +35,7 @@ public class FakeGetWithDataReply : FakeReply {
         if (request.has_raw_header ("Range")) {
             const string range = request.raw_header ("Range").to_string ();
             const GLib.Regex bytes_pattern = new GLib.Regex ("bytes= (?<start>\\d+)- (?<end>\\d+)");
-            const QRegularExpressionMatch match = bytes_pattern.match (range);
+            const GLib.RegularExpressionMatch match = bytes_pattern.match (range);
             if (match.has_match ()) {
                 const int on_signal_start = match.captured ("on_signal_start").to_int ();
                 const int end = match.captured ("end").to_int ();
@@ -77,7 +77,7 @@ public class FakeGetWithDataReply : FakeReply {
         if (aborted) {
             return 0;
         }
-        return payload.size () - offset + QIODevice.bytes_available ();
+        return payload.size () - offset + GLib.IODevice.bytes_available ();
     }
 
 

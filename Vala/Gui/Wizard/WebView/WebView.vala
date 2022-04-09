@@ -1,18 +1,18 @@
 
 
 //  #include <Gtk.Widget>
-//  #include <QWebEnginePage>
-//  #include <QWebEngineProfile>
-//  #include <QWebEngineUrlRequestInterceptor>
-//  #include <QWebEngineUrlRequestJob>
+//  #include <GLib.WebEnginePage>
+//  #include <GLib.WebEngineProfile>
+//  #include <GLib.WebEngineUrlRequestInterceptor>
+//  #include <GLib.WebEngineUrlRequestJob>
 //  #includeVERSION >= 0x051200
-//  #include <QWebEngineUrlScheme>
-//  #include <QWeb_engine_url_s
-//  #include <QWeb_engine_v
-//  #include <QDesktopServices>
-//  #include <QProgres
-//  #include <QLocale>
-//  #include <QWebEngineCertificateError>
+//  #include <GLib.WebEngineUrlScheme>
+//  #include <GLib.Web_engine_url_s
+//  #include <GLib.Web_engine_v
+//  #include <GLib.DesktopServices>
+//  #include <GLib.Progres
+//  #include <GLib.Locale>
+//  #include <GLib.WebEngineCertificateError>
 //  #include <Gtk.MessageBox>
 
 namespace Occ {
@@ -26,8 +26,8 @@ public class WebView : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private QWebEngineView webview;
-    private QWebEngineProfile profile;
+    private GLib.WebEngineView webview;
+    private GLib.WebEngineProfile profile;
     private WebEnginePage page;
 
     /***********************************************************
@@ -43,16 +43,16 @@ public class WebView : Gtk.Widget {
         base (parent);
         this.instance;
         this.instance.up_ui (this);
-        QWebEngineUrlScheme.register_scheme (new QWebEngineUrlScheme ("nc"));
-        this.webview = new QWebEngineView (this);
-        this.profile = new QWebEngineProfile (this);
+        GLib.WebEngineUrlScheme.register_scheme (new GLib.WebEngineUrlScheme ("nc"));
+        this.webview = new GLib.WebEngineView (this);
+        this.profile = new GLib.WebEngineProfile (this);
         this.page = new WebEnginePage (this.profile);
         this.interceptor = new WebViewPageUrlRequestInterceptor (this);
         this.scheme_handler = new WebViewPageUrlSchemeHandler (this);
 
         const string user_agent = Utility.user_agent_string ();
         this.profile.http_user_agent (user_agent);
-        QWebEngineProfile.default_profile ().http_user_agent (user_agent);
+        GLib.WebEngineProfile.default_profile ().http_user_agent (user_agent);
         this.profile.request_interceptor (this.interceptor);
         this.profile.install_url_scheme_handler ("nc", this.scheme_handler);
 
@@ -61,7 +61,7 @@ public class WebView : Gtk.Widget {
         Set a proper accept langauge to the language of the client
         code from : http://code.qt.io/cgit/qt/qtbase.git/tree/src/network/access/qhttpnetworkconnection
         ***********************************************************/ {
-            string system_locale = QLocale.system ().name ().replace (char.from_latin1 ('_'),char.from_latin1 ('-'));
+            string system_locale = GLib.Locale.system ().name ().replace (char.from_latin1 ('_'),char.from_latin1 ('-'));
             string accept_language;
             if (system_locale == "C") {
                 accept_language = "en,*";
@@ -95,7 +95,7 @@ public class WebView : Gtk.Widget {
         this.page [1]. Here I delete this.page manually so that this.profile can be safely
         deleted later.
 
-        [1] https://doc.qt.io/qt-5/qwebenginepage.html#QWebEnginePage-1
+        [1] https://doc.qt.io/qt-5/qwebenginepage.html#GLib.WebEnginePage-1
         ***********************************************************/
         this.page = null;
     }

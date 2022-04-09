@@ -21,7 +21,7 @@ public class OcsNavigationAppsJob : OcsJob {
     @param reply The reply
     @param status_code the status code of the response
     ***********************************************************/
-    internal signal void signal_apps_job_finished (QJsonDocument reply, int status_code);
+    internal signal void signal_apps_job_finished (GLib.JsonDocument reply, int status_code);
 
     /***********************************************************
     ***********************************************************/
@@ -47,7 +47,7 @@ public class OcsNavigationAppsJob : OcsJob {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_job_finished (QJsonDocument reply, int status_code) {
+    private void on_signal_job_finished (GLib.JsonDocument reply, int status_code) {
         /* emit */ signal_apps_job_finished (reply, status_code);
     }
 

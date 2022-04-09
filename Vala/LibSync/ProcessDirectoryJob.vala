@@ -592,8 +592,8 @@ public class ProcessDirectoryJob : GLib.Object {
         //      // be encoded in the local file system.
         //      //
         //      // We cannot use GMime.Encoding.can_encode () since that can incorrectly return true, see
-        //      // https://bugreports.qt.io/browse/QTBUG-6925.
-        //      QTextEncoder encoder = new QTextEncoder (local_codec, GMime.Encoding.Convert_invalid_to_null);
+        //      // https://bugreports.qt.io/browse/GLib.TBUG-6925.
+        //      GLib.TextEncoder encoder = new GLib.TextEncoder (local_codec, GMime.Encoding.Convert_invalid_to_null);
         //      if (encoder.from_unicode (path).contains ('\0')) {
         //          GLib.warning ("Cannot encode " + path + " to local encoding " + local_codec.name ());
         //          excluded = CSync.ExcludedFiles.Type.CANNOT_ENCODE;
@@ -2124,8 +2124,8 @@ public class ProcessDirectoryJob : GLib.Object {
             this.on_signal_discovery_single_local_directory_job_finished
         );
 
-        QThreadPool pool = QThreadPool.global_instance;
-        pool.start (local_job); // QThreadPool takes ownership
+        GLib.ThreadPool pool = GLib.ThreadPool.global_instance;
+        pool.start (local_job); // GLib.ThreadPool takes ownership
     }
 
 

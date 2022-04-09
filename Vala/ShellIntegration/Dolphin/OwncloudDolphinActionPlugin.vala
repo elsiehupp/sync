@@ -7,10 +7,10 @@
 //  #include <KCoreAddons/KPluginFactory>
 //  #include <KCoreAddons/KPluginLoader>
 //  #include <KIOWidgets/kabstractfileitemactionplugin.h>
-//  #include <QtNetwork/QLocalSocket>
+//  #include <QtNetwork/GLib.LocalSocket>
 //  #include <KIOCore/kfileitem.h>
 //  #include <KIOCore/KFileItemListProperties>
-//  #include <QtWidgets/QAction>
+//  #include <QtWidgets/GLib.Action>
 //  #include <QtWidgets/GLib.Menu>
 //  #include <QtCore/GLib.Dir>
 //  #include <QtCore/GLib.Timeout>
@@ -29,14 +29,14 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
 
     /***********************************************************
     ***********************************************************/
-    public override GLib.List<QAction> actions (KFileItemListProperties file_item_infos, Gtk.Widget* parentWidget) {
+    public override GLib.List<GLib.Action> actions (KFileItemListProperties file_item_infos, Gtk.Widget* parentWidget) {
         var helper = OwncloudDolphinPluginHelper.instance;
         if (!helper.is_connected || !file_item_infos.is_local ()) {
             return {};
         }
 
         // If any of the url is outside of a sync folder, return an empty menu.
-        const GLib.List<GLib.Uri> urls = file_item_infos.url_list ();
+        GLib.List<GLib.Uri> urls = file_item_infos.url_list ();
         const var paths = helper.paths ();
         string files;
         foreach (var url in urls) {
@@ -109,14 +109,14 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.List<QAction> legacyActions (KFileItemListProperties file_item_infos, Gtk.Widget parentWidget) {
+    public GLib.List<GLib.Action> legacyActions (KFileItemListProperties file_item_infos, Gtk.Widget parentWidget) {
         GLib.List<GLib.Uri> urls = file_item_infos.url_list ();
         if (urls.length != 1)
             return {};
         GLib.Dir local_path = new GLib.Dir (urls.first ().to_local_file ());
         var local_file = local_path.canonical_path;
         var helper = OwncloudDolphinPluginHelper.instance;
-        var menuaction = new QAction (parentWidget);
+        var menuaction = new GLib.Action (parentWidget);
         menuaction.setText (helper.context_menu_title ());
         var menu = new GLib.Menu (parentWidget);
         menuaction.setMenu (menu);

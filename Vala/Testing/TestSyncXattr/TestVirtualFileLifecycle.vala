@@ -13,7 +13,7 @@ public class TestVirtualFileLifecycle : AbstractTestSyncXAttr {
     /***********************************************************
     ***********************************************************/
     private TestVirtualFileLifecycle () {
-        QFETCH (bool, do_local_discovery);
+        GLib.FETCH (bool, do_local_discovery);
 
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
         set_up_vfs (fake_folder);
@@ -25,7 +25,7 @@ public class TestVirtualFileLifecycle : AbstractTestSyncXAttr {
         // Create a virtual file for a new remote file
         fake_folder.remote_modifier ().mkdir ("A");
         fake_folder.remote_modifier ().insert ("A/a1", 64);
-        var some_date = new GLib.DateTime (QDate (1984, 07, 30), QTime (1,3,2));
+        var some_date = new GLib.DateTime (GLib.Date (1984, 07, 30), GLib.Time (1,3,2));
         fake_folder.remote_modifier ().set_modification_time ("A/a1", some_date);
         GLib.assert_true (fake_folder.sync_once ());
         xaverify_virtual (fake_folder, "A/a1");

@@ -31,7 +31,7 @@ public class TestHttp2Resend : GLib.Object {
         resend_actual = 0;
         resend_expected = 10;
 
-        QSignalSpy complete_spy = new QSignalSpy (
+        GLib.SignalSpy complete_spy = new GLib.SignalSpy (
             fake_folder.sync_engine,
             signal_item_completed (SyncFileItem)
         );

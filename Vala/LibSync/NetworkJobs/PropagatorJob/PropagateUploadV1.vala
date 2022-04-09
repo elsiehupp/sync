@@ -191,7 +191,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
             current_chunk_size,
             this.propagator.bandwidth_manager
         );
-        if (!device.open (QIODevice.ReadOnly)) {
+        if (!device.open (GLib.IODevice.ReadOnly)) {
             GLib.warning ("Could not prepare upload device: " + device.error_string);
 
             // Soft error because this is likely caused by the user modifying his files while syncing
@@ -199,7 +199,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
             return;
         }
 
-        // job takes ownership of device via a QScopedPointer. Job deletes itself when finishing
+        // job takes ownership of device via a GLib.ScopedPointer. Job deletes itself when finishing
         var device_ptr = device; // for connections later
         var put_file_job = new PUTFileJob (this.propagator.account, this.propagator.full_remote_path (path), std.move (device), headers, this.current_chunk, this);
         this.jobs.append (put_file_job);
@@ -403,7 +403,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         // Completion is signaled with sent=0, total=0; avoid accidentally
         // resetting progress due to the sent being zero by ignoring it.
         // signal_finished () is bound to be emitted soon anyway.
-        // See https://bugreports.qt.io/browse/QTBUG-44782.
+        // See https://bugreports.qt.io/browse/GLib.TBUG-44782.
         if (sent == 0 && total == 0) {
             return;
         }

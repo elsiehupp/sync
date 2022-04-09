@@ -20,7 +20,7 @@ public class FakePropfindReply : FakeReply {
         set_request (request);
         set_url (request.url);
         set_operation (operation);
-        open (QIODevice.ReadOnly);
+        open (GLib.IODevice.ReadOnly);
 
         string filename = get_file_path_from_url (request.url);
         GLib.assert_true (!filename == null); // for root, it should be empty
@@ -35,8 +35,8 @@ public class FakePropfindReply : FakeReply {
         const string dav_uri = "DAV:";
         const string oc_uri = "http://owncloud.org/ns";
         GLib.OutputStream buffer = new GLib.OutputStream (payload);
-        buffer.open (QIODevice.WriteOnly);
-        QXmlStreamWriter xml = new QXmlStreamWriter (buffer);
+        buffer.open (GLib.IODevice.WriteOnly);
+        GLib.XmlStreamWriter xml = new GLib.XmlStreamWriter (buffer);
         xml.write_namespace (dav_uri, "d");
         xml.write_namespace (oc_uri, "oc");
         xml.write_start_document ();
@@ -74,7 +74,7 @@ public class FakePropfindReply : FakeReply {
         }
 
         var gmt_date = file_info.last_modified.to_utc ();
-        var string_date = QLocale.c ().to_string (gmt_date, "ddd, dd MMM yyyy HH:mm:ss 'GMT'");
+        var string_date = GLib.Locale.c ().to_string (gmt_date, "ddd, dd MMM yyyy HH:mm:ss 'GMT'");
         xml.write_text_element (dav_uri, "getlastmodified", string_date);
         xml.write_text_element (dav_uri, "getcontentlength", file_info.size.to_string ());
         xml.write_text_element (dav_uri, "getetag", "\"%1\"".printf (file_info.etag));
@@ -124,7 +124,7 @@ public class FakePropfindReply : FakeReply {
     /***********************************************************
     ***********************************************************/
     public override int64 bytes_available () {
-        return payload.size () + QIODevice.bytes_available ();
+        return payload.size () + GLib.IODevice.bytes_available ();
     }
 
 

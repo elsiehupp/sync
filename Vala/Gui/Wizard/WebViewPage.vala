@@ -1,8 +1,8 @@
 
-//  #include <QWebEngineUrlRequestJob>
-//  #include <QProgressBar>
-//  #include <QVBoxLayout>
-//  #include <QNetworkProxyFactory>
+//  #include <GLib.WebEngineUrlRequestJob>
+//  #include <GLib.ProgressBar>
+//  #include <GLib.VBoxLayout>
+//  #include <Soup.NetworkProxyFactory>
 //  #include <Gdk.Monitor>
 
 namespace Occ {
@@ -39,7 +39,7 @@ public class WebViewPage : AbstractCredentialsWizardPage {
         GLib.info ("Time for a webview!");
         this.web_view = new WebView (this);
 
-        var layout = new QVBoxLayout (this);
+        var layout = new GLib.VBoxLayout (this);
         layout.margin (0);
         layout.add_widget (this.web_view);
         layout (layout);
@@ -48,7 +48,7 @@ public class WebViewPage : AbstractCredentialsWizardPage {
             this.on_signal_url_catched
         );
 
-        // this.use_system_proxy = QNetworkProxyFactory.uses_system_configuration ();
+        // this.use_system_proxy = Soup.NetworkProxyFactory.uses_system_configuration ();
     }
 
 
@@ -56,14 +56,14 @@ public class WebViewPage : AbstractCredentialsWizardPage {
     ***********************************************************/
     //  ~WebViewPage () = default;
     //{
-    //    QNetworkProxyFactory.use_system_configuration (this.use_system_proxy);
+    //    Soup.NetworkProxyFactory.use_system_configuration (this.use_system_proxy);
     //}
 
 
     /***********************************************************
     ***********************************************************/
     public void initialize_page () {
-        //QNetworkProxy.application_proxy (QNetworkProxy.application_proxy ());
+        //Soup.NetworkProxy.application_proxy (Soup.NetworkProxy.application_proxy ());
 
         string url;
         if (this.oc_wizard.registration ()) {
@@ -145,7 +145,7 @@ public class WebViewPage : AbstractCredentialsWizardPage {
     ***********************************************************/
     private bool try_to_wizard_size (int width, int height) {
         const var window = this.oc_wizard.window ();
-        const var screen_geometry = Gtk.Application.screen_at (window.position ()).geometry ();
+        const var screen_geometry = GLib.Application.screen_at (window.position ()).geometry ();
         const var window_width = screen_geometry.width ();
         const var window_height = screen_geometry.height ();
 

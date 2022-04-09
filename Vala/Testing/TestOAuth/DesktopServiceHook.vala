@@ -14,7 +14,7 @@ public class DesktopServiceHook : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public DesktopServiceHook () {
-        QDesktopServices.set_url_handler ("oauthtest", this, "signal_hooked");
+        GLib.DesktopServices.set_url_handler ("oauthtest", this, "signal_hooked");
     }
 
 } // class DesktopServiceHook

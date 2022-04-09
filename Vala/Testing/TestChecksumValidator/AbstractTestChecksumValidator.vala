@@ -9,7 +9,7 @@ namespace Testing {
 
 public abstract class AbstractTestChecksumValidator : GLib.Object {
 
-    private QTemporaryDir root;
+    private GLib.TemporaryDir root;
     private string testfile;
     private string expected_error;
     private string expected;
@@ -44,7 +44,7 @@ public abstract class AbstractTestChecksumValidator : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected static string shell_sum (string command, string file) {
-        QProcess md5;
+        GLib.Process md5;
         GLib.List<string> args = new GLib.List<string> ()
         args.append (file);
         md5.on_signal_start (command, args);

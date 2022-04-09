@@ -12,9 +12,9 @@ public class TestStreamingDecryptor : AbstractTestClientSideEncryption {
     /***********************************************************
     ***********************************************************/
     private TestStreamingDecryptor () {
-        QFETCH (int, total_bytes);
+        GLib.FETCH (int, total_bytes);
 
-        QTemporaryFile dummy_input_file;
+        GLib.TemporaryFile dummy_input_file;
 
         GLib.assert_true (dummy_input_file.open ());
 
@@ -33,7 +33,7 @@ public class TestStreamingDecryptor : AbstractTestClientSideEncryption {
         var initialization_vector = LibSync.EncryptionHelper.generate_random (16);
 
         // test normal file encryption/decryption
-        QTemporaryFile dummy_encryption_output_file;
+        GLib.TemporaryFile dummy_encryption_output_file;
 
         string tag;
 
@@ -44,7 +44,7 @@ public class TestStreamingDecryptor : AbstractTestClientSideEncryption {
         dummy_encryption_output_file.close ();
         GLib.assert_true (!dummy_encryption_output_file.is_open);
 
-        QTemporaryFile dummy_decryption_output_file;
+        GLib.TemporaryFile dummy_decryption_output_file;
 
         GLib.assert_true (LibSync.EncryptionHelper.file_decryption (encryption_key, initialization_vector, dummy_encryption_output_file, dummy_decryption_output_file));
         GLib.assert_true (dummy_decryption_output_file.open ());
@@ -62,7 +62,7 @@ public class TestStreamingDecryptor : AbstractTestClientSideEncryption {
 
         string pending_bytes;
 
-        QFETCH (int, bytes_to_read);
+        GLib.FETCH (int, bytes_to_read);
 
         while (dummy_encryption_output_file.position () < dummy_encryption_output_file.size ()) {
             var bytes_remaining = dummy_encryption_output_file.size () - dummy_encryption_output_file.position ();

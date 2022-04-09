@@ -13,7 +13,7 @@ public class TestDurationToDescriptiveString : AbstractTestUtility {
     /***********************************************************
     ***********************************************************/
     private TestDurationToDescriptiveString () {
-        QLocale.set_default (QLocale ("C"));
+        GLib.Locale.set_default (GLib.Locale ("C"));
         //Note: in order for the plural to work we would need to load the english translation
 
         uint64 sec = 1000;

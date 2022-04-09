@@ -151,7 +151,7 @@ public class Share : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_password_set (QJsonDocument reply, GLib.Variant value) {
+    protected void on_signal_password_set (GLib.JsonDocument reply, GLib.Variant value) {
         this.password_is_set = !value.to_string () == "";
         /* emit */ signal_password_set ();
     }
@@ -174,7 +174,7 @@ public class Share : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_permissions_set (QJsonDocument reply, GLib.Variant value) {
+    private void on_signal_permissions_set (GLib.JsonDocument reply, GLib.Variant value) {
         this.permissions = (Permissions)value.to_int ();
         /* emit */ signal_permissions_set ();
     }

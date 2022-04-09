@@ -3,7 +3,7 @@
 namespace Occ {
 namespace Ui {
 
-public class WebEnginePage : QWebEnginePage {
+public class WebEnginePage : GLib.WebEnginePage {
 
     /***********************************************************
     ***********************************************************/
@@ -11,14 +11,14 @@ public class WebEnginePage : QWebEnginePage {
 
     /***********************************************************
     ***********************************************************/
-    public WebEnginePage (QWebEngineProfile profile, GLib.Object parent = new GLib.Object ()) {
+    public WebEnginePage (GLib.WebEngineProfile profile, GLib.Object parent = new GLib.Object ()) {
         base (profile, parent);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public QWebEnginePage create_window (QWebEnginePage.WebWindowType type) {
+    public GLib.WebEnginePage create_window (GLib.WebEnginePage.WebWindowType type) {
         //  Q_UNUSED (type);
         var view = new ExternalWebEnginePage (this.profile ());
         return view;
@@ -28,19 +28,19 @@ public class WebEnginePage : QWebEnginePage {
     /***********************************************************
     ***********************************************************/
     public void url (GLib.Uri url) {
-        QWebEnginePage.url (url);
+        GLib.WebEnginePage.url (url);
         this.enforce_https = url.scheme () == "https";
     }
 
 
     /***********************************************************
     ***********************************************************/
-    protected bool certificate_error (QWebEngineCertificateError certificate_error) {
+    protected bool certificate_error (GLib.WebEngineCertificateError certificate_error) {
         /***********************************************************
         TODO properly improve this.
         The certificate should be displayed.
 
-        Or rather we should do a request with the QNAM and see if it works (then it is in the store).
+        Or rather we should do a request with the GLib.NAM and see if it works (then it is in the store).
         This is just a quick fix for now.
         ***********************************************************/
         Gtk.MessageBox message_box;
@@ -58,7 +58,7 @@ public class WebEnginePage : QWebEnginePage {
 
     /***********************************************************
     ***********************************************************/
-    protected bool accept_navigation_request (GLib.Uri url, QWebEnginePage.Navigation_type type, bool is_main_frame) {
+    protected bool accept_navigation_request (GLib.Uri url, GLib.WebEnginePage.Navigation_type type, bool is_main_frame) {
         //  Q_UNUSED (type);
         //  Q_UNUSED (is_main_frame);
 

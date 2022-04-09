@@ -13,7 +13,7 @@ public class HttpCredentialsAccessManager : AccessManager {
 
     /***********************************************************
     The credentials object dies along with the account, while
-    the QNAM might outlive both.
+    the GLib.NAM might outlive both.
     ***********************************************************/
     private HttpCredentials credentials { private get; construct; }
 
@@ -44,7 +44,7 @@ public class HttpCredentialsAccessManager : AccessManager {
 
         if (this.credentials && !this.credentials.client_ssl_key == null && !this.credentials.client_ssl_certificate == null) {
             // SSL configuration
-            QSslConfiguration ssl_configuration = request.ssl_configuration ();
+            GLib.SslConfiguration ssl_configuration = request.ssl_configuration ();
             ssl_configuration.local_certificate (this.credentials.client_ssl_certificate);
             ssl_configuration.private_key (this.credentials.client_ssl_key);
             request.ssl_configuration (ssl_configuration);

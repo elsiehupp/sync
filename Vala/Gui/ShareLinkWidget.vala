@@ -6,19 +6,19 @@
 ***********************************************************/
 
 //  #include <GLib.OutputStream>
-//  #include <QClipboard>
+//  #include <GLib.Clipboard>
 //  #include <GLib.FileInfo>
-//  #include <QDesktopServices>
+//  #include <GLib.DesktopServices>
 //  #include <Gtk.MessageBox>
 //  #include <GLib.Menu>
-//  #include <QText_edit>
-//  #include <QToolButton>
-//  #include <QPropertyAnimation>
+//  #include <GLib.Text_edit>
+//  #include <GLib.ToolButton>
+//  #include <GLib.PropertyAnimation>
 //  #include <Gtk.Dialog
-//  #include <QToolBu
-//  #include <QHBox_layo
-//  #include <QLineEdit>
-//  #include <QWidgetAction>
+//  #include <GLib.ToolBu
+//  #include <GLib.HBox_layo
+//  #include <GLib.LineEdit>
+//  #include <GLib.WidgetAction>
 
 namespace Occ {
 namespace Ui {
@@ -46,23 +46,23 @@ public class ShareLinkWidget : Gtk.Widget {
     private bool note_required;
 
     private GLib.Menu link_context_menu;
-    private QAction read_only_link_action;
-    private QAction allow_editing_link_action;
-    private QAction allow_upload_editing_link_action;
-    private QAction allow_upload_link_action;
-    private QAction password_protect_link_action;
-    private QAction expiration_date_link_action;
-    private QAction unshare_link_action;
-    private QAction add_another_link_action;
-    private QAction note_link_action;
-    private QHBoxLayout share_link_layout = new QHBoxLayout ();
+    private GLib.Action read_only_link_action;
+    private GLib.Action allow_editing_link_action;
+    private GLib.Action allow_upload_editing_link_action;
+    private GLib.Action allow_upload_link_action;
+    private GLib.Action password_protect_link_action;
+    private GLib.Action expiration_date_link_action;
+    private GLib.Action unshare_link_action;
+    private GLib.Action add_another_link_action;
+    private GLib.Action note_link_action;
+    private GLib.HBoxLayout share_link_layout = new GLib.HBoxLayout ();
     private Gtk.Label share_link_label = new Gtk.Label ();
     private ElidedLabel share_link_elided_label = new ElidedLabel ();
-    private QLineEdit share_link_edit = new QLineEdit ();
-    private QToolButton share_link_button = new QToolButton ();
-    private QProgressIndicator share_link_progress_indicator = new QProgressIndicator ();
+    private GLib.LineEdit share_link_edit = new GLib.LineEdit ();
+    private GLib.ToolButton share_link_button = new GLib.ToolButton ();
+    private GLib.ProgressIndicator share_link_progress_indicator = new GLib.ProgressIndicator ();
     private Gtk.Widget share_link_default_widget = new Gtk.Widget ();
-    private QWidgetAction share_link_widget_action = new QWidgetAction ();
+    private GLib.WidgetAction share_link_widget_action = new GLib.WidgetAction ();
 
 
     internal signal void create_link_share ();
@@ -187,9 +187,9 @@ public class ShareLinkWidget : Gtk.Widget {
         );
 
         // Prepare permissions check and create group action
-        const QDate expire_date = this.link_share.expire_date ().is_valid
+        const GLib.Date expire_date = this.link_share.expire_date ().is_valid
             ? this.link_share.expire_date ()
-            : QDate ();
+            : GLib.Date ();
         const SharePermissions share_permissions = this.link_share.permissions ();
         var checked = false;
         var permissions_group = new GLib.ActionGroup (this);
@@ -229,13 +229,13 @@ public class ShareLinkWidget : Gtk.Widget {
         display_share_link_label ();
         this.instance.horizontal_layout.insert_widget (2, this.share_link_elided_label);
 
-        this.share_link_layout = new QHBoxLayout (this);
+        this.share_link_layout = new GLib.HBoxLayout (this);
 
         this.share_link_label = new Gtk.Label (this);
         this.share_link_label.pixmap (":/client/theme/black/edit.svg");
         this.share_link_layout.add_widget (this.share_link_label);
 
-        this.share_link_edit = new QLineEdit (this);
+        this.share_link_edit = new GLib.LineEdit (this);
         this.share_link_edit.return_pressed.connect (
             this.on_signal_create_label
         );
@@ -243,7 +243,7 @@ public class ShareLinkWidget : Gtk.Widget {
         this.share_link_edit.on_signal_text (this.link_share.label);
         this.share_link_layout.add_widget (this.share_link_edit);
 
-        this.share_link_button = new QToolButton (this);
+        this.share_link_button = new GLib.ToolButton (this);
         this.share_link_button.clicked.connect (
             this.on_signal_create_label
         );
@@ -251,14 +251,14 @@ public class ShareLinkWidget : Gtk.Widget {
         this.share_link_button.tool_button_style (Qt.Tool_button_icon_only);
         this.share_link_layout.add_widget (this.share_link_button);
 
-        this.share_link_progress_indicator = new QProgressIndicator (this);
+        this.share_link_progress_indicator = new GLib.ProgressIndicator (this);
         this.share_link_progress_indicator.visible (false);
         this.share_link_layout.add_widget (this.share_link_progress_indicator);
 
         this.share_link_default_widget = new Gtk.Widget (this);
         this.share_link_default_widget.layout (this.share_link_layout);
 
-        this.share_link_widget_action = new QWidgetAction (this);
+        this.share_link_widget_action = new GLib.WidgetAction (this);
         this.share_link_widget_action.default_widget (this.share_link_default_widget);
         this.share_link_widget_action.checkable (true);
         this.link_context_menu.add_action (this.share_link_widget_action);
@@ -318,7 +318,7 @@ public class ShareLinkWidget : Gtk.Widget {
 
         // If expiredate is enforced do not allow disable and set max days
         if (this.account.capabilities.share_public_link_enforce_expire_date ()) {
-            this.instance.calendar.maximum_date (QDate.current_date ().add_days (
+            this.instance.calendar.maximum_date (GLib.Date.current_date ().add_days (
                 this.account.capabilities.share_public_link_expire_date_days ()));
             this.expiration_date_link_action.checked (true);
             this.expiration_date_link_action.enabled (false);
@@ -401,7 +401,7 @@ public class ShareLinkWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_link_context_menu_action_triggered (QAction action) {
+    public void on_signal_link_context_menu_action_triggered (GLib.Action action) {
         const var state = action.is_checked ();
         SharePermissions share_permissions = SharePermissionRead;
 
@@ -542,7 +542,7 @@ public class ShareLinkWidget : Gtk.Widget {
     private void on_signal_copy_link_share (bool clicked) {
         //  Q_UNUSED (clicked);
 
-        Gtk.Application.clipboard ().on_signal_text (this.link_share.share_link ().to_string ());
+        GLib.Application.clipboard ().on_signal_text (this.link_share.share_link ().to_string ());
     }
 
 
@@ -568,7 +568,7 @@ public class ShareLinkWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_context_menu_button_clicked () {
-        this.link_context_menu.exec (QCursor.position ());
+        this.link_context_menu.exec (GLib.Cursor.position ());
     }
 
 
@@ -658,11 +658,11 @@ public class ShareLinkWidget : Gtk.Widget {
         this.instance.calendar.visible (enable);
         this.instance.confirm_expiration_date.visible (enable);
 
-        const var date = enable ? this.link_share.expire_date () : QDate.current_date ().add_days (1);
+        const var date = enable ? this.link_share.expire_date () : GLib.Date.current_date ().add_days (1);
         this.instance.calendar.date (date);
-        this.instance.calendar.minimum_date (QDate.current_date ().add_days (1));
+        this.instance.calendar.minimum_date (GLib.Date.current_date ().add_days (1));
         this.instance.calendar.maximum_date (
-            QDate.current_date ().add_days (this.account.capabilities.share_public_link_expire_date_days ()));
+            GLib.Date.current_date ().add_days (this.account.capabilities.share_public_link_expire_date_days ()));
         this.instance.calendar.focus ();
 
         if (!enable && this.link_share && this.link_share.expire_date.is_valid) {
@@ -673,7 +673,7 @@ public class ShareLinkWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private void toggle_button_animation (QToolButton button, QProgressIndicator progress_indicator, QAction checked_action) {
+    private void toggle_button_animation (GLib.ToolButton button, GLib.ProgressIndicator progress_indicator, GLib.Action checked_action) {
         var on_signal_start_animation = false;
         const var action_is_checked = checked_action.is_checked ();
         if (!progress_indicator.is_animated () && action_is_checked) {
@@ -700,7 +700,7 @@ public class ShareLinkWidget : Gtk.Widget {
                 .printf (share_name ()),
             Gtk.MessageBox.NoButton,
             this);
-        QPushButton yes_button =
+        GLib.PushButton yes_button =
             message_box.add_button (_("Delete"), Gtk.MessageBox.YesRole);
         message_box.add_button (_("Cancel"), Gtk.MessageBox.NoRole);
 
@@ -739,7 +739,7 @@ public class ShareLinkWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     void on_signal_start_animation (int start_index, int end) {
-        var maximum_height_animation = new QPropertyAnimation (this, "maximum_height", this);
+        var maximum_height_animation = new GLib.PropertyAnimation (this, "maximum_height", this);
 
         maximum_height_animation.duration (500);
         maximum_height_animation.start_value (start_index);
@@ -778,7 +778,7 @@ public class ShareLinkWidget : Gtk.Widget {
         this.instance.confirm_password.icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
         this.instance.confirm_expiration_date.icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
 
-        this.instance.password_progress_indicator.on_signal_color (Gtk.Application.palette ().color (Gtk.Palette.Text));
+        this.instance.password_progress_indicator.on_signal_color (GLib.Application.palette ().color (Gtk.Palette.Text));
     }
 
 

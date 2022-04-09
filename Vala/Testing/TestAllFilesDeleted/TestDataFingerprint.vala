@@ -12,7 +12,7 @@ public class TestDataFingerprint : AbstractTestAllFilesDeleted {
     /***********************************************************
     ***********************************************************/
     private TestDataFingerprint () {
-        QFETCH (
+        GLib.FETCH (
             bool,
             has_initial_finger_print
         );

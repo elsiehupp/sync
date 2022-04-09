@@ -63,7 +63,7 @@ public class PutMultiFileJob : AbstractNetworkJob {
         Soup.Request request = new Soup.Request ();
 
         foreach (var one_device in this.devices) {
-            var one_part = new QHttp_part ();
+            var one_part = new GLib.Http_part ();
 
             one_part.body_device (one_device.device);
 

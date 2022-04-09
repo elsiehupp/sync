@@ -162,7 +162,7 @@ public class RemotePermissions : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    //  public friend QDebug operator<< (QDebug dbg, RemotePermissions remote_permissions) {
+    //  public friend GLib.Debug operator<< (GLib.Debug dbg, RemotePermissions remote_permissions) {
     //      return dbg + remote_permissions.to_string ();
     //  }
 

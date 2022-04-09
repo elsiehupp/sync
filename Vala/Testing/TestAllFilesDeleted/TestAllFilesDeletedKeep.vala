@@ -14,7 +14,7 @@ public class TestAllFilesDeletedKeep : AbstractTestAllFilesDeleted {
     server, and we simulate that the users press "keep"
     ***********************************************************/
     private TestAllFilesDeletedKeep () {
-        QFETCH (
+        GLib.FETCH (
             bool,
             delete_on_remote
         );

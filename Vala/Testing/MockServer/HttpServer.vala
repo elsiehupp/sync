@@ -9,18 +9,18 @@
 @copyright GPLv??? or later
 ***********************************************************/
 
-//  #include <QTcpServer>
+//  #include <GLib.TcpServer>
 
 namespace Occ {
 namespace Testing {
 
-public class HttpServer : QTcpServer {
+public class HttpServer : GLib.TcpServer {
 
     /***********************************************************
     ***********************************************************/
     public HttpServer (int16 port, GLib.Object parent = new GLib.Object ()) {
         base (parent);
-        listen (QHostAddress.Any, port);
+        listen (GLib.HostAddress.Any, port);
     }
 
 
@@ -29,7 +29,7 @@ public class HttpServer : QTcpServer {
     public void incoming_connection (int socket) {
         if (disabled)
             return;
-        QTcpSocket tcp_socket = new QTcpSocket (this);
+        GLib.TcpSocket tcp_socket = new GLib.TcpSocket (this);
         tcp_socket.signal_ready_read.connect (
             this.on_signal_read_client
         );
@@ -43,7 +43,7 @@ public class HttpServer : QTcpServer {
     /***********************************************************
     ***********************************************************/
     private void on_signal_read_client () {
-        QTcpSocket* socket = (QTcpSocket*)sender ();
+        GLib.TcpSocket* socket = (GLib.TcpSocket*)sender ();
         if (socket.can_read_line ()) {
             GLib.List<string> tokens = socket.read_line ().split (GLib.Regex ("[ \r\n][ \r\n]*"));
             if (tokens[0] == "GET") {
@@ -58,7 +58,7 @@ public class HttpServer : QTcpServer {
 
                 QtServiceBase.instance.log_message ("Wrote to client");
 
-                if (socket.state == QTcpSocket.UnconnectedState) {
+                if (socket.state == GLib.TcpSocket.UnconnectedState) {
                     delete socket;
                     QtServiceBase.instance.log_message ("Connection closed");
                 }
@@ -68,7 +68,7 @@ public class HttpServer : QTcpServer {
 
 
     private void on_signal_discard_client () {
-        QTcpSocket socket = (QTcpSocket) sender ();
+        GLib.TcpSocket socket = (GLib.TcpSocket) sender ();
         socket.delete_later ();
 
         QtServiceBase.instance.log_message ("Connection closed");

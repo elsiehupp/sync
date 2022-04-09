@@ -4,19 +4,19 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QDialogButtonBox>
-//  #include <QVBoxLayout>
-//  #include <QTreeWidget>
+//  #include <GLib.DialogButtonBox>
+//  #include <GLib.VBoxLayout>
+//  #include <GLib.TreeWidget>
 //  #include <qpushbutton.h>
-//  #include <QFileIconProvider>
-//  #include <QHeaderView>
+//  #include <GLib.FileIconProvider>
+//  #include <GLib.HeaderView>
 //  #include <GLib.Settings>
-//  #include <QScopedValueRollback>
-//  #include <QTreeWidgetItem>
-//  #include <QVBoxLayout>
+//  #include <GLib.ScopedValueRollback>
+//  #include <GLib.TreeWidgetItem>
+//  #include <GLib.VBoxLayout>
 
 //  #include <Gtk.Dialog>
-//  #include <QTreeWidget>
+//  #include <GLib.TreeWidget>
 
 namespace Occ {
 namespace Ui {
@@ -34,7 +34,7 @@ public class SelectiveSyncDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private FolderConnection folder_connection;
-    private QPushButton ok_button;
+    private GLib.PushButton ok_button;
 
     /***********************************************************
     Dialog for a specific folder_connection (used from the account settings button)
@@ -127,16 +127,16 @@ public class SelectiveSyncDialog : Gtk.Dialog {
     ***********************************************************/
     private void on_signal_init (unowned Account account) {
         window_title (_("Choose What to Sync"));
-        var layout = new QVBoxLayout (this);
+        var layout = new GLib.VBoxLayout (this);
         this.selective_sync = new SelectiveSyncWidget (account, this);
         layout.add_widget (this.selective_sync);
-        var button_box = new QDialogButtonBox (Qt.Horizontal);
-        this.ok_button = button_box.add_button (QDialogButtonBox.Ok);
+        var button_box = new GLib.DialogButtonBox (Qt.Horizontal);
+        this.ok_button = button_box.add_button (GLib.DialogButtonBox.Ok);
         this.ok_button.clicked.connect (
             this.accept
         );
-        QPushButton button = null;
-        button = button_box.add_button (QDialogButtonBox.Cancel);
+        GLib.PushButton button = null;
+        button = button_box.add_button (GLib.DialogButtonBox.Cancel);
         button.clicked.connect (
             this.reject
         );

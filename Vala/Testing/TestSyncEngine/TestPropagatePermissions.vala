@@ -13,7 +13,7 @@ public class TestPropagatePermissions : AbstractTestSyncEngine {
     ***********************************************************/
     private TestPropagatePermissions () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        var perm = QFileDevice.Permission (0x7704); // user/owner : rwx, group : r, other : -
+        var perm = GLib.FileDevice.Permission (0x7704); // user/owner : rwx, group : r, other : -
         GLib.File.set_permissions (fake_folder.local_path + "A/a1", perm);
         GLib.File.set_permissions (fake_folder.local_path + "A/a2", perm);
         fake_folder.sync_once (); // get the metadata-only change out of the way

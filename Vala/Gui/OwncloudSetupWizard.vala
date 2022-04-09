@@ -6,15 +6,15 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QAbstractButton>
+//  #include <GLib.AbstractButton>
 //  #include <QtCore>
-//  #include <QProcess>
+//  #include <GLib.Process>
 //  #include <Gtk.MessageBox>
-//  #include <QDesktopServices>
-//  #include <Gtk.Application>
+//  #include <GLib.DesktopServices>
+//  #include <GLib.Application>
 //  #include <Gtk.Widget>
-//  #include <QProcess>
-//  #include <QPointer>
+//  #include <GLib.Process>
+//  #include <GLib.Pointer>
 
 using Soup;
 
@@ -132,11 +132,11 @@ public class OwncloudSetupWizard : GLib.Object {
 
         // Reset the proxy which might had been determined previously in ConnectionValidator.on_signal_check_server_and_auth ()
         // when there was a previous account.
-        account.network_access_manager.proxy (QNetworkProxy (QNetworkProxy.NoProxy));
+        account.network_access_manager.proxy (Soup.NetworkProxy (Soup.NetworkProxy.NoProxy));
 
-        // And also reset the QSslConfiguration, for the same reason (#6832)
+        // And also reset the GLib.SslConfiguration, for the same reason (#6832)
         // Here the client certificate is added, if any. Later it'll be in HttpCredentials
-        account.ssl_configuration (QSslConfiguration ());
+        account.ssl_configuration (GLib.SslConfiguration ());
         var ssl_configuration = account.or_create_ssl_config (); // let Account set defaults
         if (this.oc_wizard.client_ssl_certificate != null) {
             ssl_configuration.local_certificate (this.oc_wizard.client_ssl_certificate);
@@ -155,10 +155,10 @@ public class OwncloudSetupWizard : GLib.Object {
         if (ClientProxy.is_using_system_default ()) {
             GLib.debug ("Trying to look up system proxy.");
             ClientProxy.lookup_system_proxy_async (account.url,
-                this, SLOT (on_signal_system_proxy_lookup_done (QNetworkProxy)));
+                this, SLOT (on_signal_system_proxy_lookup_done (Soup.NetworkProxy)));
         } else {
-            // We want to reset the QNAM proxy so that the global proxy settings are used (via ClientProxy settings)
-            account.network_access_manager.proxy (QNetworkProxy (QNetworkProxy.DefaultProxy));
+            // We want to reset the GLib.NAM proxy so that the global proxy settings are used (via ClientProxy settings)
+            account.network_access_manager.proxy (Soup.NetworkProxy (Soup.NetworkProxy.DefaultProxy));
             // use a queued invocation so we're as asynchronous as with the other code path
             GLib.Object.invoke_method (this, "on_signal_find_server", Qt.QueuedConnection);
         }
@@ -340,7 +340,7 @@ public class OwncloudSetupWizard : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_fetch_user_name_job_json_received (string url, QJsonDocument json, int status_code) {
+    private void on_fetch_user_name_job_json_received (string url, GLib.JsonDocument json, int status_code) {
         if (status_code != 100) {
             GLib.warning ("Could not fetch username.");
         }
@@ -540,7 +540,7 @@ public class OwncloudSetupWizard : GLib.Object {
                     folder_definition.virtual_files_mode = this.best_available_vfs_mode;
                 }
                 if (folder_man.navigation_pane_helper.show_in_explorer_navigation_pane)
-                    folder_definition.navigation_pane_clsid = QUuid.create_uuid ();
+                    folder_definition.navigation_pane_clsid = GLib.Uuid.create_uuid ();
 
                 var f = folder_man.add_folder (account, folder_definition);
                 if (f) {
@@ -562,7 +562,7 @@ public class OwncloudSetupWizard : GLib.Object {
         }
 
         // notify others.
-        this.oc_wizard.on_signal_done (QWizard.Accepted);
+        this.oc_wizard.on_signal_done (GLib.Wizard.Accepted);
         /* emit */ signal_own_cloud_wizard_done (result);
     }
 
@@ -581,9 +581,9 @@ public class OwncloudSetupWizard : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_system_proxy_lookup_done (QNetworkProxy proxy) {
-        if (proxy.type () != QNetworkProxy.NoProxy) {
-            GLib.info ("Setting QNAM proxy to be system proxy " + ClientProxy.print_q_network_proxy (proxy));
+    private void on_signal_system_proxy_lookup_done (Soup.NetworkProxy proxy) {
+        if (proxy.type () != Soup.NetworkProxy.NoProxy) {
+            GLib.info ("Setting GLib.NAM proxy to be system proxy " + ClientProxy.print_q_network_proxy (proxy));
         } else {
             GLib.info ("No system proxy set by OS.");
         }

@@ -16,7 +16,7 @@ public class WheelHandler : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private QQuickItem m_target;
+    private GLib.QuickItem m_target;
     private bool m_block_target_wheel = true;
     private bool m_scroll_flickable_target = true;
     private KirigamiWheelEvent m_wheel_event;
@@ -38,7 +38,7 @@ public class WheelHandler : GLib.Object {
     the mouse signal_wheel (or scrolls with the touchpad) on top
     of that item.
     ***********************************************************/
-    //  Q_PROPERTY (QQuickItem target READ target WRITE set_target NOTIFY signal_target_changed)
+    //  Q_PROPERTY (GLib.QuickItem target READ target WRITE set_target NOTIFY signal_target_changed)
 
     /***********************************************************
     block_target_wheel : bool
@@ -63,14 +63,14 @@ public class WheelHandler : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public QQuickItem target () {
+    public GLib.QuickItem target () {
         return m_target;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void set_target (QQuickItem target) {
+    public void set_target (GLib.QuickItem target) {
         if (m_target == target) {
             return;
         }

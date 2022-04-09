@@ -14,7 +14,7 @@ public class NSISUpdater : OCUpdater {
 
     /***********************************************************
     ***********************************************************/
-    private QTemporaryFile file;
+    private GLib.TemporaryFile file;
     private string target_file;
 
     /***********************************************************
@@ -131,13 +131,13 @@ public class NSISUpdater : OCUpdater {
         message_box.attribute (Qt.WA_DeleteOnClose);
         message_box.window_flags (message_box.window_flags () & ~Qt.WindowContextHelpButtonHint);
 
-        Gtk.Icon info_icon = message_box.this.style.standard_icon (QStyle.SP_Message_box_information);
-        int icon_size = message_box.this.style.pixel_metric (QStyle.PM_Message_box_icon_size);
+        Gtk.Icon info_icon = message_box.this.style.standard_icon (GLib.Style.SP_Message_box_information);
+        int icon_size = message_box.this.style.pixel_metric (GLib.Style.PM_Message_box_icon_size);
 
         message_box.window_icon (info_icon);
 
-        var layout = new QVBoxLayout (message_box);
-        var hlayout = new QHBoxLayout ();
+        var layout = new GLib.VBoxLayout (message_box);
+        var hlayout = new GLib.HBoxLayout ();
         layout.add_layout (hlayout);
 
         message_box.window_title (_("New Version Available"));
@@ -160,10 +160,10 @@ public class NSISUpdater : OCUpdater {
         hlayout.add_widget (ico);
         hlayout.add_widget (update_label);
 
-        var button_box = new QDialogButtonBox ();
-        QPushButton skip_version_button = button_box.add_button (_("Skip this version"), QDialogButtonBox.Reset_role);
-        QPushButton skip_once_button = button_box.add_button (_("Skip this time"), QDialogButtonBox.AcceptRole);
-        QPushButton get_update_button = button_box.add_button (_("Get update"), QDialogButtonBox.AcceptRole);
+        var button_box = new GLib.DialogButtonBox ();
+        GLib.PushButton skip_version_button = button_box.add_button (_("Skip this version"), GLib.DialogButtonBox.Reset_role);
+        GLib.PushButton skip_once_button = button_box.add_button (_("Skip this time"), GLib.DialogButtonBox.AcceptRole);
+        GLib.PushButton get_update_button = button_box.add_button (_("Get update"), GLib.DialogButtonBox.AcceptRole);
 
         skip_version_button.clicked.connect (
             message_box.skip_once_button
@@ -195,13 +195,13 @@ public class NSISUpdater : OCUpdater {
         message_box.attribute (Qt.WA_DeleteOnClose);
         message_box.window_flags (message_box.window_flags () & ~Qt.WindowContextHelpButtonHint);
 
-        Gtk.Icon info_icon = message_box.this.style.standard_icon (QStyle.SP_Message_box_information);
-        int icon_size = message_box.this.style.pixel_metric (QStyle.PM_Message_box_icon_size);
+        Gtk.Icon info_icon = message_box.this.style.standard_icon (GLib.Style.SP_Message_box_information);
+        int icon_size = message_box.this.style.pixel_metric (GLib.Style.PM_Message_box_icon_size);
 
         message_box.window_icon (info_icon);
 
-        var layout = new QVBoxLayout (message_box);
-        var hlayout = new QHBoxLayout ();
+        var layout = new GLib.VBoxLayout (message_box);
+        var hlayout = new GLib.HBoxLayout ();
         layout.add_layout (hlayout);
 
         message_box.window_title (_("Update Failed"));
@@ -224,11 +224,11 @@ public class NSISUpdater : OCUpdater {
         hlayout.add_widget (ico);
         hlayout.add_widget (update_label);
 
-        var button_box = new QDialogButtonBox ();
-        var skip_version_button = button_box.add_button (_("Skip this version"), QDialogButtonBox.Reset_role);
-        var askagain = button_box.add_button (_("Ask again later"), QDialogButtonBox.Reset_role);
-        var retry = button_box.add_button (_("Restart and update"), QDialogButtonBox.AcceptRole);
-        var get_update_button = button_box.add_button (_("Update manually"), QDialogButtonBox.AcceptRole);
+        var button_box = new GLib.DialogButtonBox ();
+        var skip_version_button = button_box.add_button (_("Skip this version"), GLib.DialogButtonBox.Reset_role);
+        var askagain = button_box.add_button (_("Ask again later"), GLib.DialogButtonBox.Reset_role);
+        var retry = button_box.add_button (_("Restart and update"), GLib.DialogButtonBox.AcceptRole);
+        var get_update_button = button_box.add_button (_("Update manually"), GLib.DialogButtonBox.AcceptRole);
 
         skip_version_button.clicked.connect (
             message_box.reject
@@ -323,7 +323,7 @@ public class NSISUpdater : OCUpdater {
                         this.on_signal_download_finished
                     );
                     download_state (DownloadState.DOWNLOADING);
-                    this.file.on_signal_reset (new QTemporaryFile ());
+                    this.file.on_signal_reset (new GLib.TemporaryFile ());
                     this.file.auto_remove (true);
                     this.file.open ();
                 }

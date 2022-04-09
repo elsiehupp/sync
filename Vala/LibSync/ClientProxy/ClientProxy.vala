@@ -43,7 +43,7 @@ public class ClientProxy : GLib.Object {
         system_proxy_runnable.system_proxy_looked_up.connect (
             destination.destination_delegate
         );
-        QThreadPool.global_instance.start (system_proxy_runnable); // takes ownership and deletes
+        GLib.ThreadPool.global_instance.start (system_proxy_runnable); // takes ownership and deletes
     }
 
 
@@ -111,30 +111,30 @@ public class ClientProxy : GLib.Object {
         switch (proxy_type) {
             case Soup.ProxyResolverDefault.NoProxy:
                 GLib.info ("Set proxy configuration to use NO proxy.");
-                QNetworkProxyFactory.use_system_configuration (false);
+                Soup.NetworkProxyFactory.use_system_configuration (false);
                 Soup.ProxyResolverDefault.application_proxy (Soup.ProxyResolverDefault.NoProxy);
                 break;
             case Soup.ProxyResolverDefault.DefaultProxy:
                 GLib.info ("Set proxy configuration to use the preferred system proxy for http tcp connections."); {
-                    QNetworkProxyQuery query;
+                    GLib.NetworkProxyQuery query;
                     query.protocol_tag ("http");
-                    query.query_type (QNetworkProxyQuery.TcpSocket);
-                    var proxies = QNetworkProxyFactory.proxy_for_query (query);
+                    query.query_type (GLib.NetworkProxyQuery.TcpSocket);
+                    var proxies = Soup.NetworkProxyFactory.proxy_for_query (query);
                     proxy = proxies.first ();
                 }
-                QNetworkProxyFactory.use_system_configuration (false);
+                Soup.NetworkProxyFactory.use_system_configuration (false);
                 Soup.ProxyResolverDefault.application_proxy (proxy);
                 break;
             case Soup.ProxyResolverDefault.Socks5Proxy:
                 proxy.type (Soup.ProxyResolverDefault.Socks5Proxy);
                 GLib.info ("Set proxy configuration to SOCKS5 " + print_q_network_proxy (proxy));
-                QNetworkProxyFactory.use_system_configuration (false);
+                Soup.NetworkProxyFactory.use_system_configuration (false);
                 Soup.ProxyResolverDefault.application_proxy (proxy);
                 break;
             case Soup.ProxyResolverDefault.HttpProxy:
                 proxy.type (Soup.ProxyResolverDefault.HttpProxy);
                 GLib.info ("Set proxy configuration to HTTP " + print_q_network_proxy (proxy));
-                QNetworkProxyFactory.use_system_configuration (false);
+                Soup.NetworkProxyFactory.use_system_configuration (false);
                 Soup.ProxyResolverDefault.application_proxy (proxy);
                 break;
             default:

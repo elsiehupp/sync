@@ -9,14 +9,14 @@ This file is part of Qt Creator.
 
 @copyright LGPLv2.1 or later
 ***********************************************************/
-public class SingleApplication : Gtk.Application {
+public class SingleApplication : GLib.Application {
 
     /***********************************************************
     ***********************************************************/
     const int INSTANCES_SIZE = 1024;
 
     private int64 first_peer;
-    private QSharedMemory instances;
+    private GLib.SharedMemory instances;
     private QtLocalPeer pid_peer;
     private Gtk.Widget act_win;
     private string app_id;
@@ -36,7 +36,7 @@ public class SingleApplication : Gtk.Application {
         const string app_session_id = QtLocalPeer.app_session_id (app_id);
 
         // This shared memory holds a zero-terminated array of active (or crashed) instances
-        instances = new QShared_memory (app_session_id, this);
+        instances = new GLib.Shared_memory (app_session_id, this);
         act_win = null;
         block = false;
 
@@ -62,12 +62,12 @@ public class SingleApplication : Gtk.Application {
             }
         }
         // Add current pid to list and terminate it
-        *pids++ = Gtk.Application.application_pid ();
+        *pids++ = GLib.Application.application_pid ();
         *pids = 0;
         pid_peer = new QtLocalPeer (
             this,
             app_id + '-' +
-            Gtk.Application.application_pid ().to_string ()
+            GLib.Application.application_pid ().to_string ()
         );
         pid_peer.signal_message_received.connect (
             this.signal_message_received
@@ -80,7 +80,7 @@ public class SingleApplication : Gtk.Application {
         if (!instances) {
             return;
         }
-        const int64 app_pid = Gtk.Application.application_pid ();
+        const int64 app_pid = GLib.Application.application_pid ();
         // Rewrite array, removing current pid and previously crashed ones
         var pids = (int64) instances;
         int64 newpids = pids;
@@ -94,13 +94,13 @@ public class SingleApplication : Gtk.Application {
 
     /***********************************************************
     ***********************************************************/
-    public bool event (QEvent event) {
-        if (event.type () == QEvent.File_open) {
-            var foe = static_cast<QFile_open_event> (event);
+    public bool event (GLib.Event event) {
+        if (event.type () == GLib.Event.File_open) {
+            var foe = static_cast<GLib.File_open_event> (event);
             /* emit */ signal_file_open_request (foe.file ());
             return true;
         }
-        return Gtk.Application.event (event);
+        return GLib.Application.event (event);
     }
 
 

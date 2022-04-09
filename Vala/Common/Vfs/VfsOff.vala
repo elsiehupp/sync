@@ -152,7 +152,7 @@ public class VfsOff : AbstractVfs {
             return false;
         }
 
-        QPluginLoader loader = new QPluginLoader (AbstractPluginFactory.plugin_filename ("vfs", name));
+        GLib.PluginLoader loader = new GLib.PluginLoader (AbstractPluginFactory.plugin_filename ("vfs", name));
 
         const var base_meta_data = loader.meta_data ();
         if (base_meta_data == "" || !base_meta_data.contains ("IID")) {
@@ -169,7 +169,7 @@ public class VfsOff : AbstractVfs {
             GLib.warning ("Plugin " + loader.filename () + " metadata type " + metadata["type"] + " is incorrect");
             return false;
         }
-        if (metadata["version"].to_string () != MIRALL_VERSION_STRING) {
+        if (metadata["version"].to_string () != Common.Version.MIRALL_VERSION_STRING) {
             GLib.warning ("Plugin " + loader.filename () + " version " + metadata["version"] + " is incorrect");
             return false;
         }
@@ -244,7 +244,7 @@ public class VfsOff : AbstractVfs {
             throw new VfsError.NO_PLUGIN_FOR_MODE (mode);
         }
 
-        QPluginLoader loader = new QPluginLoader (plugin_path);
+        GLib.PluginLoader loader = new GLib.PluginLoader (plugin_path);
         var plugin = loader.instance;
         if (!plugin) {
             GLib.critical ("Could not load plugin" + plugin_path + loader.error_string);

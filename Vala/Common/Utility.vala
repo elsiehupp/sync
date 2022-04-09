@@ -14,21 +14,21 @@ public class Utility : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static int rand () {
-        return QRandomGenerator.global ().bounded (0, RAND_MAX);
+        return GLib.RandomGenerator.global ().bounded (0, RAND_MAX);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public static void sleep (int sec) {
-        QThread.sleep (sec);
+        GLib.Thread.sleep (sec);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public static void usleep (int usec) {
-        QThread.usleep (usec);
+        GLib.Thread.usleep (usec);
     }
 
 
@@ -105,7 +105,7 @@ public class Utility : GLib.Object {
         }
 
         GLib.File file = GLib.File.new_for_path (fname);
-        if (file.open (QIODevice.WriteOnly | QIODevice.Text)) {
+        if (file.open (GLib.IODevice.WriteOnly | GLib.IODevice.Text)) {
             string outfile; // = new GLib.OutputStream (&file);
             outfile = rand_string;
             // optional, as GLib.File destructor will already do it:
@@ -163,13 +163,14 @@ public class Utility : GLib.Object {
     ***********************************************************/
     public static string user_agent_string () {
         return "Mozilla/5.0 (%1) mirall/%2 (%3, %4-%5 ClientArchitecture : %6 OsArchitecture : %7)"
-            .printf (platform (),
-                MIRALL_VERSION_STRING,
-                Gtk.Application.application_name (),
-                QSysInfo.product_type (),
-                QSysInfo.kernel_version (),
-                QSysInfo.build_cpu_architecture (),
-                QSysInfo.current_cpu_architecture ())
+            .printf (
+                platform (),
+                Common.Version.MIRALL_VERSION_STRING,
+                GLib.Application.application_name (),
+                GLib.SysInfo.product_type (),
+                GLib.SysInfo.kernel_version (),
+                GLib.SysInfo.build_cpu_architecture (),
+                GLib.SysInfo.current_cpu_architecture ())
             .to_latin1 ();
     }
 
@@ -178,7 +179,7 @@ public class Utility : GLib.Object {
     ***********************************************************/
     public static string friendly_user_agent_string () {
         const var pattern = "%1 (Desktop Client - %2)";
-        const var user_agent = pattern.printf (QSysInfo.machine_host_name (), platform ());
+        const var user_agent = pattern.printf (GLib.SysInfo.machine_host_name (), platform ());
         return user_agent.to_utf8 ();
     }
 
@@ -187,7 +188,7 @@ public class Utility : GLib.Object {
     Qtified version of get_platforms () in csync_owncloud.c
     ***********************************************************/
     public static string platform () {
-        return QSysInfo.product_type ();
+        return GLib.SysInfo.product_type ();
     }
 
 
@@ -211,7 +212,7 @@ public class Utility : GLib.Object {
     and respects the XDG_CONFIG_HOME env variable
     ***********************************************************/
     static string get_user_autostart_dir_private () {
-        string config = QStandardPaths.writable_location (QStandardPaths.ConfigLocation);
+        string config = GLib.StandardPaths.writable_location (GLib.StandardPaths.ConfigLocation);
         config += "/autostart/";
         return config;
     }
@@ -227,7 +228,7 @@ public class Utility : GLib.Object {
     static bool has_launch_on_signal_startup_private (string app_name) {
         //  Q_UNUSED (app_name)
         string desktop_file_location = get_user_autostart_dir_private ()
-                                        + LINUX_APPLICATION_ID
+                                        + Common.Config.LINUX_APPLICATION_ID
                                         + ".desktop";
         return GLib.File.exists (desktop_file_location);
     }
@@ -244,7 +245,7 @@ public class Utility : GLib.Object {
         //  Q_UNUSED (app_name)
         string user_auto_start_path = get_user_autostart_dir_private ();
         string desktop_file_location = user_auto_start_path
-                                        + LINUX_APPLICATION_ID
+                                        + Common.Config.LINUX_APPLICATION_ID
                                         + ".desktop";
         if (enable) {
             if (!new GLib.Dir ().exists (user_auto_start_path) && !new GLib.Dir ().mkpath (user_auto_start_path)) {
@@ -252,7 +253,7 @@ public class Utility : GLib.Object {
                 return;
             }
             GLib.File ini_file = GLib.File.new_for_path (desktop_file_location);
-            if (!ini_file.open (QIODevice.WriteOnly)) {
+            if (!ini_file.open (GLib.IODevice.WriteOnly)) {
                 GLib.warning ("Could not write var on_signal_start entry" + desktop_file_location);
                 return;
             }
@@ -260,7 +261,7 @@ public class Utility : GLib.Object {
             // AppImage instead of the path to the executable
             const string app_image_path = q_environment_variable ("APPIMAGE");
             const bool running_inside_app_image = !app_image_path == null && GLib.File.exists (app_image_path);
-            const string executable_path = running_inside_app_image ? app_image_path : Gtk.Application.application_file_path;
+            const string executable_path = running_inside_app_image ? app_image_path : GLib.Application.application_file_path;
 
             string ts; // = new GLib.OutputStream (&ini_file);
             //  ts.codec ("UTF-8");
@@ -269,7 +270,7 @@ public class Utility : GLib.Object {
                + "GenericName=" + "File Synchronizer\n"
                + "Exec=\"" + executable_path + "\" --background\n"
                + "Terminal=" + "false\n"
-               + "Icon=" + APPLICATION_ICON_NAME + "\n"
+               + "Icon=" + Common.Config.APPLICATION_ICON_NAME + "\n"
                + "Categories=" + "Network\n"
                + "Type=" + "Application\n"
                + "StartupNotify=" + "false\n"
@@ -334,7 +335,7 @@ public class Utility : GLib.Object {
 
     ***********************************************************/
     public static string compact_format_double (double value, int prec, string unit = "") {
-        QLocale locale = QLocale.system ();
+        GLib.Locale locale = GLib.Locale.system ();
         char dec_point = locale.decimal_point ();
         string string_value = locale.to_string (value, "f", prec);
         while (string_value.has_suffix ("0") || string_value.has_suffix (dec_point)) {
@@ -494,7 +495,7 @@ public class Utility : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static string platform_name () {
-        return QSysInfo.pretty_product_name ();
+        return GLib.SysInfo.pretty_product_name ();
     }
 
 
@@ -538,15 +539,19 @@ public class Utility : GLib.Object {
 
     ***********************************************************/
     public static bool filenames_equal (string fn1, string fn2) {
-        const GLib.Dir fd1 = new GLib.Dir(fn1);
-        const GLib.Dir fd2 = new GLib.Dir (fn2);
+        GLib.Dir fd1 = new GLib.Dir (fn1);
+        GLib.Dir fd2 = new GLib.Dir (fn2);
 
-        // Attention : If the path does not exist, canonical_path returns ""
-        // ONLY use this function with existing pathes.
-        const string a = fd1.canonical_path;
-        const string b = fd2.canonical_path;
-        bool re = !a == "" && string.compare (a, b, fs_case_preserving () ? Qt.CaseInsensitive : Qt.CaseSensitive) == 0;
-        return re;
+        // Attention: If the path does not exist, canonical_path returns ""
+        // ONLY use this function with existing paths.
+        string a = fd1.canonical_path;
+        string b = fd2.canonical_path;
+
+        if (fs_case_preserving ()) {
+            return a != "" && a.down () == b.down ();
+        } else {
+            return a != "" && a == b;
+        }
     }
 
 
@@ -571,11 +576,11 @@ public class Utility : GLib.Object {
         if (is_linux ()) {
             string binary = command;
             if (binary == "") {
-                binary = Gtk.Application.arguments ()[0];
+                binary = GLib.Application.arguments ()[0];
             }
             GLib.List<string> parameters = new GLib.List<string> ();
             parameters.append ("--version");
-            QProcess process;
+            GLib.Process process;
             process.on_signal_start (binary, parameters);
             process.wait_for_finished (); // sets current thread to sleep and waits for ping_process end
             re = process.read_all_standard_output ();
@@ -737,7 +742,7 @@ public class Utility : GLib.Object {
     @brief Sort a GLib.List<string> in a way that's appropriate for filenames
     ***********************************************************/
     public static void sort_filenames (GLib.List<string> filenames) {
-        QCollator collator;
+        GLib.Collator collator;
         collator.numeric_mode (true);
         collator.case_sensitivity (Qt.CaseInsensitive);
         std.sort (filenames.begin (), filenames.end (), collator);
@@ -750,7 +755,7 @@ public class Utility : GLib.Object {
     ***********************************************************/
     public static GLib.Uri concat_url_path (
         GLib.Uri url, string concat_path,
-        QUrlQuery query_items = {}) {
+        GLib.UrlQuery query_items = {}) {
         string path = url.path;
         if (concat_path != "") {
             // avoid "//"
@@ -950,12 +955,12 @@ public class Utility : GLib.Object {
     }
 
 
-    // QTBUG-3945 and issue #4855: QT_TRANSLATE_NOOP does not work with plural form because lupdate
+    // GLib.TBUG-3945 and issue #4855: GLib.T_TRANSLATE_NOOP does not work with plural form because lupdate
     // limitation unless we fake more arguments
     // (it must be in the form ("context", "source", "comment", n)
-    //  #undef QT_TRANSLATE_NOOP
-    //  const int QT_TRANSLATE_NOOP (context, string_value, ...) string_value
-    //      Q_DECL_CONSTEXPR Period periods[] = { { QT_TRANSLATE_NOOP ("%n year (s)", 0, this.), 365 * 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("%n month (s)", 0, this.), 30 * 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("%n day (s)", 0, this.), 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("%n hour (s)", 0, this.), 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("%n minute (s)", 0, this.), 60 * 1000LL }, { QT_TRANSLATE_NOOP ("%n second (s)", 0, this.), 1000LL }, { null, 0 }
+    //  #undef GLib.T_TRANSLATE_NOOP
+    //  const int GLib.T_TRANSLATE_NOOP (context, string_value, ...) string_value
+    //      Q_DECL_CONSTEXPR Period periods[] = { { GLib.T_TRANSLATE_NOOP ("%n year (s)", 0, this.), 365 * 24 * 3600 * 1000LL }, { GLib.T_TRANSLATE_NOOP ("%n month (s)", 0, this.), 30 * 24 * 3600 * 1000LL }, { GLib.T_TRANSLATE_NOOP ("%n day (s)", 0, this.), 24 * 3600 * 1000LL }, { GLib.T_TRANSLATE_NOOP ("%n hour (s)", 0, this.), 3600 * 1000LL }, { GLib.T_TRANSLATE_NOOP ("%n minute (s)", 0, this.), 60 * 1000LL }, { GLib.T_TRANSLATE_NOOP ("%n second (s)", 0, this.), 1000LL }, { null, 0 }
     //  };
 
 } // class Utility

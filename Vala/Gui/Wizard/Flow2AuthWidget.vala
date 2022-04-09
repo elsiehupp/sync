@@ -19,7 +19,7 @@ public class Flow2AuthWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private QProgressIndicator progress_indicator;
+    private GLib.ProgressIndicator progress_indicator;
     private int status_update_skip_count = 0;
 
     internal signal void auth_result (Flow2Auth.Result result, string error_string, string user, string app_password);
@@ -29,7 +29,7 @@ public class Flow2AuthWidget : Gtk.Widget {
     ***********************************************************/
     public Flow2AuthWidget (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
-        this.progress_indicator = new QProgressIndicator (this);
+        this.progress_indicator = new GLib.ProgressIndicator (this);
         this.instance.setupUi (this);
 
         WizardCommon.initErrorLabel (this.instance.error_label);

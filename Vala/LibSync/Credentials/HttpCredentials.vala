@@ -101,7 +101,7 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    protected QSslKey client_ssl_key;
+    protected GLib.SslKey client_ssl_key;
 
     /***********************************************************
     ***********************************************************/
@@ -285,9 +285,9 @@ public class HttpCredentials : AbstractCredentials {
         qkeychain_delete_password_job.key (keychain_key);
         qkeychain_delete_password_job.start ();
 
-        // let QNAM forget about the password
+        // let GLib.NAM forget about the password
         // This needs to be done later in the event loop because we might be called (directly or
-        // indirectly) from QNetworkAccessManagerPrivate.signal_authentication_required, which itself
+        // indirectly) from GLib.NetworkAccessManagerPrivate.signal_authentication_required, which itself
         // is a called from a BlockingQueuedConnection from the Qt HTTP thread. And clearing the
         // cache needs to synchronize again with the HTTP thread.
         GLib.Timeout.single_shot (0, this.account, Account.on_signal_clear_access_manager_cache);
@@ -341,7 +341,7 @@ public class HttpCredentials : AbstractCredentials {
         request.attribute (HttpCredentials.DontAddCredentialsAttribute, true);
 
         var request_body = new Soup.Buffer ();
-        QUrlQuery arguments = new QUrlQuery ("grant_type=refresh_token&refresh_token=%1".printf (this.refresh_token));
+        GLib.UrlQuery arguments = new GLib.UrlQuery ("grant_type=refresh_token&refresh_token=%1".printf (this.refresh_token));
         request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
 
         var simple_network_job = this.account.send_request ("POST", request_token, request, request_body);
@@ -350,7 +350,7 @@ public class HttpCredentials : AbstractCredentials {
             (input_stream) => {
                 var json_data = input_stream.read_all ();
                 Json.ParserError json_parse_error;
-                Json.Object json = QJsonDocument.from_json (json_data, json_parse_error).object ();
+                Json.Object json = GLib.JsonDocument.from_json (json_data, json_parse_error).object ();
                 string access_token = json["access_token"].to_string ();
                 if (json_parse_error.error != Json.ParserError.NoError || json == "") {
                     // Invalid or empty JSON : Network error maybe?
@@ -416,7 +416,7 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_authentication (GLib.InputStream input_stream, QAuthenticator authenticator) {
+    private void on_signal_authentication (GLib.InputStream input_stream, GLib.Authenticator authenticator) {
         if (!this.ready) {
             return;
         }
@@ -469,7 +469,7 @@ public class HttpCredentials : AbstractCredentials {
 
         // Store PEM in memory
         if (read_job.error == Secret.Collection.NoError && read_job.binary_data ().length > 0) {
-            GLib.List<GLib.TlsCertificate> ssl_certificate_list = GLib.TlsCertificate.from_data (read_job.binary_data (), QSsl.Pem);
+            GLib.List<GLib.TlsCertificate> ssl_certificate_list = GLib.TlsCertificate.from_data (read_job.binary_data (), GLib.Ssl.Pem);
             if (ssl_certificate_list.length >= 1) {
                 this.client_ssl_certificate = ssl_certificate_list.at (0);
             }
@@ -500,14 +500,14 @@ public class HttpCredentials : AbstractCredentials {
 
         if (read_job.error == Secret.Collection.NoError && read_job.binary_data ().length > 0) {
             string client_key_pem = read_job.binary_data ();
-            // FIXME Unfortunately Qt has a bug and we can't just use QSsl.Opaque to let it
+            // FIXME Unfortunately Qt has a bug and we can't just use GLib.Ssl.Opaque to let it
             // load whatever we have. So we try until it works.
-            this.client_ssl_key = QSslKey (client_key_pem, QSsl.Rsa);
+            this.client_ssl_key = GLib.SslKey (client_key_pem, GLib.Ssl.Rsa);
             if (this.client_ssl_key == null) {
-                this.client_ssl_key = QSslKey (client_key_pem, QSsl.Dsa);
+                this.client_ssl_key = GLib.SslKey (client_key_pem, GLib.Ssl.Dsa);
             }
             if (this.client_ssl_key == null) {
-                this.client_ssl_key = QSslKey (client_key_pem, QSsl.Ec);
+                this.client_ssl_key = GLib.SslKey (client_key_pem, GLib.Ssl.Ec);
             }
             if (this.client_ssl_key == null) {
                 GLib.warning ("Could not load SSL key into Qt!");
@@ -768,7 +768,7 @@ public class HttpCredentials : AbstractCredentials {
         }
 
         Soup.Buffer cert_buffer = new Soup.Buffer (&this.client_cert_bundle);
-        cert_buffer.open (QIODevice.ReadOnly);
+        cert_buffer.open (GLib.IODevice.ReadOnly);
         GLib.List<GLib.TlsCertificate> client_ca_certificates;
         return GLib.TlsCertificate.import_pkcs12 (
             cert_buffer, this.client_ssl_key, this.client_ssl_certificate, client_ca_certificates, this.client_cert_password);

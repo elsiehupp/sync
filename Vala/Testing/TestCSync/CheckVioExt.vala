@@ -186,7 +186,7 @@ public class CheckVioExt : GLib.Object {
 
     static void create_file (string path, string name, string content) {
         GLib.File file = GLib.File.new_for_path ("%1/%2%3".printf (csync_test_dir (), path, name));
-        GLib.assert_true (1 == file.open (QIODevice.WriteOnly | QIODevice.NewOnly));
+        GLib.assert_true (1 == file.open (GLib.IODevice.WriteOnly | GLib.IODevice.NewOnly));
         file.write (content);
     }
 

@@ -12,9 +12,9 @@ public class TestFakeConflict : AbstractTestSyncEngine {
     /***********************************************************
     ***********************************************************/
     private TestFakeConflict () {
-        QFETCH (bool, same_mtime);
-        QFETCH (string, checksums);
-        QFETCH (int, expected_get);
+        GLib.FETCH (bool, same_mtime);
+        GLib.FETCH (string, checksums);
+        GLib.FETCH (int, expected_get);
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 

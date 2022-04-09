@@ -10,7 +10,7 @@ namespace Testing {
 /***********************************************************
 TODO: In theory we should use GLib.assert_true instead of
 GLib.assert_true for testing, but this only works when
-directly called from a QTest :- (
+directly called from a GLib.Test :- (
 ***********************************************************/
 public class SyncEngineTestUtils : GLib.Object {
 
@@ -46,17 +46,17 @@ public class SyncEngineTestUtils : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    // QTest.to_string overloads
+    // GLib.Test.to_string overloads
     //  namespace Occ {
     inline char sync_file_status_to_string (SyncFileStatus status) {
-        return QTest.to_string ("SyncFileStatus (" + status.to_socket_api_string () + ")");
+        return GLib.Test.to_string ("SyncFileStatus (" + status.to_socket_api_string () + ")");
     }
     //  }
 
     /***********************************************************
     ***********************************************************/
     inline char file_info_to_string (FileInfo file_info) {
-        return QTest.to_string (to_string_no_elide (file_info));
+        return GLib.Test.to_string (to_string_no_elide (file_info));
     }
 
     /***********************************************************
@@ -113,7 +113,7 @@ public class SyncEngineTestUtils : GLib.Object {
         foreach (FileInfo file_info in file_info.children) {
             add_files_database_data (files, file_info);
         }
-        return QTest.to_string ("FileInfo with %1 files (%2)".printf (files.size ()).printf (files.join (", ")));
+        return GLib.Test.to_string ("FileInfo with %1 files (%2)".printf (files.size ()).printf (files.join (", ")));
     }
 
 } // class SyncEngineTestUtils

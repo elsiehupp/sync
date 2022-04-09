@@ -11,7 +11,7 @@ public class EmojiModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private const QVariantList PEOPLE = {
+    private const GLib.VariantList PEOPLE = {
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x98\x80"), ":grinning:"
         }),
@@ -634,7 +634,7 @@ public class EmojiModel : GLib.Object {
             string.from_utf8 ("\xf0\x9f\x92\xbc"), ":briefcase:" }),
     }
 
-    private const QVariantList NATURE = {
+    private const GLib.VariantList NATURE = {
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x99\x88"), ":see_no_evil:"
         }),
@@ -1116,7 +1116,7 @@ public class EmojiModel : GLib.Object {
             string.from_utf8 ("\xf0\x9f\x8e\x8d"), ":bamboo:" }),
     }
 
-    private const QVariantList FOOD = {
+    private const GLib.VariantList FOOD = {
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x8d\x87"), ":grapes:"
         }),
@@ -1373,7 +1373,7 @@ public class EmojiModel : GLib.Object {
             string.from_utf8 ("\xf0\x9f\xa5\x84"), ":spoon:" }),
     }
 
-    private const QVariantList ACTIVITY = {
+    private const GLib.VariantList ACTIVITY = {
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x91\xbe"), ":space_invader:"
         }),
@@ -1792,7 +1792,7 @@ public class EmojiModel : GLib.Object {
             string.from_utf8 ("\xf0\x9f\x8f\xb9"), ":bow_and_arrow:" }),
     }
 
-    private const QVariantList TRAVEL = {
+    private const GLib.VariantList TRAVEL = {
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x8f\x8e"), ":race_car:"
         }),
@@ -2148,7 +2148,7 @@ public class EmojiModel : GLib.Object {
             string.from_utf8 ("\xf0\x9f\x8f\x81"), ":checkered_flag:" }),
     }
 
-    private const QVariantList OBJECTS = {
+    private const GLib.VariantList OBJECTS = {
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xe2\x98\xa0"), ":skull_crossbones:"
         }),
@@ -2690,7 +2690,7 @@ public class EmojiModel : GLib.Object {
             string.from_utf8 ("\xf0\x9f\x8f\xb3\xf0\x9f\x8c\x88"), ":rainbow_flag:" }),
     }
 
-    private const QVariantList SYMBOLS = {
+    private const GLib.VariantList SYMBOLS = {
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x91\x81\xf0\x9f\x97\xa8"), ":eye_in_speech_bubble:"
         }),
@@ -3517,7 +3517,7 @@ public class EmojiModel : GLib.Object {
             string.from_utf8 ("\xf0\x9f\x94\xb5"), ":blue_circle:" }),
     }
 
-    private const QVariantList FLAGS = {
+    private const GLib.VariantList FLAGS = {
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x87\xa6\xf0\x9f\x87\xa8"), ":flag_ac:"
         }),
@@ -4320,8 +4320,8 @@ public class EmojiModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public QVariantList history () {
-        return this.settings.get_value ("Editor/emojis", QVariantList ()).to_list ();
+    public GLib.VariantList history () {
+        return this.settings.get_value ("Editor/emojis", GLib.VariantList ()).to_list ();
     }
 
 
@@ -4359,7 +4359,7 @@ public class EmojiModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public QVariantList model () {
+    public GLib.VariantList model () {
         if (this.category == "history") {
             return history ();
         } else if (this.category == "people") {

@@ -5,10 +5,10 @@
 ***********************************************************/
 
 //  #include <Gtk.Image>
-//  #include <QPainter>
-//  #include <QSvgRenderer>
+//  #include <GLib.Painter>
+//  #include <GLib.SvgRenderer>
 //  #include <QtCore>
-//  #include <QQuickImageProvider>
+//  #include <GLib.QuickImageProvider>
 
 namespace Occ {
 namespace Ui {
@@ -19,11 +19,11 @@ namespace Ui {
 Allows to fetch Unified Search result icon from the server
 or used a local resource
 ***********************************************************/
-public class UnifiedSearchResultImageProvider : QQuickAsyncImageProvider {
+public class UnifiedSearchResultImageProvider : GLib.QuickAsyncImageProvider {
 
     /***********************************************************
     ***********************************************************/
-    public QQuickImageResponse request_image_response (string identifier, Gdk.Rectangle requested_size) {
+    public GLib.QuickImageResponse request_image_response (string identifier, Gdk.Rectangle requested_size) {
         return new AsyncImageResponse (identifier, requested_size);
     }
 

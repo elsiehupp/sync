@@ -4,23 +4,23 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QCursor>
-//  #include <Gtk.Application>
-//  #include <QQmlApplicationEngine>
-//  #include <QQml_context>
-//  #include <QQuick_window>
+//  #include <GLib.Cursor>
+//  #include <GLib.Application>
+//  #include <GLib.QmlApplicationEngine>
+//  #include <GLib.Qml_context>
+//  #include <GLib.Quick_window>
 //  #include <Gdk.Monitor>
 //  #include <GLib.Menu>
 
 //  #ifdef USE_FDO_NOTIFICATIONS
-//  #include <QDBusConnection>
-//  #include <QDBusInterface>
-//  #include <QDBus_message>
-//  #include <QDBus_pending_call>
+//  #include <GLib.DBusConnection>
+//  #include <GLib.DBusInterface>
+//  #include <GLib.DBus_message>
+//  #include <GLib.DBus_pending_call>
 //  #endif
 
-//  #include <QSystemTrayIcon>
-//  #include <QQmlNetworkAccessManagerFactory>
+//  #include <GLib.SystemTrayIcon>
+//  #include <GLib.QmlNetworkAccessManagerFactory>
 
 namespace Occ {
 namespace Ui {
@@ -30,13 +30,13 @@ namespace Ui {
 @brief The Systray class
 @ingroup gui
 ***********************************************************/
-public class Systray : QSystemTrayIcon {
+public class Systray : GLib.SystemTrayIcon {
 
     const string NOTIFICATIONS_SERVICE = "org.freedesktop.Notifications";
     const string NOTIFICATIONS_PATH = "/org/freedesktop/Notifications";
     const string NOTIFICATIONS_IFACE = "org.freedesktop.Notifications";
 
-    class AccessManagerFactory : QQmlNetworkAccessManagerFactory {
+    class AccessManagerFactory : GLib.QmlNetworkAccessManagerFactory {
 
         /***********************************************************
         ***********************************************************/
@@ -79,7 +79,7 @@ public class Systray : QSystemTrayIcon {
     public bool is_open { public get; private set; }
     public bool sync_is_paused { public get; private set; }
 
-    public QQmlApplicationEngine tray_engine {
+    public GLib.QmlApplicationEngine tray_engine {
         private get {
             return this.tray_engine;
         }
@@ -181,22 +181,22 @@ public class Systray : QSystemTrayIcon {
     }
 
 
-    private UserModel on_signal_user_model_instance_for_engineon_signal_instance_for_engine (QQmlEngine qml_engine, QJSEngine qjs_engine) {
+    private UserModel on_signal_user_model_instance_for_engineon_signal_instance_for_engine (GLib.QmlEngine qml_engine, GLib.JSEngine qjs_engine) {
         return UserModel.instance;
     }
 
 
-    private UserAppsModel on_signal_user_apps_model_instance_for_engineon_signal_instance_for_engine (QQmlEngine qml_engine, QJSEngine qjs_engine) {
+    private UserAppsModel on_signal_user_apps_model_instance_for_engineon_signal_instance_for_engine (GLib.QmlEngine qml_engine, GLib.JSEngine qjs_engine) {
         return UserAppsModel.instance;
     }
 
 
-    private Theme on_signal_theme_instance_for_engineon_signal_instance_for_engine (QQmlEngine qml_engine, QJSEngine qjs_engine) {
+    private Theme on_signal_theme_instance_for_engineon_signal_instance_for_engine (GLib.QmlEngine qml_engine, GLib.JSEngine qjs_engine) {
         return Theme.instance;
     }
 
 
-    private Systray on_signal_systray_instance_for_engineon_signal_instance_for_engine (QQmlEngine qml_engine, QJSEngine qjs_engine) {
+    private Systray on_signal_systray_instance_for_engineon_signal_instance_for_engine (GLib.QmlEngine qml_engine, GLib.JSEngine qjs_engine) {
         return Systray.instance;
     }
 
@@ -242,7 +242,7 @@ public class Systray : QSystemTrayIcon {
             this.tray_engine.on_signal_load ("qrc:/qml/src/gui/tray/Window.qml");
         }
         hide_window ();
-        /* emit */ activated (QSystemTrayIcon.Activation_reason.Unknown);
+        /* emit */ activated (GLib.SystemTrayIcon.Activation_reason.Unknown);
 
         const var folder_map = FolderManager.instance.map ();
         foreach (var folder_connection in folder_map) {
@@ -256,7 +256,7 @@ public class Systray : QSystemTrayIcon {
     /***********************************************************
     ***********************************************************/
     public void show_message (string title, string message, Message_icon icon) {
-        if (QDBusInterface (NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE).is_valid) {
+        if (GLib.DBusInterface (NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE).is_valid) {
             const GLib.VariantMap hints = {{"desktop-entry", LINUX_APPLICATION_ID}};
             GLib.List<GLib.Variant> args = {
                 APPLICATION_NAME,
@@ -268,11 +268,11 @@ public class Systray : QSystemTrayIcon {
                 hints,
                 (int32)-1
             };
-            QDBus_message method = QDBus_message.create_method_call (NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE, "Notify");
+            GLib.DBus_message method = GLib.DBus_message.create_method_call (NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE, "Notify");
             method.arguments (args);
-            QDBusConnection.session_bus ().async_call (method);
+            GLib.DBusConnection.session_bus ().async_call (method);
         } else {
-            QSystemTrayIcon.show_message (title, message, icon);
+            GLib.SystemTrayIcon.show_message (title, message, icon);
         }
     }
 
@@ -312,7 +312,7 @@ public class Systray : QSystemTrayIcon {
     /***********************************************************
     ***********************************************************/
     public void tool_tip (string tip) {
-        QSystemTrayIcon.tool_tip (_("%1 : %2").printf (Theme.app_name_gui, tip));
+        GLib.SystemTrayIcon.tool_tip (_("%1 : %2").printf (Theme.app_name_gui, tip));
     }
 
 
@@ -338,7 +338,7 @@ public class Systray : QSystemTrayIcon {
 
     /***********************************************************
     ***********************************************************/
-    public void position_window (QQuick_window window) {
+    public void position_window (GLib.Quick_window window) {
         if (!use_normal_window ()) {
             window.screen (current_screen ());
             const var position = compute_window_position (window.width (), window.height ());
@@ -349,7 +349,7 @@ public class Systray : QSystemTrayIcon {
 
     /***********************************************************
     ***********************************************************/
-    public void force_window_init (QQuick_window window) {
+    public void force_window_init (GLib.Quick_window window) {
         // HACK : At least on Windows, if the systray window is not shown at least once
         // it can prevent session handling to carry on properly, so we show/hide it here
         // this shouldn't flicker
@@ -418,8 +418,8 @@ public class Systray : QSystemTrayIcon {
     /***********************************************************
     ***********************************************************/
     private Gdk.Monitor current_screen () {
-        const var screens = Gtk.Application.screens ();
-        const var cursor_pos = QCursor.position ();
+        const var screens = GLib.Application.screens ();
+        const var cursor_pos = GLib.Cursor.position ();
 
         foreach (var screen in screens) {
             if (screen.geometry ().contains (cursor_pos)) {
@@ -435,7 +435,7 @@ public class Systray : QSystemTrayIcon {
 
     /***********************************************************
     ***********************************************************/
-    private QRect current_screen_rect () {
+    private GLib.Rect current_screen_rect () {
         const var screen = current_screen ();
         //  Q_ASSERT (screen);
         return screen.geometry ();
@@ -444,7 +444,7 @@ public class Systray : QSystemTrayIcon {
 
     /***********************************************************
     ***********************************************************/
-    private QPoint compute_window_reference_point () {
+    private GLib.Point compute_window_reference_point () {
         const int spacing = 4;
         const var tray_icon_center = calc_tray_icon_center ();
         const var taskbar_rect = taskbar_geometry ();
@@ -458,22 +458,22 @@ public class Systray : QSystemTrayIcon {
 
         switch (taskbar_screen_edge) {
         case TaskBarPosition.BOTTOM:
-            return new QPoint (
+            return new GLib.Point (
                 tray_icon_center.x (),
                 screen_rect.bottom () - taskbar_rect.height () - spacing
             );
         case TaskBarPosition.LEFT:
-            return new QPoint (
+            return new GLib.Point (
                 screen_rect.left () + taskbar_rect.width () + spacing,
                 tray_icon_center.y ()
             );
         case TaskBarPosition.TOP:
-            return new QPoint (
+            return new GLib.Point (
                 tray_icon_center.x (),
                 screen_rect.top () + taskbar_rect.height () + spacing
             );
         case TaskBarPosition.RIGHT:
-            return new QPoint (
+            return new GLib.Point (
                 screen_rect.right () - taskbar_rect.width () - spacing,
                 tray_icon_center.y ()
             );
@@ -484,9 +484,9 @@ public class Systray : QSystemTrayIcon {
 
     /***********************************************************
     ***********************************************************/
-    private QPoint calc_tray_icon_center () {
+    private GLib.Point calc_tray_icon_center () {
         // On Linux, fall back to mouse position (assuming tray icon is activated by mouse click)
-        return QCursor.position (current_screen ());
+        return GLib.Cursor.position (current_screen ());
     }
 
 
@@ -518,7 +518,7 @@ public class Systray : QSystemTrayIcon {
     /***********************************************************
     TODO: Get real taskbar dimensions on Linux as well
     ***********************************************************/
-    private QRect taskbar_geometry () {
+    private GLib.Rect taskbar_geometry () {
         if (taskbar_orientation () == TaskBarPosition.BOTTOM || taskbar_orientation () == TaskBarPosition.TOP) {
             var screen_width = current_screen_rect ().width ();
             return {0, 0, screen_width, 32};
@@ -531,17 +531,17 @@ public class Systray : QSystemTrayIcon {
 
     /***********************************************************
     ***********************************************************/
-    private QPoint compute_window_position (int width, int height) {
+    private GLib.Point compute_window_position (int width, int height) {
         const var reference_point = compute_window_reference_point ();
 
         const TaskBarPosition taskbar_screen_edge = taskbar_orientation ();
         const var screen_rect = current_screen_rect ();
 
-        const QPoint bottom_right = top_left (reference_point) + QPoint (width, height);
+        const GLib.Point bottom_right = top_left (reference_point) + GLib.Point (width, height);
 
         GLib.debug ("taskbar_screen_edge: " + taskbar_screen_edge.to_string ());
         GLib.debug ("screen_rect: " + screen_rect.to_string ());
-        GLib.debug ("window_rect (reference) " + QRect (top_left (reference_point), bottom_right).to_string ());
+        GLib.debug ("window_rect (reference) " + GLib.Rect (top_left (reference_point), bottom_right).to_string ());
         GLib.debug ("window_rect (adjusted) " + window_rect.to_string ());
 
         return window_rect (
@@ -558,30 +558,30 @@ public class Systray : QSystemTrayIcon {
     }
 
 
-    private static QPoint top_left (
+    private static GLib.Point top_left (
         TaskBarPosition taskbar_screen_edge,
-        QPoint reference_point,
-        QPoint bottom_right,
+        GLib.Point reference_point,
+        GLib.Point bottom_right,
         int width,
         int height
     ) {
         switch (taskbar_screen_edge) {
         case TaskBarPosition.BOTTOM:
-            return reference_point - QPoint (width / 2, height);
+            return reference_point - GLib.Point (width / 2, height);
         case TaskBarPosition.LEFT:
             return reference_point;
         case TaskBarPosition.TOP:
-            return reference_point - QPoint (width / 2, 0);
+            return reference_point - GLib.Point (width / 2, 0);
         case TaskBarPosition.RIGHT:
-            return reference_point - QPoint (width, 0);
+            return reference_point - GLib.Point (width, 0);
         }
         GLib.assert_not_reached ();
     }
 
 
-    private static QRect window_rect (QRect screen_rect, QPoint reference_point, QPoint bottom_right) {
-        const QRect rect = QRect (top_left (reference_point), bottom_right);
-        var offset = QPoint ();
+    private static GLib.Rect window_rect (GLib.Rect screen_rect, GLib.Point reference_point, GLib.Point bottom_right) {
+        const GLib.Rect rect = GLib.Rect (top_left (reference_point), bottom_right);
+        var offset = GLib.Point ();
 
         if (rect.left () < screen_rect.left ()) {
             offset.x (screen_rect.left () - rect.left () + 4);

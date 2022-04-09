@@ -1,5 +1,5 @@
 /***********************************************************
-@class QTokenizerPrivate
+@class GLib.TokenizerPrivate
 
 @author 2014 Daniel Molkentin <daniel@molkentin.de>
 
@@ -9,12 +9,12 @@ This file is part of the Qt Library
 
 @copyright GPLv3.0 only
 ****************************************************************************/
-public class QTokenizerPrivate<T> : GLib.Object {
+public class GLib.TokenizerPrivate<T> : GLib.Object {
 
     //  template <class T, class ConstIterator>
-    //  using QByte_array_tokenizer = QTokenizer<string>;
-    //  using String_tokenizer = QTokenizer<std.string_value>;
-    //  using WString_tokenizer = QTokenizer<std.wstring>;
+    //  using GLib.Byte_array_tokenizer = GLib.Tokenizer<string>;
+    //  using String_tokenizer = GLib.Tokenizer<std.string_value>;
+    //  using WString_tokenizer = GLib.Tokenizer<std.wstring>;
     //  using CharType = typename T.value_type;
 
     public T string_value;
@@ -35,7 +35,7 @@ public class QTokenizerPrivate<T> : GLib.Object {
         public CharType quote_char = '\0';
     }
 
-    public QTokenizerPrivate (T string_value, T delimiters) {
+    public GLib.TokenizerPrivate (T string_value, T delimiters) {
         this.string_value = string_value;
         this.begin = string_value.begin ();
         this.end = string_value.end ();
@@ -79,7 +79,7 @@ public class QTokenizerPrivate<T> : GLib.Object {
 }
 
 //  template <class T, class ConstIterator = typename T.ConstIterator>
-public class QTokenizer<T> : GLib.Object {
+public class GLib.Tokenizer<T> : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
@@ -87,21 +87,21 @@ public class QTokenizer<T> : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    //  private friend class QStringTokenizer;
-    internal unowned QTokenizerPrivate<T, ConstIterator> tokenizer_private;
+    //  private friend class GLib.StringTokenizer;
+    internal unowned GLib.TokenizerPrivate<T, ConstIterator> tokenizer_private;
 
 
     /***********************************************************
-    \class QTokenizer
+    \class GLib.Tokenizer
     \inmodule QtNetwork
-    \brief QTokenizer tokenizes Strings on string_value, string,
+    \brief GLib.Tokenizer tokenizes Strings on string_value, string,
             std.string_value or std.wstring
 
     Example Usage:
 
     \code
         string_value string_value = ...;
-        QByte_array_tokenizer tokenizer (string_value, "; ");
+        GLib.Byte_array_tokenizer tokenizer (string_value, "; ");
         tokenizer.set_quote_characters ("\"'");
         tokenizer.set_return_delimiters (true);
         while (tokenizer.has_next ()) {
@@ -114,10 +114,10 @@ public class QTokenizer<T> : GLib.Object {
     \param string_value The string_value to tokenize
     \param delimiters A string_value containing delimiters
 
-    \sa QStringTokenizer, QByte_array_tokenizer, String_tokenizer, WString_tokenizer
+    \sa GLib.StringTokenizer, GLib.Byte_array_tokenizer, String_tokenizer, WString_tokenizer
     ***********************************************************/
-    public QTokenizer (T string_value, T delimiters) {
-        this.tokenizer_private = new QTokenizerPrivate<T, ConstIterator> (string_value, delimiters);
+    public GLib.Tokenizer (T string_value, T delimiters) {
+        this.tokenizer_private = new GLib.TokenizerPrivate<T, ConstIterator> (string_value, delimiters);
     }
 
 
@@ -136,7 +136,7 @@ public class QTokenizer<T> : GLib.Object {
     When between two characters considered a quote, delimiters will
     be ignored.
 
-    When between quotes, blackslash characters will cause the QTokenizer
+    When between quotes, blackslash characters will cause the GLib.Tokenizer
     to skip the next character.
 
     \param quotes Characters that delimit quotes.
@@ -163,7 +163,7 @@ public class QTokenizer<T> : GLib.Object {
     \sa next ()
     ***********************************************************/
     public bool has_next () {
-        //  typename QTokenizerPrivate<T, ConstIterator>.State state;
+        //  typename GLib.TokenizerPrivate<T, ConstIterator>.State state;
         tokenizer_private.is_delim = false;
         for (;;) {
             tokenizer_private.token_begin = tokenizer_private.token_end;

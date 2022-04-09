@@ -10,10 +10,10 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public abstract class AbstractTestFolderWatcher : GLib.Object {
 
-    QTemporaryDir root;
+    GLib.TemporaryDir root;
     string root_path;
     FolderWatcher watcher;
-    QSignalSpy path_changed_spy;
+    GLib.SignalSpy path_changed_spy;
 
 
     /***********************************************************
@@ -35,7 +35,7 @@ public abstract class AbstractTestFolderWatcher : GLib.Object {
 
         this.watcher.on_signal_reset (new FolderWatcher ());
         this.watcher.init (this.root_path);
-        this.path_changed_spy.on_signal_reset (new QSignalSpy (this.watcher, SIGNAL (path_changed (string))));
+        this.path_changed_spy.on_signal_reset (new GLib.SignalSpy (this.watcher, SIGNAL (path_changed (string))));
     }
 
 

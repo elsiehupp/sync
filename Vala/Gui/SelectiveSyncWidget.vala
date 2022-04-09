@@ -25,7 +25,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private QTreeWidget folder_tree;
+    private GLib.TreeWidget folder_tree;
 
     /***********************************************************
     During account setup we want to filter out excluded folders
@@ -44,10 +44,10 @@ public class SelectiveSyncWidget : Gtk.Widget {
         base (parent);
         this.account = account;
         this.inserting = false;
-        this.folder_tree = new QTreeWidget (this);
+        this.folder_tree = new GLib.TreeWidget (this);
         this.loading = new Gtk.Label (_("Loading …"), this.folder_tree);
 
-        var layout = new QVBoxLayout (this);
+        var layout = new GLib.VBoxLayout (this);
         layout.contents_margins (0, 0, 0, 0);
 
         var header = new Gtk.Label (this);
@@ -66,8 +66,8 @@ public class SelectiveSyncWidget : Gtk.Widget {
         this.folder_tree.sorting_enabled (true);
         this.folder_tree.sort_by_column (0, Qt.AscendingOrder);
         this.folder_tree.column_count (2);
-        this.folder_tree.header ().section_resize_mode (0, QHeaderView.QHeaderView.ResizeToContents);
-        this.folder_tree.header ().section_resize_mode (1, QHeaderView.QHeaderView.ResizeToContents);
+        this.folder_tree.header ().section_resize_mode (0, GLib.HeaderView.GLib.HeaderView.ResizeToContents);
+        this.folder_tree.header ().section_resize_mode (1, GLib.HeaderView.GLib.HeaderView.ResizeToContents);
         this.folder_tree.header ().stretch_last_section (true);
         this.folder_tree.header_item ().on_signal_text (0, _("Name"));
         this.folder_tree.header_item ().on_signal_text (1, _("Size"));
@@ -81,7 +81,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
     Returns a list of blocklisted paths, each including the
     trailing "/"
     ***********************************************************/
-    public GLib.List<string> create_block_list (QTreeWidgetItem root = null) {
+    public GLib.List<string> create_block_list (GLib.TreeWidgetItem root = null) {
         if (!root) {
             root = this.folder_tree.top_level_item (0);
         }
@@ -126,7 +126,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
     /***********************************************************
     Estimates the total size of checked items (recursively)
     ***********************************************************/
-    public int64 estimated_size (QTreeWidgetItem root = null) {
+    public int64 estimated_size (GLib.TreeWidgetItem root = null) {
         if (!root) {
             root = this.folder_tree.top_level_item (0);
         }
@@ -187,7 +187,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
     ***********************************************************/
     private void on_signal_update_directories (GLib.List<string> list) {
         var lscol_job = qobject_cast<LscolJob> (sender ());
-        QScopedValueRollback<bool> is_inserting (this.inserting);
+        GLib.ScopedValueRollback<bool> is_inserting (this.inserting);
         this.inserting = true;
 
         var root = static_cast<SelectiveSyncTreeViewItem> (this.folder_tree.top_level_item (0));
@@ -202,7 +202,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
             path_to_remove.append ("/");
 
         // Check for excludes.
-        QMutableListIterator<string> it (list);
+        GLib.MutableListIterator<string> it (list);
         while (it.has_next ()) {
             it.next ();
             if (this.excluded_files.is_excluded (it.value (), path_to_remove, FolderManager.instance.ignore_hidden_files))
@@ -282,7 +282,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_item_expanded (QTreeWidgetItem item) {
+    private void on_signal_item_expanded (GLib.TreeWidgetItem item) {
         string directory = item.data (0, Qt.USER_ROLE).to_string ();
         if (directory == "")
             return;
@@ -306,14 +306,14 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_item_changed (QTreeWidgetItem item, int col) {
+    private void on_signal_item_changed (GLib.TreeWidgetItem item, int col) {
         if (col != 0 || this.inserting)
             return;
 
         if (item.check_state (0) == Qt.Checked) {
             // If we are checked, check that we may need to check the parent as well if
             // all the siblings are also checked
-            QTreeWidgetItem parent = item.parent ();
+            GLib.TreeWidgetItem parent = item.parent ();
             if (parent && parent.check_state (0) != Qt.Checked) {
                 bool has_unchecked = false;
                 for (int i = 0; i < parent.child_count (); ++i) {
@@ -337,7 +337,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
         }
 
         if (item.check_state (0) == Qt.Unchecked) {
-            QTreeWidgetItem parent = item.parent ();
+            GLib.TreeWidgetItem parent = item.parent ();
             if (parent && parent.check_state (0) == Qt.Checked) {
                 parent.check_state (0, Qt.PartiallyChecked);
             }
@@ -356,7 +356,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
         }
 
         if (item.check_state (0) == Qt.PartiallyChecked) {
-            QTreeWidgetItem parent = item.parent ();
+            GLib.TreeWidgetItem parent = item.parent ();
             if (parent && parent.check_state (0) != Qt.PartiallyChecked) {
                 parent.check_state (0, Qt.PartiallyChecked);
             }
@@ -421,9 +421,9 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private static QTreeWidgetItem find_first_child (QTreeWidgetItem parent, string text) {
+    private static GLib.TreeWidgetItem find_first_child (GLib.TreeWidgetItem parent, string text) {
         for (int i = 0; i < parent.child_count (); ++i) {
-            QTreeWidgetItem child = parent.child (i);
+            GLib.TreeWidgetItem child = parent.child (i);
             if (child.text (0) == text) {
                 return child;
             }
@@ -434,9 +434,9 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private static void SelectiveSyncWidget.recursive_insert (QTreeWidgetItem parent, GLib.List<string> path_trail, string path, int64 size) {
-        QFileIconProvider prov;
-        Gtk.Icon folder_icon = prov.icon (QFileIconProvider.FolderConnection);
+    private static void SelectiveSyncWidget.recursive_insert (GLib.TreeWidgetItem parent, GLib.List<string> path_trail, string path, int64 size) {
+        GLib.FileIconProvider prov;
+        Gtk.Icon folder_icon = prov.icon (GLib.FileIconProvider.FolderConnection);
         if (path_trail.size () == 0) {
             if (path.has_suffix ("/")) {
                 path.chop (1);
@@ -468,7 +468,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
                     item.data (1, Qt.USER_ROLE, size);
                 }
                 //            item.data (0, Qt.USER_ROLE, path_trail.first ());
-                item.child_indicator_policy (QTreeWidgetItem.ShowIndicator);
+                item.child_indicator_policy (GLib.TreeWidgetItem.ShowIndicator);
             }
 
             path_trail.remove_first ();

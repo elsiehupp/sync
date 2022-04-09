@@ -4,7 +4,7 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QResizeEvent>
+//  #include <GLib.ResizeEvent>
 
 namespace Occ {
 namespace Ui {
@@ -50,7 +50,7 @@ public class ElidedLabel : Gtk.Label {
 
     /***********************************************************
     ***********************************************************/
-    protected override void resize_event (QResizeEvent event) {
+    protected override void resize_event (GLib.ResizeEvent event) {
         Gtk.Label.resize_event (event);
 
         Cairo.FontOptions font_options = font_options ();

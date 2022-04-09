@@ -12,16 +12,16 @@ public class TestBlocklist : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private TestBlocklistBasicData () {
-        QTest.add_column<bool> ("remote");
-        QTest.new_row ("remote") + true;
-        QTest.new_row ("local") + false;
+        GLib.Test.add_column<bool> ("remote");
+        GLib.Test.new_row ("remote") + true;
+        GLib.Test.new_row ("local") + false;
     }
 
 
     /***********************************************************
     ***********************************************************/
     private TestBlocklist () {
-        QFETCH (bool, remote);
+        GLib.FETCH (bool, remote);
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());

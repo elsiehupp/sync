@@ -59,7 +59,7 @@ public class FileActivityListModel : ActivityListModel {
             this.activities_received
         );
 
-        QUrlQuery parameters;
+        GLib.UrlQuery parameters;
         parameters.add_query_item ("sort", "asc");
         parameters.add_query_item ("object_type", "files");
         parameters.add_query_item ("object_id", this.file_id);

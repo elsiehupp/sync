@@ -17,7 +17,7 @@ public class TestFetchMoreClicked : AbstractTestUnifiedSearchListmodel {
         model.set_search_term ("");
         GLib.assert_true (model.row_count () == 0);
 
-        QSignalSpy search_in_progress_changed = new QSignalSpy (
+        GLib.SignalSpy search_in_progress_changed = new GLib.SignalSpy (
             model, UnifiedSearchResultsListModel.is_search_in_progress_changed);
 
         // test that search term gets set, search gets started and enough results get returned
@@ -36,9 +36,9 @@ public class TestFetchMoreClicked : AbstractTestUnifiedSearchListmodel {
         var number_of_rows_in_mmodel_previous = model.row_count ();
 
         // test fetch more results
-        QSignalSpy current_fetch_more_in_progress_provider_id_changed = new QSignalSpy (
+        GLib.SignalSpy current_fetch_more_in_progress_provider_id_changed = new GLib.SignalSpy (
             model, &UnifiedSearchResultsListModel.current_fetch_more_in_progress_provider_id_changed);
-        QSignalSpy rows_inserted = new QSignalSpy (model, &UnifiedSearchResultsListModel.rows_inserted);
+        GLib.SignalSpy rows_inserted = new GLib.SignalSpy (model, &UnifiedSearchResultsListModel.rows_inserted);
         for (int i = 0; i < model.row_count (); ++i) {
             var type = model.data (model.index (i), UnifiedSearchResultsListModel.DataRole.TypeRole);
 
@@ -80,7 +80,7 @@ public class TestFetchMoreClicked : AbstractTestUnifiedSearchListmodel {
             current_fetch_more_in_progress_provider_id_changed == "";
             rows_inserted == "";
 
-            QSignalSpy rows_removed = new QSignalSpy (model, &UnifiedSearchResultsListModel.rows_removed);
+            GLib.SignalSpy rows_removed = new GLib.SignalSpy (model, &UnifiedSearchResultsListModel.rows_removed);
 
             for (int i = 0; i < 10; ++i) {
                 model.fetch_more_trigger_clicked (provider_id_fetch_more_triggered);

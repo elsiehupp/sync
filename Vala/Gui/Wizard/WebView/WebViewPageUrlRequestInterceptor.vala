@@ -3,7 +3,7 @@
 namespace Occ {
 namespace Ui {
 
-public class WebViewPageUrlRequestInterceptor : QWebEngineUrlRequestInterceptor {
+public class WebViewPageUrlRequestInterceptor : GLib.WebEngineUrlRequestInterceptor {
 
     /***********************************************************
     ***********************************************************/
@@ -14,7 +14,7 @@ public class WebViewPageUrlRequestInterceptor : QWebEngineUrlRequestInterceptor 
 
     /***********************************************************
     ***********************************************************/
-    public void intercept_request (QWebEngineUrlRequestInfo info)  {
+    public void intercept_request (GLib.WebEngineUrlRequestInfo info)  {
         info.http_header ("OCS-APIREQUEST", "true");
     }
 

@@ -237,7 +237,7 @@ public class TestT7pl : AbstractTestPermissions {
         GLib.assert_true (fake_folder.sync_once ());
         assert_csync_journal_ok (fake_folder.sync_journal ());
 
-        QThread.sleep (1); // make sure changes have different mtime
+        GLib.Thread.sleep (1); // make sure changes have different mtime
         edit_read_only ("readonly_directory_PERM_M_/cannot_be_modified_PERM_DVN_.data");
         fake_folder.local_modifier.set_contents ("readonly_directory_PERM_M_/cannot_be_modified_PERM_DVN_.data", 'd');
 

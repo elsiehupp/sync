@@ -277,11 +277,11 @@ public class PropagateUploadEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_folder_encrypted_metadata_received (QJsonDocument json, int status_code) {
+    private void on_signal_folder_encrypted_metadata_received (GLib.JsonDocument json, int status_code) {
         GLib.debug ("Metadata Received; preparing it for the new file. " + json.to_variant ());
 
         // Encrypt File!
-        this.metadata = new FolderMetadata (this.propagator.account, json.to_json (QJsonDocument.Compact), status_code);
+        this.metadata = new FolderMetadata (this.propagator.account, json.to_json (GLib.JsonDocument.Compact), status_code);
 
         GLib.FileInfo info = GLib.File.new_for_path (this.propagator.full_local_path (this.item.file));
         const string filename = info.filename ();
@@ -289,7 +289,7 @@ public class PropagateUploadEncrypted : GLib.Object {
         // Find existing metadata for this file
         bool found = false;
         EncryptedFile encrypted_file;
-        const GLib.List<EncryptedFile> files = this.metadata.files ();
+        GLib.List<EncryptedFile> files = this.metadata.files ();
 
         foreach (EncryptedFile file in files) {
             if (file.original_filename == filename) {
@@ -307,7 +307,7 @@ public class PropagateUploadEncrypted : GLib.Object {
             encrypted_file.metadata_key = 1;
             encrypted_file.original_filename = filename;
 
-            QMimeDatabase mdatabase;
+            GLib.MimeDatabase mdatabase;
             encrypted_file.mimetype = mdatabase.mime_type_for_file (info).name ().to_local8Bit ();
 
             // Other clients expect "httpd/unix-directory" instead of "inode/directory"
@@ -394,7 +394,7 @@ public class PropagateUploadEncrypted : GLib.Object {
         GLib.debug ("Error getting the encrypted metadata. Pretend we got empty metadata.");
         FolderMetadata empty_metadata = new FolderMetadata (this.propagator.account);
         empty_metadata.encrypted_metadata ();
-        var json = QJsonDocument.from_json (empty_metadata.encrypted_metadata ());
+        var json = GLib.JsonDocument.from_json (empty_metadata.encrypted_metadata ());
         on_signal_folder_encrypted_metadata_received (json, http_return_code);
     }
 

@@ -2,12 +2,12 @@
 namespace Occ {
 namespace Ui {
 
-public class ImageProvider : QQuickImageProvider {
+public class ImageProvider : GLib.QuickImageProvider {
 
     /***********************************************************
     ***********************************************************/
     public ImageProvider () {
-        base (QQuickImageProvider.Image);
+        base (GLib.QuickImageProvider.Image);
     }
 
 
@@ -35,8 +35,8 @@ public class ImageProvider : QQuickImageProvider {
     private static Gtk.Image make_icon (string path) {
         Gtk.Image image = new Gtk.Image (128, 128, Gtk.Image.FormatARGB32);
         image.fill (Qt.GlobalColor.transparent);
-        QPainter painter = new QPainter (image);
-        QSvgRenderer renderer = new QSvgRenderer (path);
+        GLib.Painter painter = new GLib.Painter (image);
+        GLib.SvgRenderer renderer = new GLib.SvgRenderer (path);
         renderer.render (painter);
         return image;
     }

@@ -14,7 +14,7 @@ public class TestSetUserStatusSetCustomMessageUserStatusSetCorrect : GLib.Object
     private TestSetUserStatusSetCustomMessageUserStatusSetCorrect () {
         var fake_user_status_job = new FakeUserStatusConnector ();
         UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
-        QSignalSpy finished_spy = new QSignalSpy (
+        GLib.SignalSpy finished_spy = new GLib.SignalSpy (
             model,
             UserStatusSelectorModel.on_signal_finished
         );

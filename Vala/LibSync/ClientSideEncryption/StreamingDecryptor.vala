@@ -56,7 +56,7 @@ public class StreamingDecryptor : GLib.Object {
     public string chunk_decryption (GLib.InputStream input_stream, uint64 chunk_size) {
         string byte_array;
         Soup.Buffer buffer = new Soup.Buffer (byte_array);
-        buffer.open (QIODevice.WriteOnly);
+        buffer.open (GLib.IODevice.WriteOnly);
 
         GLib.assert (this.is_initialized);
         if (!this.is_initialized) {

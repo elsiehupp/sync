@@ -22,7 +22,7 @@ public class TestSelectiveSyncBigFolders : GLib.Object {
         GLib.List<string> size_requests;
         fake_folder.set_server_override (this.override_delegate);
 
-        QSignalSpy signal_new_big_folder = new QSignalSpy (fake_folder.sync_engine, SyncEngine.signal_new_big_folder);
+        GLib.SignalSpy signal_new_big_folder = new GLib.SignalSpy (fake_folder.sync_engine, SyncEngine.signal_new_big_folder);
 
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 

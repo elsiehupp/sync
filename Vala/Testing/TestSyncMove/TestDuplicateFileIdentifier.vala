@@ -16,7 +16,7 @@ public class TestDuplicateFileIdentifier : AbstractTestSyncMove {
     right thing in that case.
     ***********************************************************/
     private TestDuplicateFileIdentifier () {
-        QFETCH (string, prefix);
+        GLib.FETCH (string, prefix);
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         var remote = fake_folder.remote_modifier ();

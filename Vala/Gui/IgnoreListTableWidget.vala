@@ -1,8 +1,8 @@
 //  #pragma once
 
 //  #include <Gtk.Widget>
-//  #include <QInputDialog>
-//  #include <QLineEdit>
+//  #include <GLib.InputDialog>
+//  #include <GLib.LineEdit>
 //  #include <Gtk.MessageBox>
 
 namespace Occ {
@@ -49,7 +49,7 @@ public class IgnoreListTableWidget : Gtk.Widget {
         );
 
         instance.table_widget.resize_columns_to_contents ();
-        instance.table_widget.horizontal_header ().section_resize_mode (pattern_col, QHeaderView.Stretch);
+        instance.table_widget.horizontal_header ().section_resize_mode (pattern_col, GLib.HeaderView.Stretch);
         instance.table_widget.vertical_header ().visible (false);
     }
 
@@ -62,7 +62,7 @@ public class IgnoreListTableWidget : Gtk.Widget {
     ***********************************************************/
     public void read_ignore_file (string file, bool read_only) {
         GLib.File ignores = new GLib.File (file);
-        if (ignores.open (QIODevice.ReadOnly)) {
+        if (ignores.open (GLib.IODevice.ReadOnly)) {
             while (!ignores.at_end ()) {
                 string line = string.from_utf8 (ignores.read_line ());
                 line.chop (1);
@@ -85,11 +85,11 @@ public class IgnoreListTableWidget : Gtk.Widget {
         int new_row = instance.table_widget.row_count ();
         instance.table_widget.row_count (new_row + 1);
 
-        var pattern_item = new QTableWidgetItem ();
+        var pattern_item = new GLib.TableWidgetItem ();
         pattern_item.on_signal_text (pattern);
         instance.table_widget.item (new_row, pattern_col, pattern_item);
 
-        var deletable_item = new QTableWidgetItem ();
+        var deletable_item = new GLib.TableWidgetItem ();
         deletable_item.flags (Qt.ItemIsUserCheckable | Qt.ItemIsEnabled);
         deletable_item.check_state (deletable ? Qt.Checked : Qt.Unchecked);
         instance.table_widget.item (new_row, deletable_col, deletable_item);
@@ -117,12 +117,12 @@ public class IgnoreListTableWidget : Gtk.Widget {
     ***********************************************************/
     public void on_signal_write_ignore_file (string file) {
         GLib.File ignores = new GLib.File (file);
-        if (ignores.open (QIODevice.WriteOnly)) {
+        if (ignores.open (GLib.IODevice.WriteOnly)) {
             // rewrites the whole file since now the user can also remove system patterns
             GLib.File.resize (file, 0);
             for (int row = 0; row < instance.table_widget.row_count (); ++row) {
-                QTableWidgetItem pattern_item = instance.table_widget.item (row, pattern_col);
-                QTableWidgetItem deletable_item = instance.table_widget.item (row, deletable_col);
+                GLib.TableWidgetItem pattern_item = instance.table_widget.item (row, pattern_col);
+                GLib.TableWidgetItem deletable_item = instance.table_widget.item (row, deletable_col);
                 if (pattern_item.flags () & Qt.ItemIsEnabled) {
                     string prepend;
                     if (deletable_item.check_state () == Qt.Checked) {
@@ -154,7 +154,7 @@ public class IgnoreListTableWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_item_selection_changed () {
-        QTableWidgetItem item = instance.table_widget.current_item ();
+        GLib.TableWidgetItem item = instance.table_widget.current_item ();
         if (!item) {
             instance.remove_push_button.enabled (false);
             return;
@@ -178,9 +178,9 @@ public class IgnoreListTableWidget : Gtk.Widget {
     ***********************************************************/
     private void on_signal_add_pattern () {
         bool ok_clicked = false;
-        string pattern = QInputDialog.text (this, _("Add Ignore Pattern"),
+        string pattern = GLib.InputDialog.text (this, _("Add Ignore Pattern"),
             _("Add a new ignore pattern:"),
-            QLineEdit.Normal, "", ok_clicked);
+            GLib.LineEdit.Normal, "", ok_clicked);
 
         if (!ok_clicked || pattern == "")
             return;

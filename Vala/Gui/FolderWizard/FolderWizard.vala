@@ -4,21 +4,21 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QDesktopServices>
+//  #include <GLib.DesktopServices>
 //  #include <GLib.Dir>
-//  #include <QFileDialog>
+//  #include <GLib.FileDialog>
 //  #include <GLib.FileInfo>
-//  #include <QFileIconProvider>
-//  #include <QInputDialog>
-//  #include <QValidator>
-//  #include <QWizardPage>
-//  #include <QTreeWidget>
-//  #include <QVBoxLayout>
-//  #include <QEvent>
-//  #include <QCheckBox>
+//  #include <GLib.FileIconProvider>
+//  #include <GLib.InputDialog>
+//  #include <GLib.Validator>
+//  #include <GLib.WizardPage>
+//  #include <GLib.TreeWidget>
+//  #include <GLib.VBoxLayout>
+//  #include <GLib.Event>
+//  #include <GLib.CheckBox>
 //  #include <Gtk.MessageBox>
 //  #include <cstdlib>
-//  #include <QWizard>
+//  #include <GLib.Wizard>
 
 using Soup;
 
@@ -29,7 +29,7 @@ namespace Ui {
 @brief The FolderWizard class
 @ingroup gui
 ***********************************************************/
-public class FolderWizard : QWizard {
+public class FolderWizard : GLib.Wizard {
 
     /***********************************************************
     ***********************************************************/
@@ -66,23 +66,23 @@ public class FolderWizard : QWizard {
         page (Page.SELECTIVE_SYNC, this.folder_wizard_selective_sync_page);
 
         window_title (_("Add FolderConnection Sync Connection"));
-        options (QWizard.Cancel_button_on_signal_left);
-        button_text (QWizard.FinishButton, _("Add Sync Connection"));
+        options (GLib.Wizard.Cancel_button_on_signal_left);
+        button_text (GLib.Wizard.FinishButton, _("Add Sync Connection"));
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public override bool event_filter (GLib.Object watched, QEvent event) {
-        if (event.type () == QEvent.Layout_request) {
-            // Workaround QTBUG-3396: forces QWizard_private.update_layout ()
+    public override bool event_filter (GLib.Object watched, GLib.Event event) {
+        if (event.type () == GLib.Event.Layout_request) {
+            // Workaround GLib.TBUG-3396: forces GLib.Wizard_private.update_layout ()
             GLib.Timeout.single_shot (
                 0,
                 this,
                 this.on_event_filter_timer
             );
         }
-        return QWizard.event_filter (watched, event);
+        return GLib.Wizard.event_filter (watched, event);
     }
 
 
@@ -95,16 +95,16 @@ public class FolderWizard : QWizard {
 
     /***********************************************************
     ***********************************************************/
-    public override void resize_event (QResizeEvent event) {
-        QWizard.resize_event (event);
+    public override void resize_event (GLib.ResizeEvent event) {
+        GLib.Wizard.resize_event (event);
 
-        // workaround for QTBUG-22819: when the error label word wrap, the minimum height is not adjusted
+        // workaround for GLib.TBUG-22819: when the error label word wrap, the minimum height is not adjusted
         var page = current_page ();
         if (page) {
             int hfw = page.height_for_width (page.width ());
             if (page.height () < hfw) {
                 page.minimum_size (page.minimum_size_hint ().width (), hfw);
-                title_format (title_format ()); // And another workaround for QTBUG-3396
+                title_format (title_format ()); // And another workaround for GLib.TBUG-3396
             }
         }
     }

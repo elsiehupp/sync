@@ -17,7 +17,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
     ***********************************************************/
     private OwncloudHttpCredsPage instance;
     private bool connected;
-    private QProgressIndicator progress_indicator;
+    private GLib.ProgressIndicator progress_indicator;
     private OwncloudWizard oc_wizard;
 
 
@@ -30,7 +30,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
         base ();
         this.instance ();
         this.connected = false;
-        this.progress_indicator = new QProgressIndicator (this);
+        this.progress_indicator = new GLib.ProgressIndicator (this);
         this.instance.up_ui (this);
 
         if (parent) {
@@ -230,7 +230,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
     ***********************************************************/
     private void customize_style () {
         if (this.progress_indicator) {
-            this.progress_indicator.on_signal_color (Gtk.Application.palette ().color (Gtk.Palette.Text));
+            this.progress_indicator.on_signal_color (GLib.Application.palette ().color (Gtk.Palette.Text));
         }
     }
 

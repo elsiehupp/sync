@@ -7,7 +7,7 @@
 namespace Occ {
 namespace Ui {
 
-public class ShareeModel : QAbstractListModel {
+public class ShareeModel : GLib.AbstractListModel {
 
     /***********************************************************
     FIXME: make it a GLib.List<Sharee> when Sharee can be compared
@@ -77,7 +77,7 @@ public class ShareeModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public override int row_count (QModelIndex parent = QModelIndex ()) {
+    public override int row_count (GLib.ModelIndex parent = GLib.ModelIndex ()) {
         return this.sharees.length ();
     }
 
@@ -91,10 +91,10 @@ public class ShareeModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_sharees_fetched (QJsonDocument reply) {
+    private void on_signal_sharees_fetched (GLib.JsonDocument reply) {
         GLib.List<unowned Sharee> new_sharees;
         {
-            const GLib.List<string> sharee_types {"users", "groups", "emails", "remotes", "circles", "rooms"};
+            GLib.List<string> sharee_types {"users", "groups", "emails", "remotes", "circles", "rooms"};
 
             const var append_sharees = [this, sharee_types] (Json.Object data, GLib.List<unowned Sharee>& out) {
                 for (var sharee_type : sharee_types) {
@@ -146,7 +146,7 @@ public class ShareeModel : QAbstractListModel {
 
         this.sharees = new_sharees;
 
-        QModel_index_list new_persistant;
+        GLib.Model_index_list new_persistant;
         new_persistant.reserve (persistent.size ());
         foreach (unowned Sharee sharee, old_persistant_sharee) {
             FindShareeHelper helper = {
@@ -154,7 +154,7 @@ public class ShareeModel : QAbstractListModel {
             }
             var it = std.find_if (this.sharees.const_begin (), this.sharees.const_end (), helper);
             if (it == this.sharees.const_end ()) {
-                new_persistant + QModelIndex ();
+                new_persistant + GLib.ModelIndex ();
             } else {
                 new_persistant + index (std.distance (this.sharees.const_begin (), it));
             }
@@ -182,7 +182,7 @@ public class ShareeModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Variant data (QModelIndex index, int role) {
+    private GLib.Variant data (GLib.ModelIndex index, int role) {
         if (index.row () < 0 || index.row () > this.sharees.size ()) {
             return GLib.Variant ();
         }
@@ -220,7 +220,7 @@ public class ShareeModel : QAbstractListModel {
     /***********************************************************
     Helper function for new_sharees (could be a lambda when we can use them)
     ***********************************************************/
-    private static unowned Sharee sharee_from_model_index (QModelIndex index) {
+    private static unowned Sharee sharee_from_model_index (GLib.ModelIndex index) {
         return index.data (Qt.USER_ROLE).value<unowned Sharee> ();
     }
 

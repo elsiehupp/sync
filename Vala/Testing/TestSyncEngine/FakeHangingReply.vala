@@ -19,14 +19,14 @@ public class FakeHangingReply : FakeReply {
         set_request (request);
         set_url (request.url);
         set_operation (operation);
-        open (QIODevice.ReadOnly);
+        open (GLib.IODevice.ReadOnly);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public override void on_signal_abort () {
-        // Follow more or less the implementation of QNetworkReplyImpl.on_signal_abort
+        // Follow more or less the implementation of GLib.NetworkReplyImpl.on_signal_abort
         close ();
         set_error (OperationCanceledError, _("Operation canceled"));
         /* emit */ error_occurred (OperationCanceledError);

@@ -24,7 +24,7 @@ public class LinkLabel : Gtk.Label {
 
     /***********************************************************
     ***********************************************************/
-    protected void enter_event (QEvent event) {
+    protected void enter_event (GLib.Event event) {
         font_underline (true);
         cursor (Qt.PointingHandCursor);
     }
@@ -32,7 +32,7 @@ public class LinkLabel : Gtk.Label {
 
     /***********************************************************
     ***********************************************************/
-    protected void leave_event (QEvent event) {
+    protected void leave_event (GLib.Event event) {
         font_underline (false);
         cursor (Qt.ArrowCursor);
     }
@@ -40,7 +40,7 @@ public class LinkLabel : Gtk.Label {
 
     /***********************************************************
     ***********************************************************/
-    protected void mouse_release_event (QMouseEvent event) {
+    protected void mouse_release_event (GLib.MouseEvent event) {
         if (GLib.Uri.is_valid (url)) {
             OpenExternal.open_browser (url);
         }

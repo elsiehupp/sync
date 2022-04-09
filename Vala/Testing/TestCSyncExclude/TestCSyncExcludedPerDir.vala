@@ -13,7 +13,7 @@ public class TestCSyncExcludedPerDir : AbstractTestCSyncExclude {
     /***********************************************************
     ***********************************************************/
     private TestCSyncExcludedPerDir () {
-        var temporary_directory = QStandardPaths.writable_location (QStandardPaths.TempLocation);
+        var temporary_directory = GLib.StandardPaths.writable_location (GLib.StandardPaths.TempLocation);
         excluded_files.on_signal_reset (new ExcludedFiles (temporary_directory + "/"));
         excluded_files.set_wildcards_match_slash (false);
         excluded_files.add_manual_exclude ("A");

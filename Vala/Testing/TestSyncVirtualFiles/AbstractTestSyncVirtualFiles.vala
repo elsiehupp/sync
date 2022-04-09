@@ -10,7 +10,7 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public class AbstractTestSyncVirtualFiles : GLib.Object {
 
-    protected const string DVSUFFIX = APPLICATION_DOTVIRTUALFILE_SUFFIX;
+    protected const string DVSUFFIX = Common.Config.APPLICATION_DOTVIRTUALFILE_SUFFIX;
 
     /***********************************************************
     ***********************************************************/

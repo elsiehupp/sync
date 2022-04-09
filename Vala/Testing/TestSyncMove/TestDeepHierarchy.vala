@@ -12,7 +12,7 @@ public class TestDeepHierarchy : AbstractTestSyncMove {
     /***********************************************************
     ***********************************************************/
     private TestDeepHierarchy () {
-        QFETCH (bool, local);
+        GLib.FETCH (bool, local);
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         var modifier = local ? fake_folder.local_modifier : fake_folder.remote_modifier ();
 

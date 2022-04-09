@@ -91,10 +91,10 @@ public class GetOrCreatePublicLinkShare : GLib.Object {
     ***********************************************************/
     private void on_signal_password_required () {
         bool ok = false;
-        string password = QInputDialog.text (null,
+        string password = GLib.InputDialog.text (null,
                                                  _("Password for share required"),
                                                  _("Please enter a password for your link share:"),
-                                                 QLineEdit.Normal,
+                                                 GLib.LineEdit.Normal,
                                                  "",
                                                  ok);
 

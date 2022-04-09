@@ -165,7 +165,7 @@
        </widget>
       </item>
       <item row="0" column="0" rowspan="4">
-       <widget class="QTreeWidget" name="folderTreeWidget">
+       <widget class="GLib.TreeWidget" name="folderTreeWidget">
         <property name="sortingEnabled">
          <bool>true</bool>
         </property>

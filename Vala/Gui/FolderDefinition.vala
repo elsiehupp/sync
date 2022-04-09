@@ -53,7 +53,7 @@ public class FolderDefinition : GLib.Object {
     /***********************************************************
     The CLSID where this folder appears in registry for the Explorer navigation pane entry.
     ***********************************************************/
-    public QUuid navigation_pane_clsid;
+    public GLib.Uuid navigation_pane_clsid;
 
     /***********************************************************
     Whether the vfs mode shall silently be updated if possible

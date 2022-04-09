@@ -24,7 +24,7 @@ public class FakePutMultiFileReply : FakeReply {
         set_request (request);
         set_url (request.url);
         set_operation (operation);
-        open (QIODevice.ReadOnly);
+        open (GLib.IODevice.ReadOnly);
         this.all_file_info = perform_multi_part (remote_root_file_info, request, put_payload, content_type);
         GLib.Object.invoke_method (this, "respond", Qt.QueuedConnection);
     }
@@ -73,7 +73,7 @@ public class FakePutMultiFileReply : FakeReply {
     ***********************************************************/
     public virtual void respond ();
     void FakePutMultiFileReply.respond () {
-        QJsonDocument reply;
+        GLib.JsonDocument reply;
         Json.Object all_file_info_reply;
 
         int64 total_size = 0;
@@ -121,7 +121,7 @@ public class FakePutMultiFileReply : FakeReply {
     /***********************************************************
     ***********************************************************/
     public override int64 bytes_available () {
-        return this.payload.size () + QIODevice.bytes_available ();
+        return this.payload.size () + GLib.IODevice.bytes_available ();
     }
 
 

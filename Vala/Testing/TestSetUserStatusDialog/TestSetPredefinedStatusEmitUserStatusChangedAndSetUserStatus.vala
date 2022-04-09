@@ -23,11 +23,11 @@ public class TestSetPredefinedStatusEmitUserStatusChangedAndSetUserStatus : GLib
             std.move (fake_date_time_provider)
         );
 
-        QSignalSpy user_status_changed_spy = new QSignalSpy (
+        GLib.SignalSpy user_status_changed_spy = new GLib.SignalSpy (
             model,
             UserStatusSelectorModel.user_status_changed
         );
-        QSignalSpy clear_at_changed_spy = new QSignalSpy (
+        GLib.SignalSpy clear_at_changed_spy = new GLib.SignalSpy (
             model,
             UserStatusSelectorModel.clear_at_changed
         );

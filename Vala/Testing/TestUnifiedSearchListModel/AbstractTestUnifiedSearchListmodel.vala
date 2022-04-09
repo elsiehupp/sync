@@ -20,7 +20,7 @@ public class AbstractTestUnifiedSearchListmodel : GLib.Object {
     protected Account account;
     protected AccountState account_state;
     protected UnifiedSearchResultsListModel model;
-    protected QAbstractItemModelTester model_tester;
+    protected GLib.AbstractItemModelTester model_tester;
 
     /***********************************************************
     ***********************************************************/
@@ -46,7 +46,7 @@ public class AbstractTestUnifiedSearchListmodel : GLib.Object {
 
         model.on_signal_reset (new UnifiedSearchResultsListModel (account_state));
 
-        model_tester.on_signal_reset (new QAbstractItemModelTester (model));
+        model_tester.on_signal_reset (new GLib.AbstractItemModelTester (model));
 
         fake_desktop_services_url_handler.on_signal_reset (new FakeDesktopServicesUrlHandler ());
     }
@@ -58,7 +58,7 @@ public class AbstractTestUnifiedSearchListmodel : GLib.Object {
 
         GLib.InputStream reply = null;
 
-        var url_query = QUrlQuery (request.url);
+        var url_query = GLib.UrlQuery (request.url);
         var format = url_query.query_item_value ("format");
         var cursor = url_query.query_item_value ("cursor").to_int ();
         var search_term = url_query.query_item_value ("term");

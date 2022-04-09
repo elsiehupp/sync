@@ -155,7 +155,7 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : AbstractNetworkJo
 
     /***********************************************************
     ***********************************************************/
-    //  protected virtual void on_signal_folder_encrypted_metadata_received (QJsonDocument json, int status_code);
+    //  protected virtual void on_signal_folder_encrypted_metadata_received (GLib.JsonDocument json, int status_code);
 
 
     /***********************************************************

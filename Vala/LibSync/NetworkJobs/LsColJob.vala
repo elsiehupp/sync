@@ -82,7 +82,7 @@ public class LscolJob : AbstractNetworkJob {
                            + "</d:propfind>\n";
         var buf = new Soup.Buffer (this);
         buf.data (xml);
-        buf.open (QIODevice.ReadOnly);
+        buf.open (GLib.IODevice.ReadOnly);
         if (this.url.is_valid != null) {
             send_request ("PROPFIND", this.url, request, buf);
         } else {

@@ -19,7 +19,7 @@ public class TestUploadChecksummingAdler : AbstractTestChecksumValidator {
         );
 
         var file = GLib.File.new_for_path (this.testfile, compute_checksum);
-        file.open (QIODevice.ReadOnly);
+        file.open (GLib.IODevice.ReadOnly);
         this.expected = calc_adler32 (file);
         GLib.debug ("XX Expected Checksum: " + this.expected);
         compute_checksum.on_signal_start (this.testfile);

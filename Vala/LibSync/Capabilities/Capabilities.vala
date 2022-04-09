@@ -2,9 +2,9 @@
 ***********************************************************/
 
 //  #include <GLib.HashTable<string, GLib.Variant>>
-//  #include <QDebug>
+//  #include <GLib.Debug>
 //  #include <GLib.HashTable<string, GLib.Variant>>
-//  #include <QMimeDatabase>
+//  #include <GLib.MimeDatabase>
 
 namespace Occ {
 namespace LibSync {
@@ -476,7 +476,7 @@ public class Capabilities : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public DirectEditor get_direct_editor_for_mimetype (QMimeType mime_type) {
+    public DirectEditor get_direct_editor_for_mimetype (GLib.MimeType mime_type) {
         foreach (DirectEditor editor in this.direct_editors) {
             if (editor.has_mimetype (mime_type)) {
                 return editor;
@@ -489,7 +489,7 @@ public class Capabilities : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public DirectEditor get_direct_editor_for_optional_mimetype (QMimeType mime_type) {
+    public DirectEditor get_direct_editor_for_optional_mimetype (GLib.MimeType mime_type) {
         foreach (DirectEditor editor in this.direct_editors) {
             if (editor.has_optional_mimetype (mime_type))
                 return editor;

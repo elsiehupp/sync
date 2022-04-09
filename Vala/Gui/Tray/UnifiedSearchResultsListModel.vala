@@ -5,8 +5,8 @@
 ***********************************************************/
 
 //  #include <algorithm>
-//  #include <QAbstractListModel>
-//  #include <QDesktopServices>
+//  #include <GLib.AbstractListModel>
+//  #include <GLib.DesktopServices>
 //  #include <limits>
 //  #include <QtCore>
 
@@ -19,7 +19,7 @@ namespace Ui {
 Simple list model to provide the list view with data for
 the Unified Search results.
 ***********************************************************/
-public class UnifiedSearchResultsListModel : QAbstractListModel {
+public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
 
     struct UnifiedSearchProvider {
         string identifier;
@@ -57,7 +57,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         /***********************************************************
         ***********************************************************/
         public static GLib.HashTable<int, string> role_names () {
-            var roles = QAbstractListModel.role_names ();
+            var roles = GLib.AbstractListModel.role_names ();
             roles[DataRole.PROVIDER_NAME] = "provider_name";
             roles[DataRole.PROVIDER_IDENTIFIER] = "provider_id";
             roles[DataRole.ICONS] = "icons";
@@ -121,8 +121,8 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.Variant data (QModelIndex index, int role) {
-        //  Q_ASSERT (check_index (index, QAbstractItemModel.Check_index_option.Index_is_valid));
+    public GLib.Variant data (GLib.ModelIndex index, int role) {
+        //  Q_ASSERT (check_index (index, GLib.AbstractItemModel.Check_index_option.Index_is_valid));
 
         switch (role) {
         case DataRole.PROVIDER_NAME:
@@ -153,7 +153,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public int row_count (QModelIndex parent) {
+    public int row_count (GLib.ModelIndex parent) {
         if (parent.is_valid) {
             return 0;
         }
@@ -179,7 +179,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     public void result_clicked (string provider_id, GLib.Uri resource_url) {
-        const QUrlQuery url_query = new QUrlQuery (resource_url);
+        const GLib.UrlQuery url_query = new GLib.UrlQuery (resource_url);
         const var directory = url_query.query_item_value ("directory", GLib.Uri.Component_formatting_option.Fully_decoded);
         const var filename =
             url_query.query_item_value ("scrollto", GLib.Uri.Component_formatting_option.Fully_decoded);
@@ -195,7 +195,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
             if (!local_files == "") {
                 GLib.info ("Opening file: " + local_files.const_first ());
-                QDesktopServices.open_url (GLib.Uri.from_local_file (local_files.const_first ()));
+                GLib.DesktopServices.open_url (GLib.Uri.from_local_file (local_files.const_first ()));
                 return;
             }
         }
@@ -258,7 +258,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
             "ocs/v2.php/search/providers/%1/search".printf (provider_id)
         );
 
-        QUrlQuery parameters;
+        GLib.UrlQuery parameters;
         parameters.add_query_item ("term", this.search_term);
         if (cursor > 0) {
             parameters.add_query_item ("cursor", string.number (cursor));
@@ -576,7 +576,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_fetch_providers_finished (LibSync.JsonApiJob json_api_job, QJsonDocument json, int status_code) {
+    private void on_signal_fetch_providers_finished (LibSync.JsonApiJob json_api_job, GLib.JsonDocument json, int status_code) {
         const var json_api_job = qobject_cast<LibSync.JsonApiJob> (sender ());
 
         if (!json_api_job) {
@@ -621,7 +621,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_search_for_provider_finished (LibSync.JsonApiJob json_api_job, QJsonDocument json, int status_code) {
+    private void on_signal_search_for_provider_finished (LibSync.JsonApiJob json_api_job, GLib.JsonDocument json, int status_code) {
         //  Q_ASSERT (this.account_state && this.account_state.account);
 
         const var json_api_job = qobject_cast<LibSync.JsonApiJob> (sender ());
@@ -760,7 +760,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         if (thumbnail_url_copy.has_prefix ("/") || thumbnail_url_copy.has_prefix ('\\')) {
             // relative image resource URL, just needs some concatenation with current server URL
             // some icons may contain parameters after (?)
-            const GLib.List<string> thumbnail_url_copy_splitted = thumbnail_url_copy.contains ('?')
+            GLib.List<string> thumbnail_url_copy_splitted = thumbnail_url_copy.contains ('?')
                 ? thumbnail_url_copy.split ('?', Qt.SkipEmptyParts)
                 : { thumbnail_url_copy };
             //  Q_ASSERT (!thumbnail_url_copy_splitted == "");
@@ -785,7 +785,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         if (fallack_icon_copy.has_prefix ("/") || fallack_icon_copy.has_prefix ('\\')) {
             // relative image resource URL, just needs some concatenation with current server URL
             // some icons may contain parameters after (?)
-            const GLib.List<string> fallack_icon_path_splitted =
+            GLib.List<string> fallack_icon_path_splitted =
                 fallack_icon_copy.contains ('?') ? fallack_icon_copy.split ('?') : { fallack_icon_copy };
             //  Q_ASSERT (!fallack_icon_path_splitted == "");
             server_url_copy.path (fallack_icon_path_splitted[0]);
@@ -813,7 +813,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         }
 
         if (server_url == "") {
-            const GLib.List<string> list_images = {thumbnail_url, fallack_icon};
+            GLib.List<string> list_images = {thumbnail_url, fallack_icon};
             return list_images.join (';');
         }
 
@@ -828,7 +828,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
             return url_for_thumbnail;
         }
 
-        const GLib.List<string> list_images = {
+        GLib.List<string> list_images = {
             url_for_thumbnail,
             url_for_fallack_icon
         };

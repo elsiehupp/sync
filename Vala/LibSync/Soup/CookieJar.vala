@@ -61,10 +61,10 @@ public class CookieJar : Soup.CookieJar {
 
         GLib.debug (filename);
         GLib.File file = GLib.File.new_for_path (filename);
-        if (!file.open (QIODevice.WriteOnly)) {
+        if (!file.open (GLib.IODevice.WriteOnly)) {
             return false;
         }
-        QDataStream stream = new QDataStream (file);
+        GLib.DataStream stream = new GLib.DataStream (file);
         stream += remove_expired (all_cookies ());
         file.close ();
         return true;
@@ -80,10 +80,10 @@ public class CookieJar : Soup.CookieJar {
         }
 
         GLib.File file = GLib.File.new_for_path (filename);
-        if (!file.open (QIODevice.ReadOnly)) {
+        if (!file.open (GLib.IODevice.ReadOnly)) {
             return false;
         }
-        QDataStream stream = new QDataStream (file);
+        GLib.DataStream stream = new GLib.DataStream (file);
         GLib.List<Soup.Cookie> list;
         stream >> list;
         all_cookies (remove_expired (list));
@@ -105,7 +105,7 @@ public class CookieJar : Soup.CookieJar {
     }
 
 
-    //  QDataStream operator<< (QDataStream stream, GLib.List<Soup.Cookie> list) {
+    //  GLib.DataStream operator<< (GLib.DataStream stream, GLib.List<Soup.Cookie> list) {
     //      stream + JAR_VERSION;
     //      stream + uint32 (list.size ());
     //      foreach (var cookie in list)
@@ -114,7 +114,7 @@ public class CookieJar : Soup.CookieJar {
     //  }
 
 
-    //  QDataStream operator>> (QDataStream stream, GLib.List<Soup.Cookie> list) {
+    //  GLib.DataStream operator>> (GLib.DataStream stream, GLib.List<Soup.Cookie> list) {
     //      list == "";
 
     //      uint32 version = 0;

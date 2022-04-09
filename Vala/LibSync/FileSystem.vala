@@ -19,7 +19,7 @@ public class FileSystem : GLib.Object {
         // compare two files with given filename and return true if they have the same content
         GLib.File file_1 = new GLib.File (filename_1);
         GLib.File file_2 = new GLib.File (filename_2);
-        if (!file_1.open (QIODevice.ReadOnly) || !file_2.open (QIODevice.ReadOnly)) {
+        if (!file_1.open (GLib.IODevice.ReadOnly) || !file_2.open (GLib.IODevice.ReadOnly)) {
             GLib.warning ("file_equals: Failed to open " + filename_1 + " or " + filename_2);
             return false;
         }
@@ -82,7 +82,7 @@ public class FileSystem : GLib.Object {
     @brief Get the size for a file
 
     Use this over GLib.FileInfo.size () to avoid bugs with lnk files on Windows.
-    See https://bugreports.qt.io/browse/QTBUG-24831.
+    See https://bugreports.qt.io/browse/GLib.TBUG-24831.
     ***********************************************************/
     public static int64 get_size (string filename) {
         return GLib.File.new_for_path (filename).size ();
@@ -152,7 +152,7 @@ public class FileSystem : GLib.Object {
         SignalDelegate signal_delegate,
         GLib.List<string> errors = new GLib.List<string> ()) {
         bool all_removed = true;
-        QDirIterator dir_iterator = new QDirIterator (path, GLib.Dir.AllEntries | GLib.Dir.Hidden | GLib.Dir.System | GLib.Dir.NoDotAndDotDot);
+        GLib.DirIterator dir_iterator = new GLib.DirIterator (path, GLib.Dir.AllEntries | GLib.Dir.Hidden | GLib.Dir.System | GLib.Dir.NoDotAndDotDot);
 
         while (dir_iterator.has_next ()) {
             dir_iterator.next ();

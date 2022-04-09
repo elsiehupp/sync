@@ -14,7 +14,7 @@ public abstract class AbstractTestOwnSql : GLib.Object {
     ***********************************************************/
     private Sqlite.Database database;
 
-    QTemporaryDir temporary_directory;
+    GLib.TemporaryDir temporary_directory;
 
     /***********************************************************
     TestOpenDatabase

@@ -221,7 +221,7 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
         on_signal_job_destroyed (put_multi_file_job); // remove it from the this.jobs list
 
         var reply_data = put_multi_file_job.input_stream.read_all ();
-        var reply_json = QJsonDocument.from_json (reply_data);
+        var reply_json = GLib.JsonDocument.from_json (reply_data);
         var full_reply_object = reply_json.object ();
 
         foreach (var single_file in this.files_to_upload) {
@@ -295,7 +295,7 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
         // Completion is signaled with sent=0, total=0; avoid accidentally
         // resetting progress due to the sent being zero by ignoring it.
         // signal_finished () is bound to be emitted soon anyway.
-        // See https://bugreports.qt.io/browse/QTBUG-44782.
+        // See https://bugreports.qt.io/browse/GLib.TBUG-44782.
         if (sent == 0 && total == 0) {
             return;
         }
@@ -388,10 +388,10 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
 
         int timeout = 0;
         foreach (var single_file in this.files_to_upload) {
-            // job takes ownership of device via a QScopedPointer. Job deletes itself when finishing
+            // job takes ownership of device via a GLib.ScopedPointer. Job deletes itself when finishing
             var device = std.make_unique<UploadDevice> (
                     single_file.local_path, 0, single_file.file_size, this.propagator.bandwidth_manager);
-            if (!device.open (QIODevice.ReadOnly)) {
+            if (!device.open (GLib.IODevice.ReadOnly)) {
                 GLib.warning ("Could not prepare upload device: " + device.error_string);
 
                 // If the file is currently locked, we want to retry the sync

@@ -12,8 +12,8 @@ public class TestConflictFileBaseName : AbstractTestSyncConflict {
     /***********************************************************
     ***********************************************************/
     private TestConflictFileBaseName () {
-        QFETCH (string, input);
-        QFETCH (string, output);
+        GLib.FETCH (string, input);
+        GLib.FETCH (string, output);
         GLib.assert_true (Utility.conflict_file_base_name_from_pattern (input) == output);
     }
 

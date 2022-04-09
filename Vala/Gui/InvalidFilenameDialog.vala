@@ -5,12 +5,12 @@
 ***********************************************************/
 
 //  #include <folder_connection.h>
-//  #include <QPush
+//  #include <GLib.Push
 //  #include <GLib.Dir>
 //  #include <qabstractbutton.h
-//  #include <QDialogBut
+//  #include <GLib.DialogBut
 //  #include <GLib.FileInfo>
-//  #include <QPushButton>
+//  #include <GLib.PushButton>
 
 //  #include <array>
 
@@ -57,8 +57,8 @@ public class InvalidFilenameDialog : Gtk.Dialog {
         this.original_filename = this.relative_file_path + file_path_file_info.filename ();
 
         this.instance.up_ui (this);
-        this.instance.button_box.button (QDialogButtonBox.Ok).enabled (false);
-        this.instance.button_box.button (QDialogButtonBox.Ok).on_signal_text (_("Rename file"));
+        this.instance.button_box.button (GLib.DialogButtonBox.Ok).enabled (false);
+        this.instance.button_box.button (GLib.DialogButtonBox.Ok).on_signal_text (_("Rename file"));
 
         this.instance.description_label.on_signal_text (_("The file %1 could not be synced because the name contains characters which are not allowed on this system.").printf (this.original_filename));
         this.instance.explanation_label.on_signal_text (_("The following characters are not allowed on the system : * \" | & ? , ; : \\ / ~ < >"));
@@ -108,7 +108,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
                                          .printf (illegal_character_list_to_string (illegal_contained_characters)));
         }
 
-        this.instance.button_box.button (QDialogButtonBox.Ok)
+        this.instance.button_box.button (GLib.DialogButtonBox.Ok)
             .enabled (is_text_valid);
     }
 
@@ -134,7 +134,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
         //  Q_UNUSED (values);
 
         this.instance.error_label.on_signal_text (_("Cannot rename file because a file with the same name does already exist on the server. Please pick another name."));
-        this.instance.button_box.button (QDialogButtonBox.Ok).enabled (false);
+        this.instance.button_box.button (GLib.DialogButtonBox.Ok).enabled (false);
     }
 
 
@@ -184,7 +184,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
             || !remote_permissions.has_permission (remote_permissions.Permissions.CAN_MOVE)) {
             this.instance.error_label.on_signal_text (
                 _("You don't have the permission to rename this file. Please ask the author of the file to rename it."));
-            this.instance.button_box.button (QDialogButtonBox.Ok).enabled (false);
+            this.instance.button_box.button (GLib.DialogButtonBox.Ok).enabled (false);
             this.instance.filename_line_edit.enabled (false);
         }
     }

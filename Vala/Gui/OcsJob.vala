@@ -5,9 +5,9 @@
 ***********************************************************/
 
 //  #include <GLib.OutputStream>
-//  #include <QJsonDocument>
+//  #include <GLib.JsonDocument>
 //  #include <Json.Object>
-//  #include <QPair>
+//  #include <GLib.Pair>
 
 namespace Occ {
 namespace Ui {
@@ -42,7 +42,7 @@ public class OcsJob : AbstractNetworkJob {
     ***********************************************************/
     string verb { private get; protected set; }
 
-    private GLib.List<QPair<string, string>> params;
+    private GLib.List<GLib.Pair<string, string>> params;
     private GLib.List<int> pass_status_codes;
     private Soup.Request request;
 
@@ -52,7 +52,7 @@ public class OcsJob : AbstractNetworkJob {
 
     @param reply the reply
     ***********************************************************/
-    internal signal void signal_job_finished (QJsonDocument reply, int status_code);
+    internal signal void signal_job_finished (GLib.JsonDocument reply, int status_code);
 
 
     /***********************************************************
@@ -84,7 +84,7 @@ public class OcsJob : AbstractNetworkJob {
     @param post_params list of pairs to add (url_encoded) to the body of the
     request
     ***********************************************************/
-    protected void post_params (GLib.List<QPair<string, string>> post_params);
+    protected void post_params (GLib.List<GLib.Pair<string, string>> post_params);
 
 
     /***********************************************************
@@ -118,7 +118,7 @@ public class OcsJob : AbstractNetworkJob {
     @param message The message that is set in the metadata
     @return The statuscode of the OCS response
     ***********************************************************/
-    public static int json_return_code (QJsonDocument json, string message) {
+    public static int json_return_code (GLib.JsonDocument json, string message) {
         // TODO proper checking
         var meta = json.object ().value ("ocs").to_object ().value ("meta").to_object ();
         int code = meta.value ("statuscode").to_int ();
@@ -147,7 +147,7 @@ public class OcsJob : AbstractNetworkJob {
 
         var buffer = new GLib.OutputStream ();
 
-        QUrlQuery query_items;
+        GLib.UrlQuery query_items;
         if (this.verb == "GET") {
             query_items = percent_encode_query_items (this.params);
         } else if (this.verb == "POST" || this.verb == "PUT") {
@@ -197,7 +197,7 @@ public class OcsJob : AbstractNetworkJob {
         Json.ParserError error;
         string message;
         int status_code = 0;
-        var json = QJsonDocument.from_json (reply_data, error);
+        var json = GLib.JsonDocument.from_json (reply_data, error);
 
         // when it is null we might have a 304 so get status code from this.reply and gives a warning...
         if (error.error != Json.ParserError.NoError) {
@@ -234,10 +234,10 @@ public class OcsJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private static QUrlQuery percent_encode_query_items (
-        GLib.List<QPair<string, string>> items) {
-        QUrlQuery result;
-        // Note: QUrlQuery.query_items () does not fully percent encode
+    private static GLib.UrlQuery percent_encode_query_items (
+        GLib.List<GLib.Pair<string, string>> items) {
+        GLib.UrlQuery result;
+        // Note: GLib.UrlQuery.query_items () does not fully percent encode
         // the query items, see #5042
         foreach (var item in items) {
             result.add_query_item (

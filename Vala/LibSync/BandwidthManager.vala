@@ -90,7 +90,7 @@ public class BandwidthManager : GLib.Object {
 
     /***********************************************************
     FIXME At some point:
-     * Register device only after the QNR received its meta_data_changed () signal
+     * Register device only after the GLib.NR received its meta_data_changed () signal
      * Incorporate Qt buffer fill state (it's a negative absolute delta).
      * Incorporate SSL overhead (percentage)
      * For relative limiting, do less measuring and more delaying+giving quota
@@ -461,7 +461,7 @@ public class BandwidthManager : GLib.Object {
         var job_count = this.download_job_list.length;
         int64 quota = relative_limit_progress_difference * (download_limit_percent / 100.0);
         if (quota > 20 * 1024) {
-            GLib.info ("ADJUSTING QUOTA FROM " + quota + " TO " + quota - 20 * 1024);
+            GLib.info ("ADJUSTING GLib.UOTA FROM " + quota + " TO " + quota - 20 * 1024);
             quota -= 20 * 1024;
         }
         int64 quota_per_job = quota / job_count + 1;

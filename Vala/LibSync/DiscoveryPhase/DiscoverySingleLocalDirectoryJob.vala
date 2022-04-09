@@ -11,7 +11,7 @@ for Discovery
 
 @copyright GPLv3 or Later
 ***********************************************************/
-public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
+public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, GLib.Runnable*/ {
 
     /***********************************************************
     ***********************************************************/
@@ -39,7 +39,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
 
 
     /***********************************************************
-    Use as QRunnable
+    Use as GLib.Runnable
     ***********************************************************/
     public void run () {
         string local_path = this.local_path;

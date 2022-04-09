@@ -18,7 +18,7 @@ public class TestUploadChecksummingSha1 : AbstractTestChecksumValidator {
         );
 
         var file = GLib.File.new_for_path (this.testfile, compute_checksum);
-        file.open (QIODevice.ReadOnly);
+        file.open (GLib.IODevice.ReadOnly);
         this.expected = calc_sha1 (file);
 
         compute_checksum.on_signal_start (this.testfile);

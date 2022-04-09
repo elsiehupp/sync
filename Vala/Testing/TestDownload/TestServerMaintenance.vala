@@ -19,7 +19,7 @@ public class TestServerMaintenance : GLib.Object {
         fake_folder.remote_modifier ().insert ("A/broken");
         fake_folder.set_server_override (this.override_delegate_server_maintenence);
 
-        QSignalSpy complete_spy = new QSignalSpy (
+        GLib.SignalSpy complete_spy = new GLib.SignalSpy (
             fake_folder.sync_engine,
             SyncEngine.signal_item_completed
         );

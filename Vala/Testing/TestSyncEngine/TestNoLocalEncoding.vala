@@ -14,7 +14,7 @@ public class TestNoLocalEncoding : AbstractTestSyncEngine {
     private TestNoLocalEncoding () {
         var utf8Locale = GMime.Encoding.codec_for_locale ();
         if (utf8Locale.mib_enum () != 106) {
-            QSKIP ("Test only works for UTF8 locale");
+            GLib.SKIP ("Test only works for UTF8 locale");
         }
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());

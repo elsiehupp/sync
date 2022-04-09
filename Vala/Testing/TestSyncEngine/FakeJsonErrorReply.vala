@@ -16,7 +16,7 @@ public class FakeJsonErrorReply : FakeErrorReply {
         Soup.Request request,
         GLib.Object parent,
         int http_error_code,
-        QJsonDocument reply = QJsonDocument ()) {
+        GLib.JsonDocument reply = GLib.JsonDocument ()) {
         base (operation, request, parent, http_error_code, reply.to_json ());
     }
 

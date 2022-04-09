@@ -62,7 +62,7 @@ public class CloudProviderManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_folder_list_changed (FolderConnection.Map folder_map) {
-        var iterator = new QMapIterator<string, CloudProviderWrapper> (this.map);
+        var iterator = new GLib.MapIterator<string, CloudProviderWrapper> (this.map);
         while (iterator.has_next ()) {
             iterator.next ();
             if (!folder_map.contains (iterator.key ())) {

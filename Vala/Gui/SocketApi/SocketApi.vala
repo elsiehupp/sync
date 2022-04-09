@@ -8,9 +8,9 @@
 
 //  #include <functional>
 //  #include <GLib.BitArray>
-//  #include <QPointer>
-//  #include <QJsonDocument
-//  #include <QJsonOb
+//  #include <GLib.Pointer>
+//  #include <GLib.JsonDocument
+//  #include <GLib.JsonOb
 //  #include <memory>
 
 //  #ifndef OWNCLOUD_TEST
@@ -18,28 +18,28 @@
 
 //  #include <array>
 //  #include <GLib.BitArray>
-//  #include <QMeta_method>
+//  #include <GLib.Meta_method>
 //  #include <GLib.Object>
-//  #include <QScopedPointer>
+//  #include <GLib.ScopedPointer>
 //  #include <GLib.Dir>
-//  #include <Gtk.Application>
-//  #include <QLocalSocket>
-//  #include <QString_builder>
+//  #include <GLib.Application>
+//  #include <GLib.LocalSocket>
+//  #include <GLib.String_builder>
 //  #include <Gtk.MessageBox>
-//  #include <QInputDialog>
-//  #include <QFileDialog>
-//  #include <QAction>
-//  #include <QJsonArray>
-//  #include <QJsonDocumen
+//  #include <GLib.InputDialog>
+//  #include <GLib.FileDialog>
+//  #include <GLib.Action>
+//  #include <GLib.JsonArray>
+//  #include <GLib.JsonDocumen
 //  #include <Json.Object>
 //  #include <Gtk.Widget>
-//  #include <QClipboar
-//  #include <QDesktopServices>
+//  #include <GLib.Clipboar
+//  #include <GLib.DesktopServices>
 
-//  #include <QProcess>
-//  #include <QStandardPaths>
+//  #include <GLib.Process>
+//  #include <GLib.StandardPaths>
 
-//  #include <QLocalServer>
+//  #include <GLib.LocalServer>
 
 namespace Occ {
 namespace Ui {
@@ -50,12 +50,12 @@ namespace Ui {
 ***********************************************************/
 public class SocketApi : GLib.Object {
 
-    class SocketApiServer : QLocalServer { }
+    class SocketApiServer : GLib.LocalServer { }
 
     /***********************************************************
     ***********************************************************/
     private GLib.List<string> registered_aliases;
-    private GLib.HashTable<QIODevice, SocketListener> listeners;
+    private GLib.HashTable<GLib.IODevice, SocketListener> listeners;
     private SocketApiServer local_server;
 
     /***********************************************************
@@ -82,7 +82,7 @@ public class SocketApi : GLib.Object {
         if (Utility.is_windows ()) {
             socket_path
                 = " (\\.\pipe\)"
-                + APPLICATION_EXECUTABLE
+                + Common.Config.APPLICATION_EXECUTABLE
                 + "-"
                 + qgetenv ("USERNAME");
             // TODO: once the windows extension supports multiple
@@ -93,10 +93,10 @@ public class SocketApi : GLib.Object {
             // This must match the code signing Team setting of the extension
             // Example for developer builds (with ad-hoc signing identity): "" "com.owncloud.desktopclient" ".socket_api"
             // Example for official signed packages: "9B5WD74GWJ." "com.owncloud.desktopclient" ".socket_api"
-            socket_path = SOCKETAPI_TEAM_IDENTIFIER_PREFIX + APPLICATION_REV_DOMAIN + ".socket_api";
+            socket_path = SOCKETAPI_TEAM_IDENTIFIER_PREFIX + Common.Config.APPLICATION_REV_DOMAIN + ".socket_api";
         } else if (Utility.is_linux () || Utility.is_bsd ()) {
             string runtime_dir;
-            runtime_dir = QStandardPaths.writable_location (QStandardPaths.Runtime_location);
+            runtime_dir = GLib.StandardPaths.writable_location (GLib.StandardPaths.Runtime_location);
             socket_path = runtime_dir + "/" + Theme.app_name + "/socket";
         } else {
             GLib.warning ("An unexpected system detected, so this probably won't work.");
@@ -255,7 +255,7 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_new_connection () {
-        // Note that on macOS this is not actually a line-based QIODevice, it's a SocketApiSocket which is our
+        // Note that on macOS this is not actually a line-based GLib.IODevice, it's a SocketApiSocket which is our
         // custom message based macOS IPC.
         GLib.OutputStream socket = this.local_server.next_pending_connection ();
 
@@ -292,7 +292,7 @@ public class SocketApi : GLib.Object {
         GLib.info ("Lost connection " + sender ());
         sender ().delete_later ();
 
-        var socket = (QIODevice) sender ();
+        var socket = (GLib.IODevice) sender ();
         //  ASSERT (socket);
         this.listeners.remove (socket);
     }
@@ -301,7 +301,7 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_socket_destroyed (GLib.Object object) {
-        var socket = static_cast<QIODevice> (object);
+        var socket = static_cast<GLib.IODevice> (object);
         this.listeners.remove (socket);
     }
 
@@ -309,7 +309,7 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_read_socket () {
-        var socket = qobject_cast<QIODevice> (sender ());
+        var socket = qobject_cast<GLib.IODevice> (sender ());
         //  ASSERT (socket);
 
         // Find the SocketListener
@@ -328,7 +328,7 @@ public class SocketApi : GLib.Object {
             const int arg_pos = line.index_of (':');
             const string command = line.mid_ref (0, arg_pos).to_utf8 ().to_upper ();
 
-            const var argument = arg_pos != -1 ? line.mid_ref (arg_pos + 1) : /* QStringRef */ string ();
+            const var argument = arg_pos != -1 ? line.mid_ref (arg_pos + 1) : /* GLib.StringRef */ string ();
             if (command.has_prefix ("ASYNC_")) {
                 var arguments = argument.split ('|');
                 if (arguments.size () != 2) {
@@ -336,7 +336,7 @@ public class SocketApi : GLib.Object {
                     return;
                 }
 
-                var json = QJsonDocument.from_json (arguments[1].to_utf8 ()).object ();
+                var json = GLib.JsonDocument.from_json (arguments[1].to_utf8 ()).object ();
 
                 var job_id = arguments[0];
 
@@ -353,7 +353,7 @@ public class SocketApi : GLib.Object {
                 }
             } else if (command.has_prefix ("V2/")) {
                 Json.ParserError error;
-                const var json = QJsonDocument.from_json (argument.to_utf8 (), error).object ();
+                const var json = GLib.JsonDocument.from_json (argument.to_utf8 (), error).object ();
                 if (error.error != Json.ParserError.NoError) {
                     GLib.warning ("Invalid json " + argument.to_string () + error.error_string);
                     listener.send_error (error.error_string);
@@ -373,7 +373,7 @@ public class SocketApi : GLib.Object {
             } else {
                 if (index_of_method (command) != -1) {
                     // to ensure that listener is still valid we need to call it with Qt.Direct_connection
-                    //  ASSERT (thread () == QThread.current_thread ())
+                    //  ASSERT (thread () == GLib.Thread.current_thread ())
                     static_meta_object.method (index_of_method (command))
                         .invoke (this, Qt.Direct_connection, Q_ARG (string, argument.to_string ()),
                             Q_ARG (SocketListener, listener));
@@ -405,7 +405,7 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private static void copy_url_to_clipboard (string link) {
-        Gtk.Application.clipboard ().on_signal_text (link);
+        GLib.Application.clipboard ().on_signal_text (link);
     }
 
 
@@ -536,7 +536,7 @@ public class SocketApi : GLib.Object {
 
             data.folder_relative_path = data.local_path.mid (data.folder_connection.clean_path.length + 1);
             data.server_relative_path = new GLib.Dir (data.folder_connection.remote_path).file_path (data.folder_relative_path);
-            string virtual_file_ext = APPLICATION_DOTVIRTUALFILE_SUFFIX;
+            string virtual_file_ext = Common.Config.APPLICATION_DOTVIRTUALFILE_SUFFIX;
             if (data.server_relative_path.has_suffix (virtual_file_ext)) {
                 data.server_relative_path.chop (virtual_file_ext.size ());
             }
@@ -578,7 +578,7 @@ public class SocketApi : GLib.Object {
         ***********************************************************/
         string folder_relative_path_no_vfs_suffix () {
             var result = folder_relative_path;
-            string virtual_file_ext = APPLICATION_DOTVIRTUALFILE_SUFFIX;
+            string virtual_file_ext = Common.Config.APPLICATION_DOTVIRTUALFILE_SUFFIX;
             if (result.has_suffix (virtual_file_ext)) {
                 result.chop (virtual_file_ext.size ());
             }
@@ -892,11 +892,11 @@ public class SocketApi : GLib.Object {
         // Add back the folder_connection path
         default_dir_and_name = GLib.Dir (file_data.folder_connection.path).file_path (default_dir_and_name);
 
-        const var target = QFileDialog.save_filename (
+        const var target = GLib.FileDialog.save_filename (
             null,
             _("Select new location …"),
             default_dir_and_name,
-            "", null, QFileDialog.Hide_name_filter_details);
+            "", null, GLib.FileDialog.Hide_name_filter_details);
         if (target == "") {
             return;
         }
@@ -911,7 +911,7 @@ public class SocketApi : GLib.Object {
     External sync
     ***********************************************************/
     private void command_V2_LIST_ACCOUNTS (SocketApiJobV2 socket_api_v2_job) {
-        QJsonArray output;
+        GLib.JsonArray output;
         foreach (var account in AccountManager.instance.accounts) {
             // TODO: Use uuid once https://github.com/owncloud/client/pull/8397 is merged
             output += new Json.Object (
@@ -1262,7 +1262,7 @@ public class SocketApi : GLib.Object {
 
         var json_api_job = new LibSync.JsonApiJob (file_data.folder_connection.account_state.account, "ocs/v2.php/apps/files/api/v1/direct_editing/open", this);
 
-        QUrlQuery parameters;
+        GLib.UrlQuery parameters;
         parameters.add_query_item ("path", file_data.server_relative_path);
         parameters.add_query_item ("editor_id", editor.identifier);
         json_api_job.add_query_params (parameters);
@@ -1275,7 +1275,7 @@ public class SocketApi : GLib.Object {
     }
 
 
-    private void on_signal_json_received (QJsonDocument json) {
+    private void on_signal_json_received (GLib.JsonDocument json) {
         var data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
         var url = new GLib.Uri (data.value ("url").to_string ());
 
@@ -1294,10 +1294,10 @@ public class SocketApi : GLib.Object {
 
         if (file_data.folder_connection != null && file_data.folder_connection.account_state.is_connected) {
             const var record = file_data.journal_record ();
-            const var mime_match_mode = record.is_virtual_file () ? QMimeDatabase.Match_extension : QMimeDatabase.Match_default;
+            const var mime_match_mode = record.is_virtual_file () ? GLib.MimeDatabase.Match_extension : GLib.MimeDatabase.Match_default;
 
-            QMimeDatabase database;
-            QMimeType type = database.mime_type_for_file (local_file, mime_match_mode);
+            GLib.MimeDatabase database;
+            GLib.MimeType type = database.mime_type_for_file (local_file, mime_match_mode);
 
             DirectEditor* editor = capabilities.direct_editor_for_mimetype (type);
             if (!editor) {
@@ -1332,7 +1332,7 @@ public class SocketApi : GLib.Object {
             var variable = current_object.property (segment.to_utf8 ().const_data ());
 
             if (variable.can_convert<Gtk.Icon> ()) {
-                variable.convert (QMetaType.Gtk.Icon);
+                variable.convert (GLib.MetaType.Gtk.Icon);
                 value = variable.value<Gtk.Icon> ();
                 break;
             }
@@ -1359,7 +1359,7 @@ public class SocketApi : GLib.Object {
     ***********************************************************/
     private void command_ASYNC_LIST_WIDGETS (SocketApiJob socket_api_job) {
         string response;
-        foreach (var widget in all_objects (Gtk.Application.all_widgets ())) {
+        foreach (var widget in all_objects (GLib.Application.all_widgets ())) {
             var object_name = widget.object_name ();
             if (!object_name == "") {
                 response += object_name + ":" + widget.property ("text").to_string () + ", ";
@@ -1409,7 +1409,7 @@ public class SocketApi : GLib.Object {
             var variable = current_object.property (segment.to_utf8 ().const_data ());
 
             if (variable.can_convert<string> ()) {
-                variable.convert (QMetaType.string);
+                variable.convert (GLib.MetaType.string);
                 value = variable.value<string> ();
                 break;
             }
@@ -1535,7 +1535,7 @@ public class SocketApi : GLib.Object {
         GLib.List<GLib.Object> objects;
         std.copy (widgets.const_begin (), widgets.const_end (), std.back_inserter (objects));
 
-        objects += Gtk.Application;
+        objects += GLib.Application;
 
         return objects;
     }
@@ -1543,7 +1543,7 @@ public class SocketApi : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static GLib.Object find_widget (string query_string, GLib.List<Gtk.Widget> widgets = Gtk.Application.all_widgets ()) {
+    private static GLib.Object find_widget (string query_string, GLib.List<Gtk.Widget> widgets = GLib.Application.all_widgets ()) {
         if (query_string.contains (">")) {
             GLib.debug ("query_string contains >");
 

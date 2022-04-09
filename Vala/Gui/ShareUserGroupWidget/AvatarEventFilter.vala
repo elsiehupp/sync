@@ -10,7 +10,7 @@ namespace Ui {
 public class AvatarEventFilter : GLib.Object {
 
     internal signal void signal_clicked ();
-    internal signal void signal_context_menu (QPoint global_position);
+    internal signal void signal_context_menu (GLib.Point global_position);
 
     /***********************************************************
     ***********************************************************/
@@ -21,9 +21,9 @@ public class AvatarEventFilter : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected override bool event_filter (GLib.Object object, QEvent event) {
-        if (event.type () == QEvent.Context_menu) {
-            const var context_menu_event = dynamic_cast<QContext_menu_event> (event);
+    protected override bool event_filter (GLib.Object object, GLib.Event event) {
+        if (event.type () == GLib.Event.Context_menu) {
+            const var context_menu_event = dynamic_cast<GLib.Context_menu_event> (event);
             if (!context_menu_event) {
                 return false;
             }

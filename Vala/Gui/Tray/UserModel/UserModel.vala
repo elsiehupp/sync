@@ -1,20 +1,20 @@
 
-//  #include <QAbstractListModel>
+//  #include <GLib.AbstractListModel>
 //  #include <Gtk.Image>
-//  #include <QQuickImageProvider>
+//  #include <GLib.QuickImageProvider>
 //  #include <chrono>
 //  #include <pushnotifications
-//  #include <QDesktopServ
+//  #include <GLib.DesktopServ
 //  #include <Gtk.Icon>
-//  #include <QMessageB
-//  #include <QSvgRenderer>
-//  #include <QPainter>
-//  #include <QPushButton>
+//  #include <GLib.MessageB
+//  #include <GLib.SvgRenderer>
+//  #include <GLib.Painter>
+//  #include <GLib.PushButton>
 
 namespace Occ {
 namespace Ui {
 
-public class UserModel : QAbstractListModel {
+public class UserModel : GLib.AbstractListModel {
 
     public enum UserRoles {
         NAME = Qt.USER_ROLE + 1,
@@ -167,7 +167,7 @@ public class UserModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public int row_count (QModelIndex index = QModelIndex ()) {
+    public int row_count (GLib.ModelIndex index = GLib.ModelIndex ()) {
         //  Q_UNUSED (index);
         return this.users.length;
     }
@@ -175,7 +175,7 @@ public class UserModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.Variant data (QModelIndex index, int role) {
+    public GLib.Variant data (GLib.ModelIndex index, int role) {
         if (index.row () < 0 || index.row () >= this.users.length) {
             return GLib.Variant ();
         }
@@ -258,7 +258,7 @@ public class UserModel : QAbstractListModel {
 
         if (!contains_user) {
             int row = row_count ();
-            begin_insert_rows (QModelIndex (), row, row);
+            begin_insert_rows (GLib.ModelIndex (), row, row);
 
             User new_user = new User (account_state, is_current);
 
@@ -386,7 +386,7 @@ public class UserModel : QAbstractListModel {
             url = "https://" + this.users[this.current_user_id].server (false);
         }
 
-        QDesktopServices.open_url (url);
+        GLib.DesktopServices.open_url (url);
     }
 
 
@@ -439,7 +439,7 @@ public class UserModel : QAbstractListModel {
             + "<p><b>Note:</b> This will <b>not</b> delete any files.</p>")
                 .printf (this.users[identifier].name ()),
             Gtk.MessageBox.NoButton);
-        QPushButton yes_button =
+        GLib.PushButton yes_button =
             message_box.add_button (_("Remove connection"), Gtk.MessageBox.YesRole);
         message_box.add_button (_("Cancel"), Gtk.MessageBox.NoRole);
 
@@ -459,7 +459,7 @@ public class UserModel : QAbstractListModel {
         this.users[identifier].log_out ();
         this.users[identifier].remove_account ();
 
-        begin_remove_rows (QModelIndex (), identifier, identifier);
+        begin_remove_rows (GLib.ModelIndex (), identifier, identifier);
         this.users.remove_at (identifier);
         end_remove_rows ();
     }

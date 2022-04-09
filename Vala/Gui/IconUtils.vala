@@ -5,10 +5,10 @@
 ***********************************************************/
 
 //  #include <theme.h>
-//  #include <QLoggingC
-//  #include <QPainter>
-//  #include <QPixmapCache>
-//  #include <QSvgRender
+//  #include <GLib.LoggingC
+//  #include <GLib.Painter>
+//  #include <GLib.PixmapCache>
+//  #include <GLib.SvgRender
 //  #include <Gdk.RGBA>
 //  #include <Gdk.Pixbuf>
 
@@ -44,8 +44,8 @@ public class IconUtils : GLib.Object {
         //  Q_ASSERT (!filename == "");
 
         const var pixmap_color = background_color.is_valid && !Theme.is_dark_color (background_color)
-            ? QColor_constants.Svg.black
-            : QColor_constants.Svg.white;
+            ? GLib.Color_constants.Svg.black
+            : GLib.Color_constants.Svg.white;
         ;
         return create_svg_pixmap_with_custom_color_cached (filename, pixmap_color);
     }
@@ -65,7 +65,7 @@ public class IconUtils : GLib.Object {
         }
 
         // some icons are present in white or black only, so, we need to check both when needed
-        const GLib.List<string> icon_base_colors = {
+        GLib.List<string> icon_base_colors = {
             "black",
             "white"
         };
@@ -128,7 +128,7 @@ public class IconUtils : GLib.Object {
         const string cache_key = filename + "," + custom_color_name.to_string ();
 
         // check for existing Gdk.Pixbuf in cache
-        if (QPixmapCache.find (cache_key, cached_pixmap)) {
+        if (GLib.PixmapCache.find (cache_key, cached_pixmap)) {
             if (*original_size != null) {
                 *original_size = {};
             }
@@ -138,7 +138,7 @@ public class IconUtils : GLib.Object {
         cached_pixmap = Gdk.Pixbuf.from_image (create_svg_image_with_custom_color (filename, custom_color, original_size, requested_size));
 
         if (cached_pixmap != null) {
-            QPixmapCache.insert (cache_key, cached_pixmap);
+            GLib.PixmapCache.insert (cache_key, cached_pixmap);
         }
 
         return cached_pixmap;
@@ -148,7 +148,7 @@ public class IconUtils : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static Gtk.Image draw_svg_with_custom_fill_color (string source_svg_path, Gdk.RGBA fill_color, Gdk.Rectangle original_size = null, Gdk.Rectangle requested_size = {}) {
-        QSvgRenderer svg_renderer;
+        GLib.SvgRenderer svg_renderer;
 
         if (!svg_renderer.on_signal_load (source_svg_path)) {
             GLib.warning ("Could no load initial SVG image.");
@@ -163,7 +163,7 @@ public class IconUtils : GLib.Object {
 
         // render source image
         Gtk.Image svg_image = new Gtk.Image (req_size, Gtk.Image.FormatARGB32); {
-            QPainter svg_image_painter = new QPainter (svg_image);
+            GLib.Painter svg_image_painter = new GLib.Painter (svg_image);
             svg_image.fill (Qt.GlobalColor.transparent);
             svg_renderer.render (svg_image_painter);
         }
@@ -171,8 +171,8 @@ public class IconUtils : GLib.Object {
         // draw target image with custom fill_color
         Gtk.Image image = new Gtk.Image (req_size, Gtk.Image.FormatARGB32);
         image.fill (Gdk.RGBA (fill_color)); {
-            QPainter image_painter = new QPainter (image);
-            image_painter.composition_mode (QPainter.Composition_mode_Destination_in);
+            GLib.Painter image_painter = new GLib.Painter (image);
+            image_painter.composition_mode (GLib.Painter.Composition_mode_Destination_in);
             image_painter.draw_image (0, 0, svg_image);
         }
 

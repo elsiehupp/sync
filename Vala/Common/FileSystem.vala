@@ -151,7 +151,7 @@ public class FileSystem : GLib.Object {
         bool success = false;
         GLib.File orig = new GLib.File (origin_filename);
         // We want a rename that also overwites.  GLib.File.rename does not overwite.
-        // Qt 5.1 has QSaveFile.rename_overwrite we could use.
+        // Qt 5.1 has GLib.SaveFile.rename_overwrite we could use.
         // ### FIXME
         success = true;
         bool dest_exists = file_exists (destination_filename);
@@ -243,7 +243,7 @@ public class FileSystem : GLib.Object {
             info_file.filename (filename); //filename+.trashinfo //  create file information file in /.local/share/Trash/info/ folder
         }
 
-        info_file.open (QIODevice.ReadWrite);
+        info_file.open (GLib.IODevice.ReadWrite);
 
         GLib.OutputStream stream = new GLib.OutputStream (info_file); // for write data on open file
 

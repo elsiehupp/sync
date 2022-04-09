@@ -9,10 +9,10 @@
 //  #include <GLib.Dir>
 //  #include <GLib.Settings>
 //  #include <Gtk.MessageBox>
-//  #include <QPushButton>
-//  #include <QApplicat
+//  #include <GLib.PushButton>
+//  #include <GLib.Applicat
 //  #include <stri
-//  #include <QUuid>
+//  #include <GLib.Uuid>
 //  #include <set>
 //  #include <chrono>
 //  #include <memory>
@@ -27,7 +27,7 @@ namespace Ui {
 public class FolderConnection : GLib.Object {
 
     public class Map : GLib.HashTable<string, FolderConnection> { }
-    public class MapIterator : QMapIterator<string, FolderConnection> { }
+    public class MapIterator : GLib.MapIterator<string, FolderConnection> { }
 
 
     /***********************************************************
@@ -214,7 +214,7 @@ public class FolderConnection : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public QUuid navigation_pane_clsid {
+    public GLib.Uuid navigation_pane_clsid {
         public get {
             return this.definition.navigation_pane_clsid;
         }
@@ -928,7 +928,7 @@ public class FolderConnection : GLib.Object {
         message_box.attribute (Qt.WA_DeleteOnClose);
         message_box.window_flags (message_box.window_flags () | Qt.Window_stays_on_signal_top_hint);
         message_box.add_button (_("Remove all files"), Gtk.MessageBox.DestructiveRole);
-        QPushButton keep_button = message_box.add_button (_("Keep files"), Gtk.MessageBox.AcceptRole);
+        GLib.PushButton keep_button = message_box.add_button (_("Keep files"), Gtk.MessageBox.AcceptRole);
         bool old_paused = sync_paused;
         this.sync_paused = true;
         message_box.signal_finished.connect (
@@ -943,7 +943,7 @@ public class FolderConnection : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_message_box_finished (Gtk.MessageBox message_box, QPushButton keep_button, Callback callback, bool old_paused) {
+    private void on_signal_message_box_finished (Gtk.MessageBox message_box, GLib.PushButton keep_button, Callback callback, bool old_paused) {
         const bool cancel = message_box.clicked_button () == keep_button;
         callback (cancel);
         if (cancel) {
@@ -975,7 +975,7 @@ public class FolderConnection : GLib.Object {
 
         GLib.info (
             "*** Start syncing " + remote_url ().to_string ()
-            + " -" + APPLICATION_NAME + "client version"
+            + " -" + Common.Config.APPLICATION_NAME + "client version"
             + Theme.version.to_string ()
         );
 
@@ -1054,7 +1054,7 @@ public class FolderConnection : GLib.Object {
         // Delete from journal and from filesystem.
         GLib.Dir folderpath = new GLib.Dir (this.definition.local_path);
         GLib.List<string> keep_nothing;
-        const GLib.List<SyncJournalDb.DownloadInfo> deleted_infos =
+        GLib.List<SyncJournalDb.DownloadInfo> deleted_infos =
             this.journal.and_delete_stale_download_infos (keep_nothing);
         foreach (var deleted_info in deleted_infos) {
             const string temporary_path = folderpath.file_path (deleted_info.temporaryfile);
@@ -1238,7 +1238,7 @@ public class FolderConnection : GLib.Object {
         GLib.info (
             "Client version" + Theme.version.to_string ()
             + " Qt " + q_version ()
-            + " SSL " + QSslSocket.ssl_library_version_string ().to_utf8 ()
+            + " SSL " + GLib.SslSocket.ssl_library_version_string ().to_utf8 ()
         );
 
         bool sync_error = !this.sync_result.error_strings () == "";
@@ -1510,7 +1510,7 @@ public class FolderConnection : GLib.Object {
     /***********************************************************
     Warn users if they create a file or folder_connection that is selective-sync excluded
     ***********************************************************/
-    private void on_signal_warn_on_signal_new_excluded_item (SyncJournalFileRecord record, /* QStringRef */ string path) {
+    private void on_signal_warn_on_signal_new_excluded_item (SyncJournalFileRecord record, /* GLib.StringRef */ string path) {
         // Never warn for items in the database
         if (record.is_valid) {
             return;

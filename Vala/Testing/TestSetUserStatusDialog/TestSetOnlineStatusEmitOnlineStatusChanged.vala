@@ -15,7 +15,7 @@ public class TestSetOnlineStatusEmitOnlineStatusChanged : GLib.Object {
         const LibSync.UserStatus.OnlineStatus online_status = LibSync.UserStatus.OnlineStatus.Invisible;
         var fake_user_status_job = new FakeUserStatusConnector ();
         UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
-        QSignalSpy online_status_changed_spy = new QSignalSpy (
+        GLib.SignalSpy online_status_changed_spy = new GLib.SignalSpy (
             model,
             UserStatusSelectorModel.online_status_changed
         );

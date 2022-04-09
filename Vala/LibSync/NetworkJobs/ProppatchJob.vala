@@ -58,7 +58,7 @@ public class ProppatchJob : AbstractNetworkJob {
         Soup.Request request = new Soup.Request ();
 
         string prop_str;
-        QMapIterator<string, string> it = new QMapIterator<string, string> (this.properties);
+        GLib.MapIterator<string, string> it = new GLib.MapIterator<string, string> (this.properties);
         while (it.has_next ()) {
             it.next ();
             string key_name = it.key ();
@@ -85,7 +85,7 @@ public class ProppatchJob : AbstractNetworkJob {
 
         var buf = new Soup.Buffer (this);
         buf.data (xml);
-        buf.open (QIODevice.ReadOnly);
+        buf.open (GLib.IODevice.ReadOnly);
         send_request ("PROPPATCH", make_dav_url (path), request, buf);
         AbstractNetworkJob.start ();
     }

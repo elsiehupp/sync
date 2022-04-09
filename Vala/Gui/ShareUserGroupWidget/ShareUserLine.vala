@@ -28,14 +28,14 @@ public class ShareUserLine : Gtk.Widget {
     /***********************************************************
     this.permission_edit is a checkbox
     ***********************************************************/
-    private QAction permission_reshare;
-    private QAction delete_share_button;
-    private QAction permission_create;
-    private QAction permission_change;
-    private QAction permission_delete;
-    private QAction note_link_action;
-    private QAction expiration_date_link_action;
-    private QAction password_protect_link_action;
+    private GLib.Action permission_reshare;
+    private GLib.Action delete_share_button;
+    private GLib.Action permission_create;
+    private GLib.Action permission_change;
+    private GLib.Action permission_delete;
+    private GLib.Action note_link_action;
+    private GLib.Action expiration_date_link_action;
+    private GLib.Action password_protect_link_action;
 
     internal signal void visual_deletion_done ();
     internal signal void resize_requested ();
@@ -97,7 +97,7 @@ public class ShareUserLine : Gtk.Widget {
 
         // create menu with checkable permissions
         var menu = new GLib.Menu (this);
-        this.permission_reshare= new QAction (_("Can reshare"), this);
+        this.permission_reshare= new GLib.Action (_("Can reshare"), this);
         this.permission_reshare.checkable (true);
         this.permission_reshare.enabled (max_sharing_permissions & Share_permission_share);
         menu.add_action (this.permission_reshare);
@@ -110,7 +110,7 @@ public class ShareUserLine : Gtk.Widget {
         const bool is_note_supported = this.share.share_type != Share.Type.Share.Type.EMAIL && this.share.share_type != Share.Type.Share.Type.ROOM;
 
         if (is_note_supported) {
-            this.note_link_action = new QAction (_("Note to recipient"));
+            this.note_link_action = new GLib.Action (_("Note to recipient"));
             this.note_link_action.checkable (true);
             menu.add_action (this.note_link_action);
             this.note_link_action.triggered.connect (
@@ -128,13 +128,13 @@ public class ShareUserLine : Gtk.Widget {
 
         if (is_expiration_date_supported) {
             // email shares do not support expiration dates
-            this.expiration_date_link_action = new QAction (_("Set expiration date"));
+            this.expiration_date_link_action = new GLib.Action (_("Set expiration date"));
             this.expiration_date_link_action.checkable (true);
             menu.add_action (this.expiration_date_link_action);
             this.expiration_date_link_action.triggered.connect (
                 this.toggle_expire_date_options
             );
-            const var on_signal_expire_date = this.share.on_signal_expire_date ().is_valid ? share.on_signal_expire_date () : QDate ();
+            const var on_signal_expire_date = this.share.on_signal_expire_date ().is_valid ? share.on_signal_expire_date () : GLib.Date ();
             if (on_signal_expire_date != null) {
                 this.expiration_date_link_action.checked (true);
                 show_expire_date_options (true, on_signal_expire_date);
@@ -145,7 +145,7 @@ public class ShareUserLine : Gtk.Widget {
 
         // Adds action to delete share widget
         Gtk.Icon delete_icon = Gtk.Icon.from_theme ("user-trash", new Gtk.Icon (":/client/theme/delete.svg"));
-        this.delete_share_button= new QAction (delete_icon,_("Unshare"), this);
+        this.delete_share_button= new GLib.Action (delete_icon,_("Unshare"), this);
 
         menu.add_action (this.delete_share_button);
         this.delete_share_button.triggered.connect (
@@ -156,7 +156,7 @@ public class ShareUserLine : Gtk.Widget {
         Files can't have create or delete permissions
         ***********************************************************/
         if (!this.is_file) {
-            this.permission_create = new QAction (_("Can create"), this);
+            this.permission_create = new GLib.Action (_("Can create"), this);
             this.permission_create.checkable (true);
             this.permission_create.enabled (max_sharing_permissions & Share_permission_create);
             menu.add_action (this.permission_create);
@@ -164,7 +164,7 @@ public class ShareUserLine : Gtk.Widget {
                 this.on_signal_permissions_changed
             );
 
-            this.permission_change = new QAction (_("Can change"), this);
+            this.permission_change = new GLib.Action (_("Can change"), this);
             this.permission_change.checkable (true);
             this.permission_change.enabled (max_sharing_permissions & Share_permission_update);
             menu.add_action (this.permission_change);
@@ -172,7 +172,7 @@ public class ShareUserLine : Gtk.Widget {
                 this.on_signal_permissions_changed
             );
 
-            this.permission_delete = new QAction (_("Can delete"), this);
+            this.permission_delete = new GLib.Action (_("Can delete"), this);
             this.permission_delete.checkable (true);
             this.permission_delete.enabled (max_sharing_permissions & Share_permission_delete);
             menu.add_action (this.permission_delete);
@@ -183,7 +183,7 @@ public class ShareUserLine : Gtk.Widget {
 
         // Adds action to display password widget (check box)
         if (this.share.share_type == Share.Type.EMAIL && (this.share.password_is_set || this.account.capabilities.share_email_password_enabled ())) {
-            this.password_protect_link_action = new QAction (_("Password protect"), this);
+            this.password_protect_link_action = new GLib.Action (_("Password protect"), this);
             this.password_protect_link_action.checkable (true);
             this.password_protect_link_action.checked (this.share.password_is_set);
             // checkbox can be checked/unchedkec if the password is not yet set or if it's not enforced
@@ -209,7 +209,7 @@ public class ShareUserLine : Gtk.Widget {
         this.instance.error_label.hide ();
 
         this.instance.permission_tool_button.menu (menu);
-        this.instance.permission_tool_button.popup_mode (QToolButton.Instant_popup);
+        this.instance.permission_tool_button.popup_mode (GLib.ToolButton.Instant_popup);
 
         this.instance.password_progress_indicator.visible (false);
 
@@ -438,7 +438,7 @@ public class ShareUserLine : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_share_deleted () {
-        QPropertyAnimation animation = new QPropertyAnimation (this, "maximum_height", this);
+        GLib.PropertyAnimation animation = new GLib.PropertyAnimation (this, "maximum_height", this);
 
         animation.duration (500);
         animation.start_value (height ());
@@ -511,7 +511,7 @@ public class ShareUserLine : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_avatar_context_menu (QPoint global_position) {
+    private void on_signal_avatar_context_menu (GLib.Point global_position) {
         if (this.share.share_type == Share.Type.USER) {
             this.profile_page_menu.exec (global_position);
         }
@@ -653,7 +653,7 @@ public class ShareUserLine : Gtk.Widget {
         this.delete_share_button.icon (delete_icon);
 
         this.instance.note_confirm_button.icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
-        this.instance.progress_indicator.on_signal_color (Gtk.Application.palette ().color (Gtk.Palette.Window_text));
+        this.instance.progress_indicator.on_signal_color (GLib.Application.palette ().color (Gtk.Palette.Window_text));
 
         // make sure to force Background_role to Gtk.Palette.Window_text for a lable, because it's parent always has a different role set that applies to children unless customized
         this.instance.error_label.background_role (Gtk.Palette.Window_text);
@@ -738,19 +738,19 @@ public class ShareUserLine : Gtk.Widget {
         show_expire_date_options (enable);
 
         if (!enable) {
-            this.share.on_signal_expire_date (QDate ());
+            this.share.on_signal_expire_date (GLib.Date ());
         }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void show_expire_date_options (bool show, QDate initial_date = new QDate ()) {
+    private void show_expire_date_options (bool show, GLib.Date initial_date = new GLib.Date ()) {
         this.instance.expiration_label.visible (show);
         this.instance.calendar.visible (show);
 
         if (show) {
-            this.instance.calendar.minimum_date (QDate.current_date ().add_days (1));
+            this.instance.calendar.minimum_date (GLib.Date.current_date ().add_days (1));
             this.instance.calendar.date (initial_date.is_valid ? initial_date : this.instance.calendar.minimum_date ());
             this.instance.calendar.focus ();
 
@@ -804,7 +804,7 @@ public class ShareUserLine : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private QDate max_expiration_date_for_share (Share.Type type, QDate fallback_date) {
+    private GLib.Date max_expiration_date_for_share (Share.Type type, GLib.Date fallback_date) {
         var days_to_expire = 0;
         if (type == Share.Type.Share.Type.REMOTE) {
             days_to_expire = this.account.capabilities.share_remote_expire_date_days ();
@@ -815,7 +815,7 @@ public class ShareUserLine : Gtk.Widget {
         }
 
         if (days_to_expire > 0) {
-            return QDate.current_date ().add_days (days_to_expire);
+            return GLib.Date.current_date ().add_days (days_to_expire);
         }
 
         return fallback_date;
@@ -859,7 +859,7 @@ public class ShareUserLine : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void calculate_background_based_on_signal_text () {
-        const QCryptographicHash hash = QCryptographicHash.hash (this.instance.shared_with.text ().to_utf8 (), GLib.ChecksumType.MD5);
+        const GLib.CryptographicHash hash = GLib.CryptographicHash.hash (this.instance.shared_with.text ().to_utf8 (), GLib.ChecksumType.MD5);
         //  Q_ASSERT (hash.size () > 0);
         if (hash.size () == 0) {
             GLib.warning ("Failed to calculate hash color for share: " + this.share.path);

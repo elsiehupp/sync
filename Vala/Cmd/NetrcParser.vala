@@ -17,8 +17,8 @@ public class NetrcParser : GLib.Object {
     const string LOGIN_KEYWORD = "login";
     const string PASSWORD_KEYWORD = "password";
 
-    private GLib.HashTable<string, QPair<string, string>> entries;
-    private QPair<string, string> default_pair;
+    private GLib.HashTable<string, GLib.Pair<string, string>> entries;
+    private GLib.Pair<string, string> default_pair;
     private string netrc_location;
 
 
@@ -36,15 +36,15 @@ public class NetrcParser : GLib.Object {
     ***********************************************************/
     public bool parse () {
         GLib.File netrc = new GLib.File (this.netrc_location);
-        if (!netrc.open (QIODevice.ReadOnly)) {
+        if (!netrc.open (GLib.IODevice.ReadOnly)) {
             return false;
         }
         string content = netrc.read_all ();
 
-        QStringTokenizer tokenizer = new QStringTokenizer (content, " \n\t");
+        GLib.StringTokenizer tokenizer = new GLib.StringTokenizer (content, " \n\t");
         tokenizer.quote_characters ("\"'");
 
-        QPair<string, string> pair;
+        GLib.Pair<string, string> pair;
         string machine;
         bool is_default = false;
         while (tokenizer.has_next ()) {
@@ -82,7 +82,7 @@ public class NetrcParser : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public QPair<string, string> find (string machine) {
+    public GLib.Pair<string, string> find (string machine) {
         if (this.entries.contains (machine)) {
             return this.entries.get (machine);
         } else {
@@ -93,7 +93,7 @@ public class NetrcParser : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void try_add_entry_and_clear (string machine, QPair<string, string> pair, bool is_default) {
+    private void try_add_entry_and_clear (string machine, GLib.Pair<string, string> pair, bool is_default) {
         if (is_default) {
             this.default_pair = pair;
         } else if (machine != "" && pair.first != "") {

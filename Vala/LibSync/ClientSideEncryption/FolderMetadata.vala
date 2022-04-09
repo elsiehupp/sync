@@ -12,7 +12,7 @@ public class FolderMetadata : GLib.Object {
 
     private GLib.HashTable<int, string> metadata_keys;
     private unowned Account account;
-    private GLib.List<QPair<string, string>> sharing;
+    private GLib.List<GLib.Pair<string, string>> sharing;
 
 
     /***********************************************************
@@ -86,9 +86,9 @@ public class FolderMetadata : GLib.Object {
         for (var it = this.sharing.const_begin (), end = this.sharing.const_end (); it != end; it++) {
             recepients.insert (it.first, it.second);
         }
-        QJsonDocument recepient_doc;
+        GLib.JsonDocument recepient_doc;
         recepient_doc.object (recepients);
-        string sharing_encrypted = encrypt_json_object (recepient_doc.to_json (QJsonDocument.Compact), this.metadata_keys.last ());
+        string sharing_encrypted = encrypt_json_object (recepient_doc.to_json (GLib.JsonDocument.Compact), this.metadata_keys.last ());
         ***********************************************************/
 
         Json.Object metadata = new Json.Object (
@@ -113,10 +113,10 @@ public class FolderMetadata : GLib.Object {
             encrypted.insert ("filename", each_file.original_filename);
             encrypted.insert ("mimetype", each_file.mimetype.to_string ());
             encrypted.insert ("version", each_file.file_version);
-            QJsonDocument encrypted_doc;
+            GLib.JsonDocument encrypted_doc;
             encrypted_doc.object (encrypted);
 
-            string encrypted_encrypted = encrypt_json_object (encrypted_doc.to_json (QJsonDocument.Compact), this.metadata_keys.last ());
+            string encrypted_encrypted = encrypt_json_object (encrypted_doc.to_json (GLib.JsonDocument.Compact), this.metadata_keys.last ());
             if (encrypted_encrypted == "") {
                 GLib.debug ("Metadata generation failed!");
             }
@@ -141,7 +141,7 @@ public class FolderMetadata : GLib.Object {
             }
         );
 
-        QJsonDocument internal_metadata;
+        GLib.JsonDocument internal_metadata;
         internal_metadata.object (meta_object);
         return internal_metadata.to_json ();
     }
@@ -191,8 +191,8 @@ public class FolderMetadata : GLib.Object {
         This is the json response from the server, it contains two
         extra objects that we are *not* interested in, ocs and data.
         ***********************************************************/
-        QJsonDocument doc = QJsonDocument.from_json (metadata);
-        GLib.info (doc.to_json (QJsonDocument.Compact));
+        GLib.JsonDocument doc = GLib.JsonDocument.from_json (metadata);
+        GLib.info (doc.to_json (GLib.JsonDocument.Compact));
 
         // The metadata is being retrieved as a string stored in a json.
         // This seems* to be broken but the RFC doesn't explicits how it wants.
@@ -205,15 +205,15 @@ public class FolderMetadata : GLib.Object {
                                 .to_object ()["meta-data"]
                                 .to_string ();
 
-        QJsonDocument meta_data_doc = QJsonDocument.from_json (meta_data_str.to_local8Bit ());
+        GLib.JsonDocument meta_data_doc = GLib.JsonDocument.from_json (meta_data_str.to_local8Bit ());
         Json.Object metadata_obj = meta_data_doc.object ()["metadata"].to_object ();
         Json.Object metadata_keys = metadata_obj["metadata_keys"].to_object ();
         string sharing = metadata_obj["sharing"].to_string ().to_local8Bit ();
         Json.Object files = meta_data_doc.object ()["files"].to_object ();
 
-        QJsonDocument debug_helper;
+        GLib.JsonDocument debug_helper;
         debug_helper.object (metadata_keys);
-        GLib.debug ("Keys: " + debug_helper.to_json (QJsonDocument.Compact));
+        GLib.debug ("Keys: " + debug_helper.to_json (GLib.JsonDocument.Compact));
 
         // Iterate over the document to store the keys. I'm unsure that the keys are in order,
         // perhaps it's better to store a map instead of a vector, perhaps this just doesn't matter.
@@ -240,7 +240,7 @@ public class FolderMetadata : GLib.Object {
             GLib.debug ("Sharing Decrypted " + sharing_decrypted);
 
             //Sharing is also a JSON object, so extract it and populate.
-            var sharing_doc = QJsonDocument.from_json (sharing_decrypted);
+            var sharing_doc = GLib.JsonDocument.from_json (sharing_decrypted);
             var sharing_obj = sharing_doc.object ();
             for (var it = sharing_obj.const_begin (), end = sharing_obj.const_end (); it != end; it++) {
                 this.sharing.push_back ({it.key (), it.value ().to_string ()});
@@ -262,7 +262,7 @@ public class FolderMetadata : GLib.Object {
             string key = this.metadata_keys[file.metadata_key];
             var encrypted_file = file_obj["encrypted"].to_string ().to_local8Bit ();
             var decrypted_file = decrypt_json_object (encrypted_file, key);
-            var decrypted_file_doc = QJsonDocument.from_json (decrypted_file);
+            var decrypted_file_doc = GLib.JsonDocument.from_json (decrypted_file);
             var decrypted_file_obj = decrypted_file_doc.object ();
 
             file.original_filename = decrypted_file_obj["filename"].to_string ();

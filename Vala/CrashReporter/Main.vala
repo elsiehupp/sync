@@ -1,9 +1,9 @@
 
 
 //  #include <libcrashreporter-gui/CrashReporter.h>
-//  #include <QAppl
+//  #include <GLib.Appl
 //  #include <GLib.Dir>
-//  #include <QDebug>
+//  #include <GLib.Debug>
 //  #include <GLib.FileInfo>
 
 namespace Occ {
@@ -17,8 +17,8 @@ namespace CrashReporter {
 public class CrashReporter {
 
     public CrashReporter (int argc, char argv[]) {
-        Gtk.Application.attribute (Qt.AAUseHighDpiPixmaps, true);
-        Gtk.Application app = new Gtk.Application (argc, argv);
+        GLib.Application.attribute (Qt.AAUseHighDpiPixmaps, true);
+        GLib.Application app = new GLib.Application (argc, argv);
 
         if (app.arguments ().length != 2) {
             GLib.debug ("You need to pass the .dmp file path as only argument.");

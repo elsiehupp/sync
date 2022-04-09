@@ -24,7 +24,7 @@ public class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    // public QSslKey private_key;
+    // public GLib.SslKey private_key;
 
     /***********************************************************
     ***********************************************************/
@@ -32,7 +32,7 @@ public class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public QSslKey public_key;
+    public GLib.SslKey public_key;
 
     /***********************************************************
     ***********************************************************/
@@ -117,7 +117,7 @@ public class ClientSideEncryption : GLib.Object {
             return;
         }
         string key = BIO2Byte_array (private_key);
-        //this.private_key = QSslKey (key, QSsl.Rsa, QSsl.Pem, QSsl.PrivateKey);
+        //this.private_key = GLib.SslKey (key, GLib.Ssl.Rsa, GLib.Ssl.Pem, GLib.Ssl.PrivateKey);
         this.private_key = key;
 
         GLib.info ("Keys generated correctly, sending to server.");
@@ -187,7 +187,7 @@ public class ClientSideEncryption : GLib.Object {
             (sign_public_key_api_job, json, return_code) => {
                 if (return_code == 200) {
                     string cert = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("public-key").to_string ();
-                    this.certificate = GLib.TlsCertificate (cert.to_local8Bit (), QSsl.Pem);
+                    this.certificate = GLib.TlsCertificate (cert.to_local8Bit (), GLib.Ssl.Pem);
                     this.public_key = this.certificate.public_key ();
                     fetch_and_validate_public_key_from_server (account);
                 }
@@ -243,7 +243,7 @@ public class ClientSideEncryption : GLib.Object {
     public void forget_sensitive_data (Account account) {
         this.private_key = "";
         this.certificate = new GLib.TlsCertificate ();
-        this.public_key = new QSslKey ();
+        this.public_key = new GLib.SslKey ();
         this.mnemonic = "";
 
         var user = account.credentials.user;
@@ -281,7 +281,7 @@ public class ClientSideEncryption : GLib.Object {
             return;
         }
 
-        this.certificate = new GLib.TlsCertificate (read_job.binary_data (), QSsl.Pem);
+        this.certificate = new GLib.TlsCertificate (read_job.binary_data (), GLib.Ssl.Pem);
 
         if (this.certificate == null) {
             get_public_key_from_server (account);
@@ -319,12 +319,12 @@ public class ClientSideEncryption : GLib.Object {
         // Error or no valid public key error out
         if (read_job.error != NoError || read_job.binary_data ().length == 0) {
             this.certificate = new GLib.TlsCertificate ();
-            this.public_key = QSslKey ();
+            this.public_key = GLib.SslKey ();
             get_public_key_from_server (account);
             return;
         }
 
-        //this.private_key = QSslKey (read_job.binary_data (), QSsl.Rsa, QSsl.Pem, QSsl.PrivateKey);
+        //this.private_key = GLib.SslKey (read_job.binary_data (), GLib.Ssl.Rsa, GLib.Ssl.Pem, GLib.Ssl.PrivateKey);
         this.private_key = read_job.binary_data ();
 
         if (this.private_key == null) {
@@ -361,7 +361,7 @@ public class ClientSideEncryption : GLib.Object {
         // Error or no valid public key error out
         if (read_job.error != NoError || read_job.text_data ().length == 0) {
             this.certificate = new GLib.TlsCertificate ();
-            this.public_key = QSslKey ();
+            this.public_key = GLib.SslKey ();
             this.private_key = "";
             get_public_key_from_server (account);
             return;
@@ -407,7 +407,7 @@ public class ClientSideEncryption : GLib.Object {
             (json_api_job, doc, return_code) => {
                 if (return_code == 200) {
                     string public_key = doc.object ()["ocs"].to_object ()["data"].to_object ()["public-keys"].to_object ()[account.dav_user].to_string ();
-                    this.certificate = GLib.TlsCertificate (public_key.to_local8Bit (), QSsl.Pem);
+                    this.certificate = GLib.TlsCertificate (public_key.to_local8Bit (), GLib.Ssl.Pem);
                     this.public_key = this.certificate.public_key ();
                     GLib.info ("Found Public key, requesting Server Public Key. Public key: " + public_key);
                     fetch_and_validate_public_key_from_server (account);
@@ -444,7 +444,7 @@ public class ClientSideEncryption : GLib.Object {
                 } else {
                     GLib.info ("Error invalid server public key.");
                     this.certificate = GLib.TlsCertificate ();
-                    this.public_key = QSslKey ();
+                    this.public_key = GLib.SslKey ();
                     this.private_key = "";
                     get_public_key_from_server (account);
                     return;
@@ -467,10 +467,10 @@ public class ClientSideEncryption : GLib.Object {
                         .printf (Utility.escape (account.credentials.user),
                             Utility.escape (account.display_name));
 
-        QInputDialog dialog;
+        GLib.InputDialog dialog;
         dialog.window_title (_("Enter E2E passphrase"));
         dialog.label_text (message);
-        dialog.text_echo_mode (QLineEdit.Normal);
+        dialog.text_echo_mode (GLib.LineEdit.Normal);
 
         string prev;
 
@@ -495,7 +495,7 @@ public class ClientSideEncryption : GLib.Object {
                 GLib.info ("Generated key: " + pass);
 
                 string private_key = EncryptionHelper.decrypt_private_key (pass, key);
-                //this.private_key = QSslKey (private_key, QSsl.Rsa, QSsl.Pem, QSsl.PrivateKey);
+                //this.private_key = GLib.SslKey (private_key, GLib.Ssl.Rsa, GLib.Ssl.Pem, GLib.Ssl.PrivateKey);
                 this.private_key = private_key;
 
                 GLib.info ("Private key: " + this.private_key.to_string ());

@@ -5,13 +5,13 @@
 ***********************************************************/
 
 //  #include <GLib.FileInfo>
-//  #include <QFileIconProvider>
-//  #include <QInputDialog>
-//  #include <QPointer>
-//  #include <QPushButton>
+//  #include <GLib.FileIconProvider>
+//  #include <GLib.InputDialog>
+//  #include <GLib.Pointer>
+//  #include <GLib.PushButton>
 //  #include <Gdk.Frame>
 
-//  #include <QPointer>
+//  #include <GLib.Pointer>
 //  #include <Gtk.Dialog>
 //  #include <Gtk.Widget>
 
@@ -44,7 +44,7 @@ public class ShareDialog : Gtk.Dialog {
     private GLib.List<ShareLinkWidget> link_widget_list;
     private ShareLinkWidget* empty_share_link_widget = null;
     private ShareUserGroupWidget user_group_widget = null;
-    private QProgressIndicator progress_indicator = null;
+    private GLib.ProgressIndicator progress_indicator = null;
 
 
     internal signal void signal_toggle_share_link_animation (bool on_signal_start);
@@ -82,7 +82,7 @@ public class ShareDialog : Gtk.Dialog {
 
         // Set icon
         GLib.FileInfo file_info = new GLib.FileInfo (this.local_path);
-        QFileIconProvider icon_provider;
+        GLib.FileIconProvider icon_provider;
         Gtk.Icon icon = icon_provider.icon (file_info);
         var pixmap = icon.pixmap (THUMBNAIL_SIZE, THUMBNAIL_SIZE);
         if (pixmap.width () > 0) {
@@ -343,10 +343,10 @@ public class ShareDialog : Gtk.Dialog {
     ***********************************************************/
     private void on_signal_link_share_requires_password () {
         bool ok = false;
-        string password = QInputDialog.text (this,
+        string password = GLib.InputDialog.text (this,
                                                  _("Password for share required"),
                                                  _("Please enter a password for your link share:"),
-                                                 QLineEdit.Password,
+                                                 GLib.LineEdit.Password,
                                                  "",
                                                  ok);
 
@@ -377,11 +377,11 @@ public class ShareDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    protected override void change_event (QEvent e) {
+    protected override void change_event (GLib.Event e) {
         switch (e.type ()) {
-        case QEvent.StyleChange:
-        case QEvent.PaletteChange:
-        case QEvent.ThemeChange:
+        case GLib.Event.StyleChange:
+        case GLib.Event.PaletteChange:
+        case GLib.Event.ThemeChange:
             // Notify the other widgets (Dark-/Light-Mode switching)
             /* emit */ signal_style_changed ();
             break;

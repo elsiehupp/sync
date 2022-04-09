@@ -34,7 +34,7 @@ public class CommandLine : GLib.Application {
         public int uplimit;
     }
 
-    const string BINARY_NAME = APPLICATION_EXECUTABLE + "cmd";
+    const string BINARY_NAME = Common.Config.APPLICATION_EXECUTABLE + "cmd";
 
     /***********************************************************
     We can't use csync_userdata because the SyncEngine sets it
@@ -42,12 +42,12 @@ public class CommandLine : GLib.Application {
     ***********************************************************/
     CmdOptions opts;
 
-    private static void null_message_handler (QtMsgType message_type, QMessageLogContext message_context, string message_text) { }
+    //  private static void null_message_handler (QtMsgType message_type, GLib.MessageLogContext message_context, string message_text) { }
 
     /***********************************************************
     ***********************************************************/
     public CommandLine () {
-        base ();
+        //  base ();
     }
 
 
@@ -71,7 +71,7 @@ public class CommandLine : GLib.Application {
     ***********************************************************/
     private void help () {
 
-        GLib.print (BINARY_NAME + " - command line " + APPLICATION_NAME + " client tool");
+        GLib.print (BINARY_NAME + " - command line " + Common.Config.APPLICATION_NAME + " client tool");
         GLib.print ("");
         GLib.print ("Usage: " + BINARY_NAME + " [OPTION] <source_dir> <server_url>");
         GLib.print ("");
@@ -118,16 +118,18 @@ public class CommandLine : GLib.Application {
 
         if (arg_count < 3) {
             if (arg_count >= 2) {
-                if (args[1] == "-v" || args[1] == "--version") {
+                if (args.nth_data (1) == "-v" || args.nth_data (1) == "--version") {
                     show_version ();
                 }
             }
             help ();
         }
 
-        options.target_url = args.take_last ();
+        options.target_url = args.nth_data (args.length ());
+        args.remove (options.target_url);
 
-        options.source_dir = args.take_last ();
+        options.source_dir = args.nth_data (args.length ());
+        args.remove (options.source_dir);
         if (!options.source_dir.has_suffix ("/")) {
             options.source_dir += "/";
         }
@@ -139,17 +141,16 @@ public class CommandLine : GLib.Application {
         }
         options.source_dir = file_info.absolute_file_path;
 
-        QStringListIterator it = new QStringListIterator (args);
-        // skip file name;
-        if (it.has_next ()) {
-            it.next ();
-        }
+        for (int index = 0; index < args.length (); index ++) {
+            // skip file name
+            if (index == 0) {
+                continue;
+            }
 
-        while (it.has_next ()) {
-            string option = it.next ();
+            string option = args.nth_data (index);
 
-            if (option == "--httpproxy" && !it.peek_next ().has_prefix ("-")) {
-                options.proxy = it.next ();
+            if (option == "--httpproxy" && !args.nth_data (index + 1).has_prefix ("-")) {
+                options.proxy = args.nth_data (index + 1);
             } else if (option == "-s" || option == "--silent") {
                 options.silent = true;
             } else if (option == "--trust") {
@@ -160,25 +161,25 @@ public class CommandLine : GLib.Application {
                 options.ignore_hidden_files = false;
             } else if (option == "--non-interactive") {
                 options.interactive = false;
-            } else if ( (option == "-u" || option == "--user") && !it.peek_next ().has_prefix ("-")) {
-                options.user = it.next ();
-            } else if ( (option == "-p" || option == "--password") && !it.peek_next ().has_prefix ("-")) {
-                options.password = it.next ();
-            } else if (option == "--exclude" && !it.peek_next ().has_prefix ("-")) {
-                options.exclude = it.next ();
-            } else if (option == "--unsynced_folders" && !it.peek_next ().has_prefix ("-")) {
-                options.unsynced_folders = it.next ();
-            } else if (option == "--max-sync-retries" && !it.peek_next ().has_prefix ("-")) {
-                options.restart_times = it.next ().to_int ();
-            } else if (option == "--uplimit" && !it.peek_next ().has_prefix ("-")) {
-                options.uplimit = it.next ().to_int () * 1000;
-            } else if (option == "--downlimit" && !it.peek_next ().has_prefix ("-")) {
-                options.downlimit = it.next ().to_int () * 1000;
+            } else if ( (option == "-u" || option == "--user") && !args.nth_data (index + 1).has_prefix ("-")) {
+                options.user = args.nth_data (index + 1);
+            } else if ( (option == "-p" || option == "--password") && !args.nth_data (index + 1).has_prefix ("-")) {
+                options.password = args.nth_data (index + 1);
+            } else if (option == "--exclude" && !args.nth_data (index + 1).has_prefix ("-")) {
+                options.exclude = args.nth_data (index + 1);
+            } else if (option == "--unsynced_folders" && !args.nth_data (index + 1).has_prefix ("-")) {
+                options.unsynced_folders = args.nth_data (index + 1);
+            } else if (option == "--max-sync-retries" && !args.nth_data (index + 1).has_prefix ("-")) {
+                options.restart_times = int.parse (args.nth_data (index + 1));
+            } else if (option == "--uplimit" && !args.nth_data (index + 1).has_prefix ("-")) {
+                options.uplimit = int.parse (args.nth_data (index + 1)) * 1000;
+            } else if (option == "--downlimit" && !args.nth_data (index + 1).has_prefix ("-")) {
+                options.downlimit = int.parse (args.nth_data (index + 1)) * 1000;
             } else if (option == "--logdebug") {
                 LibSync.Logger.instance.log_file ("-");
                 LibSync.Logger.instance.log_debug (true);
-            } else if (option == "--path" && !it.peek_next ().has_prefix ("-")) {
-                options.remote_path = it.next ();
+            } else if (option == "--path" && !args.nth_data (index + 1).has_prefix ("-")) {
+                options.remote_path = args.nth_data (index + 1);
             }
             else {
                 help ();
@@ -204,13 +205,13 @@ public class CommandLine : GLib.Application {
 
         bool ok = false;
 
-        const string [] selective_sync_list = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
-        const GLib.Set<string> old_block_list_set = new GLib.Set<string> (selective_sync_list.begin (), selective_sync_list.end ());
+        GLib.List<string> selective_sync_list = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
+        GLib.List<string> old_block_list_set = new GLib.List<string> ();
         if (ok) {
-            const GLib.Set<string> block_list_set = new GLib.Set<string> (new_list.begin (), new_list.end ());
-            const var changes = (old_block_list_set - block_list_set) + (block_list_set - old_block_list_set);
-            foreach (var it in changes) {
-                journal.schedule_path_for_remote_discovery (it);
+            GLib.List<string> block_list_set = new GLib.List<string> (new_list.begin (), new_list.end ());
+            GLib.List<string> changes = (old_block_list_set - block_list_set) + (block_list_set - old_block_list_set);
+            foreach (var change in changes) {
+                journal.schedule_path_for_remote_discovery (change);
             }
 
             journal.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, new_list);
@@ -221,7 +222,7 @@ public class CommandLine : GLib.Application {
     /***********************************************************
     ***********************************************************/
     private int main (int argc, char **argv) {
-        Gtk.Application app = new Gtk.Application (argc, argv);
+        GLib.Application app = new GLib.Application (argc, argv);
 
         CmdOptions options;
         options.silent = false;
@@ -248,7 +249,7 @@ public class CommandLine : GLib.Application {
             return EXIT_FAILURE;
         }
 
-        if (options.target_url.contains ("/webdav", Qt.CaseInsensitive) || options.target_url.contains ("/dav", Qt.CaseInsensitive)) {
+        if (options.target_url.down ().contains ("/webdav") || options.target_url.down ().contains ("/dav")) {
             GLib.warning ("Dav or webdav in server URL.");
             GLib.error ("Error! Please specify only the base URL of your host with username and password. Example:" + std.endl
                     + "http (s)://username:password@cloud.example.com");
@@ -277,7 +278,7 @@ public class CommandLine : GLib.Application {
         if (options.use_netrc) {
             NetrcParser parser;
             if (parser.parse ()) {
-                NetrcParser.QPair<string, string> pair = parser.find (host_url.host ());
+                NetrcParser.GLib.Pair<string, string> pair = parser.find (host_url.host ());
                 user = pair.first;
                 password = pair.second;
             }
@@ -318,8 +319,8 @@ public class CommandLine : GLib.Application {
 
                 port = p_list[2].to_int (&ok);
 
-                QNetworkProxyFactory.use_system_configuration (false);
-                QNetworkProxy.application_proxy (QNetworkProxy (QNetworkProxy.HttpProxy, host, port));
+                Soup.NetworkProxyFactory.use_system_configuration (false);
+                Soup.NetworkProxy.application_proxy (Soup.NetworkProxy (Soup.NetworkProxy.HttpProxy, host, port));
             } else {
                 GLib.fatal ("Could not read httpproxy. The proxy should have the format \"http://hostname:port\".");
             }
@@ -449,7 +450,7 @@ public class CommandLine : GLib.Application {
     }
 
 
-    private void on_signal_capabilities_json_received (QJsonDocument json) {
+    private void on_signal_capabilities_json_received (GLib.JsonDocument json) {
         var capabilities = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
         GLib.debug ("Server capabilities: " + capabilities);
         account.capabilities (capabilities.to_variant_map ());
@@ -458,7 +459,7 @@ public class CommandLine : GLib.Application {
     }
 
 
-    private void on_signal_user_json_received (QJsonDocument json) {
+    private void on_signal_user_json_received (GLib.JsonDocument json) {
         Json.Object data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
         account.dav_user (data.value ("identifier").to_string ());
         account.dav_display_name (data.value ("display-name").to_string ());
@@ -466,7 +467,7 @@ public class CommandLine : GLib.Application {
     }
 
 
-    private static void on_signal_sync_engine_finished (Gtk.Application app, bool result) {
+    private static void on_signal_sync_engine_finished (GLib.Application app, bool result) {
         app.this.quit (result ? EXIT_SUCCESS : EXIT_FAILURE);
     }
 

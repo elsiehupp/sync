@@ -7,7 +7,7 @@ implied, as to its usefulness for any purpose.
 namespace Occ {
 namespace Testing {
 
-public class StatusPushSpy : QSignalSpy {
+public class StatusPushSpy : GLib.SignalSpy {
 
     SyncEngine sync_engine;
 

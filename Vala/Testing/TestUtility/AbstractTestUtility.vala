@@ -13,7 +13,7 @@ public abstract class AbstractTestUtility : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_init_test_case () {
-        QStandardPaths.set_test_mode_enabled (true);
+        GLib.StandardPaths.set_test_mode_enabled (true);
     }
 
 } // class AbstractTestUtility

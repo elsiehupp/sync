@@ -106,7 +106,7 @@ public class Theme : GLib.Object {
     ***********************************************************/
     public static string app_name_gui {
         public get {
-            return APPLICATION_NAME;
+            return Common.Config.APPLICATION_NAME;
         }
     }
 
@@ -130,7 +130,7 @@ public class Theme : GLib.Object {
     ***********************************************************/
     public static string app_name {
         public get {
-            return APPLICATION_SHORTNAME;
+            return Common.Config.APPLICATION_SHORTNAME;
         }
     }
 
@@ -261,7 +261,7 @@ public class Theme : GLib.Object {
     ***********************************************************/
     public static string config_filename {
         public get {
-            return APPLICATION_EXECUTABLE + ".config";
+            return Common.Config.APPLICATION_EXECUTABLE + ".config";
         }
     }
 
@@ -456,7 +456,7 @@ public class Theme : GLib.Object {
     ***********************************************************/
     public static string help_url {
         public get {
-            return APPLICATION_HELP_URL;
+            return Common.Config.APPLICATION_HELP_URL;
         }
     }
 
@@ -493,7 +493,7 @@ public class Theme : GLib.Object {
     ***********************************************************/
     public static string override_server_url {
         public get {
-            return APPLICATION_SERVER_URL;
+            return Common.Config.APPLICATION_SERVER_URL;
         }
     }
 
@@ -505,7 +505,7 @@ public class Theme : GLib.Object {
     ***********************************************************/
     public static bool force_override_server_url {
         public get {
-            return APPLICATION_SERVER_URL_ENFORCE;
+            return Common.Config.APPLICATION_SERVER_URL_ENFORCE;
         }
     }
 
@@ -518,7 +518,7 @@ public class Theme : GLib.Object {
     ***********************************************************/
     public static bool enable_stapling_ocsp {
         public get {
-            return APPLICATION_OCSP_STAPLING_ENABLED;
+            return Common.Config.APPLICATION_OCSP_STAPLING_ENABLED;
         }
     }
 
@@ -530,7 +530,7 @@ public class Theme : GLib.Object {
     ***********************************************************/
     public static bool forbid_bad_ssl {
         public get {
-            return APPLICATION_FORBID_BAD_SSL;
+            return Common.Config.APPLICATION_FORBID_BAD_SSL;
         }
     }
 
@@ -752,7 +752,7 @@ public class Theme : GLib.Object {
                             .printf (__DATE__)
                             .printf (__TIME__)
                             .printf (q_version ())
-                            .printf (QSslSocket.ssl_library_version_string ());
+                            .printf (GLib.SslSocket.ssl_library_version_string ());
         // #endif
             return dev_string;
         }
@@ -772,16 +772,16 @@ public class Theme : GLib.Object {
             string dev_string;
             // : Example text: "<p>Nextcloud Desktop Client</p>"   (%1 is the application name)
             dev_string = _("<p>%1 Desktop Client</p>")
-                    .printf (APPLICATION_NAME);
+                    .printf (Common.Config.APPLICATION_NAME);
 
             dev_string += _("<p>Version %1. For more information please click <a href='%2'>here</a>.</p>")
-                    .printf (MIRALL_STRINGIFY (MIRALL_VERSION) + " (%1)".printf (os_name))
+                    .printf (Common.Version.MIRALL_VERSION + " (%1)".printf (os_name))
                     .printf (help_url);
 
             dev_string += _("<p><small>Using files plugin : %1</small></p>")
                             .printf (AbstractVfs.Mode.to_string (this.best_available_vfs_mode));
             dev_string += "<br>%1"
-                    .printf (QSysInfo.product_type () % '-' % QSysInfo.kernel_version ());
+                    .printf (GLib.SysInfo.product_type () % '-' % GLib.SysInfo.kernel_version ());
 
             return dev_string;
         }
@@ -795,11 +795,11 @@ public class Theme : GLib.Object {
         public get {
             string dev_string;
             dev_string = _("<p>Version %1. For more information please click <a href='%2'>here</a>.</p>")
-                    .printf (MIRALL_VERSION_STRING)
+                    .printf (Common.Version.MIRALL_VERSION_STRING)
                     .printf (help_url);
 
             dev_string += _("<p>This release was supplied by %1</p>")
-                    .printf (APPLICATION_VENDOR);
+                    .printf (Common.Config.APPLICATION_VENDOR);
 
             dev_string += git_sha1;
 
@@ -826,7 +826,7 @@ public class Theme : GLib.Object {
     ***********************************************************/
     public static string update_check_url {
         public get {
-            return APPLICATION_UPDATE_URL;
+            return Common.Config.APPLICATION_UPDATE_URL;
         }
     }
 
@@ -1048,14 +1048,14 @@ public class Theme : GLib.Object {
         // #ifdef GIT_SHA1
             help_text += "Git revision " + GIT_SHA1 + "\n";
         // #endif
-            //  help_text += "Using Qt " + q_version () + ", built against Qt " + QT_VERSION_STR + "\n";
+            //  help_text += "Using Qt " + q_version () + ", built against Qt " + GLib.T_VERSION_STR + "\n";
 
-            if (!Gtk.Application.platform_name () == "") {
-                help_text += "Using Qt platform plugin '" + Gtk.Application.platform_name () + "'\n";
+            if (!GLib.Application.platform_name () == "") {
+                help_text += "Using Qt platform plugin '" + GLib.Application.platform_name () + "'\n";
             }
 
-            help_text += "Using '" + QSslSocket.ssl_library_version_string () + "'\n";
-            help_text += "Running on " + Utility.platform_name () + ", " + QSysInfo.current_cpu_architecture () + "\n";
+            help_text += "Using '" + GLib.SslSocket.ssl_library_version_string () + "'\n";
+            help_text += "Running on " + Utility.platform_name () + ", " + GLib.SysInfo.current_cpu_architecture () + "\n";
             return help_text;
         }
     }
@@ -1108,8 +1108,8 @@ public class Theme : GLib.Object {
     2019/12/08: Implemented for the Dark Mode on macOS, because
     the app palette can not account for that (Qt 5.12.5).
     ***********************************************************/
-    public static Gdk.RGBA get_background_aware_link_color (Gdk.RGBA background_color = Gtk.Application.palette ().base ().color ()) {
-        return is_dark_color (background_color) ? Gdk.RGBA ("#6193dc") : Gtk.Application.palette ().color (Gtk.Palette.Link);
+    public static Gdk.RGBA get_background_aware_link_color (Gdk.RGBA background_color = GLib.Application.palette ().base ().color ()) {
+        return is_dark_color (background_color) ? Gdk.RGBA ("#6193dc") : GLib.Application.palette ().color (Gtk.Palette.Link);
     }
 
 
@@ -1124,7 +1124,7 @@ public class Theme : GLib.Object {
     This way we also avoid having certain strings re-translated
     on Transifex.
     ***********************************************************/
-    public static void replace_link_color_string_background_aware (string link_string, Gdk.RGBA background_color = Gtk.Application.palette ().color (Gtk.Palette.Base)) {
+    public static void replace_link_color_string_background_aware (string link_string, Gdk.RGBA background_color = GLib.Application.palette ().color (Gtk.Palette.Base)) {
         replace_link_color_string (link_string, get_background_aware_link_color (background_color));
     }
 
@@ -1152,14 +1152,14 @@ public class Theme : GLib.Object {
 
     2019/12/09: Moved here from SettingsDialog.
     ***********************************************************/
-    public static Gtk.Icon create_color_aware_icon (string name, Gtk.Palette palette = Gtk.Application.palette ()) {
-        QSvgRenderer renderer = new QSvgRenderer (name);
+    public static Gtk.Icon create_color_aware_icon (string name, Gtk.Palette palette = GLib.Application.palette ()) {
+        GLib.SvgRenderer renderer = new GLib.SvgRenderer (name);
         Gtk.Image img = new Gtk.Image (64, 64, Gtk.Image.FormatARGB32);
         img.fill (Qt.GlobalColor.transparent);
-        QPainter img_painter = new QPainter  (&img);
+        GLib.Painter img_painter = new GLib.Painter  (&img);
         Gtk.Image inverted = new Gtk.Image (64, 64, Gtk.Image.FormatARGB32);
         inverted.fill (Qt.GlobalColor.transparent);
-        QPainter inv_painter = new QPainter (inverted);
+        GLib.Painter inv_painter = new GLib.Painter (inverted);
 
         renderer.render (&img_painter);
         renderer.render (&inv_painter);
@@ -1189,7 +1189,7 @@ public class Theme : GLib.Object {
 
     2019/12/09: Adapted from create_color_aware_icon.
     ***********************************************************/
-    public static Gdk.Pixbuf create_color_aware_pixmap (string name, Gtk.Palette palette = Gtk.Application.palette ()) {
+    public static Gdk.Pixbuf create_color_aware_pixmap (string name, Gtk.Palette palette = GLib.Application.palette ()) {
         Gtk.Image img = new Gtk.Image (name);
         Gtk.Image inverted = new Gtk.Image (img);
         inverted.invert_pixels (Gtk.Image.InvertRgb);
@@ -1283,7 +1283,7 @@ public class Theme : GLib.Object {
                 return cached = Gtk.Icon.from_theme (name);
             }
 
-            QSvgRenderer renderer = new QSvgRenderer (Theme.THEME_PREFIX + "%1/%2.svg".printf (flavor).printf (name));
+            GLib.SvgRenderer renderer = new GLib.SvgRenderer (Theme.THEME_PREFIX + "%1/%2.svg".printf (flavor).printf (name));
 
             var use_svg = should_prefer_svg;
             GLib.List<int> sizes = use_svg
@@ -1296,8 +1296,8 @@ public class Theme : GLib.Object {
                 }
                 // HACK, get rid of it by supporting FDO icon themes, this is really just emulating ubuntu-mono
                 if (qgetenv ("DESKTOP_SESSION") == "ubuntu") {
-                    QBitmap mask = px.create_mask_from_color (Qt.white, Qt.MaskOutColor);
-                    QPainter p = new QPainter (px);
+                    GLib.Bitmap mask = px.create_mask_from_color (Qt.white, Qt.MaskOutColor);
+                    GLib.Painter p = new GLib.Painter (px);
                     p.pen (Gdk.RGBA ("#dfdbd2"));
                     p.draw_pixmap (px.rect (), mask, mask.rect ());
                 }
@@ -1309,10 +1309,10 @@ public class Theme : GLib.Object {
     }
 
 
-    private static Gdk.Pixbuf create_pixmap_from_svg (QSvgRenderer renderer, int size) {
+    private static Gdk.Pixbuf create_pixmap_from_svg (GLib.SvgRenderer renderer, int size) {
         Gtk.Image img = new Gtk.Image (size, size, Gtk.Image.FormatARGB32);
         img.fill (Qt.GlobalColor.transparent);
-        QPainter img_painter = new QPainter (img);
+        GLib.Painter img_painter = new GLib.Painter (img);
         renderer.render (img_painter);
         return Gdk.Pixbuf.from_image (img);
     }
@@ -1366,7 +1366,7 @@ public class Theme : GLib.Object {
 
     private static bool should_prefer_svg {
         public get {
-            return APPLICATION_ICON_SET.to_upper () == "SVG";
+            return Common.Config.APPLICATION_ICON_SET.to_upper () == "SVG";
         }
     }
 

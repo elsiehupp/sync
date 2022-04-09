@@ -80,7 +80,7 @@ public class PropagateLocalRemove : AbstractPropagateItemJob {
     private bool remove_recursively (string path) {
         string absolute = this.propagator.full_local_path (this.item.file + path);
         GLib.List<string> errors;
-        GLib.List<QPair<string, bool>> deleted;
+        GLib.List<GLib.Pair<string, bool>> deleted;
         bool on_signal_success = FileSystem.remove_recursively (
             absolute,
             PropagateLocalRemove.recursive_remove_filter,
@@ -108,7 +108,7 @@ public class PropagateLocalRemove : AbstractPropagateItemJob {
     }
 
 
-    private static void recursive_remove_filter (GLib.List<QPair<string, bool>> deleted, string path, bool is_dir) {
+    private static void recursive_remove_filter (GLib.List<GLib.Pair<string, bool>> deleted, string path, bool is_dir) {
         // by prepending, a folder deletion may be followed by content deletions
         deleted.prepend (q_make_pair (path, is_dir));
     }

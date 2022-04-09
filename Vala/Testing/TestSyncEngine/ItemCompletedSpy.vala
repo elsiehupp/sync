@@ -7,7 +7,7 @@ implied, as to its usefulness for any purpose.
 namespace Occ {
 namespace Testing {
 
-public class ItemCompletedSpy : QSignalSpy {
+public class ItemCompletedSpy : GLib.SignalSpy {
 
     ItemCompletedSpy (FakeFolder folder) {
         base (&folder.sync_engine, &SyncEngine.signal_item_completed);

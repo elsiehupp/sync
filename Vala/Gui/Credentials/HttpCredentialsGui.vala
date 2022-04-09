@@ -12,7 +12,7 @@ namespace Ui {
 public class HttpCredentialsGui : HttpCredentials {
 
     /***********************************************************
-    QScopedPointerObjectDeleteLater
+    GLib.ScopedPointerObjectDeleteLater
     ***********************************************************/
     private OAuth async_auth;
 
@@ -134,12 +134,12 @@ public class HttpCredentialsGui : HttpCredentials {
                 + "<br>";
         }
 
-        var dialog = new QInputDialog ();
+        var dialog = new GLib.InputDialog ();
         dialog.attribute (Qt.WA_DeleteOnClose, true);
         dialog.window_title (_("Enter Password"));
         dialog.label_text (message);
         dialog.text_value (this.previous_password);
-        dialog.text_echo_mode (QLineEdit.Password);
+        dialog.text_echo_mode (GLib.LineEdit.Password);
         var dialog_label = dialog.find_child<Gtk.Label> ();
         if (dialog_label) {
             dialog_label.open_external_links (true);

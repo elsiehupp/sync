@@ -16,7 +16,7 @@ public class TestSetUserStatusEmojiPredefinedStatusWasSetUserStatusSetCorrect : 
         fake_user_status_job.predefined_statuses (create_fake_predefined_statuses (create_date_time ()));
         UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
         model.set_predefined_status (0);
-        QSignalSpy finished_spy = new QSignalSpy (
+        GLib.SignalSpy finished_spy = new GLib.SignalSpy (
             model,
             UserStatusSelectorModel.on_signal_finished
         );

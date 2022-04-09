@@ -4,16 +4,16 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <Gtk.Application>
-//  #include <QMouseEvent>
-//  #include <QPainter>
-//  #include <QStyle>
-//  #include <QStyle_hints>
-//  const int HASQT5_11 (QT_VERSION >= QT_VERSION_CHECK (5,11,0))
+//  #include <GLib.Application>
+//  #include <GLib.MouseEvent>
+//  #include <GLib.Painter>
+//  #include <GLib.Style>
+//  #include <GLib.Style_hints>
+//  const int HASQT5_11 (GLib.T_VERSION >= GLib.T_VERSION_CHECK (5,11,0))
 //  #include <Gtk.Widget>
 //  #include <GLib.Timer>
-//  #include <QPointer>
-//  #include <QVariantAnimation>
+//  #include <GLib.Pointer>
+//  #include <GLib.VariantAnimation>
 
 namespace Occ {
 namespace Ui {
@@ -56,16 +56,16 @@ public class SlideShow : Gtk.Widget {
             }
 
             if (this.animation == null) {
-                this.animation = new QVariantAnimation (this);
+                this.animation = new GLib.VariantAnimation (this);
                 this.animation.duration (SLIDE_DURATION);
-                this.animation.easing_curve (QEasing_curve.Out_cubic);
+                this.animation.easing_curve (GLib.Easing_curve.Out_cubic);
                 this.animation.start_value (static_cast<double> (this.current_slide));
                 this.animation.value_changed.connect (
                     this.update
                 );
             }
             this.animation.end_value (static_cast<double> (value));
-            this.animation.on_signal_start (QAbstractAnimation.DeleteWhenStopped);
+            this.animation.on_signal_start (GLib.AbstractAnimation.DeleteWhenStopped);
 
             this.reverse = value < this.current_slide;
             this.current_slide = value;
@@ -75,11 +75,11 @@ public class SlideShow : Gtk.Widget {
         }
     }
 
-    private QPoint press_point;
+    private GLib.Point press_point;
     private GLib.Timer timer;
     private GLib.List<string> labels;
     private GLib.List<Gdk.Pixbuf> pixmaps;
-    private QVariantAnimation animation = null;
+    private GLib.VariantAnimation animation = null;
 
     internal signal void signal_clicked ();
     internal signal void signal_current_slide_changed (int index);
@@ -90,7 +90,7 @@ public class SlideShow : Gtk.Widget {
         base (parent);
         this.current_slide = 0;
         this.interval = 3500;
-        this.size_policy (QSizePolicy.Minimum, QSizePolicy.Minimum);
+        this.size_policy (GLib.SizePolicy.Minimum, GLib.SizePolicy.Minimum);
     }
 
 
@@ -112,13 +112,13 @@ public class SlideShow : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public void draw_slide (QPainter painter, int index) {
+    public void draw_slide (GLib.Painter painter, int index) {
         string label = this.labels.value (index);
-        QRect label_rect = this.style.item_text_rect (font_options (), rect (), Qt.Align_bottom | Qt.AlignHCenter, is_enabled (), label);
+        GLib.Rect label_rect = this.style.item_text_rect (font_options (), rect (), Qt.Align_bottom | Qt.AlignHCenter, is_enabled (), label);
         this.style.draw_item_text (painter, label_rect, Qt.AlignCenter, palette (), is_enabled (), label, Gtk.Palette.Window_text);
 
         Gdk.Pixbuf pixmap = this.pixmaps.value (index);
-        QRect pixmap_rect = this.style.item_pixmap_rect (QRect (0, 0, width (), label_rect.top () - SPACING), Qt.AlignCenter, pixmap);
+        GLib.Rect pixmap_rect = this.style.item_pixmap_rect (GLib.Rect (0, 0, width (), label_rect.top () - SPACING), Qt.AlignCenter, pixmap);
         this.style.draw_item_pixmap (painter, pixmap_rect, Qt.AlignCenter, pixmap);
     }
 
@@ -188,15 +188,15 @@ public class SlideShow : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    protected void mouse_press_event (QMouseEvent event) {
+    protected void mouse_press_event (GLib.MouseEvent event) {
         this.press_point = event.position ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    protected void mouse_release_event (QMouseEvent event) {
-        if (this.animation == null && QLine_f (this.press_point, event.position ()).length < Gtk.Application.style_hints ().start_drag_distance ()) {
+    protected void mouse_release_event (GLib.MouseEvent event) {
+        if (this.animation == null && GLib.Line_f (this.press_point, event.position ()).length < GLib.Application.style_hints ().start_drag_distance ()) {
             /* emit */ signal_clicked ();
         }
     }
@@ -204,8 +204,8 @@ public class SlideShow : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    protected void paint_event (QPaintEvent event) {
-        QPainter painter = new QPainter (this);
+    protected void paint_event (GLib.PaintEvent event) {
+        GLib.Painter painter = new GLib.Painter (this);
 
         if (this.animation != null) {
             int from = this.animation.start_value ().to_int ();
@@ -229,7 +229,7 @@ public class SlideShow : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    protected void timer_event (QTimerEvent event) {
+    protected void timer_event (GLib.TimerEvent event) {
         if (event.timer_id () == this.timer.timer_id ())
             on_signal_next_slide ();
     }

@@ -60,8 +60,8 @@ class QByteArray;
 class QNetworkCookie;
 class QNetworkCookieJar;
 class QNetworkReply;
-class QNetworkProxy;
-class QNetworkProxyFactory;
+class Soup.NetworkProxy;
+class Soup.NetworkProxyFactory;
 class QSslError;
 class QHstsPolicy;
 class QHttpMultiPart;
@@ -95,10 +95,10 @@ public:
     void clearConnectionCache();
 
 #ifndef QT_NO_NETWORKPROXY
-    QNetworkProxy proxy() const;
-    void setProxy(const QNetworkProxy &proxy);
-    QNetworkProxyFactory *proxyFactory() const;
-    void setProxyFactory(QNetworkProxyFactory *factory);
+    Soup.NetworkProxy proxy() const;
+    void setProxy(const Soup.NetworkProxy &proxy);
+    Soup.NetworkProxyFactory *proxyFactory() const;
+    void setProxyFactory(Soup.NetworkProxyFactory *factory);
 #endif
 
     QAbstractNetworkCache *cache() const;
@@ -150,7 +150,7 @@ public:
 
 Q_SIGNALS:
 #ifndef QT_NO_NETWORKPROXY
-    void proxyAuthenticationRequired(const QNetworkProxy &proxy, QAuthenticator *authenticator);
+    void proxyAuthenticationRequired(const Soup.NetworkProxy &proxy, QAuthenticator *authenticator);
 #endif
     void authenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator);
     void finished(QNetworkReply *reply);

@@ -69,7 +69,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
 
     /***********************************************************
     ***********************************************************/
-    private new void on_signal_folder_encrypted_metadata_received (QJsonDocument json, int status_code)  {
+    private new void on_signal_folder_encrypted_metadata_received (GLib.JsonDocument json, int status_code)  {
         if (status_code == 404) {
             // we've eneded up having no metadata, but, this.nested_items is not empty since we went this far, let's proceed with removing the nested items without modifying the metadata
             GLib.debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER + "There is no metadata for this folder. Just remove it's nested items.");
@@ -79,7 +79,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
             return;
         }
 
-        FolderMetadata metadata = new FolderMetadata (this.propagator.account, json.to_json (QJsonDocument.Compact), status_code);
+        FolderMetadata metadata = new FolderMetadata (this.propagator.account, json.to_json (GLib.JsonDocument.Compact), status_code);
 
         GLib.debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER + "It's a root encrypted folder. Let's remove nested items first.");
 

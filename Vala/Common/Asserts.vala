@@ -1,7 +1,7 @@
 
 //  //  #include <qglobal.h>
 
-//  #if defined (QT_FORCE_ASSERTS) || !defined (QT_NO_DEBUG)
+//  #if defined (GLib.T_FORCE_ASSERTS) || !defined (GLib.T_NO_DEBUG)
 //  const int OC_ASSERT_MSG GLib.fatal
 //  #else
 //  const int OC_ASSERT_MSG q_critical

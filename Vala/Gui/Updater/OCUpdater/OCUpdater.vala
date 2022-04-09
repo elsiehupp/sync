@@ -9,7 +9,7 @@
 //  #include <QtGui>
 //  #include <Qt_widgets>
 //  #include <cstdio>
-//  #include <QTemporaryFile>
+//  #include <GLib.TemporaryFile>
 
 namespace Occ {
 namespace Ui {
@@ -227,7 +227,7 @@ public class OCUpdater : AbstractUpdater {
         GLib.info ("Running updater " + update_file);
 
         if (update_file.has_suffix (".exe")) {
-            QProcess.start_detached (
+            GLib.Process.start_detached (
                 update_file,
                 {
                     "/S",
@@ -245,9 +245,9 @@ public class OCUpdater : AbstractUpdater {
             string command = "&{msiexec /promptrestart /passive /i '%1' /L*V '%2'| Out-Null ; &'%3'}"
                 .printf (prepare_path_for_powershell (update_file))
                 .printf (prepare_path_for_powershell (msi_log_file))
-                .printf (prepare_path_for_powershell (Gtk.Application.application_file_path));
+                .printf (prepare_path_for_powershell (GLib.Application.application_file_path));
 
-            QProcess.start_detached ("powershell.exe", { "-Command", command });
+            GLib.Process.start_detached ("powershell.exe", { "-Command", command });
         }
         GLib.Application.quit ();
     }
@@ -288,7 +288,7 @@ public class OCUpdater : AbstractUpdater {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_open_update_url () {
-        QDesktopServices.open_url (this.update_info.web ());
+        GLib.DesktopServices.open_url (this.update_info.web ());
     }
 
 

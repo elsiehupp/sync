@@ -10,9 +10,9 @@
 //  #include <Gtk.MessageBox>
 //  #include <owncloudgui.h>
 //  #include <cstdlib>
-//  #include <QWizard>
-//  #include <QSslKey>
-//  #include <QSslCertificate>
+//  #include <GLib.Wizard>
+//  #include <GLib.SslKey>
+//  #include <GLib.SslCertificate>
 
 namespace Occ {
 namespace Ui {
@@ -21,7 +21,7 @@ namespace Ui {
 @brief The OwncloudWizard class
 @ingroup gui
 ***********************************************************/
-public class OwncloudWizard : QWizard {
+public class OwncloudWizard : GLib.Wizard {
 
     /***********************************************************
     ***********************************************************/
@@ -86,16 +86,16 @@ public class OwncloudWizard : QWizard {
     /***********************************************************
     Key extracted from pkcs12
     ***********************************************************/
-    public QSslKey client_ssl_key;
+    public GLib.SslKey client_ssl_key;
 
     /***********************************************************
     Cert extracted from pkcs12
     ***********************************************************/
-    public QSslCertificate client_ssl_certificate;
+    public GLib.SslCertificate client_ssl_certificate;
 
     /***********************************************************
     ***********************************************************/
-    public GLib.List<QSslCertificate> client_ssl_ca_certificates;
+    public GLib.List<GLib.SslCertificate> client_ssl_ca_certificates;
 
     internal signal void clear_pending_requests ();
     internal signal void determine_auth_type (string value);
@@ -175,18 +175,18 @@ public class OwncloudWizard : QWizard {
         );
 
         window_title (_("Add %1 account").printf (Theme.instance.app_name_gui));
-        wizard_style (QWizard.ModernStyle);
-        option (QWizard.NoBackButtonOnStartPage);
-        option (QWizard.NoBackButtonOnLastPage);
-        option (QWizard.NoCancelButton);
-        button_text (QWizard.CustomButton1, _("Skip folders configuration"));
+        wizard_style (GLib.Wizard.ModernStyle);
+        option (GLib.Wizard.NoBackButtonOnStartPage);
+        option (GLib.Wizard.NoBackButtonOnLastPage);
+        option (GLib.Wizard.NoCancelButton);
+        button_text (GLib.Wizard.CustomButton1, _("Skip folders configuration"));
 
         // Change the next buttons size policy since we hide it on the
         // welcome page but want it to fill it's space that we don't get
         // flickering when the page changes
-        var next_button_size_policy = button (QWizard.NextButton).size_policy ();
+        var next_button_size_policy = button (GLib.Wizard.NextButton).size_policy ();
         next_button_size_policy.retain_size_when_hidden (true);
-        button (QWizard.NextButton).size_policy (next_button_size_policy);
+        button (GLib.Wizard.NextButton).size_policy (next_button_size_policy);
 
         // Connect signal_style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
         this.signal_style_changed.connect (
@@ -289,12 +289,12 @@ public class OwncloudWizard : QWizard {
     ***********************************************************/
     public void center_window () {
         const var wizard_window = window ();
-        const var screen = Gtk.Application.screen_at (wizard_window.position ())
-            ? Gtk.Application.screen_at (wizard_window.position ())
+        const var screen = GLib.Application.screen_at (wizard_window.position ())
+            ? GLib.Application.screen_at (wizard_window.position ())
             : Gdk.Display.get_default ().get_default_screen ().get_primary_monitor ();
         const var screen_geometry = screen.geometry ();
         const var window_geometry = wizard_window.geometry ();
-        const var new_window_position = screen_geometry.center () - QPoint (window_geometry.width () / 2, window_geometry.height () / 2);
+        const var new_window_position = screen_geometry.center () - GLib.Point (window_geometry.width () / 2, window_geometry.height () / 2);
         wizard_window.move (new_window_position);
     }
 
@@ -310,7 +310,7 @@ public class OwncloudWizard : QWizard {
     public static void ask_experimental_virtual_files_feature (Gtk.Widget receiver, CallBack callback) {
         const var best_vfs_mode = this.best_available_vfs_mode;
         Gtk.MessageBox message_box = null;
-        QPushButton accept_button = null;
+        GLib.PushButton accept_button = null;
         switch (best_vfs_mode) {
         case AbstractVfs.WindowsCfApi:
             callback (true);
@@ -350,7 +350,7 @@ public class OwncloudWizard : QWizard {
 
     /***********************************************************
     ***********************************************************/
-    private void on_message_box_accepted (CallBack callback, Gtk.MessageBox message_box, QPushButton accept_button) {
+    private void on_message_box_accepted (CallBack callback, Gtk.MessageBox message_box, GLib.PushButton accept_button) {
         callback (message_box.clicked_button () == accept_button);
         message_box.delete_later ();
     }
@@ -392,7 +392,7 @@ public class OwncloudWizard : QWizard {
 
         if (identifier == WizardCommon.Pages.PAGE_WELCOME) {
             // Set next button to just hidden so it retains it's layout
-            button (QWizard.NextButton).hidden (true);
+            button (GLib.Wizard.NextButton).hidden (true);
             // Need to set it from here, otherwise it has no effect
             this.welcome_page.login_button_default ();
         } else if (
@@ -401,22 +401,22 @@ public class OwncloudWizard : QWizard {
     //  #endif WITH_WEBENGINE
             identifier == WizardCommon.Pages.PAGE_FLOW2AUTH_CREDS) {
             button_layout ({
-                QWizard.Stretch,
-                QWizard.BackButton
+                GLib.Wizard.Stretch,
+                GLib.Wizard.BackButton
             });
         } else if (identifier == WizardCommon.Pages.PAGE_ADVANCED_SETUP) {
             button_layout ({
-                QWizard.Stretch,
-                QWizard.CustomButton1,
-                QWizard.BackButton,
-                QWizard.FinishButton
+                GLib.Wizard.Stretch,
+                GLib.Wizard.CustomButton1,
+                GLib.Wizard.BackButton,
+                GLib.Wizard.FinishButton
             });
             next_button_as_default ();
         } else {
             button_layout ({
-                QWizard.Stretch,
-                QWizard.BackButton,
-                QWizard.NextButton
+                GLib.Wizard.Stretch,
+                GLib.Wizard.BackButton,
+                GLib.Wizard.NextButton
             });
             next_button_as_default ();
         }
@@ -428,7 +428,7 @@ public class OwncloudWizard : QWizard {
         if (identifier == WizardCommon.Pages.PAGE_ADVANCED_SETUP && (this.credentials_page == this.browser_creds_page || this.credentials_page == this.flow_2_creds_page)) {
             // For OAuth, disable the back button in the PAGE_ADVANCED_SETUP because we don't want
             // to re-open the browser.
-            button (QWizard.BackButton).enabled (false);
+            button (GLib.Wizard.BackButton).enabled (false);
         }
     }
 
@@ -436,7 +436,7 @@ public class OwncloudWizard : QWizard {
     /***********************************************************
     ***********************************************************/
     private void next_button_as_default () {
-        var next_button = (QPushButton) button (QWizard.NextButton);
+        var next_button = (GLib.PushButton) button (GLib.Wizard.NextButton);
         if (next_button) {
             next_button.default (true);
         }
@@ -488,18 +488,18 @@ public class OwncloudWizard : QWizard {
 
     /***********************************************************
     ***********************************************************/
-    protected void change_event (QEvent event) {
+    protected void change_event (GLib.Event event) {
         switch (event.type ()) {
 
-        case QEvent.StyleChange:
-        case QEvent.PaletteChange:
-        case QEvent.ThemeChange:
+        case GLib.Event.StyleChange:
+        case GLib.Event.PaletteChange:
+        case GLib.Event.ThemeChange:
             customize_style ();
 
             // Notify the other widgets (Dark-/Light-Mode switching)
             /* emit */ signal_style_changed ();
             break;
-        case QEvent.ActivationChange:
+        case GLib.Event.ActivationChange:
             if (is_active_window ())
                 /* emit */ activate ();
             break;
@@ -507,7 +507,7 @@ public class OwncloudWizard : QWizard {
             break;
         }
 
-        QWizard.change_event (event);
+        GLib.Wizard.change_event (event);
     }
 
 

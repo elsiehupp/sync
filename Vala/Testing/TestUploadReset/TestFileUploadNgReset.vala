@@ -23,7 +23,7 @@ public class TestFileUploadNgReset : GLib.Object {
                         "chunking", "1.0"
                     },
                     {
-                        "httpErrorCodesThatResetFailingChunkedUploads", new QVariantList (500)
+                        "httpErrorCodesThatResetFailingChunkedUploads", new GLib.VariantList (500)
                     }
                 )
             }

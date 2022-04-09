@@ -12,12 +12,12 @@ public class TestCookies : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private TestCookies () {
-        QTemporaryDir temporary;
+        GLib.TemporaryDir temporary;
         const string nonexisting_path = temporary.file_path ("some_nonexisting_directory/test.db");
-        QNetworkCookie cookie_a = new QNetworkCookie ("foo", "bar");
+        GLib.NetworkCookie cookie_a = new GLib.NetworkCookie ("foo", "bar");
         // tomorrow rounded
         cookie_a.set_expiration_date (GLib.DateTime.current_date_time_utc ().add_days (1).date ().start_of_day ());
-        const GLib.List<QNetworkCookie> cookies = {cookie_a, QNetworkCookie ("foo2", "bar")};
+        GLib.List<GLib.NetworkCookie> cookies = {cookie_a, GLib.NetworkCookie ("foo2", "bar")};
         CookieJar jar;
         jar.set_all_cookies (cookies);
         GLib.assert_true (cookies == jar.all_cookies ());
@@ -28,7 +28,7 @@ public class TestCookies : GLib.Object {
         CookieJar jar2;
         GLib.assert_true (jar2.restore (nonexisting_path));
         // here we should have  only cookie_a as the second one was a session cookie
-        GLib.assert_true (new GLib.List<QNetworkCookie> (cookie_a) == jar2.all_cookies ());
+        GLib.assert_true (new GLib.List<GLib.NetworkCookie> (cookie_a) == jar2.all_cookies ());
 
     }
 

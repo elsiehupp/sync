@@ -20,7 +20,7 @@ public abstract class AbstractTestPushNotifications : GLib.Object {
     }
 
 
-    protected static bool verify_called_once_with_account (QSignalSpy spy, unowned Account account) {
+    protected static bool verify_called_once_with_account (GLib.SignalSpy spy, unowned Account account) {
         return_false_on_fail (spy.length == 1);
         var account_from_spy = spy.at (0).at (0).value<Account> ();
         return_false_on_fail (account_from_spy == account);
@@ -35,7 +35,7 @@ public abstract class AbstractTestPushNotifications : GLib.Object {
 
         account.push_notifications ().set_reconnect_timer_interval (0);
 
-        QSignalSpy authentication_failed_spy = new QSignalSpy (account.push_notifications (), &PushNotificationManager.authentication_failed);
+        GLib.SignalSpy authentication_failed_spy = new GLib.SignalSpy (account.push_notifications (), &PushNotificationManager.authentication_failed);
 
         // Let three authentication attempts fail
         for (uint8 i = 0; i < 3; ++i) {

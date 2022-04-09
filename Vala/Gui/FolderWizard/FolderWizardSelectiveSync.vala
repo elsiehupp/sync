@@ -13,22 +13,22 @@ namespace Ui {
 @brief The FolderWizardSelectiveSync class
 @ingroup gui
 ***********************************************************/
-public class FolderWizardSelectiveSync : QWizardPage {
+public class FolderWizardSelectiveSync : GLib.WizardPage {
 
     /***********************************************************
     ***********************************************************/
     private SelectiveSyncWidget selective_sync;
-    private QCheckBox virtual_files_check_box = null;
+    private GLib.CheckBox virtual_files_check_box = null;
 
     /***********************************************************
     ***********************************************************/
     public FolderWizardSelectiveSync (Account account) {
-        var layout = new QVBoxLayout (this);
+        var layout = new GLib.VBoxLayout (this);
         this.selective_sync = new SelectiveSyncWidget (account, this);
         layout.add_widget (this.selective_sync);
 
         if (Theme.show_virtual_files_option && this.best_available_vfs_mode != AbstractVfs.Off) {
-            this.virtual_files_check_box = new QCheckBox (_("Use virtual files instead of downloading content immediately %1").printf (this.best_available_vfs_mode == AbstractVfs.WindowsCfApi ? "" : _(" (experimental)")));
+            this.virtual_files_check_box = new GLib.CheckBox (_("Use virtual files instead of downloading content immediately %1").printf (this.best_available_vfs_mode == AbstractVfs.WindowsCfApi ? "" : _(" (experimental)")));
             this.virtual_files_check_box.clicked.connect (
                 this.on_signal_virtual_files_checkbox_clicked
             );
@@ -102,7 +102,7 @@ public class FolderWizardSelectiveSync : QWizardPage {
             //
         }
 
-        QWizardPage.initialize_page ();
+        GLib.WizardPage.initialize_page ();
     }
 
 
@@ -114,7 +114,7 @@ public class FolderWizardSelectiveSync : QWizardPage {
         if (alias == "")
             alias = Theme.app_name;
         this.selective_sync.folder_info (target_path, alias);
-        QWizardPage.clean_up_page ();
+        GLib.WizardPage.clean_up_page ();
     }
 
 

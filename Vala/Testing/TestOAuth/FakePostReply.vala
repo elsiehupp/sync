@@ -25,8 +25,8 @@ public class FakePostReply : GLib.InputStream {
         set_request (request);
         set_url (request.url);
         set_operation (operation);
-        open (QIODevice.ReadOnly);
-        payload.open (QIODevice.ReadOnly);
+        open (GLib.IODevice.ReadOnly);
+        payload.open (GLib.IODevice.ReadOnly);
         GLib.Object.invoke_method (this, "respond", Qt.QueuedConnection);
     }
 

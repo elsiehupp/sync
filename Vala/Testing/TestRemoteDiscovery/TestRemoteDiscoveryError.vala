@@ -14,9 +14,9 @@ public class TestRemoteDiscoveryError : GLib.Object {
     Check what happens when there is an error.
     ***********************************************************/
     private TestRemoteDiscoveryError () {
-        QFETCH (int, error_kind);
-        QFETCH (string, expected_error_string);
-        QFETCH (bool, sync_succeeds);
+        GLib.FETCH (int, error_kind);
+        GLib.FETCH (string, expected_error_string);
+        GLib.FETCH (bool, sync_succeeds);
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
@@ -36,10 +36,10 @@ public class TestRemoteDiscoveryError : GLib.Object {
         fake_folder.set_server_override (this.override_delegate_remote_error);
 
         // So the test that test timeout finishes fast
-        QScopedValueRollback<int> set_http_timeout = new QScopedValueRollback<int> (AbstractNetworkJob.http_timeout, error_kind == Timeout ? 1 : 10000);
+        GLib.ScopedValueRollback<int> set_http_timeout = new GLib.ScopedValueRollback<int> (AbstractNetworkJob.http_timeout, error_kind == Timeout ? 1 : 10000);
 
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
-        QSignalSpy error_spy = new QSignalSpy (
+        GLib.SignalSpy error_spy = new GLib.SignalSpy (
             fake_folder.sync_engine,
             SyncEngine.signal_sync_error
         );

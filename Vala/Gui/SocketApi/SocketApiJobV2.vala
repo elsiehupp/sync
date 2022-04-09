@@ -62,14 +62,14 @@ public class SocketApiJobV2 : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void do_finish (Json.Object object) {
-        this.socket_listener.on_signal_send_message (this.command + "this.RESULT:" + QJsonDocument ({
+        this.socket_listener.on_signal_send_message (this.command + "this.RESULT:" + GLib.JsonDocument ({
             {
                 "identifier", this.job_id
             },
             {
                 "arguments", object
             }
-        }).to_json (QJsonDocument.Compact));
+        }).to_json (GLib.JsonDocument.Compact));
         /* Q_EMIT */ on_signal_finished ();
     }
 

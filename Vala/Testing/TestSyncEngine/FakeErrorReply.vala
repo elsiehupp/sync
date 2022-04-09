@@ -25,7 +25,7 @@ public class FakeErrorReply : FakeReply {
         set_request (request);
         set_url (request.url);
         set_operation (operation);
-        open (QIODevice.ReadOnly);
+        open (GLib.IODevice.ReadOnly);
         set_attribute (Soup.Request.HttpStatusCodeAttribute, http_error_code);
         set_error (InternalServerError, "Internal Server Fake Error");
         GLib.Object.invoke_method (this, &FakeErrorReply.respond, Qt.QueuedConnection);

@@ -8,7 +8,7 @@ namespace Ui {
 
 @copyright GPLv3 or Later
 ***********************************************************/
-public class AccountState : GLib.Object /*, QSharedData*/ {
+public class AccountState : GLib.Object /*, GLib.SharedData*/ {
 
     class AccountAppList : GLib.List<AccountApp> { }
 
@@ -439,16 +439,16 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
 
             // Let's try this for all OS and see if it fixes the Qt issues we have on Linux  #4720 #3888 #4051
             //#ifdef Q_OS_WIN
-            // There seems to be a bug in Qt on Windows where QNAM sometimes stops
+            // There seems to be a bug in Qt on Windows where GLib.NAM sometimes stops
             // working correctly after the computer woke up from sleep. See #2895 #2899
             // and #2973.
-            // As an attempted workaround, reset the QNAM regularly if the account is
+            // As an attempted workaround, reset the GLib.NAM regularly if the account is
             // disconnected.
             account.reset_network_access_manager ();
 
             // If we don't reset the ssl config a second CheckServerJob can produce a
             // ssl config that does not have a sensible certificate chain.
-            account.ssl_configuration (QSslConfiguration ());
+            account.ssl_configuration (GLib.SslConfiguration ());
             //#endif
             this.connection_validator.on_signal_check_server_and_auth ();
         }
@@ -611,7 +611,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_navigation_apps_fetched (QJsonDocument reply, int status_code) {
+    protected void on_signal_navigation_apps_fetched (GLib.JsonDocument reply, int status_code) {
         if (this.account != null) {
             if (status_code == 304) {
                 GLib.warning ("Status code " + status_code.to_string () + " Not Modified - No new navigation app_list.");
@@ -623,7 +623,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
                     const var nav_links = element.to_array ();
 
                     if (nav_links.length > 0) {
-                        foreach (QJsonValue value in nav_links) {
+                        foreach (GLib.JsonValue value in nav_links) {
                             var nav_link = value.to_object ();
 
                             var app = new AccountApp (nav_link.value ("name").to_string (), GLib.Uri (nav_link.value ("href").to_string ()),

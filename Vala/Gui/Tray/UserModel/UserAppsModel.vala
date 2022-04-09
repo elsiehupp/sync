@@ -2,7 +2,7 @@
 namespace Occ {
 namespace Ui {
 
-public class UserAppsModel : QAbstractListModel {
+public class UserAppsModel : GLib.AbstractListModel {
 
     /***********************************************************
     ***********************************************************/
@@ -52,7 +52,7 @@ public class UserAppsModel : QAbstractListModel {
     ***********************************************************/
     public void build_app_list () {
         if (row_count () > 0) {
-            begin_remove_rows (QModelIndex (), 0, row_count () - 1);
+            begin_remove_rows (GLib.ModelIndex (), 0, row_count () - 1);
             this.apps = null;
             end_remove_rows ();
         }
@@ -64,7 +64,7 @@ public class UserAppsModel : QAbstractListModel {
                 if (talk_app && app.identifier == talk_app.identifier)
                     continue;
 
-                begin_insert_rows (QModelIndex (), row_count (), row_count ());
+                begin_insert_rows (GLib.ModelIndex (), row_count (), row_count ());
                 this.apps + app;
                 end_insert_rows ();
             }
@@ -74,7 +74,7 @@ public class UserAppsModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private int row_count (QModelIndex parent) {
+    private int row_count (GLib.ModelIndex parent) {
         //  Q_UNUSED (parent);
         return this.apps.length;
     }
@@ -82,7 +82,7 @@ public class UserAppsModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Variant data (QModelIndex index, int role) {
+    private GLib.Variant data (GLib.ModelIndex index, int role) {
         if (index.row () < 0 || index.row () >= this.apps.length) {
             return GLib.Variant ();
         }

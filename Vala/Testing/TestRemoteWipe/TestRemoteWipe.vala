@@ -5,7 +5,7 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 
 //  #include <qglobal.h>
-//  #include <QTemporaryDir>
+//  #include <GLib.TemporaryDir>
 
 namespace Occ {
 namespace Testing {
@@ -16,7 +16,7 @@ public class TestRemoteWipe : GLib.Object {
     ***********************************************************/
     // TODO
     private TestRemoteWipe () {
-//        QTemporaryDir directory;
+//        GLib.TemporaryDir directory;
 //        ConfigFile.set_configuration_directory (directory.path); // we don't want to pollute the user's config file
 //        GLib.assert_true (directory.is_valid);
 

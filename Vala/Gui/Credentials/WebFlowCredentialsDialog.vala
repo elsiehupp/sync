@@ -1,6 +1,6 @@
 
 //  #include <Gtk.Dialog>
-//  #include <QVBoxLayout>
+//  #include <GLib.VBoxLayout>
 
 namespace Occ {
 namespace Ui {
@@ -22,8 +22,8 @@ public class WebFlowCredentialsDialog : Gtk.Dialog {
     ***********************************************************/
     private Gtk.Label error_label;
     private Gtk.Label info_label;
-    private QVBoxLayout layout;
-    private QVBoxLayout container_layout;
+    private GLib.VBoxLayout layout;
+    private GLib.VBoxLayout container_layout;
     private HeaderBanner header_banner;
 
 
@@ -43,13 +43,13 @@ public class WebFlowCredentialsDialog : Gtk.Dialog {
     //  #endif // WITH_WEBENGINE
         window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
 
-        this.layout = new QVBoxLayout (this);
+        this.layout = new GLib.VBoxLayout (this);
         int spacing = this.layout.spacing ();
         int margin = this.layout.margin ();
         this.layout.spacing (0);
         this.layout.margin (0);
 
-        this.container_layout = new QVBoxLayout (this);
+        this.container_layout = new GLib.VBoxLayout (this);
         this.container_layout.spacing (spacing);
         this.container_layout.margin (margin);
 
@@ -87,7 +87,7 @@ public class WebFlowCredentialsDialog : Gtk.Dialog {
     //  #endif // WITH_WEBENGINE
         }
 
-        var app = static_cast<Application> (Gtk.Application);
+        var app = static_cast<Application> (GLib.Application);
         app.signal_is_showing_settings_dialog.connect (
             this.on_signal_show_settings_dialog
         );
@@ -153,7 +153,7 @@ public class WebFlowCredentialsDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    protected override void close_event (QCloseEvent e) {
+    protected override void close_event (GLib.CloseEvent e) {
         //  Q_UNUSED (e)
 
     //  #ifdef WITH_WEBENGINE
@@ -177,17 +177,17 @@ public class WebFlowCredentialsDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    protected override void change_event (QEvent e) {
+    protected override void change_event (GLib.Event e) {
         switch (e.type ()) {
-        case QEvent.StyleChange:
-        case QEvent.PaletteChange:
-        case QEvent.ThemeChange:
+        case GLib.Event.StyleChange:
+        case GLib.Event.PaletteChange:
+        case GLib.Event.ThemeChange:
             customize_style ();
 
             // Notify the other widgets (Dark-/Light-Mode switching)
             /* emit */ signal_style_changed ();
             break;
-        case QEvent.ActivationChange:
+        case GLib.Event.ActivationChange:
             if (is_active_window ())
                 /* emit */ activate ();
             break;

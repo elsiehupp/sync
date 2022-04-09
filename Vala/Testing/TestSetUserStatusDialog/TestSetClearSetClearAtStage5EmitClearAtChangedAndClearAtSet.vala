@@ -14,7 +14,7 @@ public class TestSetClearSetClearAtStage5EmitClearAtChangedAndClearAtSet : GLib.
     private TestSetClearSetClearAtStage5EmitClearAtChangedAndClearAtSet () {
         var fake_user_status_job = new FakeUserStatusConnector ();
         UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
-        QSignalSpy clear_at_changed_spy = new QSignalSpy (
+        GLib.SignalSpy clear_at_changed_spy = new GLib.SignalSpy (
             model,
             UserStatusSelectorModel.clear_at_changed
         );

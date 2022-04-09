@@ -157,23 +157,14 @@ public class SqlQuery : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool is_select () {
-        return starts_with_insensitive (this.sql, "SELECT");
+        return this.sql.down ().has_prefix ("SELECT".down ());
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool is_pragma () {
-        return starts_with_insensitive (this.sql, "PRAGMA");
-    }
-
-
-    /***********************************************************
-    There is no overloads to string.start_with that takes Qt.CaseInsensitive.
-    Returns true if 'a' starts with 'b' in a case insensitive way
-    ***********************************************************/
-    private static bool starts_with_insensitive (string a, string b) {
-        return a.length >= b.length && qstrnicmp (a.const_data (), b.const_data (), static_cast<uint32> (b.length)) == 0;
+        return this.sql.down ().has_prefix ("PRAGMA".down ());
     }
 
 
@@ -339,7 +330,7 @@ public class SqlQuery : GLib.Object {
             break;
         }
         case GLib.Variant.Time: {
-            const QTime time = value.to_time ();
+            const GLib.Time time = value.to_time ();
             const string string_value = time.to_string ("hh:mm:ss.zzz");
             res = sqlite3_bind_text16 (this.sqlite_statement, pos, string_value.utf16 (),
                 string_value.length * static_cast<int> (sizeof (ushort)), Sqlite.TRANSIENT);

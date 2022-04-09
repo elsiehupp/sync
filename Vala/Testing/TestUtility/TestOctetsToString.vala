@@ -13,7 +13,7 @@ public class TestOctetsToString : AbstractTestUtility {
     /***********************************************************
     ***********************************************************/
     private TestOctetsToString () {
-        QLocale.set_default (QLocale ("en"));
+        GLib.Locale.set_default (GLib.Locale ("en"));
         GLib.assert_true (octets_to_string (999) == "999 B");
         GLib.assert_true (octets_to_string (1024) == "1 KB");
         GLib.assert_true (octets_to_string (1364) == "1 KB");

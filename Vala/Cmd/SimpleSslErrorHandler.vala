@@ -14,7 +14,7 @@ public class SimpleSslErrorHandler : AbstractSslErrorHandler {
 
     /***********************************************************
     ***********************************************************/
-    public override bool handle_errors (GLib.List<QSslError> errors, QSslConfiguration conf, GLib.List<QSslCertificate> certificates, Account account) {
+    public override bool handle_errors (GLib.List<GLib.SslError> errors, GLib.SslConfiguration conf, GLib.List<GLib.SslCertificate> certificates, Account account) {
         (void)account;
         (void)conf;
 

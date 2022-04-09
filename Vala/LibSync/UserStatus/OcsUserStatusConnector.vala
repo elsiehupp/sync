@@ -105,7 +105,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_user_status_fetched (QJsonDocument json, int status_code) {
+    private void on_signal_user_status_fetched (GLib.JsonDocument json, int status_code) {
         log_response ("user status fetched", json, status_code);
 
         if (status_code != 200) {
@@ -121,7 +121,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_predefined_statuses_fetched (QJsonDocument json, int status_code) {
+    private void on_signal_predefined_statuses_fetched (GLib.JsonDocument json, int status_code) {
         log_response ("predefined statuses", json, status_code);
 
         if (status_code != 200) {
@@ -141,7 +141,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_user_status_online_status_set (QJsonDocument json, int status_code) {
+    private void on_signal_user_status_online_status_set (GLib.JsonDocument json, int status_code) {
         log_response ("Online status set", json, status_code);
 
         if (status_code != 200) {
@@ -153,7 +153,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_user_status_message_set (QJsonDocument json, int status_code) {
+    private void on_signal_user_status_message_set (GLib.JsonDocument json, int status_code) {
         log_response ("Message set", json, status_code);
 
         if (status_code != 200) {
@@ -172,7 +172,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_message_cleared (QJsonDocument json, int status_code) {
+    private void on_signal_message_cleared (GLib.JsonDocument json, int status_code) {
         log_response ("Message cleared", json, status_code);
 
         if (status_code != 200) {
@@ -187,7 +187,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
 
     /***********************************************************
     ***********************************************************/
-    private void log_response (string message, QJsonDocument json, int status_code) {
+    private void log_response (string message, GLib.JsonDocument json, int status_code) {
         GLib.debug ("Response from: " + message + " Status: " + status_code.to_string () +  " Json: " + json.to_string ());
     }
 
@@ -240,7 +240,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
         // Set body
         Json.Object data_object;
         data_object.insert ("status_type", online_status_to_string (online_status));
-        QJsonDocument body;
+        GLib.JsonDocument body;
         body.object (data_object);
         this.online_status_job.body (body);
         this.online_status_job.signal_json_received.connect (
@@ -277,9 +277,9 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
         if (user_status.clear_at ()) {
             data_object.insert ("clear_at", static_cast<int> (clear_at_to_timestamp (user_status.clear_at ())));
         } else {
-            data_object.insert ("clear_at", QJsonValue ());
+            data_object.insert ("clear_at", GLib.JsonValue ());
         }
-        QJsonDocument body;
+        GLib.JsonDocument body;
         body.object (data_object);
         this.message_job.body (body);
         this.message_job.signal_json_received.connect (
@@ -311,9 +311,9 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
         if (clear_at) {
             data_object.insert ("clear_at", static_cast<int> (clear_at_to_timestamp (*clear_at)));
         } else {
-            data_object.insert ("clear_at", QJsonValue ());
+            data_object.insert ("clear_at", GLib.JsonValue ());
         }
-        QJsonDocument body;
+        GLib.JsonDocument body;
         body.object (data_object);
         this.message_job.body (body);
         this.message_job.signal_json_received.connect (
@@ -390,7 +390,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
     }
 
 
-    private static UserStatus json_document_to_user_status (QJsonDocument json) {
+    private static UserStatus json_document_to_user_status (GLib.JsonDocument json) {
         Json.Object d = new Json.Object (
             {
                 "icon",
@@ -422,10 +422,10 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
         GLib.assert (clear_at.type == ClearAtType.END_OF);
 
         if (clear_at.endof == "day") {
-            return QDate.current_date ().add_days (1).start_of_day ().to_time_t ();
+            return GLib.Date.current_date ().add_days (1).start_of_day ().to_time_t ();
         } else if (clear_at.endof == "week") {
-            var days = Qt.Sunday - QDate.current_date ().day_of_week ();
-            return QDate.current_date ().add_days (days + 1).start_of_day ().to_time_t ();
+            var days = Qt.Sunday - GLib.Date.current_date ().day_of_week ();
+            return GLib.Date.current_date ().add_days (days + 1).start_of_day ().to_time_t ();
         }
         GLib.warning ("Can not handle clear at endof day type " + clear_at.endof);
         return GLib.DateTime.current_date_time ().to_time_t ();
@@ -501,7 +501,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
     }
 
 
-    private static GLib.List<UserStatus> json_to_predefined_statuses (QJsonArray json_data_array) {
+    private static GLib.List<UserStatus> json_to_predefined_statuses (GLib.JsonArray json_data_array) {
         GLib.List<UserStatus> statuses;
         foreach (var json_entry in json_data_array) {
             GLib.assert (json_entry.is_object ());

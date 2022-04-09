@@ -12,9 +12,9 @@ public class TestAllFilesDeletedKeepData : AbstractTestAllFilesDeleted {
     /***********************************************************
     ***********************************************************/
     private TestAllFilesDeletedKeepData () {
-        QTest.add_column<bool> ("delete_on_remote");
-        QTest.new_row ("local") + false;
-        QTest.new_row ("remote") + true;
+        GLib.Test.add_column<bool> ("delete_on_remote");
+        GLib.Test.new_row ("local") + false;
+        GLib.Test.new_row ("remote") + true;
     }
 
 }

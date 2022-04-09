@@ -44,14 +44,14 @@ public class UpdateMetadataApiJob : AbstractNetworkJob {
         request.raw_header ("OCS-APIREQUEST", "true");
         request.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
 
-        QUrlQuery url_query;
+        GLib.UrlQuery url_query;
         url_query.add_query_item ("format", "json");
         url_query.add_query_item ("e2e-token", this.token);
 
         GLib.Uri url = Utility.concat_url_path (account.url, this.path);
         url.query (url_query);
 
-        QUrlQuery parameters;
+        GLib.UrlQuery parameters;
         parameters.add_query_item ("meta_data",GLib.Uri.to_percent_encoding (this.b64_metadata));
         parameters.add_query_item ("e2e-token", this.token);
 

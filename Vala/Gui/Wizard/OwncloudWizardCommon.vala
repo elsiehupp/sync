@@ -6,10 +6,10 @@
 ***********************************************************/
 
 //  #include <Gdk.Pixbuf>
-//  #include <QRadioButton>
-//  #include <QAbstractButton>
-//  #include <QCheckBox>
-//  #include <QSpinBox>
+//  #include <GLib.RadioButton>
+//  #include <GLib.AbstractButton>
+//  #include <GLib.CheckBox>
+//  #include <GLib.SpinBox>
 
 namespace Occ {
 namespace Ui {

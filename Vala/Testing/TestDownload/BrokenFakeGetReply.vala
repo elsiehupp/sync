@@ -22,7 +22,7 @@ public class BrokenFakeGetReply : FakeGetReply {
         if (aborted) {
             return 0;
         }
-        return std.min (size, fake_size) + QIODevice.bytes_available (); // NOLINT : This is intended to simulare the brokeness
+        return std.min (size, fake_size) + GLib.IODevice.bytes_available (); // NOLINT : This is intended to simulare the brokeness
     }
 
 
@@ -39,7 +39,7 @@ public class BrokenFakeGetReply : FakeGetReply {
 
     /***********************************************************
     ***********************************************************/
-    SyncFileItem get_item (QSignalSpy spy, string path) {
+    SyncFileItem get_item (GLib.SignalSpy spy, string path) {
         foreach (GLib.List<GLib.Variant> args in spy) {
             var item = args[0].value<SyncFileItem> ();
             if (item.destination () == path) {

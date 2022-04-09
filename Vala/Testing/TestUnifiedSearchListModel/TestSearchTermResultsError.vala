@@ -17,8 +17,8 @@ public class TestSearchTermResultsError : AbstractTestUnifiedSearchListmodel {
         model.set_search_term ("");
         GLib.assert_true (model.row_count () == 0);
 
-        QSignalSpy error_string_changed = new QSignalSpy (model, &UnifiedSearchResultsListModel.error_string_changed);
-        QSignalSpy search_in_progress_changed = new QSignalSpy (
+        GLib.SignalSpy error_string_changed = new GLib.SignalSpy (model, &UnifiedSearchResultsListModel.error_string_changed);
+        GLib.SignalSpy search_in_progress_changed = new GLib.SignalSpy (
             model, &UnifiedSearchResultsListModel.is_search_in_progress_changed);
 
         model.set_search_term (model.search_term () + "[HTTP500]");

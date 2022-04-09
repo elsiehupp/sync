@@ -43,7 +43,7 @@ public class StorePrivateKeyApiJob : AbstractNetworkJob {
     @param json - the parsed json document
     @param status_code - the OCS status code : 100 (!) for on_signal_success
     ***********************************************************/
-    internal signal void signal_json_received (QJsonDocument json, int return_code);
+    internal signal void signal_json_received (GLib.JsonDocument json, int return_code);
 
 
     /***********************************************************
@@ -58,7 +58,7 @@ public class StorePrivateKeyApiJob : AbstractNetworkJob {
     public new void start () {
         Soup.Request request = new Soup.Request ();
         request.raw_header ("OCS-APIREQUEST", "true");
-        QUrlQuery query;
+        GLib.UrlQuery query;
         query.add_query_item ("format", "json");
         GLib.Uri url = Utility.concat_url_path (account.url, this.path);
         url.query (query);
@@ -77,7 +77,7 @@ public class StorePrivateKeyApiJob : AbstractNetworkJob {
             GLib.info ("Sending private key ended with "  + this.path + this.error_string + return_code);
 
         Json.ParserError error;
-        var json = QJsonDocument.from_json (this.reply.read_all (), error);
+        var json = GLib.JsonDocument.from_json (this.reply.read_all (), error);
         /* emit */ signal_json_received (this, json, this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ());
         return true;
     }

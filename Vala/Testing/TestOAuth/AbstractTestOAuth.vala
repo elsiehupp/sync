@@ -70,7 +70,7 @@ public abstract class AbstractTestOAuth : GLib.Object {
             this.on_signal_oauth_result
         );
         oauth.on_signal_start ();
-        QTRY_VERIFY (signal_finished ());
+        GLib.TRY_VERIFY (signal_finished ());
     }
 
 
@@ -88,7 +88,7 @@ public abstract class AbstractTestOAuth : GLib.Object {
         state = AbstractTestOAuth.State.BROWSER_OPENED;
         GLib.assert_true (url.path == s_oauth_test_server.path + "/index.php/apps/oauth2/authorize");
         GLib.assert_true (url.to_string ().has_prefix (s_oauth_test_server.to_string ()));
-        QUrlQuery query = new QUrlQuery (url);
+        GLib.UrlQuery query = new GLib.UrlQuery (url);
         GLib.assert_true (query.query_item_value ("response_type") == "code");
         GLib.assert_true (query.query_item_value ("client_id") == Theme.oauth_client_id);
         GLib.Uri redirect_uri = new GLib.Uri (query.query_item_value ("redirect_uri"));
@@ -136,7 +136,7 @@ public abstract class AbstractTestOAuth : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected virtual string token_reply_payload () {
-        QJsonDocument jsondata = new Json.Object (
+        GLib.JsonDocument jsondata = new Json.Object (
             { "access_token", "123" },
             { "refresh_token" , "456" },
             { "message_url",  "owncloud://on_signal_success"},

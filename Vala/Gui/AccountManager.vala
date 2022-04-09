@@ -363,7 +363,7 @@ public class AccountManager : GLib.Object {
 
         // now the server cert, it is in the general group
         settings.begin_group ("General");
-        const var certificates = QSslCertificate.from_data (settings.get_value (CA_CERTS_KEY_C).to_byte_array ());
+        const var certificates = GLib.SslCertificate.from_data (settings.get_value (CA_CERTS_KEY_C).to_byte_array ());
         GLib.info ("Restored: " + certificates.length + " unknown certificates.");
         acc.approved_certificates (certificates);
         settings.end_group ();

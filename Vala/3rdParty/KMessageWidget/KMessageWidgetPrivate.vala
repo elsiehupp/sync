@@ -16,8 +16,8 @@ public class KMessageWidgetPrivate : GLib.Object {
     public Gdk.Frame content = null;
     public Gtk.Label icon_label = null;
     public Gtk.Label text_label = null;
-    public QToolButton close_button = null;
-    public QTimeLine time_line = null;
+    public GLib.ToolButton close_button = null;
+    public GLib.TimeLine time_line = null;
     public Gtk.Icon icon;
     public bool ignore_show_event_doing_animated_show = false;
 
@@ -25,16 +25,16 @@ public class KMessageWidgetPrivate : GLib.Object {
     ***********************************************************/
     public KMessageWidget.MessageType message_type;
     public bool word_wrap;
-    public GLib.List<QToolButton> buttons;
+    public GLib.List<GLib.ToolButton> buttons;
     public Gdk.Pixbuf content_snap_shot;
 
     /***********************************************************
     ***********************************************************/
     public void on_init (KMessageWidget widget) {
-        widget.set_size_policy (QSizePolicy.Minimum, QSizePolicy.Fixed);
+        widget.set_size_policy (GLib.SizePolicy.Minimum, GLib.SizePolicy.Fixed);
 
         // Note: when changing the value 500, also update KMessageWidgetTest
-        time_line = new QTimeLine (500, widget);
+        time_line = new GLib.TimeLine (500, widget);
         time_line.value_changed.connect (
             widget.on_time_line_changed
         );
@@ -44,16 +44,16 @@ public class KMessageWidgetPrivate : GLib.Object {
 
         content = new Gdk.Frame (widget);
         content.set_object_name ("content_widget");
-        content.set_size_policy (QSizePolicy.Expanding, QSizePolicy.Fixed);
+        content.set_size_policy (GLib.SizePolicy.Expanding, GLib.SizePolicy.Fixed);
 
         word_wrap = false;
 
         icon_label = new Gtk.Label (content);
-        icon_label.set_size_policy (QSizePolicy.Fixed, QSizePolicy.Fixed);
+        icon_label.set_size_policy (GLib.SizePolicy.Fixed, GLib.SizePolicy.Fixed);
         icon_label.hide ();
 
         text_label = new Gtk.Label (content);
-        text_label.set_size_policy (QSizePolicy.Expanding, QSizePolicy.Fixed);
+        text_label.set_size_policy (GLib.SizePolicy.Expanding, GLib.SizePolicy.Fixed);
         text_label.set_text_interaction_flags (Qt.TextBrowserInteraction);
         text_label.link_activated.connect (
             widget.link_activated
@@ -62,7 +62,7 @@ public class KMessageWidgetPrivate : GLib.Object {
             widget.link_hovered
         );
 
-        var close_action = new QAction (widget);
+        var close_action = new GLib.Action (widget);
         close_action.on_set_text (_("&Close"));
         close_action.set_tool_tip (_("Close message"));
         close_action.on_signal_set_icon (Gtk.Icon (":/client/theme/close.svg")); // ivan : NC customization
@@ -71,7 +71,7 @@ public class KMessageWidgetPrivate : GLib.Object {
             widget.on_signal_animated_hide
         );
 
-        close_button = new QToolButton (content);
+        close_button = new GLib.ToolButton (content);
         close_button.set_auto_raise (true);
         close_button.set_default_action (close_action);
 
@@ -89,8 +89,8 @@ public class KMessageWidgetPrivate : GLib.Object {
         q_delete_all (buttons);
         buttons == "";
 
-        foreach (QAction action in widget.actions ()) {
-            var button = new QToolButton (content);
+        foreach (GLib.Action action in widget.actions ()) {
+            var button = new GLib.ToolButton (content);
             button.set_default_action (action);
             button.set_tool_button_style (Qt.ToolButtonTextBesideIcon);
             buttons.append (button);
@@ -102,7 +102,7 @@ public class KMessageWidgetPrivate : GLib.Object {
         close_button.set_auto_raise (buttons == "");
 
         if (word_wrap) {
-            var layout = new QGridLayout (content);
+            var layout = new GLib.GridLayout (content);
             // Set alignment to make sure icon does not move down if text wraps
             layout.add_widget (icon_label, 0, 0, 1, 1, Qt.AlignHCenter | Qt.AlignTop);
             layout.add_widget (text_label, 0, 1);
@@ -112,9 +112,9 @@ public class KMessageWidgetPrivate : GLib.Object {
                 layout.add_widget (close_button, 0, 2, 1, 1, Qt.AlignHCenter | Qt.AlignTop);
             } else {
                 // Use an additional layout in row 1 for the buttons.
-                var button_layout = new QHBoxLayout ();
+                var button_layout = new GLib.HBoxLayout ();
                 button_layout.add_stretch ();
-                foreach (QToolButton button in buttons) {
+                foreach (GLib.ToolButton button in buttons) {
                     // For some reason, calling show () is necessary if wordwrap is true,
                     // otherwise the buttons do not show up. It is not needed if
                     // wordwrap is false.
@@ -125,11 +125,11 @@ public class KMessageWidgetPrivate : GLib.Object {
                 layout.add_item (button_layout, 1, 0, 1, 2);
             }
         } else {
-            var layout = new QHBoxLayout (content);
+            var layout = new GLib.HBoxLayout (content);
             layout.add_widget (icon_label);
             layout.add_widget (text_label);
 
-            foreach (QToolButton button in buttons) {
+            foreach (GLib.ToolButton button in buttons) {
                 layout.add_widget (button);
             }
 
@@ -168,7 +168,7 @@ public class KMessageWidgetPrivate : GLib.Object {
         const double bg_base_color_alpha = 0.2;
         bg_base_color.set_alpha_f (bg_base_color_alpha);
 
-        const Gtk.Palette palette = Gtk.Application.palette ();
+        const Gtk.Palette palette = GLib.Application.palette ();
         const Gdk.RGBA window_color = palette.window ().color ();
         const Gdk.RGBA text_color = palette.text ().color ();
         const Gdk.RGBA border = bg_base_color;
@@ -185,8 +185,8 @@ public class KMessageWidgetPrivate : GLib.Object {
             + "background-color : %1;".printf (bg_final_color.name ())
             + "border-radius : 4px;"
             + "border: 2px solid %2;".printf (border.name ())
-            // DefaultFrameWidth returns the size of the external margin + border width. We know our border is 1px, so we subtract this from the frame normal QStyle FrameWidth to get our margin
-            + "margin: %3px;".printf (widget.this.style.pixel_metric (QStyle.PM_DefaultFrameWidth, null, widget) - 1)
+            // DefaultFrameWidth returns the size of the external margin + border width. We know our border is 1px, so we subtract this from the frame normal GLib.Style FrameWidth to get our margin
+            + "margin: %3px;".printf (widget.this.style.pixel_metric (GLib.Style.PM_DefaultFrameWidth, null, widget) - 1)
             + "}"
             + ".Gtk.Label { color : %4; }".printf (text_color.name ())
         );
@@ -212,7 +212,7 @@ public class KMessageWidgetPrivate : GLib.Object {
         content_snap_shot = Gdk.Pixbuf (content.size () * widget.scale_factor);
         content_snap_shot.set_device_pixel_ratio (widget.scale_factor);
         content_snap_shot.fill (Qt.transparent);
-        content.render (&content_snap_shot, QPoint (), QRegion (), Gtk.Widget.DrawChildren);
+        content.render (&content_snap_shot, GLib.Point (), GLib.Region (), Gtk.Widget.DrawChildren);
     }
 
 
@@ -227,7 +227,7 @@ public class KMessageWidgetPrivate : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_time_line_finished () {
-        if (time_line.direction () == QTimeLine.Forward) {
+        if (time_line.direction () == GLib.TimeLine.Forward) {
             // Show
             // We set the whole geometry here, because it may be wrong if a
             // KMessageWidget is shown right when the toplevel window is created.

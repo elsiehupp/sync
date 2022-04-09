@@ -4,7 +4,7 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QJsonDocument>
+//  #include <GLib.JsonDocument>
 
 namespace Occ {
 namespace Ui {
@@ -22,7 +22,7 @@ public class OcsShareeJob : OcsJob {
 
     @param reply The reply
     ***********************************************************/
-    internal signal void signal_sharee_job_finished (QJsonDocument reply);
+    internal signal void signal_sharee_job_finished (GLib.JsonDocument reply);
 
     /***********************************************************
     ***********************************************************/
@@ -56,7 +56,7 @@ public class OcsShareeJob : OcsJob {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_job_finished (QJsonDocument reply) {
+    private void on_signal_job_finished (GLib.JsonDocument reply) {
         /* emit */ signal_sharee_job_finished (reply);
     }
 

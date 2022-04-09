@@ -51,14 +51,14 @@ public class DirectEditor : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public bool has_mimetype (QMimeType mime_type) {
+    public bool has_mimetype (GLib.MimeType mime_type) {
         return this.mime_types.contains (mime_type.name ().to_latin1 ());
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool has_optional_mimetype (QMimeType mime_type) {
+    public bool has_optional_mimetype (GLib.MimeType mime_type) {
         return this.optional_mime_types.contains (mime_type.name ().to_latin1 ());
     }
 

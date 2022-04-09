@@ -4,12 +4,12 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QJsonDocument>
+//  #include <GLib.JsonDocument>
 //  #include <Json.Object>
-//  #include <QJsonArray>
+//  #include <GLib.JsonArray>
 
 
-//  #include <QDate>
+//  #include <GLib.Date>
 
 namespace Occ {
 namespace Ui {
@@ -125,10 +125,10 @@ public class ShareManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_create_share_job_finished (QJsonDocument reply) {
+    private void on_signal_create_share_job_finished (GLib.JsonDocument reply) {
         // Find existing share permissions (if this was shared with us)
         Share.Permissions existing_permissions = Share_permission_default;
-        foreach (QJsonValue element in reply.object ()["ocs"].to_object ()["data"].to_array ()) {
+        foreach (GLib.JsonValue element in reply.object ()["ocs"].to_object ()["data"].to_array ()) {
             var map = element.to_object ();
             if (map["file_target"] == path) {
                 existing_permissions = Share.Permissions (map["permissions"].to_int ());
@@ -164,7 +164,7 @@ public class ShareManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_shares_fetched (QJsonDocument reply) {
+    private void on_signal_shares_fetched (GLib.JsonDocument reply) {
         var temporary_shares = reply.object ().value ("ocs").to_object ().value ("data").to_array ();
         GLib.debug (this.account.server_version () + " Fetched " + temporary_shares.length + "shares");
 
@@ -195,7 +195,7 @@ public class ShareManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_create_link_share_job_finished (QJsonDocument reply) {
+    private void on_signal_create_link_share_job_finished (GLib.JsonDocument reply) {
         string message;
         int code = OcsShareJob.json_return_code (reply, message);
 
@@ -221,7 +221,7 @@ public class ShareManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_share_created (QJsonDocument reply) {
+    private void on_signal_share_created (GLib.JsonDocument reply) {
         //Parse share
         var data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
         unowned Share share = new Share (parse_share (data));
@@ -252,15 +252,15 @@ public class ShareManager : GLib.Object {
             // From own_cloud server version 8 on, a different share link scheme is used.
             url = new GLib.Uri (Utility.concat_url_path (this.account.url, "index.php/s/" + data.value ("token").to_string ())).to_string ();
         } else {
-            QUrlQuery query_args;
+            GLib.UrlQuery query_args;
             query_args.add_query_item ("service", "files");
             query_args.add_query_item ("t", data.value ("token").to_string ());
             url = new GLib.Uri (Utility.concat_url_path (this.account.url, "public.php", query_args).to_string ());
         }
 
-        QDate expire_date;
+        GLib.Date expire_date;
         if (data.value ("expiration").is_string ()) {
-            expire_date = QDate.from_string (data.value ("expiration").to_string (), "yyyy-MM-dd 00:00:00");
+            expire_date = GLib.Date.from_string (data.value ("expiration").to_string (), "yyyy-MM-dd 00:00:00");
         }
 
         string note;
@@ -295,9 +295,9 @@ public class ShareManager : GLib.Object {
             (Sharee.Type) data.value ("share_type").to_int ()
         );
 
-        QDate expire_date;
+        GLib.Date expire_date;
         if (data.value ("expiration").is_string ()) {
-            expire_date = QDate.from_string (data.value ("expiration").to_string (), "yyyy-MM-dd 00:00:00");
+            expire_date = GLib.Date.from_string (data.value ("expiration").to_string (), "yyyy-MM-dd 00:00:00");
         }
 
         string note;

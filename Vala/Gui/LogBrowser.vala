@@ -6,23 +6,23 @@
 
 //  #include <cstdio>
 //  #include <iostream>
-//  #include <QDialogB
-//  #include <QLayout>
-//  #include <QPushBu
-//  #include <QLabe
+//  #include <GLib.DialogB
+//  #include <GLib.Layout>
+//  #include <GLib.PushBu
+//  #include <GLib.Labe
 //  #include <GLib.Dir>
 //  #include <GLib.OutputStream>
 //  #include <Gtk.MessageBox>
-//  #include <QCoreAppli
-//  #include <QSetting
-//  #include <QAction>
-//  #include <QDesktopSe
-//  #include <QCheckBox>
-//  #include <QPlain_tex
+//  #include <GLib.CoreAppli
+//  #include <GLib.Setting
+//  #include <GLib.Action>
+//  #include <GLib.DesktopSe
+//  #include <GLib.CheckBox>
+//  #include <GLib.Plain_tex
 //  #include <GLib.OutputStream
 //  #include <Gtk.Dialog>
-//  #include <QLineEdit>
-//  #include <QPushButton>
+//  #include <GLib.LineEdit>
+//  #include <GLib.PushButton>
 
 namespace Occ {
 namespace Ui {
@@ -42,7 +42,7 @@ public class LogBrowser : Gtk.Dialog {
         window_title (_("Log Output"));
         minimum_width (600);
 
-        var main_layout = new QVBoxLayout ();
+        var main_layout = new GLib.VBoxLayout ();
 
         var label = new Gtk.Label (
             _("The client can write debug logs to a temporary folder. "
@@ -54,11 +54,11 @@ public class LogBrowser : Gtk.Dialog {
             .printf (LibSync.Logger.instance.temporary_folder_log_dir_path));
         label.word_wrap (true);
         label.text_interaction_flags (Qt.Text_selectable_by_mouse);
-        label.size_policy (QSizePolicy.Expanding, QSizePolicy.Minimum_expanding);
+        label.size_policy (GLib.SizePolicy.Expanding, GLib.SizePolicy.Minimum_expanding);
         main_layout.add_widget (label);
 
         // button to permanently save logs
-        var enable_logging_button = new QCheckBox ();
+        var enable_logging_button = new GLib.CheckBox ();
         enable_logging_button.on_signal_text (_("Enable logging to temporary folder"));
         enable_logging_button.checked (ConfigFile ().automatic_log_dir ());
         enable_logging_button.toggled.connect (
@@ -70,18 +70,18 @@ public class LogBrowser : Gtk.Dialog {
             _("This setting persists across client restarts.\n"
             + "Note that using any logging command line options will override this setting."));
         label.word_wrap (true);
-        label.size_policy (QSizePolicy.Expanding, QSizePolicy.Minimum_expanding);
+        label.size_policy (GLib.SizePolicy.Expanding, GLib.SizePolicy.Minimum_expanding);
         main_layout.add_widget (label);
 
-        var open_folder_button = new QPushButton ();
+        var open_folder_button = new GLib.PushButton ();
         open_folder_button.on_signal_text (_("Open folder"));
         open_folder_button.clicked.connect (
             this.on_open_folder_button_clicked
         );
         main_layout.add_widget (open_folder_button);
 
-        var btnbox = new QDialogButtonBox ();
-        QPushButton close_button = btnbox.add_button (QDialogButtonBox.Close);
+        var btnbox = new GLib.DialogButtonBox ();
+        GLib.PushButton close_button = btnbox.add_button (GLib.DialogButtonBox.Close);
         close_button.clicked.connect (
             this.close
         );
@@ -93,8 +93,8 @@ public class LogBrowser : Gtk.Dialog {
 
         this.modal = false;
 
-        var show_log_window_action = new QAction (this);
-        show_log_window_action.shortcut (QKeySequence ("F12"));
+        var show_log_window_action = new GLib.Action (this);
+        show_log_window_action.shortcut (GLib.KeySequence ("F12"));
         show_log_window_action.triggered.connect (
             this.close
         );
@@ -110,13 +110,13 @@ public class LogBrowser : Gtk.Dialog {
     private void on_open_folder_button_clicked () {
         string path = LibSync.Logger.instance.temporary_folder_log_dir_path;
         new GLib.Dir ().mkpath (path);
-        QDesktopServices.open_url (GLib.Uri.from_local_file (path));
+        GLib.DesktopServices.open_url (GLib.Uri.from_local_file (path));
     }
 
 
     /***********************************************************
     ***********************************************************/
-    protected override void close_event (QCloseEvent event) {
+    protected override void close_event (GLib.CloseEvent event) {
         ConfigFile config;
         config.save_geometry (this);
     }

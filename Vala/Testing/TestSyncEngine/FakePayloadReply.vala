@@ -30,7 +30,7 @@ public class FakePayloadReply : FakeReply {
         set_request (request);
         set_url (request.url);
         set_operation (operation);
-        open (QIODevice.ReadOnly);
+        open (GLib.IODevice.ReadOnly);
         GLib.Timeout.single_shot (delay, this, &FakePayloadReply.respond);
     }
 

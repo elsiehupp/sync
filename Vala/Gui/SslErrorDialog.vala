@@ -12,7 +12,7 @@ public class SslErrorDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    GLib.List<QSslCertificate> unknown_certificates { public get; private set; }
+    GLib.List<GLib.SslCertificate> unknown_certificates { public get; private set; }
 
     private string custom_config_handle;
     private SslErrorDialog instance;
@@ -28,10 +28,10 @@ public class SslErrorDialog : Gtk.Dialog {
         window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         this.instance.up_ui (this);
         window_title (_("Untrusted Certificate"));
-        QPushButton ok_button =
-            this.instance.dialog_button_box.button (QDialogButtonBox.Ok);
-        QPushButton cancel_button =
-            this.instance.dialog_button_box.button (QDialogButtonBox.Cancel);
+        GLib.PushButton ok_button =
+            this.instance.dialog_button_box.button (GLib.DialogButtonBox.Ok);
+        GLib.PushButton cancel_button =
+            this.instance.dialog_button_box.button (GLib.DialogButtonBox.Cancel);
         ok_button.enabled (false);
 
         this.instance.cb_trust_connect.enabled (!Theme.forbid_bad_ssl);
@@ -60,7 +60,7 @@ public class SslErrorDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public bool check_failing_certificates_known (GLib.List<QSslError> errors) {
+    public bool check_failing_certificates_known (GLib.List<GLib.SslError> errors) {
         // check if unknown certificates caused errors.
         this.unknown_certificates == null;
 
@@ -68,10 +68,10 @@ public class SslErrorDialog : Gtk.Dialog {
 
         GLib.List<string> additional_error_strings = new GLib.List<string> ();
 
-        GLib.List<QSslCertificate> trusted_certificates = this.account.approved_certificates ();
+        GLib.List<GLib.SslCertificate> trusted_certificates = this.account.approved_certificates ();
 
         for (int i = 0; i < errors.length (); ++i) {
-            QSslError error = errors.at (i);
+            GLib.SslError error = errors.at (i);
             if (trusted_certificates.contains (error.certificate ()) || this.unknown_certificates.contains (error.certificate ())) {
                 continue;
             }
@@ -89,44 +89,44 @@ public class SslErrorDialog : Gtk.Dialog {
             return true;
         }
 
-        string message = QL ("<html><head>");
-        message += QL ("<link rel='stylesheet' type='text/css' href='format.css'>");
-        message += QL ("</head><body>");
+        string message = GLib.L ("<html><head>");
+        message += GLib.L ("<link rel='stylesheet' type='text/css' href='format.css'>");
+        message += GLib.L ("</head><body>");
 
         var host = this.account.url.host ();
-        message += QL ("<h3>") + _("Cannot connect securely to <i>%1</i>:").printf (host) + QL ("</h3>");
+        message += GLib.L ("<h3>") + _("Cannot connect securely to <i>%1</i>:").printf (host) + GLib.L ("</h3>");
         // loop over the unknown certificates and line up their errors.
-        message += QL ("<div identifier=\"ca_errors\">");
-        foreach (QSslCertificate cert in this.unknown_certificates) {
-            message += QL ("<div identifier=\"ca_error\">");
+        message += GLib.L ("<div identifier=\"ca_errors\">");
+        foreach (GLib.SslCertificate cert in this.unknown_certificates) {
+            message += GLib.L ("<div identifier=\"ca_error\">");
             // add the errors for this cert
-            foreach (QSslError err in errors) {
+            foreach (GLib.SslError err in errors) {
                 if (err.certificate () == cert) {
-                    message += QL ("<p>") + err.error_string + QL ("</p>");
+                    message += GLib.L ("<p>") + err.error_string + GLib.L ("</p>");
                 }
             }
-            message += QL ("</div>");
+            message += GLib.L ("</div>");
             message += cert_div (cert);
             if (this.unknown_certificates.length > 1) {
-                message += QL ("<hr/>");
+                message += GLib.L ("<hr/>");
             }
         }
 
         if (additional_error_strings.length () != 0) {
-            message += QL ("<h4>") + _("Additional errors:") + QL ("</h4>");
+            message += GLib.L ("<h4>") + _("Additional errors:") + GLib.L ("</h4>");
 
             foreach (var error_string in additional_error_strings) {
-                message += QL ("<div identifier=\"ca_error\">");
-                message += QL ("<p>") + error_string + QL ("</p>");
-                message += QL ("</div>");
+                message += GLib.L ("<div identifier=\"ca_error\">");
+                message += GLib.L ("<p>") + error_string + GLib.L ("</p>");
+                message += GLib.L ("</div>");
             }
         }
 
-        message += QL ("</div></body></html>");
+        message += GLib.L ("</div></body></html>");
 
-        var doc = new QText_document (null);
+        var doc = new GLib.Text_document (null);
         string style = style_sheet ();
-        doc.add_resource (QText_document.Style_sheet_resource, GLib.Uri (QL ("format.css")), style);
+        doc.add_resource (GLib.Text_document.Style_sheet_resource, GLib.Uri (GLib.L ("format.css")), style);
         doc.html (message);
 
         this.instance.tb_errors.document (doc);
@@ -163,17 +163,17 @@ public class SslErrorDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private string cert_div (QSslCertificate cert) {
+    private string cert_div (GLib.SslCertificate cert) {
         string message;
-        message += QL ("<div identifier=\"cert\">");
-        message += QL ("<h3>") + _("with Certificate %1").printf (Utility.escape (cert.subject_info (QSslCertificate.Common_name))) + QL ("</h3>");
+        message += GLib.L ("<div identifier=\"cert\">");
+        message += GLib.L ("<h3>") + _("with Certificate %1").printf (Utility.escape (cert.subject_info (GLib.SslCertificate.Common_name))) + GLib.L ("</h3>");
 
-        message += QL ("<div identifier=\"ccert\">");
+        message += GLib.L ("<div identifier=\"ccert\">");
         GLib.List<string> li;
 
-        string org = Utility.escape (cert.subject_info (QSslCertificate.Organization));
-        string unit = Utility.escape (cert.subject_info (QSslCertificate.Organizational_unit_name));
-        string country = Utility.escape (cert.subject_info (QSslCertificate.Country_name));
+        string org = Utility.escape (cert.subject_info (GLib.SslCertificate.Organization));
+        string unit = Utility.escape (cert.subject_info (GLib.SslCertificate.Organizational_unit_name));
+        string country = Utility.escape (cert.subject_info (GLib.SslCertificate.Country_name));
         if (unit == "")
             unit = _("&lt;not specified&gt;");
         if (org == "")
@@ -183,41 +183,41 @@ public class SslErrorDialog : Gtk.Dialog {
         li += _("Organization : %1").printf (org);
         li += _("Unit : %1").printf (unit);
         li += _("Country : %1").printf (country);
-        message += QL ("<p>") + li.join (QL ("<br/>")) + QL ("</p>");
+        message += GLib.L ("<p>") + li.join (GLib.L ("<br/>")) + GLib.L ("</p>");
 
-        message += QL ("<p>");
+        message += GLib.L ("<p>");
 
-        if (cert.effective_date () < new GLib.DateTime (QDate (2016, 1, 1), QTime (), Qt.UTC)) {
+        if (cert.effective_date () < new GLib.DateTime (GLib.Date (2016, 1, 1), GLib.Time (), Qt.UTC)) {
         string sha1sum = Utility.format_fingerprint (cert.digest (GLib.ChecksumType.SHA1).to_hex ());
-            message += _("Fingerprint (SHA1) : <tt>%1</tt>").printf (sha1sum) + QL ("<br/>");
+            message += _("Fingerprint (SHA1) : <tt>%1</tt>").printf (sha1sum) + GLib.L ("<br/>");
         }
 
-        string sha256sum = Utility.format_fingerprint (cert.digest (QCryptographicHash.Sha256).to_hex ());
-        string sha512sum = Utility.format_fingerprint (cert.digest (QCryptographicHash.Sha512).to_hex ());
-        message += _("Fingerprint (SHA-256) : <tt>%1</tt>").printf (sha256sum) + QL ("<br/>");
-        message += _("Fingerprint (SHA-512) : <tt>%1</tt>").printf (sha512sum) + QL ("<br/>");
-        message += QL ("<br/>");
-        message += _("Effective Date : %1").printf (cert.effective_date ().to_string ()) + QL ("<br/>");
-        message += _("Expiration Date : %1").printf (cert.expiry_date ().to_string ()) + QL ("</p>");
+        string sha256sum = Utility.format_fingerprint (cert.digest (GLib.CryptographicHash.Sha256).to_hex ());
+        string sha512sum = Utility.format_fingerprint (cert.digest (GLib.CryptographicHash.Sha512).to_hex ());
+        message += _("Fingerprint (SHA-256) : <tt>%1</tt>").printf (sha256sum) + GLib.L ("<br/>");
+        message += _("Fingerprint (SHA-512) : <tt>%1</tt>").printf (sha512sum) + GLib.L ("<br/>");
+        message += GLib.L ("<br/>");
+        message += _("Effective Date : %1").printf (cert.effective_date ().to_string ()) + GLib.L ("<br/>");
+        message += _("Expiration Date : %1").printf (cert.expiry_date ().to_string ()) + GLib.L ("</p>");
 
-        message += QL ("</div>");
+        message += GLib.L ("</div>");
 
-        message += QL ("<h3>") + _("Issuer : %1").printf (Utility.escape (cert.issuer_info (QSslCertificate.Common_name))) + QL ("</h3>");
-        message += QL ("<div identifier=\"issuer\">");
+        message += GLib.L ("<h3>") + _("Issuer : %1").printf (Utility.escape (cert.issuer_info (GLib.SslCertificate.Common_name))) + GLib.L ("</h3>");
+        message += GLib.L ("<div identifier=\"issuer\">");
         li == "";
-        li += _("Organization : %1").printf (Utility.escape (cert.issuer_info (QSslCertificate.Organization)));
-        li += _("Unit : %1").printf (Utility.escape (cert.issuer_info (QSslCertificate.Organizational_unit_name)));
-        li += _("Country : %1").printf (Utility.escape (cert.issuer_info (QSslCertificate.Country_name)));
-        message += QL ("<p>") + li.join (QL ("<br/>")) + QL ("</p>");
-        message += QL ("</div>");
-        message += QL ("</div>");
+        li += _("Organization : %1").printf (Utility.escape (cert.issuer_info (GLib.SslCertificate.Organization)));
+        li += _("Unit : %1").printf (Utility.escape (cert.issuer_info (GLib.SslCertificate.Organizational_unit_name)));
+        li += _("Country : %1").printf (Utility.escape (cert.issuer_info (GLib.SslCertificate.Country_name)));
+        message += GLib.L ("<p>") + li.join (GLib.L ("<br/>")) + GLib.L ("</p>");
+        message += GLib.L ("</div>");
+        message += GLib.L ("</div>");
 
         return message;
     }
 
 
     /***********************************************************
-    Used for QSSLCertificate.subject_info which returns a
+    Used for GLib.SSLCertificate.subject_info which returns a
     GLib.List<string> in Qt5, but a string in Qt4
     ***********************************************************/
     private static string escape (GLib.List<string> l) {
@@ -227,7 +227,7 @@ public class SslErrorDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private static int QL (int x) {
+    private static int GLib.L (int x) {
         return x;
     }
 

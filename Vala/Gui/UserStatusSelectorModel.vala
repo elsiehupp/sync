@@ -8,13 +8,13 @@
 //  #include <access_managerespace.h>
 //  #include <userstatusconnector.h>
 //  #include <theme.h>
-//  #include <QLoggingCa
+//  #include <GLib.LoggingCa
 //  #include <algorithm>
 //  #include <cmath>
 //  #include <cstddef>
 //  #include <userstatusconnector.h>
 //  #include <datetimeprovider.h>
-//  #include <QMetaType>
+//  #include <GLib.MetaType>
 //  #include <Qt_numer
 //  #include <cstddef>
 //  #include <memory>

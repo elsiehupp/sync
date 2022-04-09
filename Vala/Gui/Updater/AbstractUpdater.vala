@@ -4,9 +4,9 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QUrlQuery>
-//  #include <QProcess>
-//  #include <QSysInfo>
+//  #include <GLib.UrlQuery>
+//  #include <GLib.Process>
+//  #include <GLib.SysInfo>
 
 namespace Occ {
 namespace Ui {
@@ -41,8 +41,8 @@ public abstract class AbstractUpdater : GLib.Object {
         }
 
         public static int64 current_version_to_int () {
-            return version_to_int (MIRALL_VERSION_MAJOR, MIRALL_VERSION_MINOR,
-                MIRALL_VERSION_PATCH, MIRALL_VERSION_BUILD);
+            return version_to_int (Common.Version.MIRALL_VERSION_MAJOR, Common.Version.MIRALL_VERSION_MINOR,
+                Common.Version.MIRALL_VERSION_PATCH, Common.Version.MIRALL_VERSION_BUILD);
         }
 
 
@@ -98,7 +98,7 @@ public abstract class AbstractUpdater : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected static string client_version () {
-        return MIRALL_STRINGIFY (MIRALL_VERSION_FULL);
+        return Common.Version.MIRALL_VERSION_FULL;
     }
 
 
@@ -106,7 +106,7 @@ public abstract class AbstractUpdater : GLib.Object {
     ***********************************************************/
     private static string system_info {
         public get {
-            QProcess process;
+            GLib.Process process;
             process.on_signal_start ("lsb_release", {
                 "-a"
             });
@@ -123,9 +123,9 @@ public abstract class AbstractUpdater : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static QUrlQuery query_params {
+    private static GLib.UrlQuery query_params {
         public get {
-            QUrlQuery query;
+            GLib.UrlQuery query;
             Theme theme = Theme.instance;
             string platform = "stranger";
             if (Utility.is_linux ()) {
@@ -143,14 +143,14 @@ public abstract class AbstractUpdater : GLib.Object {
             }
             query.add_query_item ("version", client_version ());
             query.add_query_item ("platform", platform);
-            query.add_query_item ("os_release", QSysInfo.product_type ());
-            query.add_query_item ("os_version", QSysInfo.product_version ());
-            query.add_query_item ("kernel_version", QSysInfo.kernel_version ());
+            query.add_query_item ("os_release", GLib.SysInfo.product_type ());
+            query.add_query_item ("os_version", GLib.SysInfo.product_version ());
+            query.add_query_item ("kernel_version", GLib.SysInfo.kernel_version ());
             query.add_query_item ("oem", theme.app_name);
-            query.add_query_item ("build_arch", QSysInfo.build_cpu_architecture ());
-            query.add_query_item ("current_arch", QSysInfo.current_cpu_architecture ());
+            query.add_query_item ("build_arch", GLib.SysInfo.build_cpu_architecture ());
+            query.add_query_item ("current_arch", GLib.SysInfo.current_cpu_architecture ());
 
-            string suffix = MIRALL_STRINGIFY (MIRALL_VERSION_SUFFIX);
+            string suffix = Common.Version.MIRALL_VERSION_SUFFIX;
             query.add_query_item ("versionsuffix", suffix);
 
             var channel = ConfigFile ().update_channel;

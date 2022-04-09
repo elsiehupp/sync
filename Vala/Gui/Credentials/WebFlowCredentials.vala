@@ -1,13 +1,13 @@
-// #include <QSslCertificate>
-//  #include <QSslKey>
+// #include <GLib.SslCertificate>
+//  #include <GLib.SslKey>
 //  #include <Soup.Request>
-//  #include <QQueue>
-//  #include <QAuthenticator>
+//  #include <GLib.Queue>
+//  #include <GLib.Authenticator>
 //  #include <Soup.Context>
-//  #include <QPointe
+//  #include <GLib.Pointe
 //  #include <GLib.Timeout>
 //  #include <Gtk.Dialog>
-//  #include <QVBoxLayout>
+//  #include <GLib.VBoxLayout>
 
 //  #ifdef WITH_WEBENGINE
 //  #endif // WITH_WEBENGINE
@@ -42,15 +42,15 @@ public class WebFlowCredentials : AbstractCredentials {
     Better than storing the count and relying on maybe-hacked values
     ***********************************************************/
     private const int client_ssl_ca_certificates_max_count = 10;
-    private QQueue<QSslCertificate> client_ssl_ca_certificates_write_queue;
+    private GLib.Queue<GLib.SslCertificate> client_ssl_ca_certificates_write_queue;
 
     string user { public get; protected set; }
     string password { public get; protected set; }
     bool ready { public get; protected set; }
 
-    protected QSslKey client_ssl_key;
-    protected QSslCertificate client_ssl_certificate;
-    protected GLib.List<QSslCertificate> client_ssl_ca_certificates;
+    protected GLib.SslKey client_ssl_key;
+    protected GLib.SslCertificate client_ssl_certificate;
+    protected GLib.List<GLib.SslCertificate> client_ssl_ca_certificates;
 
     protected bool credentials_valid = false;
     protected bool keychain_migration = false;
@@ -62,9 +62,9 @@ public class WebFlowCredentials : AbstractCredentials {
     public WebFlowCredentials (
         string user,
         string password,
-        QSslCertificate certificate = QSslCertificate (),
-        QSslKey key = QSslKey (),
-        GLib.List<QSslCertificate> ca_certificates = GLib.List<QSslCertificate> ()) {
+        GLib.SslCertificate certificate = GLib.SslCertificate (),
+        GLib.SslKey key = GLib.SslKey (),
+        GLib.List<GLib.SslCertificate> ca_certificates = GLib.List<GLib.SslCertificate> ()) {
         this.user = user;
         this.password = password;
         this.client_ssl_key = key;
@@ -85,7 +85,7 @@ public class WebFlowCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     public override Soup.Context create_access_manager () {
-        GLib.info ("Getting QNAM");
+        GLib.info ("Getting GLib.NAM");
         AccessManager soup_context = new WebFlowCredentialsAccessManager (this);
 
         soup_context.signal_authentication_required.connect (
@@ -163,9 +163,9 @@ public class WebFlowCredentials : AbstractCredentials {
         // clear the session cookie.
         this.account.clear_cookie_jar ();
 
-        // let QNAM forget about the password
+        // let GLib.NAM forget about the password
         // This needs to be done later in the event loop because we might be called (directly or
-        // indirectly) from QNetworkAccessManagerPrivate.signal_authentication_required, which itself
+        // indirectly) from GLib.NetworkAccessManagerPrivate.signal_authentication_required, which itself
         // is a called from a BlockingQueuedConnection from the Qt HTTP thread. And clearing the
         // cache needs to synchronize again with the HTTP thread.
         GLib.Timeout.single_shot (0, this.account, Account.on_signal_clear_access_manager_cache);
@@ -212,7 +212,7 @@ public class WebFlowCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_authentication (GLib.InputStream reply, QAuthenticator authenticator) {
+    private void on_signal_authentication (GLib.InputStream reply, GLib.Authenticator authenticator) {
         //  Q_UNUSED (reply)
 
         if (!this.ready) {
@@ -298,7 +298,7 @@ public class WebFlowCredentials : AbstractCredentials {
     private void on_signal_read_client_cert_pem_job_done (KeychainChunkReadJob read_job) {
         // Store PEM in memory
         if (read_job.error == NoError && read_job.binary_data ().length > 0) {
-            GLib.List<QSslCertificate> ssl_certificate_list = QSslCertificate.from_data (read_job.binary_data (), QSsl.Pem);
+            GLib.List<GLib.SslCertificate> ssl_certificate_list = GLib.SslCertificate.from_data (read_job.binary_data (), GLib.Ssl.Pem);
             if (ssl_certificate_list.length >= 1) {
                 this.client_ssl_certificate = ssl_certificate_list.at (0);
             }
@@ -324,14 +324,14 @@ public class WebFlowCredentials : AbstractCredentials {
         // Store key in memory
         if (read_job.error == NoError && read_job.binary_data ().length > 0) {
             string client_key_pem = read_job.binary_data ();
-            // FIXME Unfortunately Qt has a bug and we can't just use QSsl.Opaque to let it
+            // FIXME Unfortunately Qt has a bug and we can't just use GLib.Ssl.Opaque to let it
             // load whatever we have. So we try until it works.
-            this.client_ssl_key = QSslKey (client_key_pem, QSsl.Rsa);
+            this.client_ssl_key = GLib.SslKey (client_key_pem, GLib.Ssl.Rsa);
             if (this.client_ssl_key == null) {
-                this.client_ssl_key = QSslKey (client_key_pem, QSsl.Dsa);
+                this.client_ssl_key = GLib.SslKey (client_key_pem, GLib.Ssl.Dsa);
             }
             if (this.client_ssl_key == null) {
-                this.client_ssl_key = QSslKey (client_key_pem, QSsl.Ec);
+                this.client_ssl_key = GLib.SslKey (client_key_pem, GLib.Ssl.Ec);
             }
             if (this.client_ssl_key == null) {
                 GLib.warning ("Could not load SSL key into Qt!");
@@ -354,7 +354,7 @@ public class WebFlowCredentials : AbstractCredentials {
         // Store cert in memory
         if (read_job) {
             if (read_job.error == NoError && read_job.binary_data ().length > 0) {
-                GLib.List<QSslCertificate> ssl_certificate_list = QSslCertificate.from_data (read_job.binary_data (), QSsl.Pem);
+                GLib.List<GLib.SslCertificate> ssl_certificate_list = GLib.SslCertificate.from_data (read_job.binary_data (), GLib.Ssl.Pem);
                 if (ssl_certificate_list.length >= 1) {
                     this.client_ssl_ca_certificates.append (ssl_certificate_list.at (0));
                 }

@@ -347,7 +347,7 @@ public class ExcludedFiles : GLib.Object {
 
         // Check the bname part of the path to see whether the full
         // regular_expression should be run.
-        /* QStringRef */ string bname_str = new /* QStringRef */ string (path);
+        /* GLib.StringRef */ string bname_str = new /* GLib.StringRef */ string (path);
         int last_slash = path.last_index_of ("/");
         if (last_slash >= 0) {
             bname_str = path.mid_ref (last_slash + 1);
@@ -356,7 +356,7 @@ public class ExcludedFiles : GLib.Object {
         string base_path = this.local_path + path;
         while (base_path.length > this.local_path.length) {
             base_path = left_include_last (base_path, "/");
-            QRegularExpressionMatch regular_expression_match;
+            GLib.RegularExpressionMatch regular_expression_match;
             if (filetype == ItemType.DIRECTORY
                 && this.bname_traversal_regex_dir.contains (base_path)) {
                 regular_expression_match = this.bname_traversal_regex_dir[base_path].match (bname_str);
@@ -380,7 +380,7 @@ public class ExcludedFiles : GLib.Object {
         base_path = this.local_path + path;
         while (base_path.length > this.local_path.length) {
             base_path = left_include_last (base_path, "/");
-            QRegularExpressionMatch regular_expression_match;
+            GLib.RegularExpressionMatch regular_expression_match;
             if (filetype == ItemType.DIRECTORY
                 && this.full_traversal_regex_dir.contains (base_path)) {
                 regular_expression_match = this.full_traversal_regex_dir[base_path].match (path);
@@ -421,7 +421,7 @@ public class ExcludedFiles : GLib.Object {
         foreach (var base_path in keys) {
             foreach (var exclude_file in this.exclude_files.value (base_path)) {
                 GLib.File file = GLib.File.new_for_path (exclude_file);
-                if (file.exists () && file.open (QIODevice.ReadOnly)) {
+                if (file.exists () && file.open (GLib.IODevice.ReadOnly)) {
                     on_signal_load_exclude_file_patterns (base_path, file);
                 } else {
                     on_signal_success = false;
@@ -531,7 +531,7 @@ public class ExcludedFiles : GLib.Object {
         string base_path = this.local_path + path;
         while (base_path.length > this.local_path.length) {
             base_path = left_include_last (base_path, "/");
-            QRegularExpressionMatch regular_expression_match;
+            GLib.RegularExpressionMatch regular_expression_match;
             if (filetype == ItemType.DIRECTORY
                 && this.full_regex_dir.contains (base_path)) {
                 regular_expression_match = this.full_regex_dir[base_path].match (p);
@@ -893,7 +893,7 @@ public class ExcludedFiles : GLib.Object {
     @return true if file is reserved, false otherwise
 
     ***********************************************************/
-    private static bool csync_is_windows_reserved_word (/* QStringRef */ string filename) {
+    private static bool csync_is_windows_reserved_word (/* GLib.StringRef */ string filename) {
 
         // Drive letters
         if (filename.length == 2 && filename[1] == ':') {
@@ -933,7 +933,7 @@ public class ExcludedFiles : GLib.Object {
 
     private static CSync.ExcludedFiles.Type csync_excluded_common (string path, bool exclude_conflict_files) {
         /* split up the path */
-        /* QStringRef */ string bname = new /* QStringRef */ string (path);
+        /* GLib.StringRef */ string bname = new /* GLib.StringRef */ string (path);
         int last_slash = path.last_index_of ("/");
         if (last_slash >= 0) {
             bname = path.mid_ref (last_slash + 1);

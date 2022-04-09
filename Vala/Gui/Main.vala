@@ -18,10 +18,10 @@
 //  #endif
 
 //  #include <Gtk.MessageBox>
-//  #include <QDebug>
-//  #include <QQuick_style>
-//  #include <QQuick_window>
-//  #include <QSurface_format>
+//  #include <GLib.Debug>
+//  #include <GLib.Quick_style>
+//  #include <GLib.Quick_window>
+//  #include <GLib.Surface_format>
 
 namespace Occ {
 namespace Ui {
@@ -59,12 +59,12 @@ int main (int argc, char **argv) {
     // the platformtheme plugin won't try to force qqc2-desktops-style
     // anymore.
     // Can be removed once the bug in qqc2-desktop-style is gone.
-    QQuick_style.style ("Default");
+    GLib.Quick_style.style ("Default");
 
     // OpenSSL 1.1.0 : No explicit initialisation or de-initialisation is necessary.
 
-    Gtk.Application.attribute (Qt.AAUseHighDpiPixmaps, true);
-    Gtk.Application.attribute (Qt.AA_Enable_high_dpi_scaling, true);
+    GLib.Application.attribute (Qt.AAUseHighDpiPixmaps, true);
+    GLib.Application.attribute (Qt.AA_Enable_high_dpi_scaling, true);
     Application app = new Application (argc, argv);
 
     if (app.give_help ()) {
@@ -77,12 +77,12 @@ int main (int argc, char **argv) {
     }
 
 
-    QQuick_window.text_render_type (QQuick_window.Native_text_rendering);
+    GLib.Quick_window.text_render_type (GLib.Quick_window.Native_text_rendering);
 
 
-    var surface_format = QSurface_format.default_format ();
-    surface_format.option (QSurface_format.Reset_notification);
-    QSurface_format.default_format (surface_format);
+    var surface_format = GLib.Surface_format.default_format ();
+    surface_format.option (GLib.Surface_format.Reset_notification);
+    GLib.Surface_format.default_format (surface_format);
 
 // check a environment variable for core dumps
 //  #ifdef Q_OS_UNIX
@@ -131,8 +131,8 @@ int main (int argc, char **argv) {
 
     // We can't call is_system_tray_available with appmenu-qt5 begause it hides the systemtray
     // (issue #4693)
-    if (qgetenv ("QT_QPA_PLATFORMTHEME") != "appmenu-qt5") {
-        if (!QSystemTrayIcon.is_system_tray_available ()) {
+    if (qgetenv ("GLib.T_QPA_PLATFORMTHEME") != "appmenu-qt5") {
+        if (!GLib.SystemTrayIcon.is_system_tray_available ()) {
             // If the systemtray is not there, we will wait one second for it to maybe on_signal_start
             // (eg boot time) then we show the settings dialog if there is still no systemtray.
             // On XFCE however, we show a message box with explainaition how to install a systemtray.
@@ -145,7 +145,7 @@ int main (int argc, char **argv) {
             }
             if (desktop_session == "xfce") {
                 int attempts = 0;
-                while (!QSystemTrayIcon.is_system_tray_available ()) {
+                while (!GLib.SystemTrayIcon.is_system_tray_available ()) {
                     attempts++;
                     if (attempts >= 30) {
                         GLib.warning ("System tray unavailable (xfce)");
@@ -156,7 +156,7 @@ int main (int argc, char **argv) {
                 }
             }
 
-            if (QSystemTrayIcon.is_system_tray_available ()) {
+            if (GLib.SystemTrayIcon.is_system_tray_available ()) {
                 app.on_signal_try_tray_again ();
             } else if (!app.background_mode () && AccountManager.instance.accounts.length () != 0) {
                 if (desktop_session != "ubuntu") {

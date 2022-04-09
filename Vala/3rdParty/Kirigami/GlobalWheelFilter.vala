@@ -7,7 +7,7 @@
 ***********************************************************/
 public class GlobalWheelFilter : GLib.Object {
 
-    protected GLib.HashTable<QQuickItem, WheelHandler> m_handlers_for_item;
+    protected GLib.HashTable<GLib.QuickItem, WheelHandler> m_handlers_for_item;
     protected KirigamiWheelEvent m_wheel_event;
 
 
@@ -29,7 +29,7 @@ public class GlobalWheelFilter : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_item_handler_association (QQuickItem item, WheelHandler handler) {
+    public void set_item_handler_association (GLib.QuickItem item, WheelHandler handler) {
         if (!m_handlers_for_item.contains (handler.target ())) {
             handler.target ().install_event_filter (this);
         }
@@ -45,7 +45,7 @@ public class GlobalWheelFilter : GLib.Object {
     }
 
 
-    private void on_signal_item_destroyed (QQuickItem item) {
+    private void on_signal_item_destroyed (GLib.QuickItem item) {
         m_handlers_for_item.remove (item);
     }
 
@@ -57,7 +57,7 @@ public class GlobalWheelFilter : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void remove_item_handler_association (QQuickItem item, WheelHandler handler) {
+    public void remove_item_handler_association (GLib.QuickItem item, WheelHandler handler) {
         if (!item || !handler) {
             return;
         }
@@ -70,13 +70,13 @@ public class GlobalWheelFilter : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected override bool event_filter (GLib.Object watched, QEvent event) {
-        if (event.type () == QEvent.Wheel) {
-            var item = qobject_cast<QQuickItem> (watched);
+    protected override bool event_filter (GLib.Object watched, GLib.Event event) {
+        if (event.type () == GLib.Event.Wheel) {
+            var item = qobject_cast<GLib.QuickItem> (watched);
             if (!item || !item.is_enabled ()) {
                 return GLib.Object.event_filter (watched, event);
             }
-            var we = static_cast<QWheelEvent> (event);
+            var we = static_cast<GLib.WheelEvent> (event);
             m_wheel_event.initialize_from_event (we);
 
             bool should_block = false;
@@ -106,7 +106,7 @@ public class GlobalWheelFilter : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected void manage_wheel (QQuickItem target, QWheelEvent wheel) {
+    protected void manage_wheel (GLib.QuickItem target, GLib.WheelEvent wheel) {
         // Duck typing: accept everything that has all the properties we need
         if (target.meta_object ().index_of_property ("content_x") == -1
             || target.meta_object ().index_of_property ("content_y") == -1

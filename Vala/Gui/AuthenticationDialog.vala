@@ -4,10 +4,10 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QLineEdit>
-//  #include <QVBoxLayout>
-//  #include <QFormLayout>
-//  #include <QDialogButtonBox>
+//  #include <GLib.LineEdit>
+//  #include <GLib.VBoxLayout>
+//  #include <GLib.FormLayout>
+//  #include <GLib.DialogButtonBox>
 //  #include <Gtk.Dialog>
 
 namespace Occ {
@@ -22,28 +22,28 @@ public class AuthenticationDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private QLineEdit user;
-    private QLineEdit password;
+    private GLib.LineEdit user;
+    private GLib.LineEdit password;
 
     /***********************************************************
     ***********************************************************/
     public AuthenticationDialog (string realm, string domain, Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
-        this.user = new QLineEdit ();
-        this.password = new QLineEdit ();
+        this.user = new GLib.LineEdit ();
+        this.password = new GLib.LineEdit ();
         this.window_title (_("Authentication Required"));
-        var vertical_box_layout = new QVBoxLayout (this);
+        var vertical_box_layout = new GLib.VBoxLayout (this);
         var label = new Gtk.Label (_("Enter username and password for \"%1\" at %2.").printf (realm, domain));
         label.text_format (Qt.UpdateStatusStringFormat.PLAIN_TEXT);
         vertical_box_layout.add_widget (label);
 
-        var form = new QFormLayout ();
+        var form = new GLib.FormLayout ();
         form.add_row (_("&User:"), this.user);
         form.add_row (_("&Password:"), this.password);
         vertical_box_layout.add_layout (form);
-        this.password.echo_mode (QLineEdit.Password);
+        this.password.echo_mode (GLib.LineEdit.Password);
 
-        var dialog_button_box = new QDialogButtonBox (QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal);
+        var dialog_button_box = new GLib.DialogButtonBox (GLib.DialogButtonBox.Ok | GLib.DialogButtonBox.Cancel, Qt.Horizontal);
         dialog_button_box.accepted.connect (
             this.accept
         );

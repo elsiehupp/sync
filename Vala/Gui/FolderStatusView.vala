@@ -4,7 +4,7 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QTreeView>
+//  #include <GLib.TreeView>
 
 namespace Occ {
 namespace Ui {
@@ -13,7 +13,7 @@ namespace Ui {
 @brief The FolderStatusView class
 @ingroup gui
 ***********************************************************/
-public class FolderStatusView : QTreeView {
+public class FolderStatusView : GLib.TreeView {
 
     /***********************************************************
     ***********************************************************/
@@ -24,8 +24,8 @@ public class FolderStatusView : QTreeView {
 
     /***********************************************************
     ***********************************************************/
-    public QModelIndex index_at (QPoint point) {
-        QModelIndex index = QTreeView.index_at (point);
+    public GLib.ModelIndex index_at (GLib.Point point) {
+        GLib.ModelIndex index = GLib.TreeView.index_at (point);
         if (index.data (DataRole.ADD_BUTTON).to_bool () && !visual_rect (index).contains (point)) {
             return {};
         }
@@ -35,8 +35,8 @@ public class FolderStatusView : QTreeView {
 
     /***********************************************************
     ***********************************************************/
-    public QRect visual_rect (QModelIndex index)  {
-        QRect rect = QTreeView.visual_rect (index);
+    public GLib.Rect visual_rect (GLib.ModelIndex index)  {
+        GLib.Rect rect = GLib.TreeView.visual_rect (index);
         if (index.data (DataRole.ADD_BUTTON).to_bool ()) {
             return FolderStatusDelegate.add_button_rect (rect, layout_direction ());
         }

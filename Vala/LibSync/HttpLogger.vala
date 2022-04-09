@@ -111,7 +111,7 @@ public class HttpLogger : GLib.Object {
                 if (!device.is_open) {
                     GLib.assert (dynamic_cast<Soup.Buffer> (device));
                     // should we close item again?
-                    device.open (QIODevice.ReadOnly);
+                    device.open (GLib.IODevice.ReadOnly);
                 }
                 GLib.assert (device.position () == 0);
                 stream += device.peek (PEEK_SIZE);

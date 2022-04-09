@@ -5,14 +5,14 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QDesktopServices>
-//  #include <Gtk.Application>
-//  #include <QClipboard>
+//  #include <GLib.DesktopServices>
+//  #include <GLib.Application>
+//  #include <GLib.Clipboard>
 //  #include <GLib.OutputStream>
 //  #include <Json.Object>
-//  #include <QJsonDocument>
+//  #include <GLib.JsonDocument>
 
-//  #include <QPointer>
+//  #include <GLib.Pointer>
 
 namespace Occ {
 namespace Ui {
@@ -137,7 +137,7 @@ public class Flow2Auth : GLib.Object {
     private void on_network_job_finished (TokenAction action, GLib.InputStream reply) {
         var json_data = reply.read_all ();
         Json.ParserError json_parse_error;
-        Json.Object json = QJsonDocument.from_json (json_data, json_parse_error).object ();
+        Json.Object json = GLib.JsonDocument.from_json (json_data, json_parse_error).object ();
         string poll_token, poll_endpoint, login_url;
 
         if (reply.error == GLib.InputStream.NoError && json_parse_error.error == Json.ParserError.NoError
@@ -180,7 +180,7 @@ public class Flow2Auth : GLib.Object {
         if (this.account.is_username_prefill_supported) {
             const var user_name = Utility.current_user_name ();
             if (!user_name == "") {
-                var query = QUrlQuery (this.login_url);
+                var query = GLib.UrlQuery (this.login_url);
                 query.add_query_item ("user", user_name);
                 this.login_url.query (query);
             }
@@ -213,7 +213,7 @@ public class Flow2Auth : GLib.Object {
             }
             break;
         case TokenAction.COPY_LINK_TO_CLIPBOARD:
-            Gtk.Application.clipboard ().on_signal_text (authorisation_link ().to_string (GLib.Uri.FullyEncoded));
+            GLib.Application.clipboard ().on_signal_text (authorisation_link ().to_string (GLib.Uri.FullyEncoded));
             /* emit */ signal_status_changed (PollStatus.PollStatus.COPY_LINK_TO_CLIPBOARD, 0);
             break;
         }
@@ -278,7 +278,7 @@ public class Flow2Auth : GLib.Object {
         req.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
 
         var request_body = new GLib.OutputStream ();
-        QUrlQuery arguments = new QUrlQuery ("token=%1".printf (this.poll_token));
+        GLib.UrlQuery arguments = new GLib.UrlQuery ("token=%1".printf (this.poll_token));
         request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
 
         var simple_network_job = this.account.send_request ("POST", this.poll_endpoint, req, request_body);
@@ -295,7 +295,7 @@ public class Flow2Auth : GLib.Object {
     private void on_signal_simple_network_job_finished (GLib.InputStream reply) {
         var json_data = reply.read_all ();
         Json.ParserError json_parse_error;
-        Json.Object json = QJsonDocument.from_json (json_data, json_parse_error).object ();
+        Json.Object json = GLib.JsonDocument.from_json (json_data, json_parse_error).object ();
         GLib.Uri server_url;
         string login_name, app_password;
 

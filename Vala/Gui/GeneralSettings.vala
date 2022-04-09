@@ -4,22 +4,22 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QFileDialog>
+//  #include <GLib.FileDialog>
 //  #include <Gtk.MessageBox>
-//  #include <QNetworkProxy>
+//  #include <Soup.NetworkProxy>
 //  #include <GLib.Dir>
-//  #include <QScopedValueRollback>
+//  #include <GLib.ScopedValueRollback>
 //  #include <Gtk.MessageBox>
 //  #include <private/qzipwriter_p.h>
 
-//  const int QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
+//  const int GLib.TLEGACY (GLib.T_VERSION < GLib.T_VERSION_CHECK (5,9,0))
 
-//  #if ! (QTLEGACY)
-//  #include <QOperatingSystemVersion>
+//  #if ! (GLib.TLEGACY)
+//  #include <GLib.OperatingSystemVersion>
 //  #endif
 
 //  #include <Gtk.Widget>
-//  #include <QPointer>
+//  #include <GLib.Pointer>
 
 
 namespace Occ {
@@ -86,7 +86,7 @@ public class GeneralSettings : Gtk.Widget {
         public static void create_debug_archive (string filename) {
             const var entries = create_file_list ();
 
-            QZipWriter zip = new QZipWriter (filename);
+            GLib.ZipWriter zip = new GLib.ZipWriter (filename);
             foreach (var entry in entries) {
                 if (entry.local_filename == "") {
                     zip.add_directory (entry.zip_filename);
@@ -99,7 +99,7 @@ public class GeneralSettings : Gtk.Widget {
                 }
             }
 
-            zip.add_file ("__nextcloud_client_parameters.txt", Gtk.Application.arguments ().join (' ').to_utf8 ());
+            zip.add_file ("__nextcloud_client_parameters.txt", GLib.Application.arguments ().join (' ').to_utf8 ());
 
             const string build_info = Theme.about + "\n\n" + Theme.about_details;
             zip.add_file ("__nextcloud_client_buildinfo.txt", build_info.to_utf8 ());
@@ -215,7 +215,7 @@ public class GeneralSettings : Gtk.Widget {
     }
 
 
-    private delegate void SpinBoxValueChanged (QSpinBox spinbox, int value);
+    private delegate void SpinBoxValueChanged (GLib.SpinBox spinbox, int value);
 
 
     override ~GeneralSettings () {
@@ -322,7 +322,7 @@ public class GeneralSettings : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_debug_archive_button_clicked () {
-        const var filename = QFileDialog.save_filename (this, _("Create Debug Archive"), "", _("Zip Archives") + " (*.zip)");
+        const var filename = GLib.FileDialog.save_filename (this, _("Create Debug Archive"), "", _("Zip Archives") + " (*.zip)");
         if (filename == "") {
             return;
         }
@@ -340,7 +340,7 @@ public class GeneralSettings : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void load_misc_settings () {
-        var scope = new QScopedValueRollback<bool> (this.currently_loading, true);
+        var scope = new GLib.ScopedValueRollback<bool> (this.currently_loading, true);
         ConfigFile config_file;
         this.instance.mono_icons_check_box.checked (config_file.mono_icons ());
         this.instance.server_notifications_check_box.checked (config_file.optional_server_notifications ());

@@ -92,7 +92,7 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_choose_local_folder () {
-        string sf = QStandardPaths.writable_location (QStandardPaths.HomeLocation);
+        string sf = GLib.StandardPaths.writable_location (GLib.StandardPaths.HomeLocation);
         GLib.Dir d = new GLib.Dir (sf);
 
         // open the first entry of the home directory. Otherwise the directory picker comes
@@ -103,7 +103,7 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
         if (dirs.length > 0)
             sf += "/" + dirs.at (0); // Take the first directory in home directory.
 
-        string directory = QFileDialog.existing_directory (this,
+        string directory = GLib.FileDialog.existing_directory (this,
             _("Select the source folder"),
             sf);
         if (!directory == "") {

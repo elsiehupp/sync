@@ -14,7 +14,7 @@ public class FakeChunkMoveReply : FakeReply {
         set_request (request);
         set_url (request.url);
         set_operation (operation);
-        open (QIODevice.ReadOnly);
+        open (GLib.IODevice.ReadOnly);
         file_info = perform (uploads_file_info, remote_root_file_info, request);
         if (!file_info) {
             GLib.Timeout.single_shot (0, this, &FakeChunkMoveReply.respond_precondition_failed);

@@ -63,7 +63,7 @@ public class TestErrorsWithBulkUpload : AbstractTestSyncEngine {
                 var json_reply_object = fake_folder.for_each_reply_part (outgoing_data, content_type, fake_folder_for_each_reply_part_delegate
                 );
                 if (json_reply_object.size ()) {
-                    var json_reply = new QJsonDocument ();
+                    var json_reply = new GLib.JsonDocument ();
                     json_reply.set_object (json_reply_object);
                     return new FakeJsonErrorReply (operation, request, this, 200, json_reply);
                 }

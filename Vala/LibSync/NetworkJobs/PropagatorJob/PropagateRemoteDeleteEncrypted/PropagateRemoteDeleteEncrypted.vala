@@ -36,14 +36,14 @@ public class PropagateRemoteDeleteEncrypted : AbstractPropagateRemoteDeleteEncry
 
     /***********************************************************
     ***********************************************************/
-    private new void on_signal_folder_encrypted_metadata_received (QJsonDocument json, int status_code){
+    private new void on_signal_folder_encrypted_metadata_received (GLib.JsonDocument json, int status_code){
         if (status_code == 404) {
             GLib.debug (PROPAGATE_REMOVE_ENCRYPTED + "Metadata not found, but let's proceed with removing the file anyway.");
             delete_remote_item (this.item.encrypted_filename);
             return;
         }
 
-        FolderMetadata metadata = new FolderMetadata (this.propagator.account, json.to_json (QJsonDocument.Compact), status_code);
+        FolderMetadata metadata = new FolderMetadata (this.propagator.account, json.to_json (GLib.JsonDocument.Compact), status_code);
 
         GLib.debug (PROPAGATE_REMOVE_ENCRYPTED + "Metadata Received, preparing it for removal of the file");
 
@@ -52,7 +52,7 @@ public class PropagateRemoteDeleteEncrypted : AbstractPropagateRemoteDeleteEncry
 
         // Find existing metadata for this file
         bool found = false;
-        const GLib.List<EncryptedFile> files = metadata.files ();
+        GLib.List<EncryptedFile> files = metadata.files ();
         foreach (EncryptedFile file in files) {
             if (file.original_filename == filename) {
                 metadata.remove_encrypted_file (file);

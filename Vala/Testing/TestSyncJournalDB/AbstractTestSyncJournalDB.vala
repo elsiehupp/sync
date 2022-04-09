@@ -10,7 +10,7 @@ namespace Testing {
 public abstract class AbstractTestSyncJournalDB : GLib.Object {
 
     protected SyncJournalDb database;
-    protected QTemporaryDir temporary_directory;
+    protected GLib.TemporaryDir temporary_directory;
 
     /***********************************************************
     ***********************************************************/

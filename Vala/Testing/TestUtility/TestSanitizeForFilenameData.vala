@@ -13,16 +13,16 @@ public class TestSanitizeForFilenameData : AbstractTestUtility {
     /***********************************************************
     ***********************************************************/
     private TestSanitizeForFilenameData () {
-        QTest.add_column<string> ("input");
-        QTest.add_column<string> ("output");
+        GLib.Test.add_column<string> ("input");
+        GLib.Test.add_column<string> ("output");
 
-        QTest.new_row ("")
+        GLib.Test.new_row ("")
             + "foobar"
             + "foobar";
-        QTest.new_row ("")
+        GLib.Test.new_row ("")
             + "a/b?c<d>e\\f:g*h|i\"j"
             + "abcdefghij";
-        QTest.new_row ("")
+        GLib.Test.new_row ("")
             + "a\x01 b\x1f c\x80 d\x9f"
             + "a b c d";
     }

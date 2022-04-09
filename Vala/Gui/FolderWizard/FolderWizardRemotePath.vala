@@ -57,7 +57,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
             this.on_signal_lscol_folder_entry
         );
 
-        this.instance.folder_tree_widget.header ().section_resize_mode (0, QHeaderView.ResizeToContents);
+        this.instance.folder_tree_widget.header ().section_resize_mode (0, GLib.HeaderView.ResizeToContents);
         // Make sure that there will be a scrollbar when the contents is too wide
         this.instance.folder_tree_widget.header ().stretch_last_section (false);
     }
@@ -129,14 +129,14 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_add_remote_folder () {
-        QTreeWidgetItem current = this.instance.folder_tree_widget.current_item ();
+        GLib.TreeWidgetItem current = this.instance.folder_tree_widget.current_item ();
 
         string parent = "/";
         if (current) {
             parent = current.data (0, Qt.USER_ROLE).to_string ();
         }
 
-        var dialog = new QInputDialog (this);
+        var dialog = new GLib.InputDialog (this);
 
         dialog.window_title (_("Create Remote FolderConnection"));
         dialog.label_text (_("Enter the name of the new folder to be created below \"%1\":")
@@ -152,7 +152,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         if (folder == "")
             return;
 
-        QTreeWidgetItem current = this.instance.folder_tree_widget.current_item ();
+        GLib.TreeWidgetItem current = this.instance.folder_tree_widget.current_item ();
         string full_path;
         if (current) {
             full_path = current.data (0, Qt.USER_ROLE).to_string ();
@@ -219,9 +219,9 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     protected void on_signal_update_directories (GLib.List<string> list) {
         string webdav_folder = GLib.Uri (this.account.dav_url ()).path;
 
-        QTreeWidgetItem root = this.instance.folder_tree_widget.top_level_item (0);
+        GLib.TreeWidgetItem root = this.instance.folder_tree_widget.top_level_item (0);
         if (!root) {
-            root = new QTreeWidgetItem (this.instance.folder_tree_widget);
+            root = new GLib.TreeWidgetItem (this.instance.folder_tree_widget);
             root.on_signal_text (0, Theme.app_name_gui);
             root.icon (0, Theme.application_icon);
             root.tool_tip (0, _("Choose this to sync the entire account"));
@@ -277,7 +277,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_item_expanded (QTreeWidgetItem item) {
+    protected void on_signal_item_expanded (GLib.TreeWidgetItem item) {
         string directory = item.data (0, Qt.USER_ROLE).to_string ();
         run_lscol_job (directory);
     }
@@ -285,7 +285,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_current_item_changed (QTreeWidgetItem item) {
+    protected void on_signal_current_item_changed (GLib.TreeWidgetItem item) {
         if (item) {
             string directory = item.data (0, Qt.USER_ROLE).to_string ();
 
@@ -370,7 +370,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    private void recursive_insert (QTreeWidgetItem parent, GLib.List<string> path_trail, string path) {
+    private void recursive_insert (GLib.TreeWidgetItem parent, GLib.List<string> path_trail, string path) {
         if (path_trail == "")
             return;
 
@@ -382,16 +382,16 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         } else {
             folder_path = parent_path + "/" + folder_name;
         }
-        QTreeWidgetItem item = find_first_child (parent, folder_name);
+        GLib.TreeWidgetItem item = find_first_child (parent, folder_name);
         if (!item) {
-            item = new QTreeWidgetItem (parent);
-            QFileIconProvider prov;
-            Gtk.Icon folder_icon = prov.icon (QFileIconProvider.FolderConnection);
+            item = new GLib.TreeWidgetItem (parent);
+            GLib.FileIconProvider prov;
+            Gtk.Icon folder_icon = prov.icon (GLib.FileIconProvider.FolderConnection);
             item.icon (0, folder_icon);
             item.on_signal_text (0, folder_name);
             item.data (0, Qt.USER_ROLE, folder_path);
             item.tool_tip (0, folder_path);
-            item.child_indicator_policy (QTreeWidgetItem.ShowIndicator);
+            item.child_indicator_policy (GLib.TreeWidgetItem.ShowIndicator);
         }
 
         path_trail.remove_first ();
@@ -409,9 +409,9 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
             path.chop (1);
         }
 
-        QTreeWidgetItem it = this.instance.folder_tree_widget.top_level_item (0);
+        GLib.TreeWidgetItem it = this.instance.folder_tree_widget.top_level_item (0);
         if (!path == "") {
-            const GLib.List<string> path_trail = path.split ("/");
+            GLib.List<string> path_trail = path.split ("/");
             foreach (string path in path_trail) {
                 if (!it) {
                     return false;
@@ -431,9 +431,9 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    private static QTreeWidgetItem find_first_child (QTreeWidgetItem parent, string text) {
+    private static GLib.TreeWidgetItem find_first_child (GLib.TreeWidgetItem parent, string text) {
         for (int i = 0; i < parent.child_count (); ++i) {
-            QTreeWidgetItem child = parent.child (i);
+            GLib.TreeWidgetItem child = parent.child (i);
             if (child.text (0) == text) {
                 return child;
             }

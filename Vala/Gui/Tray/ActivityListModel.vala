@@ -5,11 +5,11 @@
 ***********************************************************/
 
 //  #include <QtCore>
-//  #include <QAbstractListModel>
-//  #include <QDesktopServices>
+//  #include <GLib.AbstractListModel>
+//  #include <GLib.DesktopServices>
 //  #include <Gtk.Widget>
 //  #include <Json.Object>
-//  #include <QJsonDocument>
+//  #include <GLib.JsonDocument>
 //  #include <qloggingcategory.h>
 //  #include <QtCore>
 
@@ -22,7 +22,7 @@ namespace Ui {
 
 Simple list model to provide the list view with data.
 ***********************************************************/
-public class ActivityListModel : QAbstractListModel {
+public class ActivityListModel : GLib.AbstractListModel {
 
     /***********************************************************
     ***********************************************************/
@@ -99,14 +99,14 @@ public class ActivityListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public override int row_count (QModelIndex parent = new QModelIndex ()) {
+    public override int row_count (GLib.ModelIndex parent = new GLib.ModelIndex ()) {
         return this.final_list.length;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public override bool can_fetch_more (QModelIndex index) {
+    public override bool can_fetch_more (GLib.ModelIndex index) {
         // We need to be connected to be able to fetch more
         if (this.account_state && this.account_state.is_connected) {
             // If the fetching is reported to be done or we are currently fetching we can't fetch more
@@ -121,7 +121,7 @@ public class ActivityListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public override void fetch_more (QModelIndex index) {
+    public override void fetch_more (GLib.ModelIndex index) {
         if (can_fetch_activities ()) {
             start_fetch_job ();
         } else {
@@ -248,7 +248,7 @@ public class ActivityListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.Variant data (QModelIndex index, int role) {
+    public GLib.Variant data (GLib.ModelIndex index, int role) {
         Activity activity;
 
         if (!index.is_valid)
@@ -482,7 +482,7 @@ public class ActivityListModel : QAbstractListModel {
         }
 
         if (path.is_valid) {
-            QDesktopServices.open_url (path);
+            GLib.DesktopServices.open_url (path);
         } else {
             const var link = data (model_index, DataRole.LINK).to_url ();
             OpenExternal.open_browser (link);
@@ -563,7 +563,7 @@ public class ActivityListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    protected void activities_received (QJsonDocument json, int status_code) {
+    protected void activities_received (GLib.JsonDocument json, int status_code) {
         var activities = json.object ().value ("ocs").to_object ().value ("data").to_array ();
 
         GLib.List<Activity> list;
@@ -650,7 +650,7 @@ public class ActivityListModel : QAbstractListModel {
             this.activities_received
         );
 
-        QUrlQuery parameters;
+        GLib.UrlQuery parameters;
         parameters.add_query_item ("since", this.current_item.to_string ());
         parameters.add_query_item ("limit", 50.to_string ());
         json_api_job.add_query_params (parameters);
@@ -709,7 +709,7 @@ public class ActivityListModel : QAbstractListModel {
         end_reset_model ();
 
         if (result_list.length () > 0) {
-            begin_insert_rows (QModelIndex (), 0, result_list.length - 1);
+            begin_insert_rows (GLib.ModelIndex (), 0, result_list.length - 1);
             this.final_list = result_list;
             end_insert_rows ();
         }

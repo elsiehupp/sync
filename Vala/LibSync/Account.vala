@@ -27,7 +27,7 @@ public class Account : GLib.Object {
     @ingroup libsync
     ***********************************************************/
     public abstract class AbstractSslErrorHandler : GLib.Object {
-        public abstract bool handle_errors (GLib.List<GnuTLS.ErrorCode> error_list, QSslConfiguration conf, GLib.List<GLib.TlsCertificate> cert_list, Account account);
+        public abstract bool handle_errors (GLib.List<GnuTLS.ErrorCode> error_list, GLib.SslConfiguration conf, GLib.List<GLib.TlsCertificate> cert_list, Account account);
     }
 
 
@@ -154,13 +154,13 @@ public class Account : GLib.Object {
         }
         private set {
             this.approved_certificates = value;
-            QSslConfiguration.default_configuration ().add_ca_certificates (value);
+            GLib.SslConfiguration.default_configuration ().add_ca_certificates (value);
         }
     }
 
     /***********************************************************
     ***********************************************************/
-    public QSslConfiguration ssl_configuration { public get; public set; }
+    public GLib.SslConfiguration ssl_configuration { public get; public set; }
 
     /***********************************************************
     Access the server capabilities
@@ -241,8 +241,8 @@ public class Account : GLib.Object {
             this.credentials = value;
             value.account = this;
 
-            // Note: This way the QNAM can outlive the Account and Credentials.
-            // This is necessary to avoid issues with the QNAM being deleted while
+            // Note: This way the GLib.NAM can outlive the Account and Credentials.
+            // This is necessary to avoid issues with the GLib.NAM being deleted while
             // processing on_signal_handle_ssl_errors ().
             //  this.soup_session = new Soup.Session (this.credentials.create_access_manager (), GLib.Object.delete_later);
             this.soup_session = new Soup.Session ();
@@ -346,7 +346,7 @@ public class Account : GLib.Object {
     /***********************************************************
     Forwards from Soup.Session.signal_proxy_authentication_required ().
     ***********************************************************/
-    internal signal void signal_proxy_authentication_required (Soup.ProxyResolverDefault proxy, QAuthenticator authenticator);
+    internal signal void signal_proxy_authentication_required (Soup.ProxyResolverDefault proxy, GLib.Authenticator authenticator);
 
     /***********************************************************
     e.g. when the approved SSL certificates changed
@@ -461,7 +461,7 @@ public class Account : GLib.Object {
 
 
     /***********************************************************
-    Create a network request on the account's QNAM.
+    Create a network request on the account's GLib.NAM.
 
     Network requests in AbstractNetworkJobs are created through
     this function. Other places should prefer to use jobs or
@@ -554,7 +554,7 @@ public class Account : GLib.Object {
     /***********************************************************
     The ssl configuration during the first connection
     ***********************************************************/
-    public QSslConfiguration get_or_create_ssl_config () {
+    public GLib.SslConfiguration get_or_create_ssl_config () {
         if (this.ssl_configuration != null) {
             // Will be set by CheckServerJob.on_signal_finished ()
             // We need to use a central shared config to get SSL session tickets
@@ -563,12 +563,12 @@ public class Account : GLib.Object {
 
         // if setting the client certificate fails, you will probably get an error similar to this:
         //  "An internal error number 1060 happened. SSL handshake failed, client certificate was requested : SSL error : sslv3 alert handshake failure"
-        QSslConfiguration ssl_config = QSslConfiguration.default_configuration ();
+        GLib.SslConfiguration ssl_config = GLib.SslConfiguration.default_configuration ();
 
         // Try hard to re-use session for different requests
-        ssl_config.ssl_option (QSsl.SslOptionDisableSessionTickets, false);
-        ssl_config.ssl_option (QSsl.SslOptionDisableSessionSharing, false);
-        ssl_config.ssl_option (QSsl.SslOptionDisableSessionPersistence, false);
+        ssl_config.ssl_option (GLib.Ssl.SslOptionDisableSessionTickets, false);
+        ssl_config.ssl_option (GLib.Ssl.SslOptionDisableSessionSharing, false);
+        ssl_config.ssl_option (GLib.Ssl.SslOptionDisableSessionPersistence, false);
 
         ssl_config.ocsp_stapling_enabled (Theme.enable_stapling_ocsp);
 
@@ -634,7 +634,7 @@ public class Account : GLib.Object {
     ***********************************************************/
     public int server_version_int {
         public get {
-            // FIXME: Use Qt 5.5 QVersionNumber
+            // FIXME: Use Qt 5.5 GLib.VersionNumber
             var components = this.server_version.split (".");
             return make_server_version (components.value (0).to_int (),
                 components.value (1).to_int (),
@@ -700,7 +700,7 @@ public class Account : GLib.Object {
 
     /***********************************************************
     This shares our official cookie jar (containing all the tasty
-    authentication cookies) with another QNAM while making sure
+    authentication cookies) with another GLib.NAM while making sure
     of not losing its ownership.
     ***********************************************************/
     public void lend_cookie_jar_to (Soup.Session guest) {
@@ -820,8 +820,8 @@ public class Account : GLib.Object {
         Soup.CookieJar jar = this.soup_session.add_feature ();
         Soup.ProxyResolverDefault proxy = this.soup_session.add_feature ();
 
-        // Use a unowned to allow locking the life of the QNAM on the stack.
-        // Make it call delete_later to make sure that we can return to any QNAM stack frames safely.
+        // Use a unowned to allow locking the life of the GLib.NAM on the stack.
+        // Make it call delete_later to make sure that we can return to any GLib.NAM stack frames safely.
         this.soup_session = new /*unowned*/ Soup.Session (this.credentials.create_access_manager (), GLib.Object.delete_later);
 
         this.soup_session.add_feature (jar); // takes ownership of the old cookie jar
@@ -1071,7 +1071,7 @@ public class Account : GLib.Object {
         }
 
         // SslDialogErrorHandler.handle_errors will run an event loop that might execute
-        // the delete_later () of the QNAM before we have the chance of unwinding our stack.
+        // the delete_later () of the GLib.NAM before we have the chance of unwinding our stack.
         // Keep a ref here on our stackframe to make sure that it doesn't get deleted before
         // handle_errors returns.
         unowned Soup.Session access_manager_lock = this.soup_session;
@@ -1083,7 +1083,7 @@ public class Account : GLib.Object {
             }
 
             if (approved_certificates.length > 0) {
-                QSslConfiguration.default_configuration ().add_ca_certificates (approved_certificates);
+                GLib.SslConfiguration.default_configuration ().add_ca_certificates (approved_certificates);
                 add_approved_certificates (approved_certificates);
                 /* emit */ signal_wants_account_saved (this);
 
@@ -1130,7 +1130,7 @@ public class Account : GLib.Object {
     }
 
 
-    private void on_signal_json_api_job_user_name_fetched (JsonApiJob fetch_user_name_job, QJsonDocument json, int status_code) {
+    private void on_signal_json_api_job_user_name_fetched (JsonApiJob fetch_user_name_job, GLib.JsonDocument json, int status_code) {
         fetch_user_name_job.delete_later ();
         if (status_code != 100) {
             GLib.warning ("Could not fetch user identifier. Login will probably not work.");
@@ -1154,7 +1154,7 @@ public class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_json_api_job_direct_editing_recieved (QJsonDocument json) {
+    protected void on_signal_json_api_job_direct_editing_recieved (GLib.JsonDocument json) {
         var data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
         var editors = data.value ("editors").to_object ();
 

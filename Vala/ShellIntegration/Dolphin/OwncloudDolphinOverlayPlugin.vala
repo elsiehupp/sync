@@ -6,7 +6,7 @@
 
 //  #include <KOverlayIconPlugin>
 //  #include <KPluginFactory>
-//  #include <QtNetwork/QLocalSocket>
+//  #include <QtNetwork/GLib.LocalSocket>
 //  #include <KIOCore/kfileitem.h>
 //  #include <GLib.Dir>
 

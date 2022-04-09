@@ -6,11 +6,11 @@
 
 //  #include <GLib.Menu>
 //  #include <QtNetwork>
-//  #include <QSslConfiguration>
-//  #include <QWidgetAction>
-//  #include <QToolButt
-//  #include <QPointer>
-//  #include <QSsl>
+//  #include <GLib.SslConfiguration>
+//  #include <GLib.WidgetAction>
+//  #include <GLib.ToolButt
+//  #include <GLib.Pointer>
+//  #include <GLib.Ssl>
 
 namespace Occ {
 namespace Ui {
@@ -19,7 +19,7 @@ namespace Ui {
 @brief The SslButton class
 @ingroup gui
 ***********************************************************/
-public class SslButton : QToolButton {
+public class SslButton : GLib.ToolButton {
 
     /***********************************************************
     ***********************************************************/
@@ -30,7 +30,7 @@ public class SslButton : QToolButton {
     ***********************************************************/
     public SslButton (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
-        popup_mode (QToolButton.Instant_popup);
+        popup_mode (GLib.ToolButton.Instant_popup);
         auto_raise (true);
 
         this.menu = new GLib.Menu (this);
@@ -55,7 +55,7 @@ public class SslButton : QToolButton {
         unowned Account account = this.account_state.account;
         if (account.url.scheme () == "https") {
             icon (Gtk.Icon (":/client/theme/lock-https.svg"));
-            QSslCipher cipher = account.session_cipher;
+            GLib.SslCipher cipher = account.session_cipher;
             tool_tip (_("This connection is encrypted using %1 bit %2.\n").printf (cipher.used_bits ()).printf (cipher.name ()));
         } else {
             icon (Gtk.Icon (":/client/theme/lock-http.svg"));
@@ -92,7 +92,7 @@ public class SslButton : QToolButton {
                 this.menu.add_action (_("No support for SSL session tickets/identifiers")).enabled (false);
             }
 
-            GLib.List<QSslCertificate> chain = account.peer_certificate_chain;
+            GLib.List<GLib.SslCertificate> chain = account.peer_certificate_chain;
 
             if (chain == "") {
                 GLib.warning ("Empty certificate chain.");
@@ -101,10 +101,10 @@ public class SslButton : QToolButton {
 
             this.menu.add_action (_("Certificate information:")).enabled (false);
 
-            const var system_certificates = QSslConfiguration.system_ca_certificates ();
+            const var system_certificates = GLib.SslConfiguration.system_ca_certificates ();
 
-            GLib.List<QSslCertificate> temporary_chain;
-            foreach (QSslCertificate cert in chain) {
+            GLib.List<GLib.SslCertificate> temporary_chain;
+            foreach (GLib.SslCertificate cert in chain) {
                 temporary_chain.append (cert);
                 if (system_certificates.contains (cert)) {
                     break;
@@ -112,10 +112,10 @@ public class SslButton : QToolButton {
             }
             chain = temporary_chain;
 
-            // find trust anchor (informational only, verification is done by QSslSocket!)
-            foreach (QSslCertificate root_ca in system_certificates) {
-                if (root_ca.issuer_info (QSslCertificate.Common_name) == chain.last ().issuer_info (QSslCertificate.Common_name)
-                    && root_ca.issuer_info (QSslCertificate.Organization) == chain.last ().issuer_info (QSslCertificate.Organization)) {
+            // find trust anchor (informational only, verification is done by GLib.SslSocket!)
+            foreach (GLib.SslCertificate root_ca in system_certificates) {
+                if (root_ca.issuer_info (GLib.SslCertificate.Common_name) == chain.last ().issuer_info (GLib.SslCertificate.Common_name)
+                    && root_ca.issuer_info (GLib.SslCertificate.Organization) == chain.last ().issuer_info (GLib.SslCertificate.Organization)) {
                     chain.append (root_ca);
                     break;
                 }
@@ -142,19 +142,19 @@ public class SslButton : QToolButton {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Menu build_cert_menu (GLib.Menu parent, QSslCertificate cert,
-        GLib.List<QSslCertificate> user_approved, int position, GLib.List<QSslCertificate> system_ca_certificates) {
-        string cn = cert.subject_info (QSslCertificate.Common_name).join (char (';'));
-        string ou = cert.subject_info (QSslCertificate.Organizational_unit_name).join (char (';'));
-        string org = cert.subject_info (QSslCertificate.Organization).join (char (';'));
-        string country = cert.subject_info (QSslCertificate.Country_name).join (char (';'));
-        string state = cert.subject_info (QSslCertificate.State_or_province_name).join (char (';'));
-        string issuer = cert.issuer_info (QSslCertificate.Common_name).join (char (';'));
+    private GLib.Menu build_cert_menu (GLib.Menu parent, GLib.SslCertificate cert,
+        GLib.List<GLib.SslCertificate> user_approved, int position, GLib.List<GLib.SslCertificate> system_ca_certificates) {
+        string cn = cert.subject_info (GLib.SslCertificate.Common_name).join (char (';'));
+        string ou = cert.subject_info (GLib.SslCertificate.Organizational_unit_name).join (char (';'));
+        string org = cert.subject_info (GLib.SslCertificate.Organization).join (char (';'));
+        string country = cert.subject_info (GLib.SslCertificate.Country_name).join (char (';'));
+        string state = cert.subject_info (GLib.SslCertificate.State_or_province_name).join (char (';'));
+        string issuer = cert.issuer_info (GLib.SslCertificate.Common_name).join (char (';'));
         if (issuer == "") {
-            issuer = cert.issuer_info (QSslCertificate.Organizational_unit_name).join (char (';'));
+            issuer = cert.issuer_info (GLib.SslCertificate.Organizational_unit_name).join (char (';'));
         }
         string sha1 = Utility.format_fingerprint (cert.digest (GLib.ChecksumType.SHA1).to_hex (), false);
-        string sha265hash = cert.digest (QCryptographicHash.Sha256).to_hex ();
+        string sha265hash = cert.digest (GLib.CryptographicHash.Sha256).to_hex ();
         string sha256escaped =
             Utility.escape (Utility.format_fingerprint (sha265hash.left (sha265hash.length / 2), false))
             + "<br/>"
@@ -231,7 +231,7 @@ public class SslButton : QToolButton {
         label.on_signal_text (details);
 
         // plug label into widget action
-        var action = new QWidgetAction (parent);
+        var action = new GLib.WidgetAction (parent);
         action.default_widget (label);
         // plug action into menu
         var menu = new GLib.Menu (parent);
@@ -258,9 +258,9 @@ public class SslButton : QToolButton {
     Necessary indication only, not sufficient for primary
     validation!
     ***********************************************************/
-    private static bool is_self_signed (QSslCertificate certificate) {
-        return certificate.issuer_info (QSslCertificate.Common_name) == certificate.subject_info (QSslCertificate.Common_name)
-            && certificate.issuer_info (QSslCertificate.Organizational_unit_name) == certificate.subject_info (QSslCertificate.Organizational_unit_name);
+    private static bool is_self_signed (GLib.SslCertificate certificate) {
+        return certificate.issuer_info (GLib.SslCertificate.Common_name) == certificate.subject_info (GLib.SslCertificate.Common_name)
+            && certificate.issuer_info (GLib.SslCertificate.Organizational_unit_name) == certificate.subject_info (GLib.SslCertificate.Organizational_unit_name);
     }
 
 } // class SslButton

@@ -365,7 +365,7 @@ public class DiscoveryPhase : GLib.Object {
 
     See this.deleted_item and this.queued_deleted_directories.
     ***********************************************************/
-    public QPair<bool, string> find_and_cancel_deleted_job (string original_path) {
+    public GLib.Pair<bool, string> find_and_cancel_deleted_job (string original_path) {
         bool result = false;
         string old_etag;
         var it = this.deleted_item.find (original_path);
@@ -408,7 +408,7 @@ public class DiscoveryPhase : GLib.Object {
             other_job = null;
             result = true;
         }
-        return new QPair<bool, string> (
+        return new GLib.Pair<bool, string> (
             result, old_etag
         );
     }

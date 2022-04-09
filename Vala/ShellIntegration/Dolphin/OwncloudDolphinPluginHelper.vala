@@ -4,23 +4,23 @@
 <GPLv2-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <QBasicTimer>
-//  #include <QLocalSocket>
+//  #include <GLib.BasicTimer>
+//  #include <GLib.LocalSocket>
 //  #include <GLib.Regex>
-//  #include <QtNetwork/QLocalSocket>
+//  #include <QtNetwork/GLib.LocalSocket>
 //  #include <qcoreevent.h>
-//  #include <QStandardPaths>
+//  #include <GLib.StandardPaths>
 
 // OWNCLOUDDOLPHINPLUGINHELPER_EXPORT
 public class OwncloudDolphinPluginHelper : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected QLocalSocket socket;
+    protected GLib.LocalSocket socket;
     protected string line;
     public GLib.List<string> paths { public get; protected set; }
 
-    protected QBasicTimer connect_timer;
+    protected GLib.BasicTimer connect_timer;
 
     protected GLib.HashTable<string, string> strings;
     protected string version;
@@ -41,7 +41,7 @@ public class OwncloudDolphinPluginHelper : GLib.Object {
     ***********************************************************/
     public bool is_connected {
         public get {
-            return this.socket.state == QLocalSocket.ConnectedState;
+            return this.socket.state == GLib.LocalSocket.ConnectedState;
         }
     }
 
@@ -89,7 +89,7 @@ public class OwncloudDolphinPluginHelper : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected override void timer_event (QTimerEvent event) {
+    protected override void timer_event (GLib.TimerEvent event) {
         if (event.timer_id () == this.connect_timer.timer_id ()) {
             try_to_connect ();
             return;
@@ -163,13 +163,13 @@ public class OwncloudDolphinPluginHelper : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void try_to_connect () {
-        if (this.socket.state != QLocalSocket.UnconnectedState) {
+        if (this.socket.state != GLib.LocalSocket.UnconnectedState) {
             return;
         }
 
-        string socketPath = QStandardPaths.locate (QStandardPaths.RuntimeLocation,
+        string socketPath = GLib.StandardPaths.locate (GLib.StandardPaths.RuntimeLocation,
                                                     APPLICATION_SHORTNAME,
-                                                    QStandardPaths.LocateDirectory);
+                                                    GLib.StandardPaths.LocateDirectory);
         if (socketPath.isEmpty ())
             return;
 

@@ -13,10 +13,10 @@ public class TestVirtualFileLifecycleData : AbstractTestSyncXAttr {
     /***********************************************************
     ***********************************************************/
     private TestVirtualFileLifecycleData () {
-        QTest.add_column<bool> ("do_local_discovery");
+        GLib.Test.add_column<bool> ("do_local_discovery");
 
-        QTest.new_row ("full local discovery") + true;
-        QTest.new_row ("skip local discovery") + false;
+        GLib.Test.new_row ("full local discovery") + true;
+        GLib.Test.new_row ("skip local discovery") + false;
     }
 
 } // class TestVirtualFileLifecycleData

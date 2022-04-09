@@ -23,7 +23,7 @@ public class FakePaintDevice : Gdk.Monitor {
 
     /***********************************************************
     ***********************************************************/
-    public QPaintEngine paint_engine () {
+    public GLib.PaintEngine paint_engine () {
         return null;
     }
 

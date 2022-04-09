@@ -206,7 +206,7 @@ public class User : GLib.Object {
     ***********************************************************/
     public void open_local_folder () {
         if (this.folder_connection != null) {
-            QDesktopServices.open_url (GLib.Uri.from_local_file (this.folder_connection.path));
+            GLib.DesktopServices.open_url (GLib.Uri.from_local_file (this.folder_connection.path));
         }
     }
 
@@ -601,7 +601,7 @@ public class User : GLib.Object {
     public void on_signal_send_notification_request (string account_name, string link, string verb, int row) {
         GLib.info ("Server Notification Request " + verb + link + " on account " + account_name);
 
-        const GLib.List<string> valid_verbs = {
+        GLib.List<string> valid_verbs = {
             "GET",
             "PUT",
             "POST",

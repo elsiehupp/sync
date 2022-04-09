@@ -40,7 +40,7 @@ public class StoreMetadataApiJob : AbstractNetworkJob {
         Soup.Request request = new Soup.Request ();
         request.raw_header ("OCS-APIREQUEST", "true");
         request.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
-        QUrlQuery query;
+        GLib.UrlQuery query;
         query.add_query_item ("format", "json");
         GLib.Uri url = Utility.concat_url_path (account.url, this.path);
         url.query (query);

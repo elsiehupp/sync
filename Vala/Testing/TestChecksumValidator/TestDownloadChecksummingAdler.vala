@@ -19,7 +19,7 @@ public class TestDownloadChecksummingAdler : AbstractTestChecksumValidator {
         );
 
         var file = GLib.File.new_for_path (this.testfile, compute_checksum);
-        file.open (QIODevice.ReadOnly);
+        file.open (GLib.IODevice.ReadOnly);
         this.expected = calc_adler32 (file);
 
         string adler = check_sum_adler_c;
@@ -30,19 +30,19 @@ public class TestDownloadChecksummingAdler : AbstractTestChecksumValidator {
         this.success_down = false;
         compute_checksum.on_signal_start (this.testfile, adler);
 
-        QTRY_VERIFY (this.success_down);
+        GLib.TRY_VERIFY (this.success_down);
 
         this.expected_error = "The downloaded file does not match the checksum, it will be resumed. \"543345\" != \"%1\"".printf (this.expected);
         this.error_seen = false;
         file.seek (0);
         compute_checksum.on_signal_start (this.testfile, "Adler32:543345");
-        QTRY_VERIFY (this.error_seen);
+        GLib.TRY_VERIFY (this.error_seen);
 
         this.expected_error = "The checksum header contained an unknown checksum type \"Klaas32\"";
         this.error_seen = false;
         file.seek (0);
         compute_checksum.on_signal_start (this.testfile, "Klaas32:543345");
-        QTRY_VERIFY (this.error_seen);
+        GLib.TRY_VERIFY (this.error_seen);
 
         delete compute_checksum;
     }

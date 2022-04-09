@@ -17,7 +17,7 @@ Contact : https://www.qt
 
 This file is part of the Qt_widgets module of the Qt Toolkit.
 
-$QT_BEGIN_LICENSE:LGPL$
+$GLib.T_BEGIN_LICENSE:LGPL$
 Commercial License Usage
 Licensees holding valid commercial Qt licenses may use this file in
 accordance with the commercial license
@@ -45,7 +45,7 @@ information to ensure the GNU General Public License requirements will
 be met : https://www.gnu.org/licenses/gpl-2.0.html and
 https://www.gnu.org/licenses/gpl-3.0.html.
 
-** $QT_END_LICENSE$
+** $GLib.T_END_LICENSE$
 ****************************************************************************/
 
 
@@ -62,7 +62,7 @@ Contact : https://www.qt
 
 This file is part of the Qt_widgets module of the Qt Toolkit.
 
-$QT_BEGIN_LICENSE:LGPL$
+$GLib.T_BEGIN_LICENSE:LGPL$
 Commercial License Usage
 Licensees holding valid commercial Qt licenses may use this file in
 accordance with the commercial license
@@ -90,14 +90,14 @@ information to ensure the GNU General Public License requirements will
 be met : https://www.gnu.org/licenses/gpl-2.0.html and
 https://www.gnu.org/licenses/gpl-3.0.html.
 
-** $QT_END_LICENSE$
+** $GLib.T_END_LICENSE$
 ****************************************************************************/
 
 //  #include <Gtk.Widget>
-//  #include <QVBoxLayout>
-//  #include <QPainte
-//  #include <QStyle>
-//  #include <Gtk.Application>
+//  #include <GLib.VBoxLayout>
+//  #include <GLib.Painte
+//  #include <GLib.Style>
+//  #include <GLib.Application>
 
 namespace Occ {
 namespace Ui {
@@ -120,14 +120,14 @@ public class HeaderBanner : Gtk.Widget {
     ***********************************************************/
     private Gtk.Label title_label;
     private Gtk.Label logo_label;
-    private QGridLayout layout;
+    private GLib.GridLayout layout;
     private Gdk.Pixbuf banner_pixmap;
 
     /***********************************************************
     ***********************************************************/
     public HeaderBanner (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
-        size_policy (QSizePolicy.Expanding, QSizePolicy.Fixed);
+        size_policy (GLib.SizePolicy.Expanding, GLib.SizePolicy.Fixed);
         background_role (Gtk.Palette.Base);
         title_label = new Gtk.Label (this);
         title_label.background_role (Gtk.Palette.Base);
@@ -135,8 +135,8 @@ public class HeaderBanner : Gtk.Widget {
         Cairo.FontFace font = title_label.font ();
         font.bold (true);
         title_label.font (font);
-        layout = new QGridLayout (this);
-        layout.contents_margins (QMargins ());
+        layout = new GLib.GridLayout (this);
+        layout.contents_margins (GLib.Margins ());
         layout.spacing (0);
         layout.row_minimum_height (3, 1);
         layout.row_stretch (4, 1);
@@ -153,12 +153,12 @@ public class HeaderBanner : Gtk.Widget {
     public void setup (
         string title, Gdk.Pixbuf logo, Gdk.Pixbuf banner,
         Qt.TextFormat title_format, string style_sheet) {
-        QStyle style = parent_widget ().this.style;
-        //const int layout_horizontal_spacing = style.pixel_metric (QStyle.PM_Layout_horizontal_spacing);
-        int top_level_margin_left = style.pixel_metric (QStyle.PM_Layout_left_margin, null, parent_widget ());
-        int top_level_margin_right = style.pixel_metric (QStyle.PM_Layout_right_margin, null, parent_widget ());
-        int top_level_margin_top = style.pixel_metric (QStyle.PM_Layout_top_margin, null, parent_widget ());
-        //int top_level_margin_bottom = style.pixel_metric (QStyle.PM_Layout_bottom_margin, 0, parent_widget ());
+        GLib.Style style = parent_widget ().this.style;
+        //const int layout_horizontal_spacing = style.pixel_metric (GLib.Style.PM_Layout_horizontal_spacing);
+        int top_level_margin_left = style.pixel_metric (GLib.Style.PM_Layout_left_margin, null, parent_widget ());
+        int top_level_margin_right = style.pixel_metric (GLib.Style.PM_Layout_right_margin, null, parent_widget ());
+        int top_level_margin_top = style.pixel_metric (GLib.Style.PM_Layout_top_margin, null, parent_widget ());
+        //int top_level_margin_bottom = style.pixel_metric (GLib.Style.PM_Layout_bottom_margin, 0, parent_widget ());
 
         layout.row_minimum_height (0, MODERN_HEADER_TOP_MARGIN);
         layout.row_minimum_height (1, top_level_margin_top - MODERN_HEADER_TOP_MARGIN - 1);
@@ -177,7 +177,7 @@ public class HeaderBanner : Gtk.Widget {
         if (banner_pixmap == null) {
             Gdk.Rectangle size = layout.total_minimum_size ();
             minimum_size (size);
-            maximum_size (QWIDGETSIZE_MAX, size.height ());
+            maximum_size (GLib.WIDGETSIZE_MAX, size.height ());
         } else {
             fixed_height (banner.height () + 2);
         }
@@ -187,12 +187,12 @@ public class HeaderBanner : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    protected override void paint_event (QPaintEvent event) {
-        QPainter painter = new QPainter (this);
+    protected override void paint_event (GLib.PaintEvent event) {
+        GLib.Painter painter = new GLib.Painter (this);
         painter.draw_pixmap (0, 0, width (), banner_pixmap.height (), banner_pixmap);
         int x = width () - 2;
         int y = height () - 2;
-        const Gtk.Palette pal = Gtk.Application.palette ();
+        const Gtk.Palette pal = GLib.Application.palette ();
         painter.pen (pal.mid ().color ());
         painter.draw_line (0, y, x, y);
         painter.pen (pal.base ().color ());

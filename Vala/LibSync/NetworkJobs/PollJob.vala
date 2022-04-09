@@ -78,7 +78,7 @@ public class PollJob : AbstractNetworkJob {
 
         string json_data = this.input_stream.read_all ().trimmed ();
         Json.ParserError json_parse_error;
-        Json.Object json = QJsonDocument.from_json (json_data, json_parse_error).object ();
+        Json.Object json = GLib.JsonDocument.from_json (json_data, json_parse_error).object ();
         GLib.info ("> " + json_data + " <" + this.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int () + json + json_parse_error.error_string);
         if (json_parse_error.error != Json.ParserError.NoError) {
             this.item.error_string = _("Invalid JSON input_stream from the poll URL");

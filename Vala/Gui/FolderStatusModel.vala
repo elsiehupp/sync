@@ -4,9 +4,9 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QAbstractItemModel>
+//  #include <GLib.AbstractItemModel>
 //  #include <GLib.Timer>
-//  #include <QPointer>
+//  #include <GLib.Pointer>
 
 namespace Occ {
 namespace Ui {
@@ -15,7 +15,7 @@ namespace Ui {
 @brief The FolderStatusModel class
 @ingroup gui
 ***********************************************************/
-public class FolderStatusModel : QAbstractItemModel {
+public class FolderStatusModel : GLib.AbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
@@ -124,7 +124,7 @@ public class FolderStatusModel : QAbstractItemModel {
         /***********************************************************
         Reset all subfolders and fetch status
         ***********************************************************/
-        void reset_subs (FolderStatusModel model, QModelIndex index) {
+        void reset_subs (FolderStatusModel model, GLib.ModelIndex index) {
             this.fetched = false;
             if (this.fetching_job) {
                 disconnect (this.fetching_job, null, model, null);
@@ -236,7 +236,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
     See on_signal_show_pending_fetch_progress ()
     ***********************************************************/
-    private GLib.HashTable<QPersistentModelIndex, GLib.Timer> fetching_items;
+    private GLib.HashTable<GLib.PersistentModelIndex, GLib.Timer> fetching_items;
 
 
     internal signal void dirty_changed ();
@@ -246,7 +246,7 @@ public class FolderStatusModel : QAbstractItemModel {
     Tell the view that this item should be expanded because it
     has an undecided item
     ***********************************************************/
-    internal signal void suggest_expand (QModelIndex index);
+    internal signal void suggest_expand (GLib.ModelIndex index);
 
 
     //  friend struct SubFolderInfo;
@@ -262,7 +262,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    public Qt.ItemFlags flags (QModelIndex index) {
+    public Qt.ItemFlags flags (GLib.ModelIndex index) {
         if (!this.account_state) {
             return {};
         }
@@ -296,7 +296,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.Variant data_for_index_and_role (QModelIndex index, int role) {
+    public GLib.Variant data_for_index_and_role (GLib.ModelIndex index, int role) {
         if (!index.is_valid) {
             return GLib.Variant ();
         }
@@ -339,7 +339,7 @@ public class FolderStatusModel : QAbstractItemModel {
                 } else if (x.size > 0 && is_any_ancestor_encrypted (index)) {
                     return new Gtk.Icon (":/client/theme/lock-broken.svg");
                 }
-                return QFileIconProvider ().icon (x.is_external ? QFileIconProvider.Network : QFileIconProvider.FolderConnection);
+                return GLib.FileIconProvider ().icon (x.is_external ? GLib.FileIconProvider.Network : GLib.FileIconProvider.FolderConnection);
             }
             case Qt.Foreground_role:
                 if (x.is_undecided) {
@@ -472,7 +472,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    public bool data_for_index_value_and_role (QModelIndex index, GLib.Variant value, int role = Qt.EditRole) {
+    public bool data_for_index_value_and_role (GLib.ModelIndex index, GLib.Variant value, int role = Qt.EditRole) {
         if (role == Qt.CheckStateRole) {
             var info = info_for_index (index);
             //  Q_ASSERT (info.folder_connection && info.folder_connection.supports_selective_sync);
@@ -483,7 +483,7 @@ public class FolderStatusModel : QAbstractItemModel {
                 if (checked == Qt.Checked) {
                     // If we are checked, check that we may need to check the parent as well if
                     // all the siblings are also checked
-                    QModelIndex parent = index.parent ();
+                    GLib.ModelIndex parent = index.parent ();
                     var parent_info = info_for_index (parent);
                     if (parent_info && parent_info.checked != Qt.Checked) {
                         bool has_unchecked = false;
@@ -508,7 +508,7 @@ public class FolderStatusModel : QAbstractItemModel {
                 }
 
                 if (checked == Qt.Unchecked) {
-                    QModelIndex parent = index.parent ();
+                    GLib.ModelIndex parent = index.parent ();
                     var parent_info = info_for_index (parent);
                     if (parent_info && parent_info.checked == Qt.Checked) {
                         data_for_index_value_and_role (parent, Qt.PartiallyChecked, Qt.CheckStateRole);
@@ -523,7 +523,7 @@ public class FolderStatusModel : QAbstractItemModel {
                 }
 
                 if (checked == Qt.PartiallyChecked) {
-                    QModelIndex parent = index.parent ();
+                    GLib.ModelIndex parent = index.parent ();
                     var parent_info = info_for_index (parent);
                     if (parent_info && parent_info.checked != Qt.PartiallyChecked) {
                         data_for_index_value_and_role (parent, Qt.PartiallyChecked, Qt.CheckStateRole);
@@ -535,20 +535,20 @@ public class FolderStatusModel : QAbstractItemModel {
             /* emit */ data_changed (index, index, GLib.List<int> () + role);
             return true;
         }
-        return QAbstractItemModel.data (index, value, role);
+        return GLib.AbstractItemModel.data (index, value, role);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public int column_count (QModelIndex parent = QModelIndex ()) {
+    public int column_count (GLib.ModelIndex parent = GLib.ModelIndex ()) {
         return 1;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public int row_count (QModelIndex parent = QModelIndex ()) {
+    public int row_count (GLib.ModelIndex parent = GLib.ModelIndex ()) {
         if (!parent.is_valid) {
             if (Theme.single_sync_folder && this.folders.length () != 0) {
                 // "Add folder_connection" button not visible in the single_sync_folder configuration.
@@ -567,7 +567,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    public QModelIndex index (int row, int column = 0, QModelIndex parent = QModelIndex ()) {
+    public GLib.ModelIndex index (int row, int column = 0, GLib.ModelIndex parent = GLib.ModelIndex ()) {
         if (!parent.is_valid) {
             return create_index (row, column /*, null*/);
         }
@@ -596,7 +596,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    public QModelIndex parent (QModelIndex child) {
+    public GLib.ModelIndex parent (GLib.ModelIndex child) {
         if (!child.is_valid) {
             return {};
         }
@@ -627,7 +627,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    public bool can_fetch_more (QModelIndex parent) {
+    public bool can_fetch_more (GLib.ModelIndex parent) {
         if (!this.account_state) {
             return false;
         }
@@ -647,7 +647,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    public void fetch_more (QModelIndex parent) {
+    public void fetch_more (GLib.ModelIndex parent) {
         var info = info_for_index (parent);
 
         if (!info || info.fetched || info.fetching_job)
@@ -690,7 +690,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
         lscol_job.start ();
 
-        QPersistentModelIndex persistent_index = new QPersistentModelIndex (parent);
+        GLib.PersistentModelIndex persistent_index = new GLib.PersistentModelIndex (parent);
         lscol_job.property (PROPERTY_PARENT_INDEX_C, GLib.Variant.from_value (persistent_index));
 
         // Show "fetching data..." hint after a while.
@@ -701,7 +701,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    public void reset_and_fetch (QModelIndex parent) {
+    public void reset_and_fetch (GLib.ModelIndex parent) {
         var info = info_for_index (parent);
         info.reset_subs (this, parent);
         fetch_more (parent);
@@ -710,7 +710,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    public bool has_children (QModelIndex parent = QModelIndex ()) {
+    public bool has_children (GLib.ModelIndex parent = GLib.ModelIndex ()) {
         if (!parent.is_valid)
             return true;
 
@@ -730,7 +730,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    public ItemType classify (QModelIndex index) {
+    public ItemType classify (GLib.ModelIndex index) {
         var sub = (SubFolderInfo) index.internal_pointer ();
         if (sub) {
             if (sub.has_label ()) {
@@ -748,7 +748,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    public SubFolderInfo info_for_index (QModelIndex index) {
+    public SubFolderInfo info_for_index (GLib.ModelIndex index) {
         if (!index.is_valid) {
             return null;
         }
@@ -773,7 +773,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    public bool is_any_ancestor_encrypted (QModelIndex index) {
+    public bool is_any_ancestor_encrypted (GLib.ModelIndex index) {
         var parent_index = parent (index);
         while (parent_index.is_valid) {
             const var info = info_for_index (parent_index);
@@ -798,11 +798,11 @@ public class FolderStatusModel : QAbstractItemModel {
 
 
     /***********************************************************
-    Return a QModelIndex for the given path within the given
+    Return a GLib.ModelIndex for the given path within the given
     folder. Note: this method returns an invalid index if the
     path was not fetched from the server before
     ***********************************************************/
-    public QModelIndex index_for_path (FolderConnection folder_connection, string path) {
+    public GLib.ModelIndex index_for_path (FolderConnection folder_connection, string path) {
 
         int slash_pos = path.last_index_of ("/");
         if (slash_pos == -1) {
@@ -1205,7 +1205,7 @@ public class FolderStatusModel : QAbstractItemModel {
     private void on_signal_update_directories (GLib.List<string> list) {
         var lscol_job = (LscolJob) sender ());
         //  ASSERT (lscol_job);
-        QModelIndex index = qvariant_cast<QPersistentModelIndex> (lscol_job.property (PROPERTY_PARENT_INDEX_C));
+        GLib.ModelIndex index = qvariant_cast<GLib.PersistentModelIndex> (lscol_job.property (PROPERTY_PARENT_INDEX_C));
         var parent_info = info_for_index (index);
         if (!parent_info) {
             return;
@@ -1256,7 +1256,7 @@ public class FolderStatusModel : QAbstractItemModel {
             sorted_subfolders.remove_first (); // skip the parent item (first in the list)
         Utility.sort_filenames (sorted_subfolders);
 
-        int[] undecided_indexes = int[10]; // previously QVarLengthArray
+        int[] undecided_indexes = int[10]; // previously GLib.VarLengthArray
 
         GLib.List<SubFolderInfo> new_subs;
         new_subs.reserve (sorted_subfolders.size ());
@@ -1395,7 +1395,7 @@ public class FolderStatusModel : QAbstractItemModel {
     private void on_signal_lscol_finished_with_error (GLib.InputStream r) {
         var lscol_job = qobject_cast<LscolJob> (sender ());
         //  ASSERT (lscol_job);
-        QModelIndex index = qvariant_cast<QPersistentModelIndex> (lscol_job.property (PROPERTY_PARENT_INDEX_C));
+        GLib.ModelIndex index = qvariant_cast<GLib.PersistentModelIndex> (lscol_job.property (PROPERTY_PARENT_INDEX_C));
         if (!index.is_valid) {
             return;
         }
@@ -1509,7 +1509,7 @@ public class FolderStatusModel : QAbstractItemModel {
     only added after some time to avoid popping.
     ***********************************************************/
     private void on_signal_show_fetch_progress () {
-        var it = new QMutableMapIterator<QPersistentModelIndex, GLib.Timer> (this.fetching_items);
+        var it = new GLib.MutableMapIterator<GLib.PersistentModelIndex, GLib.Timer> (this.fetching_items);
         while (it.has_next ()) {
             it.next ();
             if (it.value ().elapsed () > 800) {

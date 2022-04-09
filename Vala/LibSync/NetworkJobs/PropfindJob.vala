@@ -49,7 +49,7 @@ public class PropfindJob : AbstractNetworkJob {
         }
         Soup.Request request = new Soup.Request ();
         // Always have a higher priority than the propagator because we use this from the UI
-        // and really want this to be done first (no matter what internal scheduling QNAM uses).
+        // and really want this to be done first (no matter what internal scheduling GLib.NAM uses).
         // Also possibly useful for avoiding false timeouts.
         request.priority (Soup.Request.HighPriority);
         request.raw_header ("Depth", "0");
@@ -70,7 +70,7 @@ public class PropfindJob : AbstractNetworkJob {
 
         var buf = new Soup.Buffer (this);
         buf.data (xml);
-        buf.open (QIODevice.ReadOnly);
+        buf.open (GLib.IODevice.ReadOnly);
         send_request ("PROPFIND", make_dav_url (path), request, buf);
 
         AbstractNetworkJob.start ();
@@ -87,23 +87,23 @@ public class PropfindJob : AbstractNetworkJob {
 
         if (http_result_code == 207) {
             // Parse DAV response
-            QXmlStreamReader reader = new QXmlStreamReader (this.reply);
-            reader.add_extra_namespace_declaration (QXmlStreamNamespaceDeclaration ("d", "DAV:"));
+            GLib.XmlStreamReader reader = new GLib.XmlStreamReader (this.reply);
+            reader.add_extra_namespace_declaration (GLib.XmlStreamNamespaceDeclaration ("d", "DAV:"));
 
             GLib.HashTable<string, GLib.Variant> items;
             // introduced to nesting is ignored
             GLib.List<string> current_element; // should be a LIFO stack
 
             while (!reader.at_end ()) {
-                QXmlStreamReader.TokenType type = reader.read_next ();
-                if (type == QXmlStreamReader.StartElement) {
+                GLib.XmlStreamReader.TokenType type = reader.read_next ();
+                if (type == GLib.XmlStreamReader.StartElement) {
                     if (current_element.length () > 0 && current_element.top () == "prop") {
-                        items.insert (reader.name ().to_string (), reader.read_element_text (QXmlStreamReader.SkipChildElements));
+                        items.insert (reader.name ().to_string (), reader.read_element_text (GLib.XmlStreamReader.SkipChildElements));
                     } else {
                         current_element.push (reader.name ().to_string ());
                     }
                 }
-                if (type == QXmlStreamReader.EndElement) {
+                if (type == GLib.XmlStreamReader.EndElement) {
                     if (current_element.top () == reader.name ()) {
                         current_element.pop ();
                     }

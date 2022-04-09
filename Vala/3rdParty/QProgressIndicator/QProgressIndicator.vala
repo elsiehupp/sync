@@ -1,7 +1,7 @@
 /***********************************************************
-@class QProgressIndicator
+@class GLib.ProgressIndicator
 
-@brief The QProgressIndicator class lets an application
+@brief The GLib.ProgressIndicator class lets an application
 display a progress indicator to show that a lengthy task is
 under way.
 
@@ -12,9 +12,9 @@ nothing more than spin to show that the application is busy.
 
 @copyright The MIT License (MIT)
 
-@see QProgressBar
+@see GLib.ProgressBar
 ***********************************************************/
-public class QProgressIndicator : Gtk.Widget {
+public class GLib.ProgressIndicator : Gtk.Widget {
 
     //  Q_PROPERTY (int delay READ animation_delay WRITE on_set_animation_delay)
     //  Q_PROPERTY (bool displayed_when_stopped READ is_displayed_when_stopped WRITE on_set_displayed_when_stopped)
@@ -30,9 +30,9 @@ public class QProgressIndicator : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public QProgressIndicator (Gtk.Widget parent = new Gtk.Widget ()) {
+    public GLib.ProgressIndicator (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
-        set_size_policy (QSizePolicy.Fixed, QSizePolicy.Fixed);
+        set_size_policy (GLib.SizePolicy.Fixed, GLib.SizePolicy.Fixed);
         set_focus_policy (Qt.NoFocus);
     }
 
@@ -158,7 +158,7 @@ public class QProgressIndicator : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    protected override void timer_event (QTimerEvent event) {
+    protected override void timer_event (GLib.TimerEvent event) {
         m_angle = (m_angle+30)%360;
 
         update ();
@@ -167,15 +167,15 @@ public class QProgressIndicator : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    protected override void paint_event (QPaintEvent event) {
+    protected override void paint_event (GLib.PaintEvent event) {
         if (!m_displayed_when_stopped && !is_animated ()) {
             return;
         }
 
         int width = q_min (this.width (), this.height ());
 
-        QPainter p = new QPainter (this);
-        p.set_render_hint (QPainter.Antialiasing);
+        GLib.Painter p = new GLib.Painter (this);
+        p.set_render_hint (GLib.Painter.Antialiasing);
 
         int outer_radius = q_round ( (width - 1) * 0.5);
         int inner_radius = q_round ( (width - 1) * 0.5 * 0.38);

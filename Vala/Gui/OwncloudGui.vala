@@ -7,27 +7,27 @@
 //  #ifdef WITH_LIBCLOUDPROVIDERS
 //  #endif
 
-//  #include <QQmlApplicationEngine>
-//  #include <QDesktopServices>
+//  #include <GLib.QmlApplicationEngine>
+//  #include <GLib.DesktopServices>
 //  #include <GLib.Dir>
 //  #include <Gtk.MessageBox>
-//  #include <QSignal_mapper>
+//  #include <GLib.Signal_mapper>
 //  #include_LIBCLOUDPROVIDERS
-//  #include <Qt_d_bus/QDBusConnection>
-//  #include <Qt_d_bus/QDBusInterface>
+//  #include <Qt_d_bus/GLib.DBusConnection>
+//  #include <Qt_d_bus/GLib.DBusInterface>
 //  #endif
 
-//  #include <QQmlEngine>
-//  #include <QQml_component>
-//  #include <QQmlApplicationEngine>
-//  #include <QQuickItem>
-//  #include <QQml_context>
-//  #include <QPointer
-//  #include <QActio
+//  #include <GLib.QmlEngine>
+//  #include <GLib.Qml_component>
+//  #include <GLib.QmlApplicationEngine>
+//  #include <GLib.QuickItem>
+//  #include <GLib.Qml_context>
+//  #include <GLib.Pointer
+//  #include <GLib.Actio
 //  #include <GLib.Menu>
 //  #include <Gdk.Rectangle>
 //  #ifdef WITH_LIBCLOUDPROVIDERS
-//  #include <QDBusConnection>
+//  #include <GLib.DBusConnection>
 //  #endif
 
 namespace Occ {
@@ -53,7 +53,7 @@ public class OwncloudGui : GLib.Object {
     private SettingsDialog settings_dialog;
     private LogBrowser log_browser;
 
-    private QDBusConnection bus;
+    private GLib.DBusConnection bus;
 
     /***********************************************************
     ***********************************************************/
@@ -61,13 +61,13 @@ public class OwncloudGui : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private QAction action_new_account_wizard;
-    private QAction action_settings;
-    private QAction action_estimate;
+    private GLib.Action action_new_account_wizard;
+    private GLib.Action action_settings;
+    private GLib.Action action_estimate;
 
     /***********************************************************
     ***********************************************************/
-    private GLib.List<QAction> recent_items_actions;
+    private GLib.List<GLib.Action> recent_items_actions;
     private Application app;
 
     /***********************************************************
@@ -89,10 +89,10 @@ public class OwncloudGui : GLib.Object {
         this.tray = null;
         this.settings_dialog = null;
         this.log_browser = null;
-        this.bus = QDBusConnection.session_bus ();
+        this.bus = GLib.DBusConnection.session_bus ();
         this.app = parent;
         this.tray = Systray.instance;
-        this.tray.tray_engine = new QQmlApplicationEngine (this);
+        this.tray.tray_engine = new GLib.QmlApplicationEngine (this);
         // for the beginning, set the offline icon until the account was verified
         this.tray.icon = Theme.folder_offline_icon_for_tray;
 
@@ -185,7 +185,7 @@ public class OwncloudGui : GLib.Object {
         if (!this.bus.is_connected) {
             return false;
         }
-        QDBusInterface dbus_iface = new QDBusInterface (
+        GLib.DBusInterface dbus_iface = new GLib.DBusInterface (
             "org.freedesktop.CloudProviderManager",
             "/org/freedesktop/CloudProviderManager",
             "org.freedesktop.Cloud_provider.Manager1",
@@ -368,7 +368,7 @@ public class OwncloudGui : GLib.Object {
         if (folder_connection != null {
             GLib.info ("opening local url " + folder_connection.path);
             GLib.Uri url = GLib.Uri.from_local_file (folder_connection.path);
-            QDesktopServices.open_url (url);
+            GLib.DesktopServices.open_url (url);
         }
     }
 
@@ -427,9 +427,9 @@ public class OwncloudGui : GLib.Object {
         if (!progress.last_completed_item == "") {
 
             string kind_str = Progress.as_result_string (progress.last_completed_item);
-            string time_str = QTime.current_time ().to_string ("hh:mm");
+            string time_str = GLib.Time.current_time ().to_string ("hh:mm");
             string action_text = _("%1 (%2, %3)").printf (progress.last_completed_item.file, kind_str, time_str);
-            var action = new QAction (action_text, this);
+            var action = new GLib.Action (action_text, this);
             FolderConnection folder_connection = FolderManager.instance.folder_by_alias (folder_connection);
             if (folder_connection != null) {
                 string full_path = folder_connection.path + "/" + progress.last_completed_item.file;
@@ -471,8 +471,8 @@ public class OwncloudGui : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_tray_clicked (QSystemTrayIcon.Activation_reason reason) {
-        if (reason == QSystemTrayIcon.Trigger) {
+    public void on_signal_tray_clicked (GLib.SystemTrayIcon.Activation_reason reason) {
+        if (reason == GLib.SystemTrayIcon.Trigger) {
             if (OwncloudSetupWizard.bring_wizard_to_front_if_visible ()) {
                 // brought wizard to front
             } else if (this.share_dialogs.size () > 0) {
@@ -593,7 +593,7 @@ public class OwncloudGui : GLib.Object {
     public void on_signal_open_settings_dialog () {
         // if account is set up, on_signal_start the configuration wizard.
         if (AccountManager.instance.accounts.length () != 0) {
-            if (this.settings_dialog == null || Gtk.Application.active_window () != this.settings_dialog) {
+            if (this.settings_dialog == null || GLib.Application.active_window () != this.settings_dialog) {
                 on_signal_show_settings ();
             } else {
                 this.settings_dialog.close ();
@@ -624,7 +624,7 @@ public class OwncloudGui : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_help () {
-        QDesktopServices.open_url (GLib.Uri (Theme.help_url));
+        GLib.DesktopServices.open_url (GLib.Uri (Theme.help_url));
     }
 
 
@@ -718,7 +718,7 @@ public class OwncloudGui : GLib.Object {
     ***********************************************************/
     private void on_signal_new_account_wizard () {
         OwncloudSetupWizard.run_wizard (
-            Gtk.Application,
+            GLib.Application,
             on_signal_owncloud_wizard_done (int)
         );
     }

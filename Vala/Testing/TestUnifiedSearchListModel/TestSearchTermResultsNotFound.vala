@@ -20,7 +20,7 @@ public class TestSearchTermResultsNotFound : AbstractTestUnifiedSearchListmodel 
         // test that search term gets set, search gets started and enough results get returned
         model.set_search_term (model.search_term () + "[empty]");
 
-        QSignalSpy search_in_progress_changed = new QSignalSpy (
+        GLib.SignalSpy search_in_progress_changed = new GLib.SignalSpy (
             model, UnifiedSearchResultsListModel.is_search_in_progress_changed);
 
         GLib.assert_true (search_in_progress_changed.wait ());

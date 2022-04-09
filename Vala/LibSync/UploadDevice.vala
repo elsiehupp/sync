@@ -103,8 +103,8 @@ public class UploadDevice : GLib.OutputStream {
 
     /***********************************************************
     ***********************************************************/
-    public bool open (QIODevice.Open_mode mode) {
-        if (mode & QIODevice.WriteOnly)
+    public bool open (GLib.IODevice.Open_mode mode) {
+        if (mode & GLib.IODevice.WriteOnly)
             return false;
 
         // Get the file size now : this.file.filename () is no longer reliable
@@ -120,7 +120,7 @@ public class UploadDevice : GLib.OutputStream {
         this.size = q_bound (0ll, this.size, file_disk_size - this.start);
         this.read = 0;
 
-        return QIODevice.open (mode);
+        return GLib.IODevice.open (mode);
     }
 
 
@@ -128,7 +128,7 @@ public class UploadDevice : GLib.OutputStream {
     ***********************************************************/
     public void close () {
         this.file.close ();
-        QIODevice.close ();
+        GLib.IODevice.close ();
     }
 
 
@@ -185,7 +185,7 @@ public class UploadDevice : GLib.OutputStream {
     /***********************************************************
     ***********************************************************/
     public int64 bytes_available () {
-        return this.size - this.read + QIODevice.bytes_available ();
+        return this.size - this.read + GLib.IODevice.bytes_available ();
     }
 
 
@@ -200,7 +200,7 @@ public class UploadDevice : GLib.OutputStream {
     /***********************************************************
     ***********************************************************/
     public bool seek (int64 position) {
-        if (!QIODevice.seek (position)) {
+        if (!GLib.IODevice.seek (position)) {
             return false;
         }
         if (position < 0 || position > this.size) {
@@ -217,7 +217,7 @@ public class UploadDevice : GLib.OutputStream {
     public void give_bandwidth_quota (int64 bwq) {
         if (!at_end ()) {
             this.bandwidth_quota = bwq;
-            GLib.Object.invoke_method (this, "ready_read", Qt.QueuedConnection); // tell QNAM that we have quota
+            GLib.Object.invoke_method (this, "ready_read", Qt.QueuedConnection); // tell GLib.NAM that we have quota
         }
     }
 
