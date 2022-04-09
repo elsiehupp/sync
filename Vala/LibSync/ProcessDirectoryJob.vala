@@ -114,36 +114,48 @@ public class ProcessDirectoryJob : GLib.Object {
         PathTuple add_name (string name) {
             PathTuple result;
             result.original = path_append (this.original, name);
-            string build_string = (other) => {
-                // Optimize by trying to keep all string implicitly shared if they are the same (common case)
-                return other == this.original ? result.original : path_append (other, name);
-            };
-            result.target = build_string (this.target);
-            result.server = build_string (this.server);
-            result.local = build_string (this.local);
+            result.target = build_string (this.target, name, result);
+            result.server = build_string (this.server, name, result);
+            result.local = build_string (this.local, name, result);
             return result;
+        }
+
+
+        private string build_string (string other, string name, PathTuple result) {
+            // Optimize by trying to keep all string implicitly shared if they are the same (common case)
+            if (other == this.original) {
+                return result.original;
+            } else {
+                path_append (other, name);
+            }
         }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private struct MovePermissionResult {
+    private class MovePermissionResult {
 
         /***********************************************************
         Whether moving/renaming the source is ok
         ***********************************************************/
-        bool source_ok = false;
+        bool source_ok;
 
         /***********************************************************
         Whether the destination accepts (always true for renames)
         ***********************************************************/
-        bool destination_ok = false;
+        bool destination_ok;
 
         /***********************************************************
         Whether creating a new file/directory in the destination is ok
         ***********************************************************/
-        bool destination_new_ok = false;
+        bool destination_new_ok;
+
+        construct {
+            source_ok = false;
+            destination_ok = false;
+            destination_new_ok = false;
+        }
     }
 
 
@@ -239,7 +251,7 @@ public class ProcessDirectoryJob : GLib.Object {
     /***********************************************************
     The directory's pin-state, see compute_pin_state ()
     ***********************************************************/
-    private PinState pin_state = PinState.PinState.UNSPECIFIED;
+    private Common.PinState pin_state = Common.PinState.UNSPECIFIED;
 
     /***********************************************************
     This directory is encrypted or is within the tree of
@@ -267,7 +279,7 @@ public class ProcessDirectoryJob : GLib.Object {
     ***********************************************************/
     public ProcessDirectoryJob.root_job (
         DiscoveryPhase data,
-        PinState base_pin_state,
+        Common.PinState base_pin_state,
         int64 last_sync_timestamp,
         GLib.Object parent
     ) {
@@ -1849,8 +1861,9 @@ public class ProcessDirectoryJob : GLib.Object {
         case CSync.SyncInstructions.REMOVE: {
             string file_slash = item.file + "/";
             var forbidden_it = this.discovery_data.forbidden_deletes.upper_bound (file_slash);
-            if (forbidden_it != this.discovery_data.forbidden_deletes.begin ())
+            if (forbidden_it != this.discovery_data.forbidden_deletes.begin ()) {
                 forbidden_it -= 1;
+            }
             if (forbidden_it != this.discovery_data.forbidden_deletes.end ()
                 && file_slash.has_prefix (forbidden_it.key ())) {
                 item.instruction = CSync.SyncInstructions.NEW;
@@ -1882,10 +1895,10 @@ public class ProcessDirectoryJob : GLib.Object {
     }
 
 
-
     /***********************************************************
-    Check if the move is of a specified file within this directory is allowed.
-    Return true if it is allowed, false otherwise
+    Check if the move is of a specified file within this
+    directory is allowed. Return true if it is allowed, false
+    otherwise
     ***********************************************************/
     private MovePermissionResult check_move_permissions (RemotePermissions src_perm, string src_path, bool is_directory) {
         //  . MovePermissionResult {
@@ -2179,7 +2192,7 @@ public class ProcessDirectoryJob : GLib.Object {
     If the folder exists locally its state is retrieved, otherwise the
     parent's pin state is inherited.
     ***********************************************************/
-    private void compute_pin_state (PinState parent_state) {
+    private void compute_pin_state (Common.PinState parent_state) {
         this.pin_state = parent_state;
         if (this.query_local != PARENT_DOES_NOT_EXIST) {
             var state = this.discovery_data.sync_options.vfs.pin_state (this.current_folder.local);
@@ -2208,7 +2221,7 @@ public class ProcessDirectoryJob : GLib.Object {
             return;
 
         var pin = this.discovery_data.statedatabase.internal_pin_states.raw_for_path (record.path);
-        if (!pin || *pin == PinState.PinState.INHERITED)
+        if (!pin || *pin == Common.PinState.INHERITED)
             pin = this.pin_state;
 
         // Common.ItemAvailability.ONLINE_ONLY hydrated files want to be dehydrated
@@ -2216,7 +2229,7 @@ public class ProcessDirectoryJob : GLib.Object {
             record.type = ItemType.VIRTUAL_FILE_DEHYDRATION;
 
         // PinState.ALWAYS_LOCAL dehydrated files want to be hydrated
-        if (record.type == ItemType.VIRTUAL_FILE && *pin == PinState.PinState.ALWAYS_LOCAL)
+        if (record.type == ItemType.VIRTUAL_FILE && *pin == Common.PinState.ALWAYS_LOCAL)
             record.type = ItemType.VIRTUAL_FILE_DOWNLOAD;
     }
 

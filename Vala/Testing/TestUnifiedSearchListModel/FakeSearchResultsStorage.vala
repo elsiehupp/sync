@@ -70,11 +70,10 @@ public class FakeSearchResultsStorage : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static void destroy () {
-        if (this.instance) {
-            //  delete this.instance;
+        if (FakeSearchResultsStorage.instance != null) {
+            //  delete FakeSearchResultsStorage.instance;
         }
-
-        this.instance = null;
+        FakeSearchResultsStorages.instance = null;
     }
 
 

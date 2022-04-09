@@ -44,17 +44,17 @@ public class Theme : GLib.Object {
         }
     }
 
-    private bool mono = false;
+    private static bool mono = false;
     /***********************************************************
     Define if the systray icons should be using mono design
     Retrieve wether to use mono icons for systray
     ***********************************************************/
     public static bool systray_use_mono_icons {
         public get {
-            return this.mono;
+            return Theme.mono;
         }
         public set {
-            this.mono = value;
+            Theme.mono = value;
             /* emit */ signal_systray_use_mono_icons_changed (mono);
         }
     }
@@ -1213,7 +1213,7 @@ public class Theme : GLib.Object {
     ***********************************************************/
     public static bool show_virtual_files_option {
         public get {
-            return new ConfigFile ().show_experimental_options () || this.best_available_vfs_mode == AbstractVfs.WindowsCfApi;
+            return new ConfigFile ().show_experimental_options () || Theme.best_available_vfs_mode == AbstractVfs.WindowsCfApi;
         }
     }
 
@@ -1222,7 +1222,7 @@ public class Theme : GLib.Object {
     ***********************************************************/
     public static bool enforce_virtual_files_sync_folder {
         public get {
-            return ENFORCE_VIRTUAL_FILES_SYNC_FOLDER && this.best_available_vfs_mode != AbstractVfs.Off;
+            return ENFORCE_VIRTUAL_FILES_SYNC_FOLDER && Theme.best_available_vfs_mode != AbstractVfs.Off;
         }
     }
 
@@ -1333,7 +1333,7 @@ public class Theme : GLib.Object {
     @return string image path in the resources
     ***********************************************************/
     protected static string theme_image_path (string name, int size = -1, bool sys_tray = false) {
-        var flavor = (!is_branded && sys_tray) ? systray_icon_flavor (this.mono): "colored";
+        var flavor = (!is_branded && sys_tray) ? systray_icon_flavor (Theme.mono): "colored";
         var use_svg = should_prefer_svg;
 
         // branded client may have several sizes of the same icon

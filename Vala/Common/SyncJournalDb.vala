@@ -1041,15 +1041,17 @@ public class SyncJournalDb : GLib.Object {
     Returns whether the item or any subitems are dehydrated
     ***********************************************************/
     public Optional<HasHydratedDehydrated> has_hydrated_or_dehydrated_files (string filename) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
-        if (!check_connect ())
+        GLib.MutexLocker locker = new GLib.MutexLocker (SyncJournalDb.mutex);
+        if (!check_connect ()) {
             return {};
+        }
 
-        PreparedSqlQuery query = this.query_manager.get (
+        PreparedSqlQuery query = SyncJournalDb.query_manager.get (
             PreparedSqlQueryManager.Key.COUNT_DEHYDRATED_FILES_QUERY,
             "SELECT DISTINCT type FROM metadata"
             + " WHERE (" + is_prefix_path_or_equal ("?1", "path") + " OR ?1 == '');",
-            this.database);
+            this.database
+        );
         if (!query) {
             return {};
         }

@@ -697,7 +697,7 @@ public class ShareLinkWidget : Gtk.Widget {
             _("Confirm Link Share Deletion"),
             _("<p>Do you really want to delete the public link share <i>%1</i>?</p>"
             + "<p>Note: This action cannot be undone.</p>")
-                .printf (share_name ()),
+                .printf (share_name),
             Gtk.MessageBox.NoButton,
             this);
         GLib.PushButton yes_button =
@@ -724,15 +724,17 @@ public class ShareLinkWidget : Gtk.Widget {
     /***********************************************************
     Retrieve a share's name, accounting for this.names_supported
     ***********************************************************/
-    private static string share_name () {
-        string name = this.link_share.name ();
-        if (!name == "") {
-            return name;
+    private static string share_name {
+        private get {
+            string name = ShareLinkWidget.link_share.name ();
+            if (!name == "") {
+                return name;
+            }
+            if (!ShareLinkWidge.names_supported) {
+                return _("Public link");
+            }
+            return ShareLinkWidget.link_share.token ();
         }
-        if (!this.names_supported) {
-            return _("Public link");
-        }
-        return this.link_share.token ();
     }
 
 

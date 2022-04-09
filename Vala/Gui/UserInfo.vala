@@ -231,7 +231,7 @@ public class UserInfo : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private bool can_get_info () {
-        if !this.account_state == null || !this.active) {
+        if (!this.account_state == null || !this.active) {
             return false;
         }
         unowned Account account = this.account_state.account;

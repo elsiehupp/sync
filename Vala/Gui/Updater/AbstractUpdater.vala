@@ -71,7 +71,7 @@ public abstract class AbstractUpdater : GLib.Object {
                 return new GLib.Uri ();
             }
 
-            var url_query = this.query_params;
+            var url_query = AbstractUpdater.query_params;
 
             update_base_url.query (url_query);
 

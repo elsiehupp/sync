@@ -347,16 +347,17 @@ public class FakeFolder : GLib.Object {
     }
 
 
-    private static FileInfo find_or_create_directories (FileInfo base, PathComponents components) {
-        if (components == "")
-            return base;
+    private static FileInfo find_or_create_directories (FileInfo base_file_info, PathComponents components) {
+        if (components == "") {
+            return base_file_info;
+        }
         var child_name = components.path_root ();
-        var it = base.children.find (child_name);
-        if (it != base.children.end ()) {
+        var it = base_file_info.children.find (child_name);
+        if (it != base_file_info.children.end ()) {
             return find_or_create_directories (*it, components.sub_components ());
         }
-        var new_directory = base.children[child_name] = new FileInfo (child_name);
-        new_directory.parent_path = base.path;
+        var new_directory = base_file_info.children[child_name] = new FileInfo (child_name);
+        new_directory.parent_path = base_file_info.path;
         return find_or_create_directories (new_directory, components.sub_components ());
     }
 

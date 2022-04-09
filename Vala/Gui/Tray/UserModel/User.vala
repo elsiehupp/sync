@@ -625,7 +625,7 @@ public class User : GLib.Object {
 
                 // count the number of running notification requests. If this member var
                 // is larger than zero, no new fetching of notifications is started
-                this.notification_requests_running++;
+                User.notification_requests_running++;
             }
         } else {
             GLib.warning ("Notification Links: Invalid verb: " + verb);

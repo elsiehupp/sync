@@ -25,13 +25,13 @@ public class ProgressDispatcher : GLib.Object {
     private GLib.Timer timer;
     static ProgressDispatcher instance {
         public get {
-            if (!this.instance) {
-                this.instance = new ProgressDispatcher ();
+            if (!ProgressDispatcher.instance) {
+                ProgressDispatcher.instance = new ProgressDispatcher ();
             }
-            return this.instance;
+            return ProgressDispatcher.instance;
         }
         private set {
-            this.instance = value;
+            ProgressDispatcher.instance = value;
         }
     }
     //  this.instance = null;

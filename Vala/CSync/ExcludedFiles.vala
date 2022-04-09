@@ -795,19 +795,19 @@ public class ExcludedFiles : GLib.Object {
         // - "foo?bar" can match "foo/bar" but also "foo_xbar", pattern is "*bar"
 
         // First, skip wildcards on the very right of the pattern
-        this.iterator = pattern.length - 1;
-        while (this.iterator >= 0 && is_wildcard (pattern[this.iterator]))
-            --this.iterator;
+        ExcludedFiles.iterator = pattern.length - 1;
+        while (ExcludedFiles.iterator >= 0 && is_wildcard (pattern[this.iterator]))
+            --ExcludedFiles.iterator;
 
         // Then scan further until the next wildcard that could match a /
-        while (this.iterator >= 0 && !is_wildcard (pattern[this.iterator]))
-            --this.iterator;
+        while (ExcludedFiles.iterator >= 0 && !is_wildcard (pattern[this.iterator]))
+            --ExcludedFiles.iterator;
 
         // Everything to the right is part of the pattern
         pattern = pattern.mid (this.iterator + 1);
 
         // And if there was a wildcard, it starts with a *
-        if (this.iterator >= 0) {
+        if (ExcludedFiles.iterator >= 0) {
             pattern.prepend ('*');
         }
 
@@ -855,10 +855,10 @@ public class ExcludedFiles : GLib.Object {
     private static void csync_exclude_expand_escapes (char *input) {
         size_t o = 0;
         char *line = input;
-        for (this.iterator = 0; this.iterator < input.length; ++this.iterator) {
-            if (line[this.iterator] == '\\') {
-                // at worst input[this.iterator+1] is \0
-                switch (line[this.iterator+1]) {
+        for (ExcludedFiles.iterator = 0; ExcludedFiles.iterator < input.length; ++ExcludedFiles.iterator) {
+            if (line[ExcludedFiles.iterator] == '\\') {
+                // at worst input[ExcludedFiles.iterator+1] is \0
+                switch (line[ExcludedFiles.iterator+1]) {
                 case "'" : line[o++] = "'"; break;
                 case "\\" : line[o++] = "\\"; break;
                 case '?' : line[o++] = '?'; break;
@@ -878,9 +878,9 @@ public class ExcludedFiles : GLib.Object {
                     line[o++] = line[this.iterator + 1];
                     break;
                 }
-                this.iterator += 1;
+                ExcludedFiles.iterator += 1;
             } else {
-                line[o++] = line[this.iterator];
+                line[o++] = line[ExcludedFiles.iterator];
             }
         }
         input.resize (Utility.convert_size_to_int (o));

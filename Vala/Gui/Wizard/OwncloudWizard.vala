@@ -308,7 +308,7 @@ public class OwncloudWizard : GLib.Wizard {
     chosen.
     ***********************************************************/
     public static void ask_experimental_virtual_files_feature (Gtk.Widget receiver, CallBack callback) {
-        var best_vfs_mode = this.best_available_vfs_mode;
+        var best_vfs_mode = OwncloudWizard.best_available_vfs_mode;
         Gtk.MessageBox message_box = null;
         GLib.PushButton accept_button = null;
         switch (best_vfs_mode) {
