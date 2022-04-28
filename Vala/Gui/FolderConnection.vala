@@ -476,12 +476,15 @@ public class FolderConnection : GLib.Object {
     where it returns "Z:" instead of "Z:/".
     ***********************************************************/
     public string clean_path {
-        string cleaned_path = GLib.Dir.clean_path (this.canonical_local_path);
+        public get {
+            string cleaned_path = GLib.Dir.clean_path (this.canonical_local_path);
 
-        if (cleaned_path.length == 3 && cleaned_path.has_suffix (":/"))
-            cleaned_path.remove (2, 1);
+            if (cleaned_path.length == 3 && cleaned_path.has_suffix (":/")) {
+                cleaned_path.remove (2, 1);
+            }
 
-        return cleaned_path;
+            return cleaned_path;
+        }
     }
 
 
@@ -1277,8 +1280,8 @@ public class FolderConnection : GLib.Object {
             journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, {});
         }
 
-        if ( (this.sync_result.status () == LibSync.SyncResult.Status.SUCCESS
-                || this.sync_result.status () == LibSync.SyncResult.Status.PROBLEM)
+        if ((this.sync_result.status () == LibSync.SyncResult.Status.SUCCESS
+            || this.sync_result.status () == LibSync.SyncResult.Status.PROBLEM)
             && success) {
             if (this.engine.last_local_discovery_style () == LocalDiscoveryStyle.FILESYSTEM_ONLY) {
                 this.time_since_last_full_local_discovery.on_signal_start ();
@@ -1422,8 +1425,8 @@ public class FolderConnection : GLib.Object {
         /* emit */ signal_sync_finished (this.sync_result);
 
         // Immediately check the etag again if there was some sync activity.
-        if ( (this.sync_result.status () == LibSync.SyncResult.Status.SUCCESS
-                || this.sync_result.status () == LibSync.SyncResult.Status.PROBLEM)
+        if ((this.sync_result.status () == LibSync.SyncResult.Status.SUCCESS
+            || this.sync_result.status () == LibSync.SyncResult.Status.PROBLEM)
             && (this.sync_result.first_item_deleted ()
                    || this.sync_result.first_item_new ()
                    || this.sync_result.first_item_renamed ()
@@ -1497,8 +1500,9 @@ public class FolderConnection : GLib.Object {
     of conflicts across partial local discovery.
     ***********************************************************/
     private void on_signal_folder_conflicts (string folder_connection, GLib.List<string> conflict_paths) {
-        if (folder_connection != this.definition.alias)
+        if (folder_connection != this.definition.alias) {
             return;
+        }
         var r = this.sync_result;
 
         // If the number of conflicts is too low, adjust it upwards
@@ -1778,8 +1782,9 @@ public class FolderConnection : GLib.Object {
 
             if (text != "") {
                 // Ignores the settings in case of an error or conflict
-                if (status == LogStatus.ERROR || status == LogStatus.CONFLICT)
+                if (status == LogStatus.ERROR || status == LogStatus.CONFLICT) {
                     logger.post_optional_gui_log (_("Sync Activity"), text);
+                }
             }
         }
     }

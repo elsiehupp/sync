@@ -158,7 +158,7 @@ public class ConflictSolver : GLib.Object {
         uint32 i = 1;
         var result = rename_pattern ().printf (i);
         while (GLib.FileInfo.exists (result)) {
-            //  Q_ASSERT (i > 0);
+            //  GLib.assert_true (i > 0);
             i++;
             result = rename_pattern ().printf (i);
         }

@@ -80,12 +80,13 @@ public class VioHandle : GLib.Object {
         }
     //    #endif
 
-        if (file_stat.path == null)
-                return file_stat;
+        if (file_stat.path == null) {
+            return file_stat;
+        }
 
         if (CSync.VioHandle.stat_mb (full_path.const_data (), file_stat.get ()) < 0) {
-                // Will get excluded by this.csync_detect_update.
-                file_stat.type = ItemType.SKIP;
+            // Will get excluded by this.csync_detect_update.
+            file_stat.type = ItemType.SKIP;
         }
 
         // Override type for virtual files if desired

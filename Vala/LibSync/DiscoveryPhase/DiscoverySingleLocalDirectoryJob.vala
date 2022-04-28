@@ -75,7 +75,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, GLib.Runnable*/ 
                 continue;
             LocalInfo i;
             static GMime.Encoding codec = GMime.Encoding.codec_for_name ("UTF-8");
-            //  ASSERT (codec);
+            //  GLib.assert_true (codec);
             GMime.Encoding.ConverterState state;
             i.name = codec.to_unicode (dirent.path, dirent.path.size (), state);
             if (state.invalid_chars > 0 || state.remaining_chars > 0) {

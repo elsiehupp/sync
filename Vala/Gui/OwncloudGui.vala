@@ -478,7 +478,7 @@ public class OwncloudGui : GLib.Object {
             } else if (this.share_dialogs.size () > 0) {
                 // Share dialog (s) be hidden by other apps, bring them back
                 foreach (ShareDialog share_dialog in this.share_dialogs) {
-                    //  Q_ASSERT (share_dialog);
+                    //  GLib.assert_true (share_dialog);
                     raise_dialog (share_dialog);
                 }
             } else if (this.tray.is_open) {

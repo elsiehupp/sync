@@ -53,7 +53,7 @@ public class ShareUserLine : Gtk.Widget {
         this.share = share;
         this.is_file = is_file;
         this.profile_page_menu = new ProfilePageMenu (account, share.share_with.share_with);
-        //  Q_ASSERT (this.share);
+        //  GLib.assert_true (this.share);
         this.instance.up_ui (this);
 
         this.instance.shared_with.elide_mode (GLib.Elide_right);
@@ -860,7 +860,7 @@ public class ShareUserLine : Gtk.Widget {
     ***********************************************************/
     private void calculate_background_based_on_signal_text () {
         GLib.CryptographicHash hash = GLib.CryptographicHash.hash (this.instance.shared_with.text ().to_utf8 (), GLib.ChecksumType.MD5);
-        //  Q_ASSERT (hash.size () > 0);
+        //  GLib.assert_true (hash.size () > 0);
         if (hash.size () == 0) {
             GLib.warning ("Failed to calculate hash color for share: " + this.share.path);
             return Gdk.RGBA ();

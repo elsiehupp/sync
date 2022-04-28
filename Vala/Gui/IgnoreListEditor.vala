@@ -84,9 +84,9 @@ public class IgnoreListEditor : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void on_signal_restore_defaults (GLib.AbstractButton button) {
-        if (instance.button_box.button_role (button) != GLib.DialogButtonBox.Reset_role)
+        if (instance.button_box.button_role (button) != GLib.DialogButtonBox.Reset_role) {
             return;
-
+        }
         instance.ignore_table_widget.on_signal_remove_all_items ();
 
         ConfigFile config_file;

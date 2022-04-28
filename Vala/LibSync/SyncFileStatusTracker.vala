@@ -102,7 +102,7 @@ public class SyncFileStatusTracker : GLib.Object {
     public void on_signal_path_touched (string filename) {
         string folder_path = this.sync_engine.local_path;
 
-        //  ASSERT (filename.has_prefix (folder_path));
+        //  GLib.assert_true (filename.has_prefix (folder_path));
         string local_path = filename.mid (folder_path.size ());
         this.dirty_paths.insert (local_path);
 
@@ -122,7 +122,7 @@ public class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_about_to_propagate (GLib.List<unowned SyncFileItem> items) {
-        //  ASSERT (this.sync_count == "");
+        //  GLib.assert_true (this.sync_count == "");
 
         ProblemsMap old_problems;
         std.swap (this.sync_problems, old_problems);
@@ -267,7 +267,7 @@ public class SyncFileStatusTracker : GLib.Object {
                 status.set (problem_status);
         }
 
-        //  ASSERT (shared_flag != SharedFlag.UNKNOWN_SHARED,
+        //  GLib.assert_true (shared_flag != SharedFlag.UNKNOWN_SHARED,
         //      "The shared status needs to have been fetched from a SyncFileItem or the DB at this point.");
         if (shared_flag == SharedFlag.SHARED)
             status.shared (true);
@@ -313,7 +313,7 @@ public class SyncFileStatusTracker : GLib.Object {
 
             // We passed from OK to SYNC, increment the parent to keep it marked as
             // SYNC while we propagate ourselves and our own children.
-            //  ASSERT (!relative_path.has_suffix ("/"));
+            //  GLib.assert_true (!relative_path.has_suffix ("/"));
             int last_slash_index = relative_path.last_index_of ("/");
             if (last_slash_index != -1)
                 inc_sync_count_and_emit_status_changed (relative_path.left (last_slash_index), SharedFlag.UNKNOWN_SHARED);
@@ -337,7 +337,7 @@ public class SyncFileStatusTracker : GLib.Object {
             /* emit */ signal_file_status_changed (get_system_destination (relative_path), status);
 
             // We passed from SYNC to OK, decrement our parent.
-            //  ASSERT (!relative_path.has_suffix ("/"));
+            //  GLib.assert_true (!relative_path.has_suffix ("/"));
             int last_slash_index = relative_path.last_index_of ("/");
             if (last_slash_index != -1) {
                 dec_sync_count_and_emit_status_changed (relative_path.left (last_slash_index), SharedFlag.UNKNOWN_SHARED);
@@ -351,7 +351,7 @@ public class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private Common.SyncFileStatus file_status (string relative_path) {
-        //  ASSERT (!relative_path.has_suffix ("/"));
+        //  GLib.assert_true (!relative_path.has_suffix ("/"));
 
         if (relative_path == "") {
             // This is the root sync folder, it doesn't have an entry in the database and won't be walked by csync, so resolve manually.

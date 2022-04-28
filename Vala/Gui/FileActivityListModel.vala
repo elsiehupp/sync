@@ -23,7 +23,7 @@ public class FileActivityListModel : ActivityListModel {
     /***********************************************************
     ***********************************************************/
     public void on_signal_load (AccountState account_state, string file_id) {
-        //  Q_ASSERT (account_state);
+        //  GLib.assert_true (account_state);
         if (!account_state || currently_fetching ()) {
             return;
         }

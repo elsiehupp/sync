@@ -430,9 +430,9 @@ public class ActivityListModel : GLib.AbstractListModel {
 
         var activity = this.final_list.at (activity_index);
         if (activity.status == SyncFileItem.Status.CONFLICT) {
-            //  Q_ASSERT (!activity.file == "");
-            //  Q_ASSERT (!activity.folder_connection == "");
-            //  Q_ASSERT (Utility.is_conflict_file (activity.file));
+            //  GLib.assert_true (!activity.file == "");
+            //  GLib.assert_true (!activity.folder_connection == "");
+            //  GLib.assert_true (Utility.is_conflict_file (activity.file));
 
             var folder_connection = FolderManager.instance.folder_by_alias (activity.folder_connection);
 

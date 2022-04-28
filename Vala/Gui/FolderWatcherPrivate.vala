@@ -131,9 +131,9 @@ public class FolderWatcherPrivate : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_add_folder_recursive (string path) {
-        if (this.path_to_watch.contains (path))
+        if (this.path_to_watch.contains (path)) {
             return;
-
+        }
         int subdirectories = 0;
         GLib.debug (" (+) Watcher: " + path);
 
@@ -197,9 +197,9 @@ public class FolderWatcherPrivate : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void inotify_register_path (string path) {
-        if (path == "")
+        if (path == "") {
             return;
-
+        }
         int wd = inotify_add_watch (this.fd, path.to_utf8 ().const_data (),
             IN_CLOSE_WRITE | IN_ATTRIB | IN_MOVE | IN_CREATE | IN_DELETE | IN_DELETE_SELF | IN_MOVE_SELF | IN_UNMOUNT | IN_ONLYDIR);
         if (wd > -1) {
@@ -222,16 +222,17 @@ public class FolderWatcherPrivate : GLib.Object {
     ***********************************************************/
     protected void remove_folders_below (string path) {
         var it = this.path_to_watch.find (path);
-        if (it == this.path_to_watch.end ())
+        if (it == this.path_to_watch.end ()) {
             return;
-
+        }
         string path_slash = path + "/";
 
         // Remove the entry and all subentries
         while (it != this.path_to_watch.end ()) {
             var it_path = it.key ();
-            if (!it_path.has_prefix (path))
+            if (!it_path.has_prefix (path)) {
                 break;
+            }
             if (it_path != path && !it_path.has_prefix (path_slash)) {
                 // order is 'foo', 'foo bar', 'foo/bar'
                 ++it;

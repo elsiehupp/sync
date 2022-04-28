@@ -105,7 +105,7 @@ public class NavigationPaneHelper : GLib.Object {
                     // Add runtime checks rather than #ifdefing out the whole code to help catch breakages when developing on other platforms.
 
                     // Don't crash, by any means!
-                    // Q_ASSERT (false);
+                    // GLib.assert_true (false);
                 }
             }
         }

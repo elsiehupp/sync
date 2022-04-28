@@ -69,8 +69,9 @@ public class GLib.TokenizerPrivate<T> : GLib.Object {
                 state.in_quote = false;
             }
         } else {
-            if (is_delimiter (c))
+            if (is_delimiter (c)) {
                 return false;
+            }
             state.in_quote = is_quote (state.quote_char = c);
         }
         return true;
@@ -167,11 +168,13 @@ public class GLib.Tokenizer<T> : GLib.Object {
         tokenizer_private.is_delim = false;
         for (;;) {
             tokenizer_private.token_begin = tokenizer_private.token_end;
-            if (tokenizer_private.token_end == tokenizer_private.end)
+            if (tokenizer_private.token_end == tokenizer_private.end) {
                 return false;
+            }
             tokenizer_private.token_end++;
-            if (tokenizer_private.next_char (&state, *tokenizer_private.token_begin))
+            if (tokenizer_private.next_char (&state, *tokenizer_private.token_begin)) {
                 break;
+            }
             if (tokenizer_private.return_delimiters) {
                 tokenizer_private.is_delim = true;
                 return true;

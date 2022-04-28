@@ -43,7 +43,7 @@ public class ExcludedFiles : GLib.Object {
             base ();
 
             this.string_value = string_value;
-            //  Q_ASSERT (has_suffix ("/"));
+            //  GLib.assert_true (has_suffix ("/"));
         }
 
 
@@ -53,7 +53,7 @@ public class ExcludedFiles : GLib.Object {
 
         //  public BasePathString (string other) {
         //      base (other);
-        //      //  Q_ASSERT (has_suffix ("/"));
+        //      //  GLib.assert_true (has_suffix ("/"));
         //  }
     }
 
@@ -195,7 +195,7 @@ public class ExcludedFiles : GLib.Object {
     public ExcludedFiles (string local_path = "/") {
         this.local_path = local_path;
         this.client_version = { MIRALL_VERSION_MAJOR, MIRALL_VERSION_MINOR, MIRALL_VERSION_PATCH };
-        //  Q_ASSERT (this.local_path.has_suffix ("/"));
+        //  GLib.assert_true (this.local_path.has_suffix ("/"));
 
         this.exclude_conflict_files = true;
         // Windows used to use PathMatchSpec which allows foo to match abc/deffoo.
@@ -289,7 +289,7 @@ public class ExcludedFiles : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void add_manual_exclude_with_base_path (string expr, string base_path) {
-        //  Q_ASSERT (base_path.has_suffix ("/"));
+        //  GLib.assert_true (base_path.has_suffix ("/"));
 
         var key = base_path;
         this.manual_excludes[key].append (expr);
@@ -326,10 +326,12 @@ public class ExcludedFiles : GLib.Object {
     ***********************************************************/
     public CSync.ExcludedFiles.Type traversal_pattern_match (string path, ItemType filetype) {
         var match = csync_excluded_common (path, this.exclude_conflict_files);
-        if (match != CSync.ExcludedFiles.Type.NOT_EXCLUDED)
+        if (match != CSync.ExcludedFiles.Type.NOT_EXCLUDED) {
             return match;
-        if (this.all_excludes == "")
+        }
+        if (this.all_excludes == "") {
             return CSync.ExcludedFiles.Type.NOT_EXCLUDED;
+        }
 
         // Directories are guaranteed to be visited before their files
         if (filetype == ItemType.DIRECTORY) {
@@ -367,9 +369,9 @@ public class ExcludedFiles : GLib.Object {
                 continue;
             }
 
-            if (!regular_expression_match.has_match ())
+            if (!regular_expression_match.has_match ()) {
                 return CSync.ExcludedFiles.Type.NOT_EXCLUDED;
-            if (regular_expression_match.captured_start ("exclude") != -1) {
+            } else if (regular_expression_match.captured_start ("exclude") != -1) {
                 return CSync.ExcludedFiles.Type.LIST;
             } else if (regular_expression_match.captured_start ("excluderemove") != -1) {
                 return CSync.ExcludedFiles.Type.AND_REMOVE;
@@ -447,12 +449,12 @@ public class ExcludedFiles : GLib.Object {
         GLib.List<string> patterns = new GLib.List<string> ();
         while (!file.at_end ()) {
             string line = file.read_line ().trimmed ();
-            if (line.has_prefix ("#!version")) {
-                if (!version_directive_keep_next_line (line))
-                    file.read_line ();
+            if (line.has_prefix ("#!version") && !version_directive_keep_next_line (line)) {
+                file.read_line ();
             }
-            if (line == "" || line.has_prefix ('#'))
+            if (line == "" || line.has_prefix ('#')) {
                 continue;
+            }
             csync_exclude_expand_escapes (line);
             patterns.append (string.from_utf8 (line));
         }
@@ -481,27 +483,34 @@ public class ExcludedFiles : GLib.Object {
     Would enable the "myexclude" pattern only for versions before 2.5.0.
     ***********************************************************/
     private bool version_directive_keep_next_line (string directive) {
-        if (!directive.has_prefix ("#!version"))
+        if (!directive.has_prefix ("#!version")) {
             return true;
-        GLib.List<string> args = directive.split (' ');
-        if (args.length != 3)
+        }
+        GLib.List<string> args = directive.split (" ");
+        if (args.length != 3) {
             return true;
+        }
         string operation = args[1];
-        GLib.List<string> arg_versions = args[2].split ('.');
-        if (arg_versions.length != 3)
+        GLib.List<string> arg_versions = args[2].split (".");
+        if (arg_versions.length != 3) {
             return true;
-
+        }
         var arg_version = std.make_tuple (arg_versions[0].to_int (), arg_versions[1].to_int (), arg_versions[2].to_int ());
-        if (operation == "<=")
+        if (operation == "<=") {
             return this.client_version <= arg_version;
-        if (operation == "<")
+        }
+        if (operation == "<") {
             return this.client_version < arg_version;
-        if (operation == ">")
+        }
+        if (operation == ">") {
             return this.client_version > arg_version;
-        if (operation == ">=")
+        }
+        if (operation == ">=") {
             return this.client_version >= arg_version;
-        if (operation == "==")
+        }
+        if (operation == "==") {
             return this.client_version == arg_version;
+        }
         return true;
     }
 
@@ -514,16 +523,18 @@ public class ExcludedFiles : GLib.Object {
     Note that this only matches patterns. It does not check whether the file
     or directory pointed to is hidden (or whether it even exists).
     ***********************************************************/
-    private CSync.ExcludedFiles.Type full_pattern_match (string path, ItemType filetype) {
-        var match = csync_excluded_common (p, this.exclude_conflict_files);
-        if (match != CSync.ExcludedFiles.Type.NOT_EXCLUDED)
+    private CSync.ExcludedFiles.Type full_pattern_match (string path_1, ItemType filetype) {
+        var match = csync_excluded_common (path_1, this.exclude_conflict_files);
+        if (match != CSync.ExcludedFiles.Type.NOT_EXCLUDED) {
             return match;
-        if (this.all_excludes == "")
+        }
+        if (this.all_excludes == "") {
             return CSync.ExcludedFiles.Type.NOT_EXCLUDED;
+        }
 
         // `path` seems to always be relative to `this.local_path`, the tests however have not been
         // written that way... this makes the tests happy for now. TODO Fix the tests at some point
-        string path = p;
+        string path = path_1;
         if (path.has_prefix (this.local_path)) {
             path = path.mid (this.local_path.length);
         }
@@ -585,7 +596,7 @@ public class ExcludedFiles : GLib.Object {
     returns not-excluded because "c" isn't a bname activation pattern.
     ***********************************************************/
     private void prepare_with_base_path (BasePathString base_path) {
-        //  Q_ASSERT (this.all_excludes.contains (base_path));
+        //  GLib.assert_true (this.all_excludes.contains (base_path));
 
         // Build regular expressions for the different cases.
         //
@@ -784,11 +795,10 @@ public class ExcludedFiles : GLib.Object {
         // We can definitely drop everything to the left of a / - that will never match
         // any bname.
         string pattern = exclude.mid (exclude.last_index_of ("/") + 1);
-
         // Easy case, nothing else can match a slash, so that's it.
-        if (!wildcards_match_slash)
+        if (!wildcards_match_slash) {
             return pattern;
-
+        }
         // Otherwise it's more complicated. Examples:
         // - "foo*bar" can match "foo_x/Xbar", pattern is "*bar"
         // - "foo*bar*" can match "foo_x/XbarX", pattern is "*bar*"

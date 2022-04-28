@@ -70,8 +70,8 @@ public class UserGroupShare : Share {
         base (account, identifier, owner, owner_display_name, path, share_type, password_is_set, permissions, share_with);
         this.note = note;
         this.expire_date = expire_date;
-        //  Q_ASSERT (Share.is_share_type_user_group_email_room_or_remote (share_type));
-        //  Q_ASSERT (share_with);
+        //  GLib.assert_true (Share.is_share_type_user_group_email_room_or_remote (share_type));
+        //  GLib.assert_true (share_with);
     }
 
 

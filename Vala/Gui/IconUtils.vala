@@ -41,7 +41,7 @@ public class IconUtils : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static Gdk.Pixbuf pixmap_for_background (string filename, Gdk.RGBA background_color) {
-        //  Q_ASSERT (!filename == "");
+        //  GLib.assert_true (!filename == "");
 
         var pixmap_color = background_color.is_valid && !Theme.is_dark_color (background_color)
             ? GLib.Color_constants.Svg.black
@@ -54,8 +54,8 @@ public class IconUtils : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static Gtk.Image create_svg_image_with_custom_color (string filename, Gdk.RGBA custom_color, Gdk.Rectangle original_size = null, Gdk.Rectangle requested_size = {}) {
-        //  Q_ASSERT (!filename == "");
-        //  Q_ASSERT (custom_color.is_valid);
+        //  GLib.assert_true (!filename == "");
+        //  GLib.assert_true (custom_color.is_valid);
 
         Gtk.Image result = new Gtk.Image ();
 
@@ -84,7 +84,7 @@ public class IconUtils : GLib.Object {
         // find the first matching svg file
         var source_svg = find_svg_file_path (filename, icon_base_colors);
 
-        //  Q_ASSERT (!source_svg == "");
+        //  GLib.assert_true (!source_svg == "");
         if (source_svg == "") {
             GLib.warning ("Failed to find base SVG file for " + filename);
             return result;
@@ -92,7 +92,7 @@ public class IconUtils : GLib.Object {
 
         result = draw_svg_with_custom_fill_color (source_svg, custom_color, original_size, requested_size);
 
-        //  Q_ASSERT (!result == null);
+        //  GLib.assert_true (!result == null);
         if (result == null) {
             GLib.warning ("Failed to load pixmap for " + filename);
         }

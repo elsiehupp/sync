@@ -105,8 +105,9 @@ public class OAuth : GLib.Object {
     ***********************************************************/
     private void on_signal_ready_read (GLib.TcpSocket socket) {
         string peek = socket.peek (int64.min (socket.bytes_available (), 4000LL)); //The code should always be within the first 4K
-        if (peek.index_of ("\n") < 0)
+        if (peek.index_of ("\n") < 0) {
             return; // wait until we find a \n
+        }
         GLib.Regex regular_expression = new GLib.Regex ("^GET /\\?code= ([a-z_a-Z0-9]+)[& ]"); // Match a  /?code=...  URL
         var regular_expression_match = regular_expression.match (peek);
         if (!regular_expression_match.has_match ()) {
@@ -249,7 +250,7 @@ public class OAuth : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public GLib.Uri authorisation_link () {
-        //  Q_ASSERT (this.server.is_listening ());
+        //  GLib.assert_true (this.server.is_listening ());
         GLib.UrlQuery query;
         query.query_items ({
             {

@@ -117,7 +117,7 @@ public class AccountManager : GLib.Object {
                     var acc_state = AccountState.load_from_settings (acc, settings);
                     if (acc_state) {
                         var jar = (Soup.CookieJar)acc.am.cookie_jar ();
-                        //  ASSERT (jar);
+                        //  GLib.assert_true (jar);
                         if (jar) {
                             jar.restore (acc.cookie_jar_path);
                         }
@@ -266,8 +266,9 @@ public class AccountManager : GLib.Object {
             settings.get_value (AUTH_TYPE_C, acc.credentials.auth_type ());
 
             // HACK : Save http_user also as user
-            if (acc.settings_map.contains (HTTP_USER_C))
+            if (acc.settings_map.contains (HTTP_USER_C)) {
                 settings.get_value (USER_C, acc.settings_map.get_value (HTTP_USER_C));
+            }
         }
 
         // Save accepted certificates.

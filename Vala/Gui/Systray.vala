@@ -437,7 +437,7 @@ public class Systray : GLib.SystemTrayIcon {
     ***********************************************************/
     private GLib.Rect current_screen_rect () {
         var screen = current_screen ();
-        //  Q_ASSERT (screen);
+        //  GLib.assert_true (screen);
         return screen.geometry ();
     }
 

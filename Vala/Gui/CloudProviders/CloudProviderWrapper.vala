@@ -176,7 +176,7 @@ public class CloudProviderWrapper : GLib.Object {
     public GMenuModel menu_model () {
 
         GLib.Menu section;
-        GMenuItem item;
+        GLib.MenuItem item;
         string item_label;
 
         this.main_menu = g_menu_new ();
@@ -275,9 +275,9 @@ public class CloudProviderWrapper : GLib.Object {
     public void on_signal_update_progress (string folder_connection, ProgressInfo progress) {
         // Only update progress for the current folder_connection
         FolderConnection f = FolderManager.instance.folder_connection (folder_connection);
-        if (f != this.folder_connection)
+        if (f != this.folder_connection) {
             return;
-
+        }
         // Build recently changed files list
         if (!progress.last_completed_item == "" && should_show_in_recents_menu (progress.last_completed_item)) {
             string kind_str = Progress.as_result_string (progress.last_completed_item);
@@ -328,7 +328,7 @@ public class CloudProviderWrapper : GLib.Object {
 
         if (!progress.last_completed_item == ""
                 && should_show_in_recents_menu (progress.last_completed_item)) {
-            GMenuItem* item;
+            GLib.MenuItem item;
             g_menu_remove_all (G_MENU (this.recent_menu));
             if (this.recently_changed != null) {
                 foreach (var item in this.recently_changed) {
@@ -390,14 +390,14 @@ public class CloudProviderWrapper : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static GMenuItem menu_item_new (string label, gchar detailed_action) {
+    private static GLib.MenuItem menu_item_new (string label, gchar detailed_action) {
         return g_menu_item_new (label.to_utf8 (), detailed_action);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private static GMenuItem menu_item_new_submenu (string label, GMenuModel submenu) {
+    private static GLib.MenuItem menu_item_new_submenu (string label, GMenuModel submenu) {
         return g_menu_item_new_submenu (label.to_utf8 (), submenu);
     }
 

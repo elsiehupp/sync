@@ -85,9 +85,9 @@ public class SelectiveSyncWidget : Gtk.Widget {
         if (!root) {
             root = this.folder_tree.top_level_item (0);
         }
-        if (!root)
+        if (!root) {
             return GLib.List<string> ();
-
+        }
         switch (root.check_state (0)) {
         case GLib.Unchecked:
             return GLib.List<string> (root.data (0, GLib.USER_ROLE).to_string () + "/");
@@ -105,9 +105,10 @@ public class SelectiveSyncWidget : Gtk.Widget {
         } else {
             // We did not load from the server so we re-use the one from the old block list
             string path = root.data (0, GLib.USER_ROLE).to_string ();
-            foreach (string it, this.old_block_list) {
-                if (it.has_prefix (path))
+            foreach (string it in this.old_block_list) {
+                if (it.has_prefix (path)) {
                     result += it;
+                }
             }
         }
         return result;
@@ -130,9 +131,9 @@ public class SelectiveSyncWidget : Gtk.Widget {
         if (!root) {
             root = this.folder_tree.top_level_item (0);
         }
-        if (!root)
+        if (!root) {
             return -1;
-
+        }
         switch (root.check_state (0)) {
         case GLib.Unchecked:
             return 0;
@@ -146,8 +147,9 @@ public class SelectiveSyncWidget : Gtk.Widget {
         if (root.child_count ()) {
             for (int i = 0; i < root.child_count (); ++i) {
                 var r = estimated_size (root.child (i));
-                if (r < 0)
+                if (r < 0) {
                     return r;
+                }
                 result += r;
             }
         } else {
@@ -198,15 +200,16 @@ public class SelectiveSyncWidget : Gtk.Widget {
             path_to_remove.append ("/");
         }
         path_to_remove.append (this.folder_path);
-        if (!this.folder_path == "")
+        if (!this.folder_path == "") {
             path_to_remove.append ("/");
-
+        }
         // Check for excludes.
         GLib.MutableListIterator<string> it (list);
         while (it.has_next ()) {
             it.next ();
-            if (this.excluded_files.is_excluded (it.value (), path_to_remove, FolderManager.instance.ignore_hidden_files))
+            if (this.excluded_files.is_excluded (it.value (), path_to_remove, FolderManager.instance.ignore_hidden_files)) {
                 it.remove ();
+            }
         }
 
         // Since / cannot be in the blocklist, expand it to the actual
@@ -257,10 +260,12 @@ public class SelectiveSyncWidget : Gtk.Widget {
             }
 
             GLib.List<string> paths = path.split ("/");
-            if (paths.last () == "")
+            if (paths.last () == "") {
                 paths.remove_last ();
-            if (paths == "")
+            }
+            if (paths == "") {
                 continue;
+            }
             if (!path.has_suffix ("/")) {
                 path.append ("/");
             }
@@ -284,8 +289,9 @@ public class SelectiveSyncWidget : Gtk.Widget {
     ***********************************************************/
     private void on_signal_item_expanded (GLib.TreeWidgetItem item) {
         string directory = item.data (0, GLib.USER_ROLE).to_string ();
-        if (directory == "")
+        if (directory == "") {
             return;
+        }
         string prefix;
         if (!this.folder_path == "") {
             prefix = this.folder_path + "/";
@@ -307,9 +313,9 @@ public class SelectiveSyncWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_item_changed (GLib.TreeWidgetItem item, int col) {
-        if (col != 0 || this.inserting)
+        if (col != 0 || this.inserting) {
             return;
-
+        }
         if (item.check_state (0) == GLib.Checked) {
             // If we are checked, check that we may need to check the parent as well if
             // all the siblings are also checked
@@ -385,7 +391,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
         }
 
         var webdav_folder = GLib.Uri (this.account.dav_url ()).path;
-        //  Q_ASSERT (path.has_prefix (webdav_folder));
+        //  GLib.assert_true (path.has_prefix (webdav_folder));
         // This dialog use the postfix / convention for folder paths
         this.encrypted_paths + path.mid (webdav_folder.size ()) + "/";
     }

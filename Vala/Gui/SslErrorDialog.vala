@@ -139,9 +139,9 @@ public class SslErrorDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     public bool trust_connection () {
-        if (this.all_trusted)
+        if (this.all_trusted) {
             return true;
-
+        }
         bool stat = (this.instance.cb_trust_connect.check_state () == GLib.Checked);
         GLib.info ("SSL-Connection is trusted: " + stat);
 
@@ -174,12 +174,15 @@ public class SslErrorDialog : Gtk.Dialog {
         string org = Utility.escape (cert.subject_info (GLib.SslCertificate.Organization));
         string unit = Utility.escape (cert.subject_info (GLib.SslCertificate.Organizational_unit_name));
         string country = Utility.escape (cert.subject_info (GLib.SslCertificate.Country_name));
-        if (unit == "")
+        if (unit == "") {
             unit = _("&lt;not specified&gt;");
-        if (org == "")
+        }
+        if (org == "") {
             org = _("&lt;not specified&gt;");
-        if (country == "")
+        }
+        if (country == "") {
             country = _("&lt;not specified&gt;");
+        }
         li += _("Organization : %1").printf (org);
         li += _("Unit : %1").printf (unit);
         li += _("Country : %1").printf (country);

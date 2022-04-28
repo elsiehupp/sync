@@ -19,12 +19,12 @@ class TestCloseBrowserDontCrash : AbstractTestOAuth {
 
 
     override GLib.InputStream token_reply (Soup.Operation operation, Soup.Request request) {
-        //  ASSERT (browser_reply);
+        //  GLib.assert_true (browser_reply);
         // simulate the fact that the browser is closing the connection
         browser_reply.on_signal_abort ();
         GLib.Application.process_events ();
 
-        //  ASSERT (state == AbstractTestOAuth.State.BROWSER_OPENED);
+        //  GLib.assert_true (state == AbstractTestOAuth.State.BROWSER_OPENED);
         state = AbstractTestOAuth.State.TOKEN_ASKED;
 
         GLib.OutputStream payload = new new GLib.OutputStream ();

@@ -80,8 +80,8 @@ public class ProxyAuthHandler : GLib.Object {
     private ConfigFile config_file;
 
     /***********************************************************
-    To distinguish between a new GLib.NAM asking for credentials and
-    credentials failing for an existing GLib.NAM, we keep track of
+    To distinguish between a new Soup.Session asking for credentials and
+    credentials failing for an existing Soup.Session, we keep track of
     the senders of the proxy_auth_required signal here.
     ***********************************************************/
     private GLib.List<GLib.Object> gave_credentials_to;
@@ -123,7 +123,7 @@ public class ProxyAuthHandler : GLib.Object {
             return;
         }
 
-        // Find the responsible GLib.NAM if possible.
+        // Find the responsible Soup.Session if possible.
         Soup.Context sending_access_manager = null;
         var account = (Account) sender ();
         if (account) {
@@ -133,7 +133,7 @@ public class ProxyAuthHandler : GLib.Object {
             sending_access_manager = account.shared_network_access_manager;
         }
         if (sending_access_manager == null) {
-            GLib.warning ("Could not get the sending GLib.NAM for " + sender ());
+            GLib.warning ("Could not get the sending Soup.Session for " + sender ());
         }
 
         GLib.info ("Proxy auth required for " + key + proxy.type ());
@@ -141,7 +141,7 @@ public class ProxyAuthHandler : GLib.Object {
         // If we already had a username but auth still failed,
         // invalidate the old credentials! Unfortunately, authenticator.user ()
         // isn't reliable, so we also invalidate credentials if we previously
-        // gave presumably valid credentials to the same GLib.NAM.
+        // gave presumably valid credentials to the same Soup.Session.
         bool invalidated = false;
         if (this.waiting_for_dialog <= 0 && this.waiting_for_keychain <= 0 && (
             authenticator.user () != "" || (

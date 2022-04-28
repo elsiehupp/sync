@@ -370,7 +370,7 @@ public class GETFileJob : AbstractNetworkJob {
             // request. new_reply_hook () will reestablish signal connections for the follow-up request.
             bool ok = disconnect (this.input_stream, GLib.InputStream.signal_finished, this, GETFileJob.on_signal_ready_read)
                 && disconnect (this.input_stream, GLib.InputStream.ready_read, this, GETFileJob.on_signal_ready_read);
-            //  ASSERT (ok);
+            //  GLib.assert_true (ok);
             return;
         }
 

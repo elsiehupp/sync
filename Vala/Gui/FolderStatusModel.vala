@@ -350,8 +350,9 @@ public class FolderStatusModel : GLib.AbstractItemModel {
                 return x.file_id;
             case DataRole.FOLDER_PATH_ROLE: {
                 var folder_connection = x.folder_connection;
-                if (!folder_connection)
+                if (!folder_connection) {
                     return GLib.Variant ();
+                }
                 return GLib.Variant (folder_connection.path + x.path);
             }
             }
@@ -375,12 +376,11 @@ public class FolderStatusModel : GLib.AbstractItemModel {
         case ItemType.ROOT_FOLDER:
             break;
         }
-
         SubFolderInfo folder_info = this.folders.at (index.row ());
         var folder_connection = folder_info.folder_connection;
-        if (!folder_connection)
+        if (!folder_connection) {
             return GLib.Variant ();
-
+        }
         SubFolderInfo.Progress progress = folder_info.progress;
         bool account_connected = this.account_state.is_connected;
 
@@ -416,10 +416,11 @@ public class FolderStatusModel : GLib.AbstractItemModel {
             if (!progress == null) {
                 return progress.progress_string;
             }
-            if (account_connected)
+            if (account_connected) {
                 tool_tip = Theme.status_header_text (folder_connection.sync_result.status ());
-            else
+            } else {
                 tool_tip = _("Signed out");
+            }
             tool_tip += "\n";
             tool_tip += folder_info.folder_connection.path;
             return tool_tip;
@@ -475,7 +476,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
     public bool data_for_index_value_and_role (GLib.ModelIndex index, GLib.Variant value, int role = GLib.EditRole) {
         if (role == GLib.CheckStateRole) {
             var info = info_for_index (index);
-            //  Q_ASSERT (info.folder_connection && info.folder_connection.supports_selective_sync);
+            //  GLib.assert_true (info.folder_connection && info.folder_connection.supports_selective_sync);
             var checked = (GLib.CheckState)value.to_int ();
 
             if (info && info.checked != checked) {
@@ -557,10 +558,12 @@ public class FolderStatusModel : GLib.AbstractItemModel {
             return this.folders.length () + 1; // +1 for the "add folder_connection" button
         }
         var info = info_for_index (parent);
-        if (!info)
+        if (!info) {
             return 0;
-        if (info.has_label ())
+        }
+        if (info.has_label ()) {
             return 1;
+        }
         return info.subs.length;
     }
 
@@ -576,17 +579,20 @@ public class FolderStatusModel : GLib.AbstractItemModel {
         case ItemType.FETCH_LABEL:
             return {};
         case ItemType.ROOT_FOLDER:
-            if (this.folders.length <= parent.row ())
+            if (this.folders.length <= parent.row ()) {
                 return {}; // should not happen
+            }
             return create_index (row, column, (SubFolderInfo)this.folders[parent.row ()]);
         case ItemType.SUBFOLDER: {
             var pinfo = (SubFolderInfo)parent.internal_pointer ();
-            if (pinfo.subs.length <= parent.row ())
+            if (pinfo.subs.length <= parent.row ()) {
                 return {}; // should not happen
+            }
             var info = pinfo.subs[parent.row ()];
             if (!info.has_label ()
-                && info.subs.length <= row)
+                && info.subs.length <= row) {
                 return {}; // should not happen
+            }
             return create_index (row, column, info);
         }
         }
@@ -610,14 +616,14 @@ public class FolderStatusModel : GLib.AbstractItemModel {
         }
         var path_index = ((SubFolderInfo)child.internal_pointer ()).path_index;
         int i = 1;
-        //  ASSERT (path_index.at (0) < this.folders.length);
+        //  GLib.assert_true (path_index.at (0) < this.folders.length);
         if (path_index.length == 1) {
             return create_index (path_index.at (0), 0 /*, null*/);
         }
 
         SubFolderInfo info = this.folders[path_index.at (0)];
         while (i < path_index.length - 1) {
-            //  ASSERT (path_index.at (i) < info.subs.length);
+            //  GLib.assert_true (path_index.at (i) < info.subs.length);
             info = info.subs.at (path_index.at (i));
             ++i;
         }
@@ -635,8 +641,9 @@ public class FolderStatusModel : GLib.AbstractItemModel {
             return false;
         }
         var info = info_for_index (parent);
-        if (!info || info.fetched || info.fetching_job)
+        if (!info || info.fetched || info.fetching_job) {
             return false;
+        }
         if (info.has_error) {
             // Keep showing the error to the user, it will be hidden when the account reconnects
             return false;
@@ -650,8 +657,9 @@ public class FolderStatusModel : GLib.AbstractItemModel {
     public void fetch_more (GLib.ModelIndex parent) {
         var info = info_for_index (parent);
 
-        if (!info || info.fetched || info.fetching_job)
+        if (!info || info.fetched || info.fetching_job) {
             return;
+        }
         info.reset_subs (this, parent);
         string path = info.folder_connection.remote_path_trailing_slash;
 
@@ -711,19 +719,19 @@ public class FolderStatusModel : GLib.AbstractItemModel {
     /***********************************************************
     ***********************************************************/
     public bool has_children (GLib.ModelIndex parent = GLib.ModelIndex ()) {
-        if (!parent.is_valid)
+        if (!parent.is_valid) {
             return true;
-
+        }
         var info = info_for_index (parent);
-        if (!info)
+        if (!info) {
             return false;
-
-        if (!info.fetched)
+        }
+        if (!info.fetched) {
             return true;
-
-        if (info.subs == "")
+        }
+        if (info.subs == "") {
             return false;
-
+        }
         return true;
     }
 
@@ -826,9 +834,9 @@ public class FolderStatusModel : GLib.AbstractItemModel {
         }
 
         var parent = index_for_path (folder_connection, path.left (slash_pos));
-        if (!parent.is_valid)
+        if (!parent.is_valid) {
             return parent;
-
+        }
         if (slash_pos == path.length - 1) {
             // The slash is the last part, we found our index
             return parent;
@@ -1204,14 +1212,14 @@ public class FolderStatusModel : GLib.AbstractItemModel {
     ***********************************************************/
     private void on_signal_update_directories (GLib.List<string> list) {
         var lscol_job = (LscolJob) sender ());
-        //  ASSERT (lscol_job);
+        //  GLib.assert_true (lscol_job);
         GLib.ModelIndex index = (GLib.PersistentModelIndex)lscol_job.property (PROPERTY_PARENT_INDEX_C);
         var parent_info = info_for_index (index);
         if (!parent_info) {
             return;
         }
-        //  ASSERT (parent_info.fetching_job == lscol_job);
-        //  ASSERT (parent_info.subs == "");
+        //  GLib.assert_true (parent_info.fetching_job == lscol_job);
+        //  GLib.assert_true (parent_info.subs == "");
 
         if (parent_info.has_label ()) {
             begin_remove_rows (index, 0, 0);
@@ -1226,9 +1234,9 @@ public class FolderStatusModel : GLib.AbstractItemModel {
 
         GLib.Uri url = parent_info.folder_connection.remote_url ();
         string path_to_remove = url.path;
-        if (!path_to_remove.has_suffix ("/"))
+        if (!path_to_remove.has_suffix ("/")) {
             path_to_remove += "/";
-
+        }
         GLib.List<string> selective_sync_block_list;
         bool ok1 = true;
         bool ok2 = true;
@@ -1252,8 +1260,9 @@ public class FolderStatusModel : GLib.AbstractItemModel {
         var encryption_map = lscol_job.property (PROPERTY_ENCRYPTION_MAP).to_map ();
 
         GLib.List<string> sorted_subfolders = list;
-        if (!sorted_subfolders == "")
+        if (!sorted_subfolders == "") {
             sorted_subfolders.remove_first (); // skip the parent item (first in the list)
+        }
         Utility.sort_filenames (sorted_subfolders);
 
         int[] undecided_indexes = int[10]; // previously GLib.VarLengthArray
@@ -1294,9 +1303,9 @@ public class FolderStatusModel : GLib.AbstractItemModel {
             var folder_info = lscol_job.folder_infos.value (path);
             new_info.size = folder_info.size;
             new_info.file_id = folder_info.file_id;
-            if (relative_path == "")
+            if (relative_path == "") {
                 continue;
-
+            }
             if (parent_info.checked == GLib.Unchecked) {
                 new_info.checked = GLib.Unchecked;
             } else if (parent_info.checked == GLib.Checked) {
@@ -1362,13 +1371,13 @@ public class FolderStatusModel : GLib.AbstractItemModel {
     ***********************************************************/
     private void on_signal_gather_permissions (string href, GLib.HashTable<string, string> map) {
         var it = map.find ("permissions");
-        if (it == map.end ())
+        if (it == map.end ()) {
             return;
-
+        }
         var abstract_network_job = sender ();
         var permission_map = abstract_network_job.property (PROPERTY_PERMISSION_MAP).to_map ();
         abstract_network_job.property (PROPERTY_PERMISSION_MAP, GLib.Variant ()); // avoid a detach of the map while it is modified
-        //  ASSERT (!href.has_suffix ("/"), "LscolXMLParser.parse should remove the trailing slash before calling us.");
+        //  GLib.assert_true (!href.has_suffix ("/"), "LscolXMLParser.parse should remove the trailing slash before calling us.");
         permission_map[href] = *it;
         abstract_network_job.property (PROPERTY_PERMISSION_MAP, permission_map);
     }
@@ -1378,13 +1387,13 @@ public class FolderStatusModel : GLib.AbstractItemModel {
     ***********************************************************/
     private void on_signal_gather_encryption_status (string href, GLib.HashTable<string, string> properties) {
         var it = properties.find ("is-encrypted");
-        if (it == properties.end ())
+        if (it == properties.end ()) {
             return;
-
+        }
         var abstract_network_job = sender ();
         var encryption_map = abstract_network_job.property (PROPERTY_ENCRYPTION_MAP).to_map ();
         abstract_network_job.property (PROPERTY_ENCRYPTION_MAP, GLib.Variant ()); // avoid a detach of the map while it is modified
-        //  ASSERT (!href.has_suffix ("/"), "LscolXMLParser.parse should remove the trailing slash before calling us.");
+        //  GLib.assert_true (!href.has_suffix ("/"), "LscolXMLParser.parse should remove the trailing slash before calling us.");
         encryption_map[href] = *it;
         abstract_network_job.property (PROPERTY_ENCRYPTION_MAP, encryption_map);
     }
@@ -1394,7 +1403,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
     ***********************************************************/
     private void on_signal_lscol_finished_with_error (GLib.InputStream r) {
         var lscol_job = (LscolJob)sender ();
-        //  ASSERT (lscol_job);
+        //  GLib.assert_true (lscol_job);
         GLib.ModelIndex index = (GLib.PersistentModelIndex)lscol_job.property (PROPERTY_PARENT_INDEX_C);
         if (!index.is_valid) {
             return;
@@ -1410,7 +1419,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
             if (error == GLib.InputStream.ContentNotFoundError) {
                 parent_info.fetched = true;
             } else {
-                //  ASSERT (!parent_info.has_label ());
+                //  GLib.assert_true (!parent_info.has_label ());
                 begin_insert_rows (index, 0, 0);
                 parent_info.has_error = true;
                 end_insert_rows ();
@@ -1443,8 +1452,9 @@ public class FolderStatusModel : GLib.AbstractItemModel {
             FolderManager folder_man = FolderManager.instance;
             int position = folder_man.schedule_queue ().index_of (folder_connection);
             foreach (var other in folder_man.map ()) {
-                if (other != folder_connection && other.is_sync_running ())
+                if (other != folder_connection && other.is_sync_running ()) {
                     position += 1;
+                }
             }
             string message;
             if (position <= 0) {
@@ -1484,7 +1494,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
     ***********************************************************/
     private void on_signal_new_big_folder_discovered () {
         var folder_connection = (FolderConnection)sender ();
-        //  ASSERT (folder_connection);
+        //  GLib.assert_true (folder_connection);
 
         int folder_index = -1;
         for (int i = 0; i < this.folders.length; ++i) {

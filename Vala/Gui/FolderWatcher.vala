@@ -120,7 +120,7 @@ public class FolderWatcher : GLib.Object {
     The path must be ignored by the watcher.
     ***********************************************************/
     public void start_notificaton_test (string path) {
-        //  Q_ASSERT (this.test_notification_path == "");
+        //  GLib.assert_true (this.test_notification_path == "");
         this.test_notification_path = path;
 
         // Don't do the local file modification immediately:

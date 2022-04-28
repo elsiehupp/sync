@@ -443,7 +443,7 @@ public class ProcessDirectoryJob : GLib.Object {
     Will start scheduling subdir jobs when done.
     ***********************************************************/
     private void process () {
-        //  ASSERT (this.local_query_done && this.server_query_done);
+        //  GLib.assert_true (this.local_query_done && this.server_query_done);
 
         // Build lookup tables for local, remote and database entries.
         // For suffix-virtual files, the key will normally be the base_record file name
@@ -1356,8 +1356,8 @@ public class ProcessDirectoryJob : GLib.Object {
         if (local_entry.is_virtual_file && !no_server_entry) {
             // Somehow there is a missing DB entry while the virtual file already exists.
             // The instruction should already be set correctly.
-            //  ASSERT (item.instruction == CSync.SyncInstructions.UPDATE_METADATA);
-            //  ASSERT (item.type == ItemType.VIRTUAL_FILE);
+            //  GLib.assert_true (item.instruction == CSync.SyncInstructions.UPDATE_METADATA);
+            //  GLib.assert_true (item.type == ItemType.VIRTUAL_FILE);
             on_signal_finalize ();
             return;
         } else if (server_modified) {
@@ -1763,7 +1763,7 @@ public class ProcessDirectoryJob : GLib.Object {
         }
 
         if (path.original != path.target && (item.instruction == CSync.SyncInstructions.UPDATE_METADATA || item.instruction == CSync.SyncInstructions.NONE)) {
-            //  ASSERT (this.dir_item && this.dir_item.instruction == CSync.SyncInstructions.RENAME);
+            //  GLib.assert_true (this.dir_item && this.dir_item.instruction == CSync.SyncInstructions.RENAME);
             // This is because otherwise subitems are not updated!  (ideally renaming a directory could
             // update the database for all items!  See PropagateDirectory.on_signal_sub_jobs_finished)
             item.instruction = CSync.SyncInstructions.RENAME;
@@ -1983,7 +1983,7 @@ public class ProcessDirectoryJob : GLib.Object {
     ***********************************************************/
     private void sub_job_finished () {
         var process_directory_job = (ProcessDirectoryJob)sender ();
-        //  ASSERT (process_directory_job);
+        //  GLib.assert_true (process_directory_job);
 
         this.child_ignored |= process_directory_job.child_ignored;
         this.child_modified |= process_directory_job.child_modified;
@@ -1992,7 +1992,7 @@ public class ProcessDirectoryJob : GLib.Object {
             /* emit */ this.discovery_data.signal_item_discovered (process_directory_job.dir_item);
 
         int count = this.running_jobs.remove_all (process_directory_job);
-        //  ASSERT (count == 1);
+        //  GLib.assert_true (count == 1);
         process_directory_job.delete_later ();
         GLib.Timeout.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
     }
@@ -2028,7 +2028,7 @@ public class ProcessDirectoryJob : GLib.Object {
         if (!is_vfs_with_suffix ())
             return;
         bool has_suffix = has_virtual_file_suffix (string_value);
-        //  ASSERT (has_suffix);
+        //  GLib.assert_true (has_suffix);
         if (has_suffix)
             string_value.chop (this.discovery_data.sync_options.vfs.file_suffix ().size ());
     }

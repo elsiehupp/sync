@@ -201,7 +201,7 @@ public class UserStatusSelectorModel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void update_user_status () {
-        //  Q_ASSERT (this.user_status_connector);
+        //  GLib.assert_true (this.user_status_connector);
         if (!this.user_status_connector) {
             return;
         }
@@ -214,7 +214,7 @@ public class UserStatusSelectorModel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void clear_user_status () {
-        //  Q_ASSERT (this.user_status_connector);
+        //  GLib.assert_true (this.user_status_connector);
         if (!this.user_status_connector) {
             return;
         }
@@ -234,7 +234,7 @@ public class UserStatusSelectorModel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public LibSync.UserStatus predefined_status_for_index (int index) {
-        //  Q_ASSERT (0 <= index && index < (int)this.predefined_statuses.size ());
+        //  GLib.assert_true (0 <= index && index < (int)this.predefined_statuses.size ());
         return this.predefined_statuses[index];
     }
 
@@ -249,7 +249,7 @@ public class UserStatusSelectorModel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void predefined_status (int index) {
-        //  Q_ASSERT (0 <= index && index < (int)this.predefined_statuses.size ());
+        //  GLib.assert_true (0 <= index && index < (int)this.predefined_statuses.size ());
 
         this.user_status.message_predefined (true);
         var predefined_status = this.predefined_statuses[index];
@@ -292,7 +292,7 @@ public class UserStatusSelectorModel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void clear_at_for_index (int index) {
-        //  Q_ASSERT (0 <= index && index < (int)this.clear_stages.size ());
+        //  GLib.assert_true (0 <= index && index < (int)this.clear_stages.size ());
         this.user_status.clear_at (clear_stage_type_to_date_time (this.clear_stages[index]));
         /* emit */ clear_at_changed ();
     }

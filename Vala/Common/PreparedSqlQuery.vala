@@ -10,8 +10,6 @@ namespace Common {
 ***********************************************************/
 public class PreparedSqlQuery : GLib.Object {
 
-    using Sqlite.Database;
-
     /***********************************************************
     ***********************************************************/
     private SqlQuery query;
@@ -22,7 +20,7 @@ public class PreparedSqlQuery : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private PreparedSqlQuery (SqlQuery query, bool ok = true) {
+    internal PreparedSqlQuery (SqlQuery query, bool ok = true) {
         this.query = query;
         this.ok = ok;
     }
@@ -39,12 +37,12 @@ public class PreparedSqlQuery : GLib.Object {
     }
 
     //  public SqlQuery operator. () {
-    //      //  Q_ASSERT (this.ok);
+    //      //  GLib.assert_true (this.ok);
     //      return this.query;
     //  }
 
     //  public SqlQuery operator* () & {
-    //      //  Q_ASSERT (this.ok);
+    //      //  GLib.assert_true (this.ok);
     //      return this.query;
     //  }
 

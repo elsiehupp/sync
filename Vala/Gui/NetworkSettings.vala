@@ -176,8 +176,9 @@ public class NetworkSettings : Gtk.Widget {
         } else if (this.instance.manual_proxy_radio_button.is_checked ()) {
             int type = this.instance.type_combo_box.item_data (this.instance.type_combo_box.current_index ()).to_int ();
             string host = this.instance.host_line_edit.text ();
-            if (host == "")
+            if (host == "") {
                 type = Soup.NetworkProxy.NoProxy;
+            }
             bool needs_auth = this.instance.auth_requiredcheck_box.is_checked ();
             string user = this.instance.user_line_edit.text ();
             string pass = this.instance.password_line_edit.text ();
@@ -302,8 +303,9 @@ public class NetworkSettings : Gtk.Widget {
 
         this.instance.host_line_edit.on_signal_text (config_file.proxy_host_name ());
         int port = config_file.proxy_port ();
-        if (port == 0)
+        if (port == 0) {
             port = 8080;
+        }
         this.instance.port_spin_box.value (port);
         this.instance.auth_requiredcheck_box.checked (config_file.proxy_needs_auth ());
         this.instance.user_line_edit.on_signal_text (config_file.proxy_user ());

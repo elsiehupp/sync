@@ -49,7 +49,7 @@ public class PropfindJob : AbstractNetworkJob {
         }
         Soup.Request request = new Soup.Request ();
         // Always have a higher priority than the propagator because we use this from the UI
-        // and really want this to be done first (no matter what internal scheduling GLib.NAM uses).
+        // and really want this to be done first (no matter what internal scheduling Soup.Session uses).
         // Also possibly useful for avoiding false timeouts.
         request.priority (Soup.Request.HighPriority);
         request.raw_header ("Depth", "0");

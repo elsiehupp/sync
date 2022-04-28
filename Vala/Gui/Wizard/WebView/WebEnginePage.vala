@@ -40,7 +40,7 @@ public class WebEnginePage : GLib.WebEnginePage {
         TODO properly improve this.
         The certificate should be displayed.
 
-        Or rather we should do a request with the GLib.NAM and see if it works (then it is in the store).
+        Or rather we should do a request with the Soup.Session and see if it works (then it is in the store).
         This is just a quick fix for now.
         ***********************************************************/
         Gtk.MessageBox message_box;

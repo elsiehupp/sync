@@ -65,9 +65,9 @@ public class HttpCredentialsGui : HttpCredentials {
     static string request_app_password_text (Account account) {
         int version = account.server_version_int;
         var url = account.url.to_string ();
-        if (url.has_suffix ("/"))
+        if (url.has_suffix ("/")) {
             url.chop (1);
-
+        }
         if (version >= Account.make_server_version (13, 0, 0)) {
             url += "/index.php/settings/user/security";
         } else if (version >= Account.make_server_version (12, 0, 0)) {
@@ -101,7 +101,7 @@ public class HttpCredentialsGui : HttpCredentials {
             break;
         }
 
-        //  ASSERT (this.user == user); // ensured by this.async_auth
+        //  GLib.assert_true (this.user == user); // ensured by this.async_auth
 
         this.password = token;
         this.refresh_token = refresh_token;

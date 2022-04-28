@@ -37,7 +37,7 @@
 //          OC_ASSERT_MSG ("ASSERT : \"%s\" in file %s, line %d with message : %s", #cond, __FILE__, __LINE__, message);
 //      } else {
 //      }
-//  const int ASSERT (...) OC_ASSERT_OVERLOAD (ASSERT, __VA_ARGS__)
+//  const int GLib.assert_true (...) OC_ASSERT_OVERLOAD (ASSERT, __VA_ARGS__)
 
 //  // Enforce condition to be true, even in release builds.
 //  //
@@ -57,6 +57,6 @@
 //  // An assert that is only present in debug builds : typically used for
 //  // asserts that are too expensive for release mode.
 //  //
-//  // Q_ASSERT
+//  // GLib.assert_true
 
 //  //  #endif

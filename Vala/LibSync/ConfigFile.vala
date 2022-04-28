@@ -181,7 +181,7 @@ public class ConfigFile : GLib.Object {
             return ConfigFile.exclude_file_from_system ();
         }
 
-        //  ASSERT (false);
+        //  GLib.assert_true (false);
         return "";
     }
 
@@ -886,7 +886,7 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     public void save_geometry (Gtk.Widget w) {
     // #ifndef TOKEN_AUTH_ONLY
-        //  ASSERT (!w.object_name () == null);
+        //  GLib.assert_true (!w.object_name () == null);
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         settings.begin_group (w.object_name ());
         settings.set_value (GEOMETRY_C, w.save_geometry ());
@@ -912,7 +912,7 @@ public class ConfigFile : GLib.Object {
         if (header == null) {
             return;
         }
-        //  ASSERT (!header.object_name () == "");
+        //  GLib.assert_true (!header.object_name () == "");
 
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         settings.begin_group (header.object_name ());
@@ -929,7 +929,7 @@ public class ConfigFile : GLib.Object {
         if (header == null) {
             return;
         }
-        //  ASSERT (!header.object_name () == null);
+        //  GLib.assert_true (!header.object_name () == null);
 
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         settings.begin_group (header.object_name ());

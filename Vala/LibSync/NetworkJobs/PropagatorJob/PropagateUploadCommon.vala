@@ -491,7 +491,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
     ***********************************************************/
     private void on_signal_poll_job_finished () {
         var poll_job = (PollJob)sender ();
-        //  ASSERT (poll_job);
+        //  GLib.assert_true (poll_job);
 
         this.propagator.active_job_list.remove_one (this);
 

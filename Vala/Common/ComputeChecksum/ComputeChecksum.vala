@@ -102,7 +102,7 @@ public class ComputeChecksum : AbstractComputeChecksum {
     public void start_for_device (GLib.OutputStream device) {
         //  ENFORCE (device);
         GLib.info ("Computing " + this.checksum_type + " checksum of device " + device.get () + " in a thread.");
-        //  ASSERT (!device.parent ());
+        //  GLib.assert_true (!device.parent ());
 
         start_impl (std.move (device));
     }

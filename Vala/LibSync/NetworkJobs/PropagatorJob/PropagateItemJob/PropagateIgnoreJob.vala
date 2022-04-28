@@ -29,7 +29,7 @@ public class PropagateIgnoreJob : AbstractPropagateItemJob {
                 status = SyncFileItem.Status.NORMAL_ERROR;
             } else {
                 status = SyncFileItem.Status.FILE_IGNORED;
-                //  ASSERT (this.item.instruction == CSync.SyncInstructions.IGNORE);
+                //  GLib.assert_true (this.item.instruction == CSync.SyncInstructions.IGNORE);
             }
         }
         on_signal_done (status, this.item.error_string);

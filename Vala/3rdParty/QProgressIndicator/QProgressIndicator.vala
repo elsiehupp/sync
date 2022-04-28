@@ -96,9 +96,9 @@ public class GLib.ProgressIndicator : Gtk.Widget {
     ***********************************************************/
     public void on_start_animation () {
         m_angle = 0;
-
-        if (m_timer_id == -1)
+        if (m_timer_id == -1) {
             m_timer_id = start_timer (m_delay);
+        }
     }
 
 
@@ -107,11 +107,10 @@ public class GLib.ProgressIndicator : Gtk.Widget {
     \sa on_start_animation is_animated
     ***********************************************************/
     public void on_stop_animation () {
-        if (m_timer_id != -1)
+        if (m_timer_id != -1) {
             kill_timer (m_timer_id);
-
+        }
         m_timer_id = -1;
-
         update ();
     }
 
@@ -123,13 +122,13 @@ public class GLib.ProgressIndicator : Gtk.Widget {
     \sa animation_delay
     ***********************************************************/
     public void on_set_animation_delay (int delay) {
-        if (m_timer_id != -1)
+        if (m_timer_id != -1) {
             kill_timer (m_timer_id);
-
+        }
         m_delay = delay;
-
-        if (m_timer_id != -1)
+        if (m_timer_id != -1) {
             m_timer_id = start_timer (m_delay);
+        }
     }
 
 

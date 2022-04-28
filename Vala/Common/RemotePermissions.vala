@@ -27,8 +27,9 @@ public class RemotePermissions : GLib.Object {
     //  private template <typename Char> // can be 'char' or 'ushort' if conversion from string
     private void from_array (char[] remote_permissions) {
         this.value = (uint16)not_null_mask;
-        if (remote_permissions == null)
+        if (remote_permissions == null) {
             return;
+        }
         for (int i; i < remote_permissions.length; i++) {
             var res = std.strchr (LETTERS, (char)remote_permissions[i]);
             if (res) {
@@ -100,8 +101,9 @@ public class RemotePermissions : GLib.Object {
     read value that was written with to_database_value ()
     ***********************************************************/
     public static RemotePermissions from_database_value (string value) {
-        if (value == "")
+        if (value == "") {
             return {};
+        }
         RemotePermissions perm;
         perm.from_array (value.const_data ());
         return perm;

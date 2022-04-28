@@ -106,9 +106,9 @@ public class Flow2Auth : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void fetch_new_token (TokenAction action) {
-        if (this.is_busy)
+        if (this.is_busy) {
             return;
-
+        }
         this.is_busy = true;
         this.has_token = false;
 
@@ -260,11 +260,10 @@ public class Flow2Auth : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_poll_timer_timeout () {
-        if (this.is_busy || !this.has_token)
+        if (this.is_busy || !this.has_token) {
             return;
-
+        }
         this.is_busy = true;
-
         this.seconds_left--;
         if (this.seconds_left > 0) {
             /* emit */ signal_status_changed (PollStatus.PollStatus.POLL_COUNTDOWN, this.seconds_left);
@@ -300,7 +299,7 @@ public class Flow2Auth : GLib.Object {
         string login_name, app_password;
 
         if (reply.error == GLib.InputStream.NoError && json_parse_error.error == Json.ParserError.NoError
-            && !json == "") {
+            && json != "") {
             server_url = json["server"].to_string ();
             if (this.enforce_https && server_url.scheme () != "https") {
                 GLib.warning ("Returned server url " + server_url.to_string () + " does not start with https.");

@@ -208,7 +208,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
             return;
         }
         var lscol_job = (LscolJob)sender ();
-        //  ASSERT (lscol_job);
+        //  GLib.assert_true (lscol_job);
         on_signal_show_warning (_("Failed to list a folder. Error : %1")
                      .printf (lscol_job.error_string_parsing_body ()));
     }
@@ -260,7 +260,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         }
 
         var webdav_folder = GLib.Uri (this.account.dav_url ()).path;
-        //  Q_ASSERT (path.has_prefix (webdav_folder));
+        //  GLib.assert_true (path.has_prefix (webdav_folder));
         this.encrypted_paths + path.mid (webdav_folder.size ());
     }
 

@@ -81,7 +81,7 @@ public class VfsSuffix : Common.AbstractVfs {
         // The concrete shape of the placeholder is also used in is_dehydrated_placeholder () below
         string fn = this.setup_params.filesystem_path + item.file;
         if (!fn.has_suffix (file_suffix ())) {
-            //  ASSERT (false, "vfs file isn't ending with suffix");
+            //  GLib.assert_true (false, "vfs file isn't ending with suffix");
             return "vfs file isn't ending with suffix";
         }
 

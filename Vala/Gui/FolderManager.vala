@@ -208,7 +208,7 @@ public class FolderManager : GLib.Object {
     private FolderManager (GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.navigation_pane_helper = this;
-        //  ASSERT (!this.instance);
+        //  GLib.assert_true (!this.instance);
         this.instance = this;
         this.sync_enabled = true;
         this.current_sync_folder = null;
@@ -768,9 +768,9 @@ public class FolderManager : GLib.Object {
     Compute status summarizing multiple folders
     ***********************************************************/
     public static void tray_overall_status (GLib.List<FolderConnection> folders,
-        LibSync.SyncResult.Status status, bool unresolved_conflicts) {
-        *status = LibSync.SyncResult.Status.UNDEFINED;
-        *unresolved_conflicts = false;
+        out LibSync.SyncResult.Status status, out bool unresolved_conflicts) {
+        status = LibSync.SyncResult.Status.UNDEFINED;
+        unresolved_conflicts = false;
 
         int count = folders.length;
 
@@ -784,22 +784,22 @@ public class FolderManager : GLib.Object {
             if (folder_connection) {
                 var sync_result = folder_connection.sync_result;
                 if (folder_connection.sync_paused) {
-                    *status = LibSync.SyncResult.Status.PAUSED;
+                    status = LibSync.SyncResult.Status.PAUSED;
                 } else {
                     LibSync.SyncResult.Status sync_status = sync_result.status ();
                     switch (sync_status) {
                     case LibSync.SyncResult.Status.UNDEFINED:
-                        *status = LibSync.SyncResult.Status.ERROR;
+                        status = LibSync.SyncResult.Status.ERROR;
                         break;
                     case LibSync.SyncResult.Status.PROBLEM : // don't show the problem icon in tray.
-                        *status = LibSync.SyncResult.Status.SUCCESS;
+                        status = LibSync.SyncResult.Status.SUCCESS;
                         break;
                     default:
-                        *status = sync_status;
+                        status = sync_status;
                         break;
                     }
                 }
-                *unresolved_conflicts = sync_result.has_unresolved_conflicts;
+                unresolved_conflicts = sync_result.has_unresolved_conflicts;
             }
         } else {
             int errors_seen = 0;
@@ -838,18 +838,19 @@ public class FolderManager : GLib.Object {
                         // no default case on purpose, check compiler warnings
                     }
                 }
-                if (folder_result.has_unresolved_conflicts)
-                    *unresolved_conflicts = true;
+                if (folder_result.has_unresolved_conflicts) {
+                    unresolved_conflicts = true;
+                }
             }
             if (errors_seen > 0) {
-                *status = LibSync.SyncResult.Status.ERROR;
+                status = LibSync.SyncResult.Status.ERROR;
             } else if (abort_or_paused_seen > 0 && abort_or_paused_seen == count) {
                 // only if all folders are paused
-                *status = LibSync.SyncResult.Status.PAUSED;
+                status = LibSync.SyncResult.Status.PAUSED;
             } else if (run_seen > 0) {
-                *status = LibSync.SyncResult.Status.SYNC_RUNNING;
+                status = LibSync.SyncResult.Status.SYNC_RUNNING;
             } else if (good_seen > 0) {
-                *status = LibSync.SyncResult.Status.SUCCESS;
+                status = LibSync.SyncResult.Status.SUCCESS;
             }
         }
     }
@@ -1062,7 +1063,7 @@ public class FolderManager : GLib.Object {
             delete folder_connection;
             count++;
         }
-        //  ASSERT (this.folder_map == "");
+        //  GLib.assert_true (this.folder_map == "");
 
         this.last_sync_folder = null;
         this.current_sync_folder = null;
@@ -1315,7 +1316,7 @@ public class FolderManager : GLib.Object {
     ***********************************************************/
     private void on_signal_folder_can_sync_changed () {
         var folder_connection = (FolderConnection)sender ();
-         //  ASSERT (folder_connection);
+         //  GLib.assert_true (folder_connection);
         if (folder_connection.can_sync ()) {
             this.socket_api.on_signal_register_path (folder_connection.alias ());
         } else {
@@ -1328,10 +1329,10 @@ public class FolderManager : GLib.Object {
     ***********************************************************/
     private void on_signal_folder_sync_started () {
         var folder_connection = (FolderConnection)sender ();
-        //  ASSERT (folder_connection);
-        if (!folder_connection)
+        //  GLib.assert_true (folder_connection);
+        if (!folder_connection) {
             return;
-
+        }
         GLib.info (lc_folder_man, ">========== Sync started for folder_connection [%s] of account [%s] with remote [%s]",
             q_printable (folder_connection.short_gui_local_path),
             q_printable (folder_connection.account_state.account.display_name),
@@ -1347,10 +1348,10 @@ public class FolderManager : GLib.Object {
     ***********************************************************/
     private void on_signal_folder_sync_finished (LibSync.SyncResult result) {
         var folder_connection = (FolderConnection)sender ();
-        //  ASSERT (folder_connection);
-        if (!folder_connection)
+        //  GLib.assert_true (folder_connection);
+        if (!folder_connection) {
             return;
-
+        }
         GLib.info (lc_folder_man, "<========== Sync on_signal_finished for folder_connection [%s] of account [%s] with remote [%s]",
             q_printable (folder_connection.short_gui_local_path),
             q_printable (folder_connection.account_state.account.display_name),
@@ -1360,8 +1361,9 @@ public class FolderManager : GLib.Object {
             this.last_sync_folder = this.current_sync_folder;
             this.current_sync_folder = null;
         }
-        if (!is_any_sync_running ())
+        if (!is_any_sync_running ()) {
             start_scheduled_sync_soon ();
+        }
     }
 
 
@@ -1582,8 +1584,9 @@ public class FolderManager : GLib.Object {
                 (folder_connection.consecutive_failing_syncs () > 0 && folder_connection.consecutive_failing_syncs () < 3)
                 || folder_connection.sync_engine.is_another_sync_needed () == AnotherSyncNeeded.DELAYED_FOLLOW_UP;
             var sync_again_delay = std.chrono.seconds (10); // 10s for the first retry-after-fail
-            if (folder_connection.consecutive_failing_syncs () > 1)
+            if (folder_connection.consecutive_failing_syncs () > 1) {
                 sync_again_delay = std.chrono.seconds (60); // 60s for each further attempt
+            }
             if (sync_again && msecs_since_sync > sync_again_delay) {
                 GLib.info (
                     "Scheduling folder_connection " + folder_connection.alias ()
@@ -1833,10 +1836,10 @@ public class FolderManager : GLib.Object {
         if (!new GLib.Dir (folder_connection.path).exists ()) {
             return;
         }
-
         // register the folder_connection with the socket API
-        if (folder_connection.can_sync ())
+        if (folder_connection.can_sync ()) {
             this.socket_api.on_signal_register_path (folder_connection.alias ());
+        }
     }
 
 

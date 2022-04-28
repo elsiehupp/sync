@@ -122,7 +122,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
     /***********************************************************
     ***********************************************************/
     public GLib.Variant data (GLib.ModelIndex index, int role) {
-        //  Q_ASSERT (check_index (index, GLib.AbstractItemModel.Check_index_option.Index_is_valid));
+        //  GLib.assert_true (check_index (index, GLib.AbstractItemModel.Check_index_option.Index_is_valid));
 
         switch (role) {
         case DataRole.PROVIDER_NAME:
@@ -224,7 +224,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
     /***********************************************************
     ***********************************************************/
     private void start_search () {
-        //  Q_ASSERT (this.account_state && this.account_state.account);
+        //  GLib.assert_true (this.account_state && this.account_state.account);
 
         disconnect_and_clear_search_jobs ();
 
@@ -247,7 +247,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
     /***********************************************************
     ***********************************************************/
     private void start_search_for_provider (string provider_id, int32 cursor) {
-        //  Q_ASSERT (this.account_state && this.account_state.account);
+        //  GLib.assert_true (this.account_state && this.account_state.account);
 
         if (!this.account_state || !this.account_state.account) {
             return;
@@ -473,7 +473,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
             if (it_fetch_more_trigger_for_provider != std.end (this.results)
                 && it_fetch_more_trigger_for_provider != std.begin (this.results)) {
                 var erase_index = (int)std.distance (std.begin (this.results), it_fetch_more_trigger_for_provider);
-                //  Q_ASSERT (erase_index >= 0 && erase_index < (int) (this.results.size ());
+                //  GLib.assert_true (erase_index >= 0 && erase_index < (int) (this.results.size ());
                 begin_remove_rows ({}, erase_index, erase_index);
                 this.results.erase (it_fetch_more_trigger_for_provider);
                 end_remove_rows ();
@@ -622,7 +622,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
     /***********************************************************
     ***********************************************************/
     private void on_signal_search_for_provider_finished (LibSync.JsonApiJob json_api_job, GLib.JsonDocument json, int status_code) {
-        //  Q_ASSERT (this.account_state && this.account_state.account);
+        //  GLib.assert_true (this.account_state && this.account_state.account);
 
         var json_api_job = (LibSync.JsonApiJob)sender ();
 
@@ -763,7 +763,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
             GLib.List<string> thumbnail_url_copy_splitted = thumbnail_url_copy.contains ('?')
                 ? thumbnail_url_copy.split ('?', GLib.SkipEmptyParts)
                 : { thumbnail_url_copy };
-            //  Q_ASSERT (!thumbnail_url_copy_splitted == "");
+            //  GLib.assert_true (!thumbnail_url_copy_splitted == "");
             server_url_copy.path (thumbnail_url_copy_splitted[0]);
             thumbnail_url_copy = server_url_copy.to_string ();
             if (thumbnail_url_copy_splitted.size () > 1) {
@@ -787,7 +787,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
             // some icons may contain parameters after (?)
             GLib.List<string> fallack_icon_path_splitted =
                 fallack_icon_copy.contains ('?') ? fallack_icon_copy.split ('?') : { fallack_icon_copy };
-            //  Q_ASSERT (!fallack_icon_path_splitted == "");
+            //  GLib.assert_true (!fallack_icon_path_splitted == "");
             server_url_copy.path (fallack_icon_path_splitted[0]);
             fallack_icon_copy = server_url_copy.to_string ();
             if (fallack_icon_path_splitted.size () > 1) {

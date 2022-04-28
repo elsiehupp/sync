@@ -330,7 +330,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
         this.propagator.active_job_list.remove_one (this);
 
         GETFileJob get_file_job = this.get_file_job;
-        //  ASSERT (get_file_job);
+        //  GLib.assert_true (get_file_job);
 
         this.item.http_error_code = get_file_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         this.item.request_id = get_file_job.request_id ();
@@ -373,7 +373,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
                 return;
             }
 
-            // This gives a custom GLib.NAM (by the user of libowncloudsync) to abort () a GLib.InputStream in its meta_data_changed () slot and
+            // This gives a custom Soup.Session (by the user of libowncloudsync) to abort () a GLib.InputStream in its meta_data_changed () slot and
             // set a custom error string to make this a soft error. In contrast to the default hard error this won't bring down
             // the whole sync and allows for a custom error message.
             GLib.InputStream reply = get_file_job.input_stream;
@@ -555,7 +555,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_download_finished () {
-        //  ASSERT (!this.temporary_file.is_open);
+        //  GLib.assert_true (!this.temporary_file.is_open);
         string fn = this.propagator.full_local_path (this.item.file);
 
         // In case of file name clash, report an error

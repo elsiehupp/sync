@@ -95,8 +95,9 @@ public class Utility : GLib.Object {
     public static bool write_random_file (string fname, int size = -1) {
         int max_size = 10 * 10 * 1024;
 
-        if (size == -1)
+        if (size == -1) {
             size = rand () % max_size;
+        }
 
         string rand_string;
         for (int i = 0; i < size; i++) {
@@ -149,13 +150,12 @@ public class Utility : GLib.Object {
         } else {
             s = _("%L1 B");
         }
-
-        if (value > 9.95)
+        if (value > 9.95) {
             round = true;
-
-        if (round)
+        }
+        if (round) {
             return s.printf (q_round (value));
-
+        }
         return s.printf (value, 0, "g", 2);
     }
 
@@ -514,8 +514,9 @@ public class Utility : GLib.Object {
     ***********************************************************/
     public static bool fs_case_preserving_override () {
         string env = qgetenv ("OWNCLOUD_TEST_CASE_PRESERVING");
-        if (!env == "")
+        if (!env == "") {
             return env.to_int ();
+        }
         return Utility.is_windows () || Utility.is_mac ();
     }
 
@@ -854,12 +855,14 @@ public class Utility : GLib.Object {
     //      }
 
     //      // Old pattern
-    //      if (std.strstr (bname, "this.conflict-"))
+    //      if (std.strstr (bname, "this.conflict-")) {
     //          return true;
+    //      }
 
     //      // New pattern
-    //      if (std.strstr (bname, " (conflicted copy"))
+    //      if (std.strstr (bname, " (conflicted copy")) {
     //          return true;
+    //      }
 
     //      return false;
     //  }
@@ -914,12 +917,14 @@ public class Utility : GLib.Object {
         // Find the end of the tag
         var tag_end = conflict_name.length;
         var dot = conflict_name.last_index_of ("."); // dot could be part of user name for new tag!
-        if (dot > tag_start)
+        if (dot > tag_start) {
             tag_end = dot;
+        }
         if (tag_start == start_new) {
             var paren = conflict_name.index_of (")", tag_start);
-            if (paren != -1)
+            if (paren != -1) {
                 tag_end = paren + 1;
+            }
         }
         return conflict_name.left (tag_start) + conflict_name.mid (tag_end);
     }

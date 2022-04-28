@@ -102,7 +102,7 @@ public class PropagateRemoteDelete : AbstractPropagateItemJob {
     private void on_signal_delete_job_finished () {
         this.propagator.active_job_list.remove_one (this);
 
-        //  ASSERT (this.delete_job);
+        //  GLib.assert_true (this.delete_job);
 
         GLib.InputStream.NetworkError err = this.delete_job.input_stream.error;
         int http_status = this.delete_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();

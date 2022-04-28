@@ -71,7 +71,7 @@ public class PropagatorCompositeJob : AbstractPropagatorJob {
 
         // Ask all the running composite jobs if they have something new to schedule.
         foreach (var running_job in q_as_const (this.running_jobs)) {
-            //  ASSERT (running_job.state == Running);
+            //  GLib.assert_true (running_job.state == Running);
 
             if (on_signal_possibly_run_next_job (running_job)) {
                 return true;
@@ -192,7 +192,7 @@ public class PropagatorCompositeJob : AbstractPropagatorJob {
     ***********************************************************/
     private void on_signal_next_propagator_job_finished (SyncFileItem.Status status) {
         var sub_job = (AbstractPropagatorJob)sender ();
-        //  ASSERT (sub_job);
+        //  GLib.assert_true (sub_job);
 
         // Delete the job and remove it from our list of jobs.
         sub_job.delete_later ();

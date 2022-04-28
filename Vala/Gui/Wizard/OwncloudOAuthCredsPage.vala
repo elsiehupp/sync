@@ -59,7 +59,7 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
     public AbstractCredentials credentials {
         public get {
             OwncloudWizard oc_wizard = (OwncloudWizard) wizard ();
-            //  Q_ASSERT (oc_wizard);
+            //  GLib.assert_true (oc_wizard);
             return new HttpCredentialsGui (
                 this.user, this.token, this.refresh_token,
                 oc_wizard.client_cert_bundle,
@@ -73,7 +73,7 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
     ***********************************************************/
     public void initialize_page () {
         var oc_wizard = (OwncloudWizard)wizard ();
-        //  Q_ASSERT (oc_wizard);
+        //  GLib.assert_true (oc_wizard);
         oc_wizard.account.credentials (CredentialsFactory.create ("http"));
         this.async_auth.on_signal_reset (new OAuth (oc_wizard.account, this));
         this.async_auth.signal_result.connect (
@@ -143,7 +143,7 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
             this.user = user;
             this.refresh_token = refresh_token;
             var oc_wizard = (OwncloudWizard)wizard ();
-            //  Q_ASSERT (oc_wizard);
+            //  GLib.assert_true (oc_wizard);
             /* emit */ connect_to_oc_url (oc_wizard.account.url.to_string ());
             break;
         }

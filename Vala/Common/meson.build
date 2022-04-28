@@ -19,6 +19,7 @@ srcs = files([
     'PluginFactory/AbstractPluginFactory.vala',
     'PluginFactory/DefaultPluginFactory.vala',
 
+    'PreparedSqlQuery.vala',
     'PreparedSqlQueryManager.vala',
     'RemotePermissions.vala',
 
@@ -26,6 +27,7 @@ srcs = files([
     'Result/Result.vala',
 
     'SqlDatabase.vala',
+    'SqlQuery.vala',
     'SyncFileStatus.vala',
     'SyncJournalDb.vala',
 

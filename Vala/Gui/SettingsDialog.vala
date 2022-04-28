@@ -301,8 +301,9 @@ public class SettingsDialog : Gtk.Dialog {
             /* emit */ signal_style_changed ();
             break;
         case Gdk.Event.ActivationChange:
-            if (is_active_window ())
+            if (is_active_window ()) {
                 /* emit */ activate ();
+            }
             break;
         default:
             break;

@@ -119,7 +119,7 @@ public class ConflictDialog : Gtk.Dialog {
         var is_local_picked = this.instance.local_version_radio.is_checked ();
         var is_remote_picked = this.instance.remote_version_radio.is_checked ();
 
-        //  Q_ASSERT (is_local_picked || is_remote_picked);
+        //  GLib.assert_true (is_local_picked || is_remote_picked);
         if (!is_local_picked && !is_remote_picked) {
             return;
         }

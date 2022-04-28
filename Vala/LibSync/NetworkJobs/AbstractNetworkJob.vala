@@ -59,7 +59,7 @@ public class AbstractNetworkJob : GLib.Object {
 
     /***********************************************************
     On get ():
-    //  ASSERT (!this.response_timestamp == "");
+    //  GLib.assert_true (!this.response_timestamp == "");
     ***********************************************************/
     public string response_timestamp { public get; protected set; }
 
@@ -153,7 +153,7 @@ public class AbstractNetworkJob : GLib.Object {
         this.input_stream = null;
         this.path = path;
         // Since we hold a unowned to the account, this makes no sense. (issue #6893)
-        //  ASSERT (account != parent);
+        //  GLib.assert_true (account != parent);
 
         this.timer.single_shot (true);
         this.timer.interval (

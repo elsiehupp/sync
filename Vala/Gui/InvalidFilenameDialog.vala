@@ -46,8 +46,8 @@ public class InvalidFilenameDialog : Gtk.Dialog {
         this.account = account;
         this.folder_connection = folder_connection;
         this.file_path = std.move (file_path);
-        //  Q_ASSERT (this.account);
-        //  Q_ASSERT (this.folder_connection);
+        //  GLib.assert_true (this.account);
+        //  GLib.assert_true (this.folder_connection);
 
         GLib.FileInfo file_path_file_info = new GLib.FileInfo (this.file_path);
         this.relative_file_path = file_path_file_info.path + "/";

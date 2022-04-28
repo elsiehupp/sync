@@ -135,7 +135,7 @@ public class UploadDevice : GLib.OutputStream {
     /***********************************************************
     ***********************************************************/
     public int64 write_data (string unused_string, int64 unused_int64) {
-        //  ASSERT (false, "write to read only device");
+        //  GLib.assert_true (false, "write to read only device");
         return 0;
     }
 
@@ -217,7 +217,7 @@ public class UploadDevice : GLib.OutputStream {
     public void give_bandwidth_quota (int64 bwq) {
         if (!at_end ()) {
             this.bandwidth_quota = bwq;
-            GLib.Object.invoke_method (this, "ready_read", GLib.QueuedConnection); // tell GLib.NAM that we have quota
+            GLib.Object.invoke_method (this, "ready_read", GLib.QueuedConnection); // tell Soup.Session that we have quota
         }
     }
 

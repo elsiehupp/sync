@@ -4,7 +4,8 @@ namespace Common {
 /***********************************************************
 @brief Class that handles the sync database
 
-@details This class is thread safe. All public functions lock the mutex.
+@details This class is thread safe. All public functions
+    lock the mutex.
 
 @author Klaas Freitag <freitag@owncloud.com>
 
@@ -110,15 +111,16 @@ public class SyncJournalDb : GLib.Object {
         Returns none on database error.
         ***********************************************************/
         Optional<PinState> raw_for_path (string path) {
-            GLib.MutexLocker lock = new GLib.MutexLocker (this.database.mutex);
-            if (!this.database.check_connect ())
-                return {};
-
-            PreparedSqlQuery query = this.database.query_manager.get (
+            GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.database.mutex);
+            if (!this.database.check_connect ()) {
+                return new Optional<PinState> ();
+            }
+            PreparedSqlQuery query = this.database.query_manager.get_for_key_sql_and_database (
                 PreparedSqlQueryManager.Key.GET_RAW_PIN_STATE_QUERY,
                 "SELECT pin_state FROM flags WHERE path == ?1;",
-                this.database.database);
-            //  ASSERT (query)
+                this.database.database
+            );
+            //  GLib.assert_true (query)
             query.bind_value (1, path);
             query.exec ();
 
@@ -150,11 +152,11 @@ public class SyncJournalDb : GLib.Object {
         Returns none on database error.
         ***********************************************************/
         public Optional<PinState> effective_for_path (string path) {
-            GLib.MutexLocker lock = new GLib.MutexLocker (this.database.mutex);
-            if (!this.database.check_connect ())
+            GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.database.mutex);
+            if (!this.database.check_connect ()) {
                 return {};
-
-            PreparedSqlQuery query = this.database.query_manager.get (
+            }
+            PreparedSqlQuery query = this.database.query_manager.get_for_key_sql_and_database (
                 PreparedSqlQueryManager.Key.GET_EFFECTIVE_PIN_STATE_QUERY,
                 "SELECT pin_state FROM flags WHERE"
                 // explicitly allow "" to represent the root path
@@ -162,14 +164,16 @@ public class SyncJournalDb : GLib.Object {
                 + " (" + is_prefix_path_or_equal ("path", "?1") + " OR path == '')"
                 + " AND pin_state is not null AND pin_state != 0"
                 + " ORDER BY length (path) DESC LIMIT 1;",
-                this.database.database);
-            //  ASSERT (query)
+                this.database.database
+            );
+            //  GLib.assert_true (query)
             query.bind_value (1, path);
             query.exec ();
 
             var next = query.next ();
-            if (!next.ok)
+            if (!next.ok) {
                 return {};
+            }
             // If the root path has no setting, assume PinState.ALWAYS_LOCAL
             if (!next.has_data) {
                 return PinState.ALWAYS_LOCAL;
@@ -196,34 +200,38 @@ public class SyncJournalDb : GLib.Object {
             // Get the item's effective pin state. We'll compare subitem's pin states
             // against this.
             PreparedSqlQuery base_pin = effective_for_path (path);
-            if (!base_pin)
+            if (!base_pin) {
                 return {};
-
-            GLib.MutexLocker lock = new GLib.MutexLocker (this.database.mutex);
-            if (!this.database.check_connect ())
+            }
+            GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.database.mutex);
+            if (!this.database.check_connect ()) {
                 return {};
-
+            }
             // Find all the non-inherited pin states below the item
-            PreparedSqlQuery query = this.database.query_manager.get (
+            PreparedSqlQuery query = this.database.query_manager.get_for_key_sql_and_database (
                 PreparedSqlQueryManager.Key.GET_SUB_PINS_QUERY,
                 "SELECT DISTINCT pin_state FROM flags WHERE"
                 + " (" + is_prefix_path_of ("?1", "path") + " OR ?1 == '')"
                 + " AND pin_state is not null and pin_state != 0;",
-                this.database.database);
-            //  ASSERT (query)
+                this.database.database
+            );
+            //  GLib.assert_true (query)
             query.bind_value (1, path);
             query.exec ();
 
             // Check if they are all identical
             while (true) {
                 var next = query.next ();
-                if (!next.ok)
+                if (!next.ok) {
                     return {};
-                if (!next.has_data)
+                }
+                if (!next.has_data) {
                     break;
+                }
                 PreparedSqlQuery sub_pin = (PinState)query.int_value (0);
-                if (sub_pin != *base_pin)
+                if (sub_pin != base_pin) {
                     return PinState.PinState.INHERITED;
+                }
             }
 
             return base_pin;
@@ -237,11 +245,11 @@ public class SyncJournalDb : GLib.Object {
         It's valid to use the root path "".
         ***********************************************************/
         public void for_path (string path, PinState state) {
-            GLib.MutexLocker lock = new GLib.MutexLocker (this.database.mutex);
-            if (!this.database.check_connect ())
+            GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.database.mutex);
+            if (!this.database.check_connect ()) {
                 return;
-
-            PreparedSqlQuery query = this.database.query_manager.get (
+            }
+            PreparedSqlQuery query = this.database.query_manager.get_for_key_sql_and_database (
                 PreparedSqlQueryManager.Key.SET_PIN_STATE_QUERY,
                 // If we had sqlite >=3.24.0 everywhere this could be an upsert,
                 // making further flags columns easy
@@ -249,8 +257,9 @@ public class SyncJournalDb : GLib.Object {
                 //" ON CONFLICT (path) DO UPDATE SET pin_state=?2;"),
                 // Simple version that doesn't work nicely with multiple columns:
                 "INSERT OR REPLACE INTO flags (path, pin_state) VALUES (?1, ?2);",
-                this.database.database);
-            //  ASSERT (query)
+                this.database.database
+            );
+            //  GLib.assert_true (query)
             query.bind_value (1, path);
             query.bind_value (2, state);
             query.exec ();
@@ -265,17 +274,18 @@ public class SyncJournalDb : GLib.Object {
         The path "" wipes every entry.
         ***********************************************************/
         public void wipe_for_path_and_below (string path) {
-            GLib.MutexLocker lock = new GLib.MutexLocker (this.database.mutex);
-            if (!this.database.check_connect ())
+            GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.database.mutex);
+            if (!this.database.check_connect ()) {
                 return;
-
-            PreparedSqlQuery query = this.database.query_manager.get (
+            }
+            PreparedSqlQuery query = this.database.query_manager.get_for_key_sql_and_database (
                 PreparedSqlQueryManager.Key.WIPE_PIN_STATE_QUERY,
                 "DELETE FROM flags WHERE "
                 // Allow "" to delete everything
                 + " (" + is_prefix_path_or_equal ("?1", "path") + " OR ?1 == '');",
-                this.database.database);
-            //  ASSERT (query)
+                this.database.database
+            );
+            //  GLib.assert_true (query)
             query.bind_value (1, path);
             query.exec ();
         }
@@ -287,20 +297,22 @@ public class SyncJournalDb : GLib.Object {
         Note that this will have an entry for "".
         ***********************************************************/
         Optional<GLib.List<GLib.Pair<string, PinState>>> raw_list () {
-            GLib.MutexLocker lock = new GLib.MutexLocker (this.database.mutex);
-            if (!this.database.check_connect ())
+            GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.database.mutex);
+            if (!this.database.check_connect ()) {
                 return {};
-
+            }
             SqlQuery query = new SqlQuery ("SELECT path, pin_state FROM flags;", this.database.database);
             query.exec ();
 
             GLib.List<GLib.Pair<string, PinState>> result;
             while (true) {
                 var next = query.next ();
-                if (!next.ok)
+                if (!next.ok) {
                     return {};
-                if (!next.has_data)
+                }
+                if (!next.has_data) {
                     break;
+                }
                 result.append ({
                     query.byte_array_value (0), (PinState)query.int_value (1)
                 });
@@ -318,7 +330,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     Public functions are protected with the mutex.
     ***********************************************************/
-    internal GLib.RecursiveMutex mutex;
+    internal GLib.Mutex mutex;
 
     private GLib.HashTable<string, int> checksym_type_cache;
     private int transaction;
@@ -505,22 +517,28 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool get_file_record (string filename, SyncJournalFileRecord record) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
 
         // Reset the output var in case the caller is reusing it.
-        //  Q_ASSERT (record);
+        //  GLib.assert_true (record);
         record.path == "";
-        //  Q_ASSERT (!record.is_valid);
+        //  GLib.assert_true (!record.is_valid);
 
-        if (this.metadata_table_is_empty)
+        if (this.metadata_table_is_empty) {
             return true; // no error, yet nothing found (record.is_valid == false)
+        }
 
-        if (!check_connect ())
+        if (!check_connect ()) {
             return false;
+        }
 
         if (filename != "") {
-            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_FILE_RECORD_QUERY, GET_FILE_RECORD_QUERY + " WHERE phash=?1", this.database);
-            if (!query) {
+            PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
+                PreparedSqlQueryManager.Key.GET_FILE_RECORD_QUERY,
+                GET_FILE_RECORD_QUERY + " WHERE phash=?1",
+                this.database
+            );
+            if (query == null) {
                 return false;
             }
 
@@ -549,12 +567,12 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool get_file_record_by_e2e_mangled_name (string mangled_name, SyncJournalFileRecord record) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
 
         // Reset the output var in case the caller is reusing it.
-        //  Q_ASSERT (record);
+        //  GLib.assert_true (record);
         record.path == "";
-        //  Q_ASSERT (!record.is_valid);
+        //  GLib.assert_true (!record.is_valid);
 
         if (this.metadata_table_is_empty) {
             return true; // no error, yet nothing found (record.is_valid == false)
@@ -565,11 +583,12 @@ public class SyncJournalDb : GLib.Object {
         }
 
         if (mangled_name != "") {
-            PreparedSqlQuery query = this.query_manager.get (
+            PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
                 PreparedSqlQueryManager.Key.GET_FILE_RECORD_QUERY_BY_MANGLED_NAME,
                 GET_FILE_RECORD_QUERY + " WHERE e2e_mangled_name=?1",
-                this.database);
-            if (!query) {
+                this.database
+            );
+            if (query == null) {
                 return false;
             }
 
@@ -598,12 +617,12 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool get_file_record_by_inode (uint64 inode, SyncJournalFileRecord record) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
 
         // Reset the output var in case the caller is reusing it.
-        //  Q_ASSERT (record);
+        //  GLib.assert_true (record);
         //  record.path == "";
-        //  Q_ASSERT (!record.is_valid);
+        //  GLib.assert_true (!record.is_valid);
 
         if (inode == 0 || this.metadata_table_is_empty) {
             return true; // no error, yet nothing found (record.is_valid == false)
@@ -612,24 +631,26 @@ public class SyncJournalDb : GLib.Object {
         if (!check_connect ()) {
             return false;
         }
-        PreparedSqlQuery query = this.query_manager.get (
+        PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
             PreparedSqlQueryManager.Key.GET_FILE_RECORD_QUERY_BY_INODE,
             GET_FILE_RECORD_QUERY + " WHERE inode=?1",
-            this.database);
-        if (!query)
+            this.database
+        );
+        if (query == null) {
             return false;
+        }
 
-        query.bind_value (1, inode);
-
-        if (!query.exec ())
+        query.bind_value<uint64> (1, inode);
+        if (!query.exec ()) {
             return false;
-
+        }
         var next = query.next ();
-        if (!next.ok)
+        if (!next.ok) {
             return false;
-        if (next.has_data)
+        }
+        if (next.has_data) {
             fill_file_record_from_get_query (record, query);
-
+        }
         return true;
     }
 
@@ -639,34 +660,34 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool get_file_records_by_file_id (string file_id, RowCallback row_callback) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
 
-        if (file_id == "" || this.metadata_table_is_empty)
+        if (file_id == "" || this.metadata_table_is_empty) {
             return true; // no error, yet nothing found (record.is_valid == false)
-
-        if (!check_connect ())
-            return false;
-
-        PreparedSqlQuery query = this.query_manager.get (
-            PreparedSqlQueryManager.Key.GET_FILE_RECORD_QUERY_BY_FILE_ID,
-            GET_FILE_RECORD_QUERY + " WHERE fileid=?1",
-            this.database);
-        if (!query) {
+        }
+        if (!check_connect ()) {
             return false;
         }
-
-        query.bind_value (1, file_id);
-
-        if (!query.exec ())
+        PreparedSqlQuery query = this.query_manager.geget_for_key_sql_and_databaset (
+            PreparedSqlQueryManager.Key.GET_FILE_RECORD_QUERY_BY_FILE_ID,
+            GET_FILE_RECORD_QUERY + " WHERE fileid=?1",
+            this.database
+        );
+        if (query == null) {
             return false;
-
+        }
+        query.bind_value (1, file_id);
+        if (!query.exec ()) {
+            return false;
+        }
         while (true) {
             var next = query.next ();
-            if (!next.ok)
+            if (!next.ok) {
                 return false;
-            if (!next.has_data)
+            }
+            if (!next.has_data) {
                 break;
-
+            }
             SyncJournalFileRecord record;
             fill_file_record_from_get_query (record, *query);
             row_callback (record);
@@ -679,7 +700,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool get_files_below_path (string path, RowCallback row_callback) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
 
         if (this.metadata_table_is_empty) {
             return true; // no error, yet nothing found
@@ -696,10 +717,12 @@ public class SyncJournalDb : GLib.Object {
 
         //      while (true) {
         //          var next = query.next ();
-        //          if (!next.ok)
+        //          if (!next.ok) {
         //              return false;
-        //          if (!next.has_data)
+        //          }
+        //          if (!next.has_data) {
         //              break;
+        //          }
 
         //          SyncJournalFileRecord record;
         //          fill_file_record_from_get_query (record, query);
@@ -714,18 +737,19 @@ public class SyncJournalDb : GLib.Object {
             // and find nothing. So, unfortunately, we have to use a different query for
             // retrieving the whole tree.
 
-            PreparedSqlQuery query = this.query_manager.get (
+            PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
                 PreparedSqlQueryManager.Key.GET_ALL_FILES_QUERY,
-                GET_FILE_RECORD_QUERY + " ORDER BY path||"/" ASC",
-                this.database);
-            if (!query) {
+                GET_FILE_RECORD_QUERY + " ORDER BY path||\"/\" ASC",
+                this.database
+            );
+            if (query == null) {
                 return false;
             }
             return this.exec (*query);
         } else {
             // This query is used to skip discovery and fill the tree from the
             // database instead
-            PreparedSqlQuery query = this.query_manager.get (
+            PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
                 PreparedSqlQueryManager.Key.GET_FILES_BELOW_PATH_QUERY,
                 GET_FILE_RECORD_QUERY + " WHERE " + is_prefix_path_of ("?1", "path")
                 + " OR " + is_prefix_path_of ("?1", "e2e_mangled_name")
@@ -734,9 +758,9 @@ public class SyncJournalDb : GLib.Object {
                 // an ordering like foo, foo-2, foo/file would be returned.
                 // With the trailing /, we get foo-2, foo, foo/file. This property
                 // is used in fill_tree_from_database ().
-                + " ORDER BY path||"/" ASC",
+                + " ORDER BY path||\"/\" ASC",
                 this.database);
-            if (!query) {
+            if (query == null) {
                 return false;
             }
             query.bind_value (1, path);
@@ -748,35 +772,35 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool list_files_in_path (string path, RowCallback row_callback) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
-
-        if (this.metadata_table_is_empty)
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
+        if (this.metadata_table_is_empty) {
             return true;
-
-        if (!check_connect ())
+        }
+        if (!check_connect ()) {
             return false;
-
-        PreparedSqlQuery query = this.query_manager.get (
+        }
+        PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
             PreparedSqlQueryManager.Key.LIST_FILES_IN_PATH_QUERY,
-            GET_FILE_RECORD_QUERY + " WHERE parent_hash (path) = ?1 ORDER BY path||"/" ASC",
-            this.database);
-        if (!query) {
+            GET_FILE_RECORD_QUERY + " WHERE parent_hash (path) = ?1 ORDER BY path||\"/\" ASC",
+            this.database
+        );
+        if (query == null) {
             return false;
         }
         query.bind_value (1, get_pHash (path));
-
-        if (!query.exec ())
+        if (!query.exec ()) {
             return false;
-
+        }
         while (true) {
             var next = query.next ();
-            if (!next.ok)
+            if (!next.ok) {
                 return false;
-            if (!next.has_data)
+            }
+            if (!next.has_data) {
                 break;
-
+            }
             SyncJournalFileRecord record;
-            fill_file_record_from_get_query (record, *query);
+            fill_file_record_from_get_query (record, query);
             if (!record.path.has_prefix (path) || record.path.index_of ("/", path.length + 1) > 0) {
                 GLib.warning ("hash collision" + path + record.path);
                 continue;
@@ -792,7 +816,7 @@ public class SyncJournalDb : GLib.Object {
     ***********************************************************/
     public Result<void, string> file_record (SyncJournalFileRecord record) {
         SyncJournalFileRecord record = this.record;
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
 
         if (this.etag_storage_filter != null) {
             // If we are a directory that should not be read from database next time, don't write the etag
@@ -825,13 +849,14 @@ public class SyncJournalDb : GLib.Object {
             parse_checksum_header (record.checksum_header, checksum_type, checksum);
             int content_checksum_type_id = map_checksum_type (checksum_type);
 
-            PreparedSqlQuery query = this.query_manager.get (
+            PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
                 PreparedSqlQueryManager.Key.SET_FILE_RECORD_QUERY,
                 "INSERT OR REPLACE INTO metadata "
                 + " (phash, pathlen, path, inode, uid, gid, mode, modtime, type, md5, fileid, remote_permissions, filesize, ignored_children_remote, content_checksum, content_checksum_type_id, e2e_mangled_name, is_e2e_encrypted) "
                 + "VALUES (?1 , ?2, ?3 , ?4 , ?5 , ?6 , ?7,  ?8 , ?9 , ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18);",
-                this.database);
-            if (!query) {
+                this.database
+            );
+            if (query == null) {
                 return query.error;
             }
 
@@ -872,13 +897,17 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void key_value_store_set (string key, GLib.Variant value) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
         if (!check_connect ()) {
             return;
         }
 
-        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.SET_KEY_VALUE_STORE_QUERY, "INSERT OR REPLACE INTO key_value_store (key, value) VALUES (?1, ?2);", this.database);
-        if (!query) {
+        PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
+            PreparedSqlQueryManager.Key.SET_KEY_VALUE_STORE_QUERY,
+            "INSERT OR REPLACE INTO key_value_store (key, value) VALUES (?1, ?2);",
+            this.database
+        );
+        if (query == null) {
             return;
         }
 
@@ -891,13 +920,17 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public int64 key_value_store_get_int (string key, int64 default_value) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
         if (!check_connect ()) {
             return default_value;
         }
 
-        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_KEY_VALUE_STORE_QUERY, "SELECT value FROM key_value_store WHERE key=?1", this.database);
-        if (!query) {
+        PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
+            PreparedSqlQueryManager.Key.GET_KEY_VALUE_STORE_QUERY,
+            "SELECT value FROM key_value_store WHERE key=?1",
+            this.database
+        );
+        if (query == null) {
             return default_value;
         }
 
@@ -916,15 +949,19 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void key_value_store_delete (string key) {
-        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_KEY_VALUE_STORE_QUERY, "DELETE FROM key_value_store WHERE key=?1;", this.database);
-        if (!query) {
+        PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
+            PreparedSqlQueryManager.Key.DELETE_KEY_VALUE_STORE_QUERY,
+            "DELETE FROM key_value_store WHERE key=?1;",
+            this.database
+        );
+        if (query == null) {
             GLib.warning ("Failed to init_or_reset this.delete_key_value_store_query");
-            //  Q_ASSERT (false);
+            //  GLib.assert_true (false);
         }
         query.bind_value (1, key);
         if (!query.exec ()) {
             GLib.warning ("Failed to exec this.delete_key_value_store_query for key" + key);
-            //  Q_ASSERT (false);
+            //  GLib.assert_true (false);
         }
     }
 
@@ -933,18 +970,22 @@ public class SyncJournalDb : GLib.Object {
     TODO: filename -> GLib.Bytearray?
     ***********************************************************/
     public bool delete_file_record (string filename, bool recursively = false) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
 
         if (check_connect ()) {
             // if (!recursively) {
             // always delete the actual file.
             {
-                PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_FILE_RECORD_PHASH, "DELETE FROM metadata WHERE phash=?1", this.database);
-                if (!query) {
+                PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
+                    PreparedSqlQueryManager.Key.DELETE_FILE_RECORD_PHASH,
+                    "DELETE FROM metadata WHERE phash=?1",
+                    this.database
+                );
+                if (query == null) {
                     return false;
                 }
 
-                int64 phash = get_pHash (filename.to_utf8 ());
+                int64 phash = get_pHash (filename);
                 query.bind_value (1, phash);
 
                 if (!query.exec ()) {
@@ -953,12 +994,14 @@ public class SyncJournalDb : GLib.Object {
             }
 
             if (recursively) {
-                PreparedSqlQuery query = this.query_manager.get (
+                PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
                     PreparedSqlQueryManager.Key.DELETE_FILE_RECORD_RECURSIVELY,
                     "DELETE FROM metadata WHERE " + is_prefix_path_of ("?1", "path"),
-                    this.database);
-                if (!query)
+                    this.database
+                );
+                if (!query) {
                     return false;
+                }
                 query.bind_value (1, filename);
                 if (!query.exec ()) {
                     return false;
@@ -977,7 +1020,7 @@ public class SyncJournalDb : GLib.Object {
     public bool update_file_record_checksum (string filename,
         string content_checksum,
         string content_checksum_type) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
 
         GLib.info ("Updating file checksum" + filename + content_checksum + content_checksum_type);
 
@@ -989,13 +1032,14 @@ public class SyncJournalDb : GLib.Object {
 
         int checksum_type_id = map_checksum_type (content_checksum_type);
 
-        PreparedSqlQuery query = this.query_manager.get (
+        PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
             PreparedSqlQueryManager.Key.SET_FILE_RECORD_CHECKSUM_QUERY,
             "UPDATE metadata"
             + " SET content_checksum = ?2, content_checksum_type_id = ?3"
             +" WHERE phash == ?1;",
-            this.database);
-        if (!query) {
+            this.database
+        );
+        if (query == null) {
             return false;
         }
         query.bind_value (1, phash);
@@ -1009,7 +1053,7 @@ public class SyncJournalDb : GLib.Object {
     ***********************************************************/
     public bool update_local_metadata (string filename,
         int64 modtime, int64 size, uint64 inode) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
 
         GLib.info ("Updating local metadata for:" + filename + modtime.to_string () + size.to_string () + inode.to_string ());
 
@@ -1019,13 +1063,14 @@ public class SyncJournalDb : GLib.Object {
             return false;
         }
 
-        PreparedSqlQuery query = this.query_manager.get (
+        PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
             PreparedSqlQueryManager.Key.SET_FILE_LOCAL_METADATA_QUERY,
             "UPDATE metadata"
             + " SET inode=?2, modtime=?3, filesize=?4"
             + " WHERE phash == ?1;",
-            this.database);
-        if (!query) {
+            this.database
+        );
+        if (query == null) {
             return false;
         }
 
@@ -1041,39 +1086,42 @@ public class SyncJournalDb : GLib.Object {
     Returns whether the item or any subitems are dehydrated
     ***********************************************************/
     public Optional<HasHydratedDehydrated> has_hydrated_or_dehydrated_files (string filename) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (SyncJournalDb.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
         if (!check_connect ()) {
             return null;
         }
 
-        PreparedSqlQuery query = this.query_manager.get (
+        PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
             PreparedSqlQueryManager.Key.COUNT_DEHYDRATED_FILES_QUERY,
             "SELECT DISTINCT type FROM metadata"
             + " WHERE (" + is_prefix_path_or_equal ("?1", "path") + " OR ?1 == '');",
             this.database
         );
-        if (!query) {
+        if (query == null) {
             return {};
         }
 
         query.bind_value (1, filename);
-        if (!query.exec ())
+        if (!query.exec ()) {
             return {};
-
+        }
         HasHydratedDehydrated result;
         while (true) {
             var next = query.next ();
-            if (!next.ok)
+            if (!next.ok) {
                 return {};
-            if (!next.has_data)
+            }
+            if (!next.has_data) {
                 break;
+            }
             var type = (ItemType)query.int_value (0);
-            if (type == ItemType.FILE || type == ItemType.VIRTUAL_FILE_DEHYDRATION)
+            if (type == ItemType.FILE || type == ItemType.VIRTUAL_FILE_DEHYDRATION) {
                 result.has_hydrated = true;
-            if (type == ItemType.VIRTUAL_FILE || type == ItemType.VIRTUAL_FILE_DOWNLOAD)
+            }
+            if (type == ItemType.VIRTUAL_FILE || type == ItemType.VIRTUAL_FILE_DOWNLOAD) {
                 result.has_dehydrated = true;
+            }
         }
-
         return result;
     }
 
@@ -1081,7 +1129,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool exists () {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
         return (this.database_file != "" && GLib.File.exists (this.database_file));
     }
 
@@ -1124,7 +1172,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void error_blocklist_entry_for_item (SyncJournalErrorBlocklistRecord item) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
 
         GLib.info ("Setting blocklist entry for" + item.file + item.retry_count.to_string ()
                     + item.error_string + item.last_try_time.to_string () + item.ignore_duration.to_string ()
@@ -1135,13 +1183,14 @@ public class SyncJournalDb : GLib.Object {
             return;
         }
 
-        PreparedSqlQuery query = this.query_manager.get (
+        PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
             PreparedSqlQueryManager.Key.SET_ERROR_BLOCKLIST_QUERY,
             "INSERT OR REPLACE INTO blocklist "
             + " (path, last_try_etag, last_try_modtime, retrycount, errorstring, last_try_time, ignore_duration, rename_target, error_category, request_id) "
             + "VALUES ( ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
-            this.database);
-        if (!query) {
+            this.database
+        );
+        if (query == null) {
             return;
         }
 
@@ -1166,7 +1215,7 @@ public class SyncJournalDb : GLib.Object {
             return;
         }
 
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
         if (check_connect ()) {
             SqlQuery query = new SqlQuery (this.database);
 
@@ -1182,7 +1231,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void wipe_error_blocklist_category (SyncJournalErrorBlocklistRecord.Category category) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
         if (check_connect ()) {
             SqlQuery query = new SqlQuery (this.database);
 
@@ -1198,7 +1247,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public int wipe_error_blocklist () {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
         if (check_connect ()) {
             SqlQuery query = new SqlQuery (this.database);
 
@@ -1219,7 +1268,7 @@ public class SyncJournalDb : GLib.Object {
     public int on_signal_error_block_list_entry_count () {
         int re = 0;
 
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
         if (check_connect ()) {
             SqlQuery query = new SqlQuery ("SELECT count (*) FROM blocklist", this.database);
 
@@ -1237,13 +1286,17 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public DownloadInfo get_download_info (string file) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
 
         DownloadInfo download_info;
 
         if (check_connect ()) {
-            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_DOWNLOAD_INFO_QUERY, "SELECT temporaryfile, etag, errorcount FROM downloadinfo WHERE path=?1", this.database);
-            if (!query) {
+            PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
+                PreparedSqlQueryManager.Key.GET_DOWNLOAD_INFO_QUERY,
+                "SELECT temporaryfile, etag, errorcount FROM downloadinfo WHERE path=?1",
+                this.database
+            );
+            if (query == null) {
                 return download_info;
             }
 
@@ -1264,20 +1317,21 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void download_info (string file, DownloadInfo i) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
 
         if (!check_connect ()) {
             return;
         }
 
         if (i.valid) {
-            PreparedSqlQuery query = this.query_manager.get (
+            PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
                 PreparedSqlQueryManager.Key.SET_DOWNLOAD_INFO_QUERY,
                 "INSERT OR REPLACE INTO downloadinfo "
                 + " (path, temporaryfile, etag, errorcount) "
                 + "VALUES ( ?1 , ?2, ?3, ?4 )",
-                this.database);
-            if (!query) {
+                this.database
+            );
+            if (query == null) {
                 return;
             }
             query.bind_value (1, file);
@@ -1286,7 +1340,9 @@ public class SyncJournalDb : GLib.Object {
             query.bind_value (4, i.error_count);
             query.exec ();
         } else {
-            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_DOWNLOAD_INFO_QUERY);
+            PreparedSqlQuery query = this.query_manager.get_for_key (
+                PreparedSqlQueryManager.Key.DELETE_DOWNLOAD_INFO_QUERY
+            );
             query.bind_value (1, file);
             query.exec ();
         }
@@ -1308,7 +1364,7 @@ public class SyncJournalDb : GLib.Object {
     ***********************************************************/
     public GLib.List<DownloadInfo> get_and_delete_stale_download_infos (GLib.List<string> keep) {
         GLib.List<SyncJournalDb.DownloadInfo> empty_result;
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
 
         if (!check_connect ()) {
             return empty_result;
@@ -1335,7 +1391,9 @@ public class SyncJournalDb : GLib.Object {
             }
         }
         {
-            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_DOWNLOAD_INFO_QUERY);
+            PreparedSqlQuery query = this.query_manager.get_for_key (
+                PreparedSqlQueryManager.Key.DELETE_DOWNLOAD_INFO_QUERY
+            );
             if (!delete_batch (*query, superfluous_paths, "downloadinfo")) {
                 return empty_result;
             }
@@ -1350,7 +1408,7 @@ public class SyncJournalDb : GLib.Object {
     public int on_signal_download_info_count () {
         int re = 0;
 
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
         if (check_connect ()) {
             SqlQuery query = new SqlQuery ("SELECT count (*) FROM downloadinfo", this.database);
 
@@ -1368,17 +1426,18 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public UploadInfo get_upload_info (string file) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
 
         UploadInfo upload_info;
 
         if (check_connect ()) {
-            PreparedSqlQuery query = this.query_manager.get (
+            PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
                 PreparedSqlQueryManager.Key.GET_UPLOAD_INFO_QUERY,
                 "SELECT chunk, transferid, errorcount, size, modtime, content_checksum FROM "
                 + "uploadinfo WHERE path=?1",
-                this.database);
-            if (!query) {
+                this.database
+            );
+            if (query == null) {
                 return upload_info;
             }
             query.bind_value (1, file);
@@ -1405,20 +1464,21 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void upload_info (string file, UploadInfo i) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
 
         if (!check_connect ()) {
             return;
         }
 
         if (i.valid) {
-            PreparedSqlQuery query = this.query_manager.get (
+            PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
                 PreparedSqlQueryManager.Key.SET_UPLOAD_INFO_QUERY,
                 "INSERT OR REPLACE INTO uploadinfo "
                 + " (path, chunk, transferid, errorcount, size, modtime, content_checksum) "
                 + "VALUES ( ?1 , ?2, ?3 , ?4 ,  ?5, ?6 , ?7 )",
-                this.database);
-            if (!query) {
+                this.database
+            );
+            if (query == null) {
                 return;
             }
 
@@ -1434,7 +1494,9 @@ public class SyncJournalDb : GLib.Object {
                 return;
             }
         } else {
-            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_UPLOAD_INFO_QUERY);
+            PreparedSqlQuery query = this.query_manager.get_for_key (
+                PreparedSqlQueryManager.Key.DELETE_UPLOAD_INFO_QUERY
+            );
             query.bind_value (1, file);
 
             if (!query.exec ()) {
@@ -1448,7 +1510,7 @@ public class SyncJournalDb : GLib.Object {
     Return the list of transfer ids that were removed.
     ***********************************************************/
     public GLib.List<uint32> delete_stale_upload_infos (GLib.List<string> keep) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
         GLib.List<uint32> ids;
 
         if (!check_connect ()) {
@@ -1472,7 +1534,9 @@ public class SyncJournalDb : GLib.Object {
             }
         }
 
-        PreparedSqlQuery delete_upload_info_query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_UPLOAD_INFO_QUERY);
+        PreparedSqlQuery delete_upload_info_query = this.query_manager.get_for_key (
+            PreparedSqlQueryManager.Key.DELETE_UPLOAD_INFO_QUERY
+        );
         delete_batch (*delete_upload_info_query, superfluous_paths, "uploadinfo");
         return ids;
     }
@@ -1481,28 +1545,28 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public SyncJournalErrorBlocklistRecord error_blocklist_entry_for_file (string file) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
-        SyncJournalErrorBlocklistRecord entry;
-
-        if (file == "")
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
+        SyncJournalErrorBlocklistRecord entry = new SyncJournalErrorBlocklistRecord ();
+        if (file == "") {
             return entry;
+        }
 
         if (check_connect ()) {
-            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_ERROR_BLOCKLIST_QUERY);
+            PreparedSqlQuery query = this.query_manager.get_for_key (
+                PreparedSqlQueryManager.Key.GET_ERROR_BLOCKLIST_QUERY
+            );
             query.bind_value (1, file);
-            if (query.exec ()) {
-                if (query.next ().has_data) {
-                    entry.last_try_etag = query.byte_array_value (0);
-                    entry.last_try_modtime = query.int64_value (1);
-                    entry.retry_count = query.int_value (2);
-                    entry.error_string = query.string_value (3);
-                    entry.last_try_time = query.int64_value (4);
-                    entry.ignore_duration = query.int64_value (5);
-                    entry.rename_target = query.string_value (6);
-                    entry.error_category = (SyncJournalErrorBlocklistRecord.Category)query.int_value (7);
-                    entry.request_id = query.byte_array_value (8);
-                    entry.file = file;
-                }
+            if (query.exec () && query.next ().has_data) {
+                entry.last_try_etag = query.byte_array_value (0);
+                entry.last_try_modtime = query.int64_value (1);
+                entry.retry_count = query.int_value (2);
+                entry.error_string = query.string_value (3);
+                entry.last_try_time = query.int64_value (4);
+                entry.ignore_duration = query.int64_value (5);
+                entry.rename_target = query.string_value (6);
+                entry.error_category = (SyncJournalErrorBlocklistRecord.Category)query.int_value (7);
+                entry.request_id = query.byte_array_value (8);
+                entry.file = file;
             }
         }
 
@@ -1513,7 +1577,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool delete_stale_error_blocklist_entries (GLib.List<string> keep) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
 
         if (!check_connect ()) {
             return false;
@@ -1545,10 +1609,10 @@ public class SyncJournalDb : GLib.Object {
     Delete flags table entries that have no metadata correspondent
     ***********************************************************/
     public void delete_stale_flags_entries () {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
-        if (!check_connect ())
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
+        if (!check_connect ()) {
             return;
-
+        }
         SqlQuery del_query = new SqlQuery ("DELETE FROM flags WHERE path != '' AND path NOT IN (SELECT path from metadata);", this.database);
         del_query.exec ();
     }
@@ -1562,7 +1626,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void avoid_renames_on_signal_next_sync (string path) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
 
         if (!check_connect ()) {
             return;
@@ -1582,7 +1646,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void poll_info (PollInfo poll_info) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
         if (!check_connect ()) {
             return;
         }
@@ -1606,14 +1670,12 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public GLib.List<PollInfo> get_poll_infos () {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
-
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
         GLib.List<SyncJournalDb.PollInfo> poll_info_list;
-
-        if (!check_connect ())
+        if (!check_connect ()) {
             return poll_info_list;
-
-        SqlQuery query = new SqlQuery ("SELECT path, modtime, filesize, pollpath FROM async_poll", this.database);
+        }
+        SqlQuery query = new SqlQuery.with_string ("SELECT path, modtime, filesize, pollpath FROM async_poll", this.database);
 
         if (!query.exec ()) {
             return poll_info_list;
@@ -1657,35 +1719,40 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     return the specified list from the database
     ***********************************************************/
-    public GLib.List<string> get_selective_sync_list (SelectiveSyncListType type, bool ok) {
-        GLib.List<string> result = new GLib.List<string> ()
-        //  ASSERT (ok);
+    public GLib.List<string> get_selective_sync_list (SelectiveSyncListType type, out bool ok) {
+        GLib.List<string> result = new GLib.List<string> ();
+        //  GLib.assert_true (ok);
 
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
         if (!check_connect ()) {
-            *ok = false;
+            ok = false;
             return result;
         }
 
-        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_SELECTIVE_SYNC_LIST_QUERY, "SELECT path FROM selectivesync WHERE type=?1", this.database);
-        if (!query) {
-            *ok = false;
+        PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
+            PreparedSqlQueryManager.Key.GET_SELECTIVE_SYNC_LIST_QUERY,
+            "SELECT path FROM selectivesync WHERE type=?1",
+            this.database
+        );
+        if (query == null) {
+            ok = false;
             return result;
         }
 
         query.bind_value (1, int (type));
         if (!query.exec ()) {
-            *ok = false;
+            ok = false;
             return result;
         }
         while (true) {
             var next = query.next ();
             if (!next.ok) {
-                *ok = false;
+                ok = false;
                 return result;
             }
-            if (!next.has_data)
+            if (!next.has_data) {
                 break;
+            }
 
             var entry = query.string_value (0);
             if (!entry.has_suffix ("/")) {
@@ -1693,7 +1760,7 @@ public class SyncJournalDb : GLib.Object {
             }
             result.append (entry);
         }
-        *ok = true;
+        ok = true;
 
         return result;
     }
@@ -1703,7 +1770,7 @@ public class SyncJournalDb : GLib.Object {
     Write the selective sync list (remove all other entries of that list
     ***********************************************************/
     public void selective_sync_list (SelectiveSyncListType type, GLib.List<string> list) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
         if (!check_connect ()) {
             return;
         }
@@ -1711,13 +1778,13 @@ public class SyncJournalDb : GLib.Object {
         start_transaction ();
 
         // first, delete all entries of this type
-        SqlQuery del_query = new SqlQuery ("DELETE FROM selectivesync WHERE type == ?1", this.database);
+        SqlQuery del_query = new SqlQuery.with_string ("DELETE FROM selectivesync WHERE type == ?1", this.database);
         del_query.bind_value (1, int (type));
         if (!del_query.exec ()) {
             GLib.warning ("SQL error when deleting selective sync list" + list.to_string () + del_query.error);
         }
 
-        SqlQuery ins_query = new SqlQuery ("INSERT INTO selectivesync VALUES (?1, ?2)", this.database);
+        SqlQuery ins_query = new SqlQuery.with_string ("INSERT INTO selectivesync VALUES (?1, ?2)", this.database);
         foreach (var path in list) {
             ins_query.reset_and_clear_bindings ();
             ins_query.bind_value (1, path);
@@ -1755,17 +1822,16 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void schedule_path_for_remote_discovery (string filename) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
 
         if (!check_connect ()) {
             return;
         }
-
         // Remove trailing slash
         var argument = filename;
-        if (argument.has_suffix ("/"))
+        if (argument.has_suffix ("/")) {
             argument.chop (1);
-
+        }
         SqlQuery query = new SqlQuery (this.database);
         // This query will match entries for which the path is a prefix of filename
         // Note: CSYNC_FTW_TYPE_DIR == 2
@@ -1795,7 +1861,7 @@ public class SyncJournalDb : GLib.Object {
     for all files.
     ***********************************************************/
     public void force_remote_discovery_next_sync () {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
 
         if (!check_connect ()) {
             return;
@@ -1811,7 +1877,7 @@ public class SyncJournalDb : GLib.Object {
     Commit will actually commit the transaction and create a new one.
     ***********************************************************/
     public void commit (string context, bool start_trans = true) {
-        GLib.MutexLocker lock = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
         commit_internal (context, start_trans);
     }
 
@@ -1819,7 +1885,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void commit_if_needed_and_start_new_transaction (string context) {
-        GLib.MutexLocker lock = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
         if (this.transaction == 1) {
             commit_internal (context, true);
         } else {
@@ -1837,7 +1903,7 @@ public class SyncJournalDb : GLib.Object {
     returns true if it could be openend or is currently opened.
     ***********************************************************/
     public bool open () {
-        GLib.MutexLocker lock = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
         return check_connect ();
     }
 
@@ -1847,7 +1913,7 @@ public class SyncJournalDb : GLib.Object {
     ***********************************************************/
     public bool is_open {
         public get {
-            GLib.MutexLocker lock = new GLib.MutexLocker (this.mutex);
+            GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
             return this.database.is_open;
         }
     }
@@ -1857,7 +1923,7 @@ public class SyncJournalDb : GLib.Object {
     Close the database
     ***********************************************************/
     public void close () {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
         GLib.info ("Closing DB" + this.database_file);
 
         commit_transaction ();
@@ -1872,14 +1938,18 @@ public class SyncJournalDb : GLib.Object {
     Returns the checksum type for an identifier.
     ***********************************************************/
     public string get_checksum_type (int checksum_type_id) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
         if (!check_connect ()) {
             return "";
         }
 
         // Retrieve the identifier
-        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_CHECKSUM_TYPE_QUERY, "SELECT name FROM checksumtype WHERE identifier=?1", this.database);
-        if (!query) {
+        PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
+            PreparedSqlQueryManager.Key.GET_CHECKSUM_TYPE_QUERY,
+            "SELECT name FROM checksumtype WHERE identifier=?1",
+            this.database
+        );
+        if (query == null) {
             return "";
         }
         query.bind_value (1, checksum_type_id);
@@ -1900,13 +1970,21 @@ public class SyncJournalDb : GLib.Object {
     ***********************************************************/
     string data_fingerprint {
         set {
-            GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+            GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
             if (!check_connect ()) {
                 return;
             }
 
-            PreparedSqlQuery data_fingerprint_query1 = this.query_manager.get (PreparedSqlQueryManager.Key.SET_DATA_FINGERPRINT_QUERY1, "DELETE FROM datafingerprint;", this.database);
-            PreparedSqlQuery data_fingerprint_query2 = this.query_manager.get (PreparedSqlQueryManager.Key.SET_DATA_FINGERPRINT_QUERY2, "INSERT INTO datafingerprint (fingerprint) VALUES (?1);", this.database);
+            PreparedSqlQuery data_fingerprint_query1 = this.query_manager.get_for_key_sql_and_database (
+                PreparedSqlQueryManager.Key.SET_DATA_FINGERPRINT_QUERY1,
+                "DELETE FROM datafingerprint;",
+                this.database
+            );
+            PreparedSqlQuery data_fingerprint_query2 = this.query_manager.get_for_key_sql_and_database (
+                PreparedSqlQueryManager.Key.SET_DATA_FINGERPRINT_QUERY2,
+                "INSERT INTO datafingerprint (fingerprint) VALUES (?1);",
+                this.database
+            );
             if (!data_fingerprint_query1 || !data_fingerprint_query2) {
                 return;
             }
@@ -1917,13 +1995,17 @@ public class SyncJournalDb : GLib.Object {
             data_fingerprint_query2.exec ();
         }
         get {
-            GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+            GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
             if (!check_connect ()) {
                 return "";
             }
 
-            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_DATA_FINGERPRINT_QUERY, "SELECT fingerprint FROM datafingerprint", this.database);
-            if (!query) {
+            PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
+                PreparedSqlQueryManager.Key.GET_DATA_FINGERPRINT_QUERY,
+                "SELECT fingerprint FROM datafingerprint",
+                this.database
+            );
+            if (query == null) {
                 return "";
             }
 
@@ -1947,23 +2029,24 @@ public class SyncJournalDb : GLib.Object {
     Store a new or updated record in the database
     ***********************************************************/
     public void store_conflict_record (ConflictRecord record) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
-        if (!check_connect ())
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
+        if (!check_connect ()) {
             return;
-
-        PreparedSqlQuery query = this.query_manager.get (
+        }
+        PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
             PreparedSqlQueryManager.Key.SET_CONFLICT_RECORD_QUERY,
             "INSERT OR REPLACE INTO conflicts "
             + " (path, base_file_id, base_modtime, base_etag, base_path) "
             + "VALUES (?1, ?2, ?3, ?4, ?5);",
-            this.database);
-        //  ASSERT (query)
+            this.database
+        );
+        //  GLib.assert_true (query)
         query.bind_value (1, record.path);
         query.bind_value (2, record.base_file_id);
         query.bind_value (3, record.base_modtime);
         query.bind_value (4, record.base_etag);
         query.bind_value (5, record.initial_base_path);
-        //  ASSERT (query.exec ())
+        //  GLib.assert_true (query.exec ())
     }
 
 
@@ -1973,17 +2056,21 @@ public class SyncJournalDb : GLib.Object {
     public ConflictRecord conflict_record_for_path (string path) {
         ConflictRecord entry;
 
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
         if (!check_connect ()) {
             return entry;
         }
-        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_CONFLICT_RECORD_QUERY, "SELECT base_file_id, base_modtime, base_etag, base_path FROM conflicts WHERE path=?1;", this.database);
-        //  ASSERT (query)
+        PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
+            PreparedSqlQueryManager.Key.GET_CONFLICT_RECORD_QUERY,
+            "SELECT base_file_id, base_modtime, base_etag, base_path FROM conflicts WHERE path=?1;",
+            this.database
+        );
+        //  GLib.assert_true (query)
         query.bind_value (1, path);
-        //  ASSERT (query.exec ())
-        if (!query.next ().has_data)
+        //  GLib.assert_true (query.exec ())
+        if (!query.next ().has_data) {
             return entry;
-
+        }
         entry.path = path;
         entry.base_file_id = query.byte_array_value (0);
         entry.base_modtime = query.int64_value (1);
@@ -1998,14 +2085,18 @@ public class SyncJournalDb : GLib.Object {
     conflict tag
     ***********************************************************/
     public void delete_conflict_record (string path) {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
-        if (!check_connect ())
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
+        if (!check_connect ()) {
             return;
-
-        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_CONFLICT_RECORD_QUERY, "DELETE FROM conflicts WHERE path=?1;", this.database);
-        //  ASSERT (query)
+        }
+        PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
+            PreparedSqlQueryManager.Key.DELETE_CONFLICT_RECORD_QUERY,
+            "DELETE FROM conflicts WHERE path=?1;",
+            this.database
+        );
+        //  GLib.assert_true (query)
         query.bind_value (1, path);
-        //  ASSERT (query.exec ())
+        //  GLib.assert_true (query.exec ())
     }
 
 
@@ -2013,14 +2104,14 @@ public class SyncJournalDb : GLib.Object {
     Return all paths of files with a conflict tag in the name and records in the database
     ***********************************************************/
     public GLib.List<string> conflict_record_paths () {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
         if (!check_connect ()) {
             return new GLib.List<string> ();
         }
 
         SqlQuery query = new SqlQuery (this.database);
         query.prepare ("SELECT path FROM conflicts");
-        //  ASSERT (query.exec ());
+        //  GLib.assert_true (query.exec ());
 
         GLib.List<string> paths = new GLib.List<string> ();
         while (query.next ().has_data)
@@ -2061,7 +2152,7 @@ public class SyncJournalDb : GLib.Object {
     it will be a conflict that will be automatically resolved if the file is the same.
     ***********************************************************/
     public void clear_file_table () {
-        GLib.MutexLocker lock = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
         SqlQuery query = new SqlQuery (this.database);
         query.prepare ("DELETE FROM metadata;");
         query.exec ();
@@ -2075,12 +2166,12 @@ public class SyncJournalDb : GLib.Object {
     The path "" marks everything.
     ***********************************************************/
     public void mark_virtual_file_for_download_recursively (string path) {
-        GLib.MutexLocker lock = new GLib.MutexLocker (this.mutex);
-        if (!check_connect ())
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
+        if (!check_connect ()) {
             return;
-
+        }
         static_assert (ItemType.VIRTUAL_FILE == 4 && ItemType.VIRTUAL_FILE_DOWNLOAD == 5, "");
-        SqlQuery query = new SqlQuery (
+        SqlQuery query = new SqlQuery.with_string (
             "UPDATE metadata SET type=5 WHERE "
             + " (" + is_prefix_path_of ("?1", "path") + " OR ?1 == '') "
             + "AND type=4;",
@@ -2120,7 +2211,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private int get_file_record_count () {
-        GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
+        GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
 
         SqlQuery query = new SqlQuery (this.database);
         query.prepare ("SELECT COUNT (*) FROM metadata");
@@ -2151,10 +2242,12 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private bool update_database_structure () {
-        if (!update_metadata_table_structure ())
+        if (!update_metadata_table_structure ()) {
             return false;
-        if (!update_error_blocklist_table_structure ())
+        }
+        if (!update_error_blocklist_table_structure ()) {
             return false;
+        }
         return true;
     }
 
@@ -2166,7 +2259,7 @@ public class SyncJournalDb : GLib.Object {
         if (!check_connect ()) {
             return columns;
         }
-        SqlQuery query = new SqlQuery ("PRAGMA table_info ('" + table + "');", this.database);
+        SqlQuery query = new SqlQuery.with_string ("PRAGMA table_info ('" + table + "');", this.database);
         if (!query.exec ()) {
             return columns;
         }
@@ -2418,7 +2511,7 @@ public class SyncJournalDb : GLib.Object {
         commit_transaction ();
         GLib.warning ("SQL Error" + log + query.error);
         //  this.database.close ();
-        //  ASSERT (false);
+        //  GLib.assert_true (false);
         return false;
     }
 
@@ -2502,8 +2595,9 @@ public class SyncJournalDb : GLib.Object {
 
         // Set locking mode to avoid issues with WAL on Windows
         string locking_mode_env = qgetenv ("OWNCLOUD_Sqlite.LOCKING_MODE");
-        if (locking_mode_env == "")
+        if (locking_mode_env == "") {
             locking_mode_env = "EXCLUSIVE";
+        }
         pragma1.prepare ("PRAGMA locking_mode=" + locking_mode_env + ";");
         if (!pragma1.exec ()) {
             return sql_fail ("Set PRAGMA locking_mode", pragma1);
@@ -2732,7 +2826,7 @@ public class SyncJournalDb : GLib.Object {
 
         bool force_remote_discovery = false;
 
-        SqlQuery version_query = new SqlQuery ("SELECT major, minor, patch FROM version;", this.database);
+        SqlQuery version_query = new SqlQuery.with_string ("SELECT major, minor, patch FROM version;", this.database);
         if (!version_query.next ().has_data) {
             force_remote_discovery = true;
 
@@ -2800,12 +2894,20 @@ public class SyncJournalDb : GLib.Object {
         if (force_remote_discovery) {
             force_remote_discovery_next_sync_locked ();
         }
-        PreparedSqlQuery delete_download_info = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_DOWNLOAD_INFO_QUERY, "DELETE FROM downloadinfo WHERE path=?1", this.database);
+        PreparedSqlQuery delete_download_info = this.query_manager.get_for_key_sql_and_database (
+            PreparedSqlQueryManager.Key.DELETE_DOWNLOAD_INFO_QUERY,
+            "DELETE FROM downloadinfo WHERE path=?1",
+            this.database
+        );
         if (!delete_download_info) {
             return sql_fail ("prepare this.delete_download_info_query", *delete_download_info);
         }
 
-        PreparedSqlQuery delete_upload_info_query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_UPLOAD_INFO_QUERY, "DELETE FROM uploadinfo WHERE path=?1", this.database);
+        PreparedSqlQuery delete_upload_info_query = this.query_manager.get_for_key_sql_and_database (
+            PreparedSqlQueryManager.Key.DELETE_UPLOAD_INFO_QUERY,
+            "DELETE FROM uploadinfo WHERE path=?1",
+            this.database
+        );
         if (!delete_upload_info_query) {
             return sql_fail ("prepare this.delete_upload_info_query", *delete_upload_info_query);
         }
@@ -2817,7 +2919,11 @@ public class SyncJournalDb : GLib.Object {
             // case insensitively
             sql_string += " COLLATE NOCASE";
         }
-        PreparedSqlQuery get_error_blocklist_query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_ERROR_BLOCKLIST_QUERY, sql_string, this.database);
+        PreparedSqlQuery get_error_blocklist_query = this.query_manager.get_for_key_sql_and_database (
+            PreparedSqlQueryManager.Key.GET_ERROR_BLOCKLIST_QUERY,
+            sql_string,
+            this.database
+        );
         if (!get_error_blocklist_query) {
             return sql_fail ("prepare this.get_error_blocklist_query", get_error_blocklist_query);
         }
@@ -2835,7 +2941,7 @@ public class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     Same as force_remote_discovery_next_sync but without
-    acquiring the lock
+    acquiring the mutex_locker
     ***********************************************************/
     private void force_remote_discovery_next_sync_locked () {
         GLib.info ("Forcing remote re-discovery by deleting folder Etags");
@@ -2855,14 +2961,18 @@ public class SyncJournalDb : GLib.Object {
             return 0;
         }
 
-        var it =  this.checksym_type_cache.find (checksum_type);
-        if (it != this.checksym_type_cache.end ())
+        var it = this.checksym_type_cache.find (checksum_type);
+        if (it != this.checksym_type_cache.end ()) {
             return it;
-
+        }
         // Ensure the checksum type is in the database
         {
-            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.INSERT_CHECKSUM_TYPE_QUERY, "INSERT OR IGNORE INTO checksumtype (name) VALUES (?1)", this.database);
-            if (!query) {
+            PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
+                PreparedSqlQueryManager.Key.INSERT_CHECKSUM_TYPE_QUERY,
+                "INSERT OR IGNORE INTO checksumtype (name) VALUES (?1)",
+                this.database
+            );
+            if (query == null) {
                 return 0;
             }
             query.bind_value (1, checksum_type);
@@ -2873,8 +2983,12 @@ public class SyncJournalDb : GLib.Object {
 
         // Retrieve the identifier
         {
-            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_CHECKSUM_TYPE_ID_QUERY, "SELECT identifier FROM checksumtype WHERE name=?1", this.database);
-            if (!query) {
+            PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
+                PreparedSqlQueryManager.Key.GET_CHECKSUM_TYPE_ID_QUERY,
+                "SELECT identifier FROM checksumtype WHERE name=?1",
+                this.database
+            );
+            if (query == null) {
                 return 0;
             }
             query.bind_value (1, checksum_type);
@@ -2900,7 +3014,7 @@ public class SyncJournalDb : GLib.Object {
     Note: "/" + 1 == '0'
     ***********************************************************/
     static string is_prefix_path_of (string prefix, string path) {
-        return " (" + path + " > (" + prefix + "||"/") AND " + path + " < (" + prefix + "||'0'))";
+        return " (" + path + " > (" + prefix + "||\"/\") AND " + path + " < (" + prefix + "||'0'))";
     }
 
     static string is_prefix_path_or_equal (string prefix, string path) {

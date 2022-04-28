@@ -23,7 +23,7 @@ public class SocketApiJobV2 : GLib.Object {
         this.command = command;
         this.job_id = arguments["identifier"].to_string ();
         this.arguments = arguments["arguments"].to_object ());
-        //  ASSERT (!this.job_id == "")
+        //  GLib.assert_true (!this.job_id == "")
     }
 
 

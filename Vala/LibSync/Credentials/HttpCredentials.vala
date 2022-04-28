@@ -137,7 +137,7 @@ public class HttpCredentials : AbstractCredentials {
         this.client_cert_password = client_cert_password;
         this.retry_on_signal_key_chain_error = false;
         if (!unpack_client_cert_bundle ()) {
-            //  ASSERT (false, "pkcs12 client cert bundle passed to HttpCredentials must be valid");
+            //  GLib.assert_true (false, "pkcs12 client cert bundle passed to HttpCredentials must be valid");
         }
     }
 
@@ -285,7 +285,7 @@ public class HttpCredentials : AbstractCredentials {
         qkeychain_delete_password_job.key (keychain_key);
         qkeychain_delete_password_job.start ();
 
-        // let GLib.NAM forget about the password
+        // let Soup.Session forget about the password
         // This needs to be done later in the event loop because we might be called (directly or
         // indirectly) from GLib.NetworkAccessManagerPrivate.signal_authentication_required, which itself
         // is a called from a BlockingQueuedConnection from the Qt HTTP thread. And clearing the

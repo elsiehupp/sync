@@ -21,7 +21,7 @@ public class SvgImageProvider : GLib.QuickImageProvider {
     /***********************************************************
     ***********************************************************/
     public Gtk.Image request_image (string identifier, Gdk.Rectangle size, Gdk.Rectangle requested_size) {
-        //  Q_ASSERT (!identifier == "");
+        //  GLib.assert_true (!identifier == "");
 
         var id_split = identifier.split ("/", GLib.SkipEmptyParts);
 

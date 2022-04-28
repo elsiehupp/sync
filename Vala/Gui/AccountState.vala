@@ -369,12 +369,14 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
     Asks for user credentials
     ***********************************************************/
     public void handle_invalid_credentials () {
-        if (is_signed_out || this.waiting_for_new_credentials)
+        if (is_signed_out || this.waiting_for_new_credentials) {
             return;
-
-        GLib.info ("Invalid credentials for " + this.account.url.to_string ()
-                               + " asking user.");
-
+        }
+        GLib.info (
+            "Invalid credentials for "
+            + this.account.url.to_string ()
+            + " asking user."
+        );
         this.waiting_for_new_credentials = true;
         this.state = State.ASKING_CREDENTIALS;
 
@@ -437,10 +439,10 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
 
             // Let's try this for all OS and see if it fixes the Qt issues we have on Linux  #4720 #3888 #4051
             //#ifdef Q_OS_WIN
-            // There seems to be a bug in Qt on Windows where GLib.NAM sometimes stops
+            // There seems to be a bug in Qt on Windows where Soup.Session sometimes stops
             // working correctly after the computer woke up from sleep. See #2895 #2899
             // and #2973.
-            // As an attempted workaround, reset the GLib.NAM regularly if the account is
+            // As an attempted workaround, reset the Soup.Session regularly if the account is
             // disconnected.
             account.reset_network_access_manager ();
 

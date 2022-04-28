@@ -121,8 +121,9 @@ int main (int argc, char **argv) {
         GLib.List<string> args = app.arguments ();
         if (args.size () > 1) {
             string message = args.join ("|");
-            if (!app.on_signal_send_message ("MSG_PARSEOPTIONS:" + message))
+            if (!app.on_signal_send_message ("MSG_PARSEOPTIONS:" + message)) {
                 return -1;
+            }
         } else if (!app.background_mode () && !app.on_signal_send_message ("MSG_SHOWMAINDIALOG")) {
             return -1;
         }

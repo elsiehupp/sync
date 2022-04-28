@@ -22,7 +22,7 @@ class TestTokenUrlHasRedirect : AbstractTestOAuth {
     /***********************************************************
     ***********************************************************/
     private override GLib.InputStream token_reply (Soup.Operation operation, Soup.Request request) {
-        //  ASSERT (browser_reply);
+        //  GLib.assert_true (browser_reply);
         // Kind of reproduces what we had in https://github.com/owncloud/enterprise/issues/2951 (not 1:1)
         if (redirects_done == 0) {
             GLib.OutputStream payload = new GLib.OutputStream ();

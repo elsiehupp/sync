@@ -53,9 +53,9 @@ public class QtLocalPeer : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool on_send_message (string message, int timeout, bool block) {
-        if (!is_client ())
+        if (!is_client ()) {
             return false;
-
+        }
         GLib.LocalSocket socket;
         bool conn_ok = false;
         for (int i = 0; i < 2; i++) {
@@ -81,8 +81,9 @@ public class QtLocalPeer : GLib.Object {
         bool res = socket.wait_for_bytes_written (timeout);
         res &= socket.wait_for_ready_read (timeout); // wait for ACK
         res &= (socket.read (ACK.length) == ACK);
-        if (block) // block until peer disconnects
+        if (block) { // block until peer disconnects
             socket.wait_for_disconnected (-1);
+        }
         return res;
     }
 
@@ -117,8 +118,9 @@ public class QtLocalPeer : GLib.Object {
 
         // Why doesn't Qt have a blocking stream that takes care of this shait???
         while (socket.bytes_available () < (int)sizeof (uint32)) {
-            if (!socket.is_valid) // stale request
+            if (!socket.is_valid) { // stale request
                 return;
+            }
             socket.wait_for_ready_read (1000);
         }
         GLib.DataStream ds = new GLib.DataStream (socket);

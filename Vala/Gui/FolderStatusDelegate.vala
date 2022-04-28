@@ -189,8 +189,9 @@ public class FolderStatusDelegate : GLib.StyledItemDelegate {
         Gtk.Palette.ColorGroup cg = option.state & GLib.Style.State_Enabled
             ? Gtk.Palette.Normal
             : Gtk.Palette.Disabled;
-        if (cg == Gtk.Palette.Normal && ! (option.state & GLib.Style.State_Active))
+        if (cg == Gtk.Palette.Normal && ! (option.state & GLib.Style.State_Active)) {
             cg = Gtk.Palette.Inactive;
+        }
 
         if (option.state & GLib.Style.State_Selected) {
             painter.pen (palette.color (cg, Gtk.Palette.HighlightedText));
@@ -219,11 +220,12 @@ public class FolderStatusDelegate : GLib.StyledItemDelegate {
 
         if (!conflict_texts == "")
             draw_text_box (conflict_texts, Gdk.RGBA (0xba, 0xba, 0x4d));
-        if (!error_texts == "")
+        if (!error_texts == "") {
             draw_text_box (error_texts, Gdk.RGBA (0xbb, 0x4d, 0x4d));
-        if (!info_texts == "")
+        }
+        if (!info_texts == "") {
             draw_text_box (info_texts, Gdk.RGBA (0x4d, 0x4d, 0xba));
-
+        }
         // Sync File Progress Bar: Show it if sync_file is not empty.
         if (show_progess) {
             int filename_text_height = sub_font_metrics.bounding_rect (_("File")).height ();

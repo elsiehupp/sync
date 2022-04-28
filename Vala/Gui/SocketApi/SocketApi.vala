@@ -135,7 +135,7 @@ public class SocketApi : GLib.Object {
         GLib.debug ("dtor");
         this.local_server.close ();
         // All remaining sockets will be destroyed with this.local_server, their parent
-        //  ASSERT (this.listeners == "" || this.listeners.nth_data (0).socket.parent () == this.local_server)
+        //  GLib.assert_true (this.listeners == "" || this.listeners.nth_data (0).socket.parent () == this.local_server)
         this.listeners = null;
     }
 
@@ -219,7 +219,7 @@ public class SocketApi : GLib.Object {
             system_path,
             file_status.to_socket_api_string ()
         );
-        //  Q_ASSERT (!system_path.has_suffix ("/"));
+        //  GLib.assert_true (!system_path.has_suffix ("/"));
         uint32 directory_hash = q_hash (system_path.left (system_path.last_index_of ("/")));
         foreach (var listener in this.listeners) {
             listener.send_message_if_directory_monitored (message, directory_hash);
@@ -272,7 +272,7 @@ public class SocketApi : GLib.Object {
         socket.destroyed.connect (
             this.on_signal_socket_destroyed
         );
-        //  ASSERT (socket.read_all () == "");
+        //  GLib.assert_true (socket.read_all () == "");
 
         unowned var listener = SocketListener.create (socket);
         this.listeners.insert (socket, listener);
@@ -293,7 +293,7 @@ public class SocketApi : GLib.Object {
         sender ().delete_later ();
 
         var socket = (GLib.IODevice) sender ();
-        //  ASSERT (socket);
+        //  GLib.assert_true (socket);
         this.listeners.remove (socket);
     }
 
@@ -310,7 +310,7 @@ public class SocketApi : GLib.Object {
     ***********************************************************/
     private void on_signal_read_socket () {
         var socket = (GLib.IODevice)sender ();
-        //  ASSERT (socket);
+        //  GLib.assert_true (socket);
 
         // Find the SocketListener
         //
@@ -373,7 +373,7 @@ public class SocketApi : GLib.Object {
             } else {
                 if (index_of_method (command) != -1) {
                     // to ensure that listener is still valid we need to call it with GLib.Direct_connection
-                    //  ASSERT (thread () == GLib.Thread.current_thread ())
+                    //  GLib.assert_true (thread () == GLib.Thread.current_thread ())
                     static_meta_object.method (index_of_method (command))
                         .invoke (this, GLib.Direct_connection, Q_ARG (string, argument.to_string ()),
                             Q_ARG (SocketListener, listener));
@@ -392,12 +392,12 @@ public class SocketApi : GLib.Object {
         } else {
             function_with_arguments += command + " (string,SocketListener*)";
         }
-        //  Q_ASSERT (static_qt_meta_object.normalized_signature (function_with_arguments) == function_with_arguments);
+        //  GLib.assert_true (static_qt_meta_object.normalized_signature (function_with_arguments) == function_with_arguments);
         var output = static_meta_object.index_of_method (function_with_arguments);
         if (output == -1) {
             listener.send_error ("Function %1 not found".printf (string.from_utf8 (function_with_arguments)));
         }
-        //  ASSERT (output != -1)
+        //  GLib.assert_true (output != -1)
         return output;
     }
 
@@ -1552,7 +1552,7 @@ public class SocketApi : GLib.Object {
             GLib.debug ("query_string contains >");
 
             var sub_queries = query_string.split (">", string.SkipEmptyParts);
-            //  Q_ASSERT (sub_queries.length == 2);
+            //  GLib.assert_true (sub_queries.length == 2);
 
             var parent_query_string = sub_queries[0].trimmed ();
             GLib.debug ("Find parent: " + parent_query_string);
@@ -1608,7 +1608,7 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private static string remove_trailing_slash (string path) {
-        //  Q_ASSERT (path.has_suffix ("/"));
+        //  GLib.assert_true (path.has_suffix ("/"));
         path.truncate (path.length - 1);
         return path;
     }

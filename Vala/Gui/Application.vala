@@ -184,12 +184,10 @@ public class Application : GLib.Application {
         //    organization_name (APPLICATION_VENDOR);
         organization_domain (APPLICATION_REV_DOMAIN);
 
-        // desktop_filename to provide wayland compatibility (in general : conformance with naming standards)
+        // desktop_filename to provide wayland compatibility (in general: conformance with naming standards)
         // but only on Qt >= 5.7, where desktop_filename was introduced
-    //  #if (GLib.T_VERSION >= 0x050700)
         string desktop_filename = Common.Config.LINUX_APPLICATION_ID + ".desktop";
         desktop_filename (desktop_filename);
-    //  #endif
 
         application_name (this.theme.app_name);
         window_icon (this.theme.application_icon);
@@ -197,11 +195,6 @@ public class Application : GLib.Application {
         if (!ConfigFile ().exists ()) {
             // Migrate from version <= 2.4
             application_name (this.theme.app_name_gui);
-    //  #ifndef GLib.T_WARNING_DISABLE_DEPRECATED // Was added in Qt 5.9
-        //  const int GLib.T_WARNING_DISABLE_DEPRECATED = GLib.T_WARNING_DISABLE_GCC ("-Wdeprecated-declarations")
-    //  #endif
-            //  GLib.T_WARNING_PUSH
-            //  GLib.T_WARNING_DISABLE_DEPRECATED
             // We need to use the deprecated GLib.DesktopServices.storage_location because of its Qt4
             // behavior of adding "data" to the path
             string old_dir = GLib.DesktopServices.storage_location (GLib.DesktopServices.DataLocation);
@@ -238,17 +231,16 @@ public class Application : GLib.Application {
 
         parse_options (arguments ());
         //no need to waste time;
-        if (this.help_only || this.version_only)
+        if (this.help_only || this.version_only) {
             return;
-
+        }
         if (this.quit_instance) {
             GLib.Timeout.single_shot (0, GLib.Application, GLib.Application.quit);
             return;
         }
-
-        if (is_running ())
+        if (is_running ()) {
             return;
-
+        }
     //  #if defined (WITH_CRASHREPORTER)
         if (ConfigFile ().crash_reporter ()) {
             var reporter = CRASHREPORTER_EXECUTABLE;
@@ -265,17 +257,19 @@ public class Application : GLib.Application {
 
         ConfigFile config;
         // The timeout is initialized with an environment variable, if not, override with the value from the config
-        if (!AbstractNetworkJob.http_timeout)
+        if (!AbstractNetworkJob.http_timeout) {
             AbstractNetworkJob.http_timeout = config.timeout ();
-
+        }
         // Check vfs plugins
         if (Theme.show_virtual_files_option && this.best_available_vfs_mode == AbstractVfs.Off) {
             GLib.warning ("Theme wants to show vfs mode, but no vfs plugins are available.");
         }
-        if (is_vfs_plugin_available (AbstractVfs.WindowsCfApi))
+        if (is_vfs_plugin_available (AbstractVfs.WindowsCfApi)) {
             GLib.info ("VFS windows plugin is available");
-        if (is_vfs_plugin_available (AbstractVfs.WithSuffix))
+        }
+        if (is_vfs_plugin_available (AbstractVfs.WithSuffix)) {
             GLib.info ("VFS suffix plugin is available");
+        }
 
         this.folder_manager.on_signal_reset (new FolderManager ());
 
@@ -632,11 +626,10 @@ public class Application : GLib.Application {
     protected void setup_translations () {
         GLib.List<string> ui_languages;
         ui_languages = GLib.Locale.system ().ui_languages ();
-
         string enforced_locale = Theme.enforced_locale;
-        if (!enforced_locale == "")
+        if (!enforced_locale == "") {
             ui_languages.prepend (enforced_locale);
-
+        }
         var translator = new GLib.Translator (this);
         var qt_translator = new GLib.Translator (this);
         var qtkeychain_translator = new GLib.Translator (this);
@@ -668,16 +661,20 @@ public class Application : GLib.Application {
                 if (!qtkeychain_translator.on_signal_load (qtkeychain_tr_file, qt_tr_path)) {
                     qtkeychain_translator.on_signal_load (qtkeychain_tr_file, tr_path);
                 }
-                if (!translator == "")
+                if (!translator == "") {
                     install_translator (translator);
-                if (!qt_translator == "")
+                }
+                if (!qt_translator == "") {
                     install_translator (qt_translator);
-                if (!qtkeychain_translator == "")
+                }
+                if (!qtkeychain_translator == "") {
                     install_translator (qtkeychain_translator);
+                }
                 break;
             }
-            if (property ("ui_lang") == null)
+            if (property ("ui_lang") == null) {
                 property ("ui_lang", "C");
+            }
         }
     }
 
@@ -894,9 +891,9 @@ public class Application : GLib.Application {
         // or if we're ignoring something and the client version changed.
         bool warning_message = delete_keys != null || (ignore_keys != null && version_changed);
 
-        if (!version_changed && !warning_message)
+        if (!version_changed && !warning_message) {
             return true;
-
+        }
         var backup_file = config_file.create_backup ();
 
         if (warning_message) {

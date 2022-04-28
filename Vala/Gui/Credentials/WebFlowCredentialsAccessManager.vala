@@ -11,7 +11,7 @@ public class WebFlowCredentialsAccessManager : LibSync.Soup.ClientContext {
 
     /***********************************************************
     The credentials object dies along with the account, while
-    the GLib.NAM might outlive both.
+    the Soup.Session might outlive both.
     ***********************************************************/
     private WebFlowCredentials credentials { private get; construct; }
 

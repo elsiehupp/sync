@@ -17,13 +17,13 @@ public class Result<T> : GLib.Object {
 
     T result {
         public get {
-            //  ASSERT (!this.is_error)
+            //  GLib.assert_true (!this.is_error)
             return this.result;
         }
     }
     Error error {
         public get {
-            //  ASSERT (this.is_error);
+            //  GLib.assert_true (this.is_error);
             return this.error;
         }
     }
@@ -129,7 +129,7 @@ public class Result<T> : GLib.Object {
     /***********************************************************
     ***********************************************************/
     //  public const T operator* () & {
-    //      //  ASSERT (!this.is_error);
+    //      //  GLib.assert_true (!this.is_error);
     //      return this.result;
     //  }
 
@@ -137,7 +137,7 @@ public class Result<T> : GLib.Object {
     /***********************************************************
     ***********************************************************/
     //  public T operator* () && {
-    //      //  ASSERT (!this.is_error);
+    //      //  GLib.assert_true (!this.is_error);
     //      return std.move (this.result);
     //  }
 
@@ -145,14 +145,14 @@ public class Result<T> : GLib.Object {
     /***********************************************************
     ***********************************************************/
     //  public const T *operator-> () {
-    //      //  ASSERT (!this.is_error);
+    //      //  GLib.assert_true (!this.is_error);
     //      return this.result;
     //  }
 
     /***********************************************************
     ***********************************************************/
     //  public Error error () && {
-    //      //  ASSERT (this.is_error);
+    //      //  GLib.assert_true (this.is_error);
     //      return std.move (this.error);
     //  }
 

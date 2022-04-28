@@ -310,7 +310,7 @@ public class ShareDialog : Gtk.Dialog {
     ***********************************************************/
     private void on_signal_create_password_for_link_share (string password) {
         var share_link_widget = (ShareLinkWidget)sender ();
-        //  Q_ASSERT (share_link_widget);
+        //  GLib.assert_true (share_link_widget);
         if (share_link_widget) {
             this.share_manager.signal_link_share_requires_password.connect (
                 share_link_widget.on_signal_create_share_requires_password
@@ -329,7 +329,7 @@ public class ShareDialog : Gtk.Dialog {
     ***********************************************************/
     private void on_signal_create_password_for_link_share_processed () {
         var share_link_widget = (ShareLinkWidget)sender ();
-        //  Q_ASSERT (share_link_widget);
+        //  GLib.assert_true (share_link_widget);
         if (share_link_widget) {
             this.share_manager.signal_link_share_requires_password.disconnect (
                 share_link_widget.on_signal_create_share_requires_password

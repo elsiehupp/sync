@@ -169,8 +169,9 @@ public class IgnoreListTableWidget : Gtk.Widget {
     ***********************************************************/
     private void on_signal_remove_current_item () {
         instance.table_widget.remove_row (instance.table_widget.current_row ());
-        if (instance.table_widget.row_count () == read_only_rows)
+        if (instance.table_widget.row_count () == read_only_rows) {
             instance.remove_all_push_button.enabled (false);
+        }
     }
 
 
@@ -178,12 +179,18 @@ public class IgnoreListTableWidget : Gtk.Widget {
     ***********************************************************/
     private void on_signal_add_pattern () {
         bool ok_clicked = false;
-        string pattern = GLib.InputDialog.text (this, _("Add Ignore Pattern"),
+        string pattern = GLib.InputDialog.text (
+            this,
+            _("Add Ignore Pattern"),
             _("Add a new ignore pattern:"),
-            GLib.LineEdit.Normal, "", ok_clicked);
+            GLib.LineEdit.Normal,
+            "",
+            ok_clicked
+        );
 
-        if (!ok_clicked || pattern == "")
+        if (!ok_clicked || pattern == "") {
             return;
+        }
 
         add_pattern (pattern, false, false);
         instance.table_widget.scroll_to_bottom ();

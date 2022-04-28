@@ -54,7 +54,7 @@ public class LscolXMLParser : GLib.Object {
             // Start elements with DAV:
             if (type == GLib.XmlStreamReader.StartElement && reader.namespace_uri () == "DAV:") {
                 if (name == "href") {
-                    // We don't use URL encoding in our request URL (which is the expected path) (GLib.NAM will do it for us)
+                    // We don't use URL encoding in our request URL (which is the expected path) (Soup.Session will do it for us)
                     // but the result will have URL encoding..
                     string href_string = GLib.Uri.from_local_file (GLib.Uri.from_percent_encoding (reader.read_element_text ().to_utf8 ()))
                             .adjusted (GLib.Uri.NormalizePathSegments)

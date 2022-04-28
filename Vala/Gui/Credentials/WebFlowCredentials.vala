@@ -85,7 +85,7 @@ public class WebFlowCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     public override Soup.Context create_access_manager () {
-        GLib.info ("Getting GLib.NAM");
+        GLib.info ("Getting Soup.Session");
         Soup.ClientContext soup_context = new WebFlowCredentialsAccessManager (this);
 
         soup_context.signal_authentication_required.connect (
@@ -163,7 +163,7 @@ public class WebFlowCredentials : AbstractCredentials {
         // clear the session cookie.
         this.account.clear_cookie_jar ();
 
-        // let GLib.NAM forget about the password
+        // let Soup.Session forget about the password
         // This needs to be done later in the event loop because we might be called (directly or
         // indirectly) from GLib.NetworkAccessManagerPrivate.signal_authentication_required, which itself
         // is a called from a BlockingQueuedConnection from the Qt HTTP thread. And clearing the

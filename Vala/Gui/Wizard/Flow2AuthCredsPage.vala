@@ -58,7 +58,7 @@ public class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
     public AbstractCredentials credentials  {
         public get {
             OwncloudWizard oc_wizard = (OwncloudWizard) wizard ();
-            //  Q_ASSERT (oc_wizard);
+            //  GLib.assert_true (oc_wizard);
             return new WebFlowCredentials (
                         this.user,
                         this.app_password,
@@ -74,7 +74,7 @@ public class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
     ***********************************************************/
     public void initialize_page () {
         var oc_wizard = (OwncloudWizard)wizard ();
-        //  Q_ASSERT (oc_wizard);
+        //  GLib.assert_true (oc_wizard);
         oc_wizard.account.credentials (CredentialsFactory.create ("http"));
 
         if (this.flow_2_auth_widget)
@@ -114,7 +114,7 @@ public class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
     ***********************************************************/
     public void connected () {
         var oc_wizard = (OwncloudWizard)wizard ();
-        //  Q_ASSERT (oc_wizard);
+        //  GLib.assert_true (oc_wizard);
 
         // bring wizard to top
         oc_wizard.bring_to_top ();
@@ -154,7 +154,7 @@ public class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
                 this.user = user;
                 this.app_password = app_password;
                 var oc_wizard = (OwncloudWizard)wizard ();
-                //  Q_ASSERT (oc_wizard);
+                //  GLib.assert_true (oc_wizard);
 
                 /* emit */ connect_to_oc_url (oc_wizard.account.url.to_string ());
                 break;

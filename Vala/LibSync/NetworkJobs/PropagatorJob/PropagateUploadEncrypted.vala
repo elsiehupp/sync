@@ -130,7 +130,7 @@ public class PropagateUploadEncrypted : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void unlock_folder () {
-        //  ASSERT (!this.is_unlock_running);
+        //  GLib.assert_true (!this.is_unlock_running);
 
         if (this.is_unlock_running) {
             GLib.warning ("Double-call to unlock_folder.");

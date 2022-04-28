@@ -72,7 +72,7 @@ public class PropagateRemoteMove : AbstractPropagateItemJob {
 
         var vfs = this.propagator.sync_options.vfs;
         var itype = this.item.type;
-        //  ASSERT (itype != ItemType.VIRTUAL_FILE_DOWNLOAD && itype != ItemType.VIRTUAL_FILE_DEHYDRATION);
+        //  GLib.assert_true (itype != ItemType.VIRTUAL_FILE_DOWNLOAD && itype != ItemType.VIRTUAL_FILE_DEHYDRATION);
         if (vfs.mode () == AbstractVfs.WithSuffix && itype != ItemType.DIRECTORY) {
             var suffix = vfs.file_suffix ();
             bool source_had_suffix = remote_source.has_suffix (suffix);
@@ -96,13 +96,13 @@ public class PropagateRemoteMove : AbstractPropagateItemJob {
             // name.
             string folder_target_alt = folder_target;
             if (itype == ItemType.FILE) {
-                //  ASSERT (!source_had_suffix && !destination_had_suffix);
+                //  GLib.assert_true (!source_had_suffix && !destination_had_suffix);
 
                 // If foo . bar.owncloud, the rename target will be "bar"
                 folder_target_alt = folder_target + suffix;
 
             } else if (itype == ItemType.VIRTUAL_FILE) {
-                //  ASSERT (source_had_suffix && destination_had_suffix);
+                //  GLib.assert_true (source_had_suffix && destination_had_suffix);
 
                 // If foo.owncloud . bar, the rename target will be "bar.owncloud"
                 folder_target_alt.chop (suffix.size ());
@@ -169,8 +169,8 @@ public class PropagateRemoteMove : AbstractPropagateItemJob {
             return false;
 
         bool changed = false;
-        //  ASSERT (!from_.has_suffix ("/"));
-        //  ASSERT (!to_.has_suffix ("/"));
+        //  GLib.assert_true (!from_.has_suffix ("/"));
+        //  GLib.assert_true (!to_.has_suffix ("/"));
         string from = from_ + "/";
         string to = to_ + "/";
 
@@ -193,7 +193,7 @@ public class PropagateRemoteMove : AbstractPropagateItemJob {
     private void on_signal_move_job_finished () {
         this.propagator.active_job_list.remove_one (this);
 
-        //  ASSERT (this.move_job);
+        //  GLib.assert_true (this.move_job);
 
         GLib.InputStream.NetworkError err = this.move_job.input_stream.error;
         this.item.http_error_code = this.move_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();

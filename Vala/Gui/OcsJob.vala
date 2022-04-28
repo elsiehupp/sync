@@ -223,8 +223,9 @@ public class OcsJob : AbstractNetworkJob {
 
         } else {
             // save new ETag value
-            if (this.reply.raw_header_list ().contains ("ETag"))
+            if (this.reply.raw_header_list ().contains ("ETag")) {
                 /* emit */ etag_response_header_received (this.reply.raw_header ("ETag"), status_code);
+            }
 
             /* emit */ signal_job_finished (json, status_code);
         }

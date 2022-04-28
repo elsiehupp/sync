@@ -157,7 +157,7 @@ public class OwncloudSetupWizard : GLib.Object {
             ClientProxy.lookup_system_proxy_async (account.url,
                 this, SLOT (on_signal_system_proxy_lookup_done (Soup.NetworkProxy)));
         } else {
-            // We want to reset the GLib.NAM proxy so that the global proxy settings are used (via ClientProxy settings)
+            // We want to reset the Soup.Session proxy so that the global proxy settings are used (via ClientProxy settings)
             account.network_access_manager.proxy (Soup.NetworkProxy (Soup.NetworkProxy.DefaultProxy));
             // use a queued invocation so we're as asynchronous as with the other code path
             GLib.Object.invoke_method (this, "on_signal_find_server", GLib.QueuedConnection);
@@ -543,14 +543,14 @@ public class OwncloudSetupWizard : GLib.Object {
                 if (this.oc_wizard.use_virtual_file_sync ()) {
                     folder_definition.virtual_files_mode = this.best_available_vfs_mode;
                 }
-                if (folder_man.navigation_pane_helper.show_in_explorer_navigation_pane)
+                if (folder_man.navigation_pane_helper.show_in_explorer_navigation_pane) {
                     folder_definition.navigation_pane_clsid = GLib.Uuid.create_uuid ();
-
+                }
                 var f = folder_man.add_folder (account, folder_definition);
                 if (f) {
-                    if (folder_definition.virtual_files_mode != AbstractVfs.Off && this.oc_wizard.use_virtual_file_sync ())
+                    if (folder_definition.virtual_files_mode != AbstractVfs.Off && this.oc_wizard.use_virtual_file_sync ()) {
                         f.root_pin_state (Common.ItemAvailability.ONLINE_ONLY);
-
+                    }
                     f.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
                         this.oc_wizard.selective_sync_blocklist ());
                     if (!this.oc_wizard.is_confirm_big_folder_checked ()) {
@@ -588,7 +588,7 @@ public class OwncloudSetupWizard : GLib.Object {
     ***********************************************************/
     private void on_signal_system_proxy_lookup_done (Soup.NetworkProxy proxy) {
         if (proxy.type () != Soup.NetworkProxy.NoProxy) {
-            GLib.info ("Setting GLib.NAM proxy to be system proxy " + ClientProxy.print_q_network_proxy (proxy));
+            GLib.info ("Setting Soup.Session proxy to be system proxy " + ClientProxy.print_q_network_proxy (proxy));
         } else {
             GLib.info ("No system proxy set by OS.");
         }

@@ -75,8 +75,8 @@ public abstract class AbstractTestOAuth : GLib.Object {
 
 
     protected GLib.InputStream oauth_test_case_override (Soup.Operation operation, Soup.Request request, GLib.OutputStream device) {
-        //  ASSERT (device);
-        //  ASSERT (device.bytes_available ()>0); // OAuth2 always sends around POST data.
+        //  GLib.assert_true (device);
+        //  GLib.assert_true (device.bytes_available ()>0); // OAuth2 always sends around POST data.
         return this.token_reply (operation, request);
     }
 
@@ -122,11 +122,11 @@ public abstract class AbstractTestOAuth : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected virtual GLib.OutputStream token_reply (Soup.Operation operation, Soup.Request request) {
-        //  ASSERT (state == AbstractTestOAuth.State.BROWSER_OPENED);
+        //  GLib.assert_true (state == AbstractTestOAuth.State.BROWSER_OPENED);
         state = AbstractTestOAuth.State.TOKEN_ASKED;
-        //  ASSERT (operation == Soup.PostOperation);
-        //  ASSERT (request.url.to_string ().has_prefix (s_oauth_test_server.to_string ()));
-        //  ASSERT (request.url.path == s_oauth_test_server.path + "/index.php/apps/oauth2/api/v1/token");
+        //  GLib.assert_true (operation == Soup.PostOperation);
+        //  GLib.assert_true (request.url.to_string ().has_prefix (s_oauth_test_server.to_string ()));
+        //  GLib.assert_true (request.url.path == s_oauth_test_server.path + "/index.php/apps/oauth2/api/v1/token");
         GLib.OutputStream payload = new GLib.OutputStream ();
         payload.set_data (token_reply_payload ());
         return new FakePostReply (operation, request, std.move (payload), fake_soup_context);

@@ -152,7 +152,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     /***********************************************************
     ***********************************************************/
     private void start_new_upload () {
-        //  ASSERT (this.propagator.active_job_list.count (this) == 1);
+        //  GLib.assert_true (this.propagator.active_job_list.count (this) == 1);
         GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
             GLib.warning ("Invalid modified time" + this.item.file.to_string () + this.item.modtime.to_string ());
@@ -392,7 +392,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     ***********************************************************/
     private void on_signal_delete_job_finished () {
         var delete_job = (KeychainChunkDeleteJob)sender ();
-        //  ASSERT (delete_job);
+        //  GLib.assert_true (delete_job);
         this.jobs.remove (this.jobs.index_of (delete_job));
 
         GLib.InputStream.NetworkError err = delete_job.input_stream.error;
@@ -444,7 +444,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     ***********************************************************/
     private void on_signal_put_file_job_finished () {
         var put_file_job = (PUTFileJob)sender ();
-        //  ASSERT (put_file_job);
+        //  GLib.assert_true (put_file_job);
 
         on_signal_network_job_destroyed (put_file_job); // remove it from the this.jobs list
 

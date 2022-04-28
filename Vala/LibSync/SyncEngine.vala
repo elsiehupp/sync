@@ -263,7 +263,7 @@ public class SyncEngine : GLib.Object {
         q_register_meta_type<SyncFileItem.Direction> ("SyncFileItem.Direction");
 
         // Everything in the SyncEngine expects a trailing slash for the local_path.
-        //  ASSERT (local_path.has_suffix ("/"));
+        //  GLib.assert_true (local_path.has_suffix ("/"));
 
         this.excluded_files.reset (new ExcludedFiles (local_path));
 
@@ -318,7 +318,7 @@ public class SyncEngine : GLib.Object {
         }
 
         if (is_any_sync_running || this.sync_running) {
-            //  ASSERT (false)
+            //  GLib.assert_true (false)
             return;
         }
 
@@ -1365,7 +1365,7 @@ public class SyncEngine : GLib.Object {
         // This happens when the conflicts table is new or when conflict files
         // are downlaoded but the server doesn't send conflict headers.
         foreach (var path in q_as_const (this.seen_conflict_files)) {
-            //  ASSERT (Common.Utility.is_conflict_file (path));
+            //  GLib.assert_true (Common.Utility.is_conflict_file (path));
 
             var bapath = path.to_utf8 ();
             if (!conflict_record_paths.contains (bapath)) {

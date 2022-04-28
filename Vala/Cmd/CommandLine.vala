@@ -314,11 +314,10 @@ public class CommandLine : GLib.Application {
                 // http : //192.168.178.23 : 8080
                 //  0            1            2
                 host = p_list[1];
-                if (host.has_prefix ("//"))
+                if (host.has_prefix ("//")) {
                     host.remove (0, 2);
-
+                }
                 port = p_list[2].to_int (&ok);
-
                 Soup.NetworkProxyFactory.use_system_configuration (false);
                 Soup.NetworkProxy.application_proxy (Soup.NetworkProxy (Soup.NetworkProxy.HttpProxy, host, port));
             } else {

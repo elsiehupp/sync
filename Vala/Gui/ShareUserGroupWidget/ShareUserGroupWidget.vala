@@ -262,7 +262,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
                 this.instance.main_owner_label.text ("SharedFlag.SHARED with you by " += share.owner_display_name ());
             }
 
-            //  Q_ASSERT (Share.is_share_type_user_group_email_room_or_remote (share.share_type));
+            //  GLib.assert_true (Share.is_share_type_user_group_email_room_or_remote (share.share_type));
             var user_group_share = (UserGroupShare)share;
             var share_user_line = new ShareUserLine (this.account, user_group_share, this.max_sharing_permissions, this.is_file, this.parent_scroll_area);
             share_user_line.resize_requested.connect (

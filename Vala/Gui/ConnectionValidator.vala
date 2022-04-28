@@ -161,7 +161,7 @@ public class ConnectionValidator : GLib.Object {
             ClientProxy.lookup_system_proxy_async (this.account.url,
                 this, SLOT (on_signal_system_proxy_lookup_done (Soup.NetworkProxy)));
         } else {
-            // We want to reset the GLib.NAM proxy so that the global proxy settings are used (via ClientProxy settings)
+            // We want to reset the Soup.Session proxy so that the global proxy settings are used (via ClientProxy settings)
             this.account.network_access_manager.proxy (Soup.NetworkProxy (Soup.NetworkProxy.DefaultProxy));
             // use a queued invocation so we're as asynchronous as with the other code path
             GLib.Object.invoke_method (this, "on_signal_actual_check", GLib.QueuedConnection);
@@ -178,7 +178,7 @@ public class ConnectionValidator : GLib.Object {
         }
 
         if (proxy.type () != Soup.NetworkProxy.NoProxy) {
-            GLib.info ("Setting GLib.NAM proxy to be system proxy " + ClientProxy.print_q_network_proxy (proxy));
+            GLib.info ("Setting Soup.Session proxy to be system proxy " + ClientProxy.print_q_network_proxy (proxy));
         } else {
             GLib.info ("No system proxy set by OS.");
         }

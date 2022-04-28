@@ -57,8 +57,9 @@ public class SingleApplication : GLib.Application {
             // Find the first instance that it still running
             // The whole list needs to be iterated in order to append to it
             for (; *pids; ++pids) {
-                if (first_peer == -1 && is_running (*pids))
+                if (first_peer == -1 && is_running (*pids)) {
                     first_peer = *pids;
+                }
             }
         }
         // Add current pid to list and terminate it
@@ -85,8 +86,9 @@ public class SingleApplication : GLib.Application {
         var pids = (int64) instances;
         int64 newpids = pids;
         for (; *pids; ++pids) {
-            if (*pids != app_pid && is_running (*pids))
+            if (*pids != app_pid && is_running (*pids)) {
                 *newpids++ = *pids;
+            }
         }
         *newpids = 0;
     }
@@ -116,8 +118,9 @@ public class SingleApplication : GLib.Application {
     public bool is_running (int64 pid) {
         if (pid == -1) {
             pid = first_peer;
-            if (pid == -1)
+            if (pid == -1) {
                 return false;
+            }
         }
 
         QtLocalPeer peer = new QtLocalPeer (this, app_id + '-' + string.number (pid, 10));
@@ -136,8 +139,9 @@ public class SingleApplication : GLib.Application {
     ***********************************************************/
     public void set_activation_window (Gtk.Widget aw, bool activate_on_message) {
         act_win = aw;
-        if (!pid_peer)
+        if (!pid_peer) {
             return;
+        }
         if (activate_on_message) {
             pid_peer.signal_message_received.connect (
                 this.on_signal_activate_window

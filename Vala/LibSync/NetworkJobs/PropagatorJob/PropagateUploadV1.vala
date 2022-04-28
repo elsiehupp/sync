@@ -262,7 +262,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
     ***********************************************************/
     private void on_signal_put_job_finished () {
         var put_file_job = (PUTFileJob)sender ();
-        //  ASSERT (put_file_job);
+        //  GLib.assert_true (put_file_job);
 
         on_signal_job_destroyed (put_file_job); // remove it from the this.jobs list
 

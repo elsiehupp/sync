@@ -64,7 +64,7 @@ public class FolderCreationDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void on_signal_accept () {
-        //  Q_ASSERT (!this.destination.has_suffix ("/"));
+        //  GLib.assert_true (!this.destination.has_suffix ("/"));
 
         if (new GLib.Dir (this.destination + "/" + instance.new_folder_name_edit.text ()).exists ()) {
             instance.label_error_message.visible (true);

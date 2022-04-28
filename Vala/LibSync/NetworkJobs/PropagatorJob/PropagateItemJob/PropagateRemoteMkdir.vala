@@ -197,7 +197,7 @@ public class PropagateRemoteMkdir : AbstractPropagateItemJob {
     private void on_signal_mkcol_job_finished () {
         this.propagator.active_job_list.remove_one (this);
 
-        //  ASSERT (this.mkcol_job);
+        //  GLib.assert_true (this.mkcol_job);
 
         GLib.InputStream.NetworkError err = this.mkcol_job.input_stream.error;
         this.item.http_error_code = this.mkcol_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();

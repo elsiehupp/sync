@@ -241,8 +241,8 @@ public class Account : GLib.Object {
             this.credentials = value;
             value.account = this;
 
-            // Note: This way the GLib.NAM can outlive the Account and Credentials.
-            // This is necessary to avoid issues with the GLib.NAM being deleted while
+            // Note: This way the Soup.Session can outlive the Account and Credentials.
+            // This is necessary to avoid issues with the Soup.Session being deleted while
             // processing on_signal_handle_ssl_errors ().
             //  this.soup_session = new Soup.Session (this.credentials.create_access_manager (), GLib.Object.delete_later);
             this.soup_session = new Soup.Session ();
@@ -461,7 +461,7 @@ public class Account : GLib.Object {
 
 
     /***********************************************************
-    Create a network request on the account's GLib.NAM.
+    Create a network request on the account's Soup.Session.
 
     Network requests in AbstractNetworkJobs are created through
     this function. Other places should prefer to use jobs or
@@ -692,7 +692,7 @@ public class Account : GLib.Object {
     ***********************************************************/
     public void clear_cookie_jar () {
         var jar = (CookieJar) this.soup_session.add_feature ();
-        //  ASSERT (jar);
+        //  GLib.assert_true (jar);
         jar.all_cookies (new GLib.List<Soup.Cookie> ());
         /* emit */ signal_wants_account_saved (this);
     }
@@ -700,7 +700,7 @@ public class Account : GLib.Object {
 
     /***********************************************************
     This shares our official cookie jar (containing all the tasty
-    authentication cookies) with another GLib.NAM while making sure
+    authentication cookies) with another Soup.Session while making sure
     of not losing its ownership.
     ***********************************************************/
     public void lend_cookie_jar_to (Soup.Session guest) {
@@ -820,8 +820,8 @@ public class Account : GLib.Object {
         Soup.CookieJar jar = this.soup_session.add_feature ();
         Soup.ProxyResolverDefault proxy = this.soup_session.add_feature ();
 
-        // Use a unowned to allow locking the life of the GLib.NAM on the stack.
-        // Make it call delete_later to make sure that we can return to any GLib.NAM stack frames safely.
+        // Use a unowned to allow locking the life of the Soup.Session on the stack.
+        // Make it call delete_later to make sure that we can return to any Soup.Session stack frames safely.
         this.soup_session = new /*unowned*/ Soup.Session (this.credentials.create_access_manager (), GLib.Object.delete_later);
 
         this.soup_session.add_feature (jar); // takes ownership of the old cookie jar
@@ -1071,7 +1071,7 @@ public class Account : GLib.Object {
         }
 
         // SslDialogErrorHandler.handle_errors will run an event loop that might execute
-        // the delete_later () of the GLib.NAM before we have the chance of unwinding our stack.
+        // the delete_later () of the Soup.Session before we have the chance of unwinding our stack.
         // Keep a ref here on our stackframe to make sure that it doesn't get deleted before
         // handle_errors returns.
         unowned Soup.Session access_manager_lock = this.soup_session;

@@ -68,7 +68,7 @@ public class CleanupPollsJob : GLib.Object {
     ***********************************************************/
     private void on_signal_poll_finished () {
         var poll_job = PollJob)sender ();
-        //  ASSERT (poll_job);
+        //  GLib.assert_true (poll_job);
         if (poll_job.item.status == SyncFileItem.Status.FATAL_ERROR) {
             /* emit */ aborted (poll_job.item.error_string);
             delete_later ();

@@ -391,7 +391,7 @@ public class KMessageWidget : Gdk.Frame {
         }
 
         if (!this.style.style_hint (GLib.Style.SH_WidgetAnimate, null, this)
-         || (parent_widget () && !parent_widget ().is_visible ())) {
+            || (parent_widget () && !parent_widget ().is_visible ())) {
             show ();
             /* emit */ show_animation_finished ();
             return;
