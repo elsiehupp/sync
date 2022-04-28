@@ -467,7 +467,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         //  ENFORCE (this.sent <= this.file_to_upload.size, "can't send more than size");
 
         // Adjust the chunk size for the time taken.
-        //
+        //  
         // Dynamic chunk sizing is enabled if the server configured a
         // target duration for each chunk upload.
         var target_duration = this.propagator.sync_options.target_chunk_upload_duration;
@@ -478,7 +478,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             // The whole targeting is heuristic. The predicted_good_size will fluctuate
             // quite a bit because of external factors (like available bandwidth)
             // and internal factors (like number of parallel uploads).
-            //
+            //  
             // We use an exponential moving average here as a cheap way of smoothing
             // the chunk sizes a bit.
             int64 target_size = this.propagator.chunk_size / 2 + predicted_good_size / 2;

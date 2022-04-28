@@ -1103,7 +1103,7 @@ public class FolderConnection : GLib.Object {
         var relative_path = path.mid_ref (this.path.size ());
 
         // Add to list of locally modified paths
-        //
+        //  
         // We do this before checking for our own sync-related changes to make
         // extra sure to not miss relevant changes.
         var relative_path_bytes = relative_path.to_utf8 ();

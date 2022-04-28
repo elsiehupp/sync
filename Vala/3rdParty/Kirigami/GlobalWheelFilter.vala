@@ -107,7 +107,10 @@ public class GlobalWheelFilter : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void manage_wheel (GLib.QuickItem target, Gdk.EventScroll wheel) {
-        // Duck typing: accept everything that has all the properties we need
+        /***********************************************************
+        Duck typing: accept everything that has all the properties
+        we need.
+        ***********************************************************/
         if (target.meta_object ().index_of_property ("content_x") == -1
             || target.meta_object ().index_of_property ("content_y") == -1
             || target.meta_object ().index_of_property ("content_width") == -1
@@ -132,17 +135,27 @@ public class GlobalWheelFilter : GLib.Object {
         double origin_x = target.property ("origin_x").to_double ();
         double origin_y = target.property ("origin_y").to_double ();
 
-        // Scroll Y
+        /***********************************************************
+        Scroll Y
+        ***********************************************************/
         if (content_height > target.height ()) {
 
             int y = event.pixel_delta ().y () != 0 ? event.pixel_delta ().y () : event.angle_delta ().y () / 8;
 
-            //if we don't have a pixeldelta, apply the configured mouse wheel lines
+            /***********************************************************
+            If we don't have a pixeldelta, apply the configured mouse
+            wheel lines.
+            ***********************************************************/
             if (!event.pixel_delta ().y ()) {
-                y *= 3; // Magic copied value from Kirigami.Settings
+                /***********************************************************
+                Magic copied value from Kirigami.Settings
+                ***********************************************************/
+                y *= 3;
             }
 
-            // Scroll one page regardless of delta:
+            /***********************************************************
+            Scroll one page regardless of delta.
+            ***********************************************************/
             if ( (event.modifiers () & GLib.ControlModifier) || (event.modifiers () & GLib.ShiftModifier)) {
                 if (y > 0) {
                     y = target.height ();
@@ -157,22 +170,36 @@ public class GlobalWheelFilter : GLib.Object {
             target.set_property ("content_y", double.min (-max_yExtent, double.max (-min_yExtent, content_y - y)));
         }
 
-        //Scroll X
+        /***********************************************************
+        Scroll X
+        ***********************************************************/
         if (content_width > target.width ()) {
 
             int x = event.pixel_delta ().x () != 0 ? event.pixel_delta ().x () : event.angle_delta ().x () / 8;
 
-            // Special case : when can't scroll vertically, scroll horizontally with vertical wheel as well
+            /***********************************************************
+            Special case: when can't scroll vertically, scroll
+            horizontally with vertical wheel as well.
+            ***********************************************************/
             if (x == 0 && content_height <= target.height ()) {
                 x = event.pixel_delta ().y () != 0 ? event.pixel_delta ().y () : event.angle_delta ().y () / 8;
             }
 
-            //if we don't have a pixeldelta, apply the configured mouse wheel lines
+            /***********************************************************
+            If we don't have a pixeldelta, apply the configured mouse
+            wheel lines.
+            ***********************************************************/
             if (!event.pixel_delta ().x ()) {
-                x *= 3; // Magic copied value from Kirigami.Settings
+
+                /***********************************************************
+                Magic copied value from Kirigami.Settings
+                ***********************************************************/
+                x *= 3;
             }
 
-            // Scroll one page regardless of delta:
+            /***********************************************************
+            Scroll one page regardless of delta.
+            ***********************************************************/
             if ( (event.modifiers () & GLib.ControlModifier) || (event.modifiers () & GLib.ShiftModifier)) {
                 if (x > 0) {
                     x = target.width ();
@@ -187,18 +214,10 @@ public class GlobalWheelFilter : GLib.Object {
             target.set_property ("content_x", double.min (-max_xExtent, double.max (-min_xExtent, content_x - x)));
         }
 
-        //this is just for making the scrollbar
+        /***********************************************************
+        This is just for making the scrollbar.
+        ***********************************************************/
         target.meta_object ().invoke_method (target, "flick", Q_ARG (double, 0), Q_ARG (double, 1));
         target.meta_object ().invoke_method (target, "cancel_flick");
     }
 }
-
-
-
-
-
-
-
-
-
-

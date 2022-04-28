@@ -25,7 +25,7 @@ public class QtLocalPeer : GLib.Object {
         base (parent);
         this.identifier = app_id;
         if (identifier == "") {
-            identifier = GLib.Application.application_file_path;  //### On win, check if this returns .../argv[0] without casefolding; .\MYAPP == .\myapp on Win
+            identifier = GLib.Application.application_file_path;  //  ### On win, check if this returns .../argv[0] without casefolding; .\MYAPP == .\myapp on Win
         }
 
         socket_name = app_session_id (identifier);
@@ -76,8 +76,8 @@ public class QtLocalPeer : GLib.Object {
         }
 
         string u_msg = message.to_utf8 ();
-        GLib.DataStream ds = new GLib.DataStream (socket);
-        ds.write_bytes (u_msg.const_data (), u_msg.length);
+        GLib.DataStream data_stream = new GLib.DataStream (socket);
+        data_stream.write_bytes (u_msg.const_data (), u_msg.length);
         bool res = socket.wait_for_bytes_written (timeout);
         res &= socket.wait_for_ready_read (timeout); // wait for ACK
         res &= (socket.read (ACK.length) == ACK);
@@ -100,7 +100,7 @@ public class QtLocalPeer : GLib.Object {
     public static string app_session_id (string app_id) {
         string idc = app_id.to_utf8 ();
         uint16 id_num = q_checksum (idc.const_data (), idc.length);
-        //### could do : two 16bit checksums over separate halves of identifier, for a 32bit result - improved uniqeness probability. Every-other-char split would be best.
+        //  ### could do : two 16bit checksums over separate halves of identifier, for a 32bit result - improved uniqeness probability. Every-other-char split would be best.
 
         string res = "qtsingleapplication-" + string.number (id_num, 16);
         res += '-' + string.number (getuid (), 16);
@@ -123,21 +123,21 @@ public class QtLocalPeer : GLib.Object {
             }
             socket.wait_for_ready_read (1000);
         }
-        GLib.DataStream ds = new GLib.DataStream (socket);
+        GLib.DataStream data_stream = new GLib.DataStream (socket);
         string u_msg;
         uint32 remaining = 0;
-        ds >> remaining;
+        data_stream >> remaining;
         u_msg.resize (remaining);
         int got = 0;
         char* u_msg_buf = u_msg;
-        //GLib.debug () << "RCV : remaining" << remaining;
+        //  GLib.debug () << "RCV : remaining" << remaining;
         do {
-            got = ds.read_raw_data (u_msg_buf, remaining);
+            got = data_stream.read_raw_data (u_msg_buf, remaining);
             remaining -= got;
             u_msg_buf += got;
-            //GLib.debug () << "RCV : got" << got << "remaining" << remaining;
+            //  GLib.debug () << "RCV : got" << got << "remaining" << remaining;
         } while (remaining && got >= 0 && socket.wait_for_ready_read (2000));
-        //### error check : got<0
+        //  ### error check : got<0
         if (got < 0) {
             GLib.warning ("QtLocalPeer: Message reception failed " + socket.error_string);
             delete socket;

@@ -104,7 +104,7 @@ public class ShareLinkWidget : Gtk.Widget {
 
         this.instance.share_link_tool_button.hide ();
 
-        //Is this a file or folder?
+        //  Is this a file or folder?
         GLib.FileInfo file_info = new GLib.FileInfo (local_path);
         this.is_file = file_info.is_file ();
 

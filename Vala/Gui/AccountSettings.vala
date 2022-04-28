@@ -1338,7 +1338,7 @@ public class AccountSettings : Gtk.Widget {
                 ensable_vfs_action = menu.add_action (_("Enable virtual file support %1 …").printf (mode == AbstractVfs.WindowsCfApi ? "" : _(" (experimental)")));
                 // TODO: remove when UX decision is made
                 ensable_vfs_action.enabled (!Utility.is_path_windows_drive_partition_root (FolderManager.instance.folder_by_alias (alias).path));
-                //
+                //  
                 ensable_vfs_action.triggered.connect (
                     this.on_signal_enable_vfs_current_folder
                 );

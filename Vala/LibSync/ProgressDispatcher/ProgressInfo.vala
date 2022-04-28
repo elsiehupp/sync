@@ -227,7 +227,7 @@ public class ProgressInfo : GLib.Object {
             // after N calls to this function (and thus seconds) the this.progress_per_sec
             // will have reduced to P*smoothing^N.
             // With a value of 0.9, only 4% of the original value is left after 30s
-            //
+            //  
             // In the first few updates we want to go to the correct value quickly.
             // Therefore, smoothing starts at 0 and ramps up to its final value over time.
             double smoothing = 0.9 * (1.0 - this.initial_smoothing);
@@ -470,21 +470,21 @@ public class ProgressInfo : GLib.Object {
         //   + remaining_file_count * per_file_overhead
         //   + remaining_chunked_file_sizes / chunked_reassembly_speed
         // with us estimating the three parameters in conjunction.
-        //
+        //  
         // But we currently only model the bandwidth and the files per
         // second independently, which leads to incorrect values. To slightly
         // mitigate this problem, we combine the two models depending on
         // which factor dominates (essentially big-file-upload vs.
         // many-small-files)
-        //
+        //  
         // If we have size information, we prefer an estimate based
         // on the upload speed. That's particularly relevant for large file
         // up/downloads, where files per second will be close to 0.
-        //
+        //  
         // However, when many small* files are transfered, the estimate
         // can become very pessimistic as the transfered amount per second
         // drops significantly.
-        //
+        //  
         // So, if we detect a high rate of files per second or a very low
         // transfer rate (often drops hugely during a sequence of deletes,
         // for instance), we gradually prefer an optimistic estimate and

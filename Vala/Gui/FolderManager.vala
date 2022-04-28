@@ -335,7 +335,7 @@ public class FolderManager : GLib.Object {
         GLib.info ("Setup folders from " + this.folder_config_path + " (migration).");
 
         GLib.Dir directory = new GLib.Dir (this.folder_config_path);
-        //We need to include hidden files just in case the alias starts with '.'
+        //  We need to include hidden files just in case the alias starts with '.'
         directory.filter (GLib.Dir.Files | GLib.Dir.Hidden);
         var list = directory.entry_list ();
 
@@ -1380,7 +1380,7 @@ public class FolderManager : GLib.Object {
                 }
             }
             if (this.current_etag_job == null) {
-                //GLib.debug ("No more remote ETag check jobs to schedule.";
+                //  GLib.debug ("No more remote ETag check jobs to schedule.";
 
                 // now it might be a good time to check for restarting...
                 if (!is_any_sync_running () && this.app_restart_required) {

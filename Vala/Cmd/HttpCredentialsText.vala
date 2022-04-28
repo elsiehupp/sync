@@ -20,7 +20,9 @@ public class HttpCredentialsText : HttpCredentials {
     ***********************************************************/
     public HttpCredentialsText (string user, string password) {
         base (user, password);
-        // FIXME: not working with client certificates yet (qknight)
+        /***********************************************************
+        FIXME: not working with client certificates yet (qknight)
+        ***********************************************************/
         this.ssl_trusted = false;
     }
 

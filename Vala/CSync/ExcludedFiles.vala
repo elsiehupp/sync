@@ -243,7 +243,7 @@ public class ExcludedFiles : GLib.Object {
             return true;
         }
 
-        //TODO this seems a waste, hidden files are ignored before hitting this function it seems
+        //  TODO this seems a waste, hidden files are ignored before hitting this function it seems
         if (exclude_hidden) {
             string path = file_path;
             // Check all path subcomponents, but to not* check the base path:
@@ -599,10 +599,10 @@ public class ExcludedFiles : GLib.Object {
         //  GLib.assert_true (this.all_excludes.contains (base_path));
 
         // Build regular expressions for the different cases.
-        //
+        //  
         // To compose the this.bname_traversal_regex, this.full_traversal_regex and this.full_regex
         // patterns we collect several subgroups of patterns here.
-        //
+        //  
         // * The "full" group will contain all patterns that contain a non-trailing
         //   slash. They only make sense in the full_regex and full_traversal_regex.
         // * The "bname" group contains all patterns without a non-trailing slash.
@@ -610,7 +610,7 @@ public class ExcludedFiles : GLib.Object {
         //   patterns must be anchored to the front, these don't need it)
         // * The "bname_trigger" group contains the bname part of all patterns in the
         //   "full" group. These and the "bname" group become this.bname_traversal_regex.
-        //
+        //  
         // To complicate matters, the exclude patterns have two binary attributes
         // meaning we'll end up with 4 variants:
         // * "]" patterns mean "EXCLUDE_AND_REMOVE", they get collected in the
@@ -901,7 +901,6 @@ public class ExcludedFiles : GLib.Object {
     @brief Checks if filename is considered reserved by Windows
     @param filename filename
     @return true if file is reserved, false otherwise
-
     ***********************************************************/
     private static bool csync_is_windows_reserved_word (/* GLib.StringRef */ string filename) {
 
@@ -1003,7 +1002,7 @@ public class ExcludedFiles : GLib.Object {
         // The escape sequences \*, \?, \[. \\ have a special meaning,
         // the other ones have already been expanded before
         // (like "\\n" being replaced by "\n").
-        //
+        //  
         // string being UTF-16 makes unicode-correct escaping tricky.
         // If we escaped each UTF-16 code unit we'd end up splitting 4-byte
         // code points. To avoid problems we delegate as much work as possible to

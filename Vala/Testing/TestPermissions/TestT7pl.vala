@@ -41,47 +41,47 @@ public class TestT7pl : AbstractTestPermissions {
         assert_csync_journal_ok (fake_folder.sync_journal ());
         GLib.info ("Do some changes and see how they propagate");
 
-        //1. remove the file than cannot be removed
+        //  1. remove the file than cannot be removed
         //  (they should be recovered)
         fake_folder.local_modifier.remove ("normal_directory_PERM_CKDNV_/cannot_be_removed_PERM_WVN_.data");
         fake_folder.local_modifier.remove ("readonly_directory_PERM_M_/cannot_be_removed_PERM_WVN_.data");
 
-        //2. remove the file that can be removed
+        //  2. remove the file that can be removed
         //  (they should properly be gone)
         remove_read_only ("normal_directory_PERM_CKDNV_/can_be_removed_PERM_D_.data");
         remove_read_only ("readonly_directory_PERM_M_/can_be_removed_PERM_D_.data");
 
-        //3. Edit the files that cannot be modified
+        //  3. Edit the files that cannot be modified
         //  (they should be recovered, and a conflict shall be created)
         edit_read_only ("normal_directory_PERM_CKDNV_/cannot_be_modified_PERM_DVN_.data");
         edit_read_only ("readonly_directory_PERM_M_/cannot_be_modified_PERM_DVN_.data");
 
-        //4. Edit other files
+        //  4. Edit other files
         //  (they should be uploaded)
         fake_folder.local_modifier.append_byte ("normal_directory_PERM_CKDNV_/can_be_modified_PERM_W_.data");
         fake_folder.local_modifier.append_byte ("readonly_directory_PERM_M_/can_be_modified_PERM_W_.data");
 
-        //5. Create a new file in a read write folder
+        //  5. Create a new file in a read write folder
         // (should be uploaded)
         fake_folder.local_modifier.insert ("normal_directory_PERM_CKDNV_/new_file_PERM_WDNV_.data", 106 );
         apply_permissions_from_name (fake_folder.remote_modifier ());
 
-        //do the sync
+        //  do the sync
         GLib.assert_true (fake_folder.sync_once ());
         assert_csync_journal_ok (fake_folder.sync_journal ());
         var current_local_state = fake_folder.current_local_state ();
 
-        //1.
+        //  1.
         // File should be recovered
         GLib.assert_true (current_local_state.find ("normal_directory_PERM_CKDNV_/cannot_be_removed_PERM_WVN_.data"));
         GLib.assert_true (current_local_state.find ("readonly_directory_PERM_M_/cannot_be_removed_PERM_WVN_.data"));
 
-        //2.
+        //  2.
         // File should be deleted
         GLib.assert_true (!current_local_state.find ("normal_directory_PERM_CKDNV_/can_be_removed_PERM_D_.data"));
         GLib.assert_true (!current_local_state.find ("readonly_directory_PERM_M_/can_be_removed_PERM_D_.data"));
 
-        //3.
+        //  3.
         // File should be recovered
         GLib.assert_true (current_local_state.find ("normal_directory_PERM_CKDNV_/cannot_be_modified_PERM_DVN_.data").size == cannot_be_modified_size);
         GLib.assert_true (current_local_state.find ("readonly_directory_PERM_M_/cannot_be_modified_PERM_DVN_.data").size == cannot_be_modified_size);
@@ -96,11 +96,11 @@ public class TestT7pl : AbstractTestPermissions {
         fake_folder.local_modifier.remove (c1.path);
         fake_folder.local_modifier.remove (c2.path);
 
-        //4. File should be updated, that's tested by assert_local_and_remote_dir
+        //  4. File should be updated, that's tested by assert_local_and_remote_dir
         GLib.assert_true (current_local_state.find ("normal_directory_PERM_CKDNV_/can_be_modified_PERM_W_.data").size == can_be_modified_size + 1);
         GLib.assert_true (current_local_state.find ("readonly_directory_PERM_M_/can_be_modified_PERM_W_.data").size == can_be_modified_size + 1);
 
-        //5.
+        //  5.
         // the file should be in the server and local
         GLib.assert_true (current_local_state.find ("normal_directory_PERM_CKDNV_/new_file_PERM_WDNV_.data"));
 
@@ -109,7 +109,7 @@ public class TestT7pl : AbstractTestPermissions {
 
         // Next test
 
-        //6. Create a new file in a read only folder
+        //  6. Create a new file in a read only folder
         // (they should not be uploaded)
         fake_folder.local_modifier.insert ("readonly_directory_PERM_M_/new_file_PERM_WDNV_.data", 105 );
 
@@ -120,7 +120,7 @@ public class TestT7pl : AbstractTestPermissions {
         assert_csync_journal_ok (fake_folder.sync_journal ());
         current_local_state = fake_folder.current_local_state ();
 
-        //6.
+        //  6.
         // The file should not exist on the remote, but still be there
         GLib.assert_true (current_local_state.find ("readonly_directory_PERM_M_/new_file_PERM_WDNV_.data"));
         GLib.assert_true (!fake_folder.current_remote_state ().find ("readonly_directory_PERM_M_/new_file_PERM_WDNV_.data"));
@@ -129,7 +129,7 @@ public class TestT7pl : AbstractTestPermissions {
         // Both side should still be the same
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
-        //######################################################################
+        //  ######################################################################
         GLib.info ( "remove the read only directory" );
         // . It must be recovered
         fake_folder.local_modifier.remove ("readonly_directory_PERM_M_");
@@ -150,11 +150,11 @@ public class TestT7pl : AbstractTestPermissions {
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
-        //######################################################################
+        //  ######################################################################
         GLib.info ( "move a directory in a outside read only folder" );
 
-        //Missing directory should be restored
-        //new directory should be uploaded
+        //  Missing directory should be restored
+        //  new directory should be uploaded
         fake_folder.local_modifier.rename ("readonly_directory_PERM_M_/subdir_PERM_CK_", "normal_directory_PERM_CKDNV_/subdir_PERM_CKDNV_");
         apply_permissions_from_name (fake_folder.remote_modifier ());
         GLib.assert_true (fake_folder.sync_once ());
@@ -178,7 +178,7 @@ public class TestT7pl : AbstractTestPermissions {
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
-        //######################################################################
+        //  ######################################################################
         GLib.info ( "rename a directory in a read only folder and move a directory to a read-only" );
 
         // do a sync to update the database
@@ -188,19 +188,19 @@ public class TestT7pl : AbstractTestPermissions {
 
         GLib.assert_true (fake_folder.current_local_state ().find ("readonly_directory_PERM_M_/subdir_PERM_CK_/subsubdir_PERM_CKDNV_/normal_file_PERM_WVND_.data" ));
 
-        //1. rename a directory in a read only folder
-        //Missing directory should be restored
-        //new directory should stay but not be uploaded
+        //  1. rename a directory in a read only folder
+        //  Missing directory should be restored
+        //  new directory should stay but not be uploaded
         fake_folder.local_modifier.rename ("readonly_directory_PERM_M_/subdir_PERM_CK_", "readonly_directory_PERM_M_/newname_PERM_CK_"  );
 
-        //2. move a directory from read to read only  (move the directory from previous step)
+        //  2. move a directory from read to read only  (move the directory from previous step)
         fake_folder.local_modifier.rename ("normal_directory_PERM_CKDNV_/subdir_PERM_CKDNV_", "readonly_directory_PERM_M_/moved_PERM_CK_" );
 
         // error : can't upload to read_only!
         GLib.assert_true (!fake_folder.sync_once ());
         current_local_state = fake_folder.current_local_state ();
 
-        //1.
+        //  1.
         // old name restored
         GLib.assert_true (current_local_state.find ("readonly_directory_PERM_M_/subdir_PERM_CK_" ));
         // including contents
@@ -210,20 +210,20 @@ public class TestT7pl : AbstractTestPermissions {
         // but is not on server : so remove it localy for the future comarison
         fake_folder.local_modifier.remove ("readonly_directory_PERM_M_/newname_PERM_CK_");
 
-        //2.
+        //  2.
         // old removed
         GLib.assert_true (!current_local_state.find ("normal_directory_PERM_CKDNV_/subdir_PERM_CKDNV_"));
         // but still on the server : the rename causing an error meant the deletes didn't execute
         GLib.assert_true (fake_folder.current_remote_state ().find ("normal_directory_PERM_CKDNV_/subdir_PERM_CKDNV_"));
         // new still there
         GLib.assert_true (current_local_state.find ("readonly_directory_PERM_M_/moved_PERM_CK_/subsubdir_PERM_CKDNV_/normal_file_PERM_WVND_.data" ));
-        //but not on server
+        //  but not on server
         fake_folder.local_modifier.remove ("readonly_directory_PERM_M_/moved_PERM_CK_");
         fake_folder.remote_modifier ().remove ("normal_directory_PERM_CKDNV_/subdir_PERM_CKDNV_");
 
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
-        //######################################################################
+        //  ######################################################################
         GLib.info ( "multiple restores of a file create different conflict files" );
 
         fake_folder.remote_modifier ().insert ("readonly_directory_PERM_M_/cannot_be_modified_PERM_DVN_.data");
@@ -232,7 +232,7 @@ public class TestT7pl : AbstractTestPermissions {
 
         edit_read_only ("readonly_directory_PERM_M_/cannot_be_modified_PERM_DVN_.data");
         fake_folder.local_modifier.set_contents ("readonly_directory_PERM_M_/cannot_be_modified_PERM_DVN_.data", 's');
-        //do the sync
+        //  do the sync
         apply_permissions_from_name (fake_folder.remote_modifier ());
         GLib.assert_true (fake_folder.sync_once ());
         assert_csync_journal_ok (fake_folder.sync_journal ());
@@ -241,7 +241,7 @@ public class TestT7pl : AbstractTestPermissions {
         edit_read_only ("readonly_directory_PERM_M_/cannot_be_modified_PERM_DVN_.data");
         fake_folder.local_modifier.set_contents ("readonly_directory_PERM_M_/cannot_be_modified_PERM_DVN_.data", 'd');
 
-        //do the sync
+        //  do the sync
         apply_permissions_from_name (fake_folder.remote_modifier ());
         GLib.assert_true (fake_folder.sync_once ());
         assert_csync_journal_ok (fake_folder.sync_journal ());

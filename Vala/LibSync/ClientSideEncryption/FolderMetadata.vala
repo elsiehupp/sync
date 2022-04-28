@@ -239,7 +239,7 @@ public class FolderMetadata : GLib.Object {
             var sharing_decrypted = decrypt_json_object (sharing, this.metadata_keys.last ());
             GLib.debug ("Sharing Decrypted " + sharing_decrypted);
 
-            //Sharing is also a JSON object, so extract it and populate.
+            //  Sharing is also a JSON object, so extract it and populate.
             var sharing_doc = GLib.JsonDocument.from_json (sharing_decrypted);
             var sharing_obj = sharing_doc.object ();
             for (var it = sharing_obj.const_begin (), end = sharing_obj.const_end (); it != end; it++) {
@@ -258,7 +258,7 @@ public class FolderMetadata : GLib.Object {
             file.authentication_tag = new string.from_base64 (file_obj["authentication_tag"].to_string ().to_local8Bit ());
             file.initialization_vector = new string.from_base64 (file_obj["initialization_vector"].to_string ().to_local8Bit ());
 
-            //Decrypt encrypted part
+            //  Decrypt encrypted part
             string key = this.metadata_keys[file.metadata_key];
             var encrypted_file = file_obj["encrypted"].to_string ().to_local8Bit ();
             var decrypted_file = decrypt_json_object (encrypted_file, key);

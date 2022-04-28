@@ -201,12 +201,12 @@ public class VfsOff : AbstractVfs {
             // For now the "suffix" backend has still precedence over the "xattr" backend.
             // Ultimately the order of those ifs will change when xattr will be more mature.
             // But what does "more mature" means here?
-            //
+            //  
             //  * On Mac when it properly reads and writes com.apple.LaunchServices.OpenWith
             // This will require reverse engineering to see what they stuff in there. Maybe a good
             // starting point:
             // https://eclecticlight.co/2017/12/20/xattr-com-apple-launchservices-openwith-sets-a-custom-app-to-open-a-file/
-            //
+            //  
             //  * On Linux when our user.nextcloud.hydrate_exec is adopted by at least KDE and Gnome
             // the "user.nextcloud" prefix might turn into "user.xdg" in the process since it would
             // be best to have a freedesktop.org spec for it.

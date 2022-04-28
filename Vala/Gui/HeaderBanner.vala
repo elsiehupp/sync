@@ -157,11 +157,11 @@ public class HeaderBanner : Gtk.Widget {
         GLib.TextFormat title_format,
         string style_sheet) {
         GLib.Style style = parent_widget ().this.style;
-        //const int layout_horizontal_spacing = style.pixel_metric (GLib.Style.PM_Layout_horizontal_spacing);
+        //  const int layout_horizontal_spacing = style.pixel_metric (GLib.Style.PM_Layout_horizontal_spacing);
         int top_level_margin_left = style.pixel_metric (GLib.Style.PM_Layout_left_margin, null, parent_widget ());
         int top_level_margin_right = style.pixel_metric (GLib.Style.PM_Layout_right_margin, null, parent_widget ());
         int top_level_margin_top = style.pixel_metric (GLib.Style.PM_Layout_top_margin, null, parent_widget ());
-        //int top_level_margin_bottom = style.pixel_metric (GLib.Style.PM_Layout_bottom_margin, 0, parent_widget ());
+        //  int top_level_margin_bottom = style.pixel_metric (GLib.Style.PM_Layout_bottom_margin, 0, parent_widget ());
 
         layout.row_minimum_height (0, MODERN_HEADER_TOP_MARGIN);
         layout.row_minimum_height (1, top_level_margin_top - MODERN_HEADER_TOP_MARGIN - 1);

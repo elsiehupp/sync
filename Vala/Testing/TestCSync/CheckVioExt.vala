@@ -131,7 +131,6 @@ public class CheckVioExt : GLib.Object {
 
     The int parameter count contains the number of seen files (not dirs) in the
     whole tree.
-
     ***********************************************************/
     static void traverse_dir (void **state, string directory, int count) {
         CSync.VioHandle directory_handle = null;

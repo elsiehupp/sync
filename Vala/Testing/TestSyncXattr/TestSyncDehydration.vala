@@ -24,9 +24,9 @@ public class TestSyncDehydration : AbstractTestSyncXAttr {
 
         clean_up_test_sync_dehydration ();
 
-        //
+        //  
         // Mark for dehydration and check
-        //
+        //  
 
         mark_for_dehydration (fake_folder, "A/a1");
 

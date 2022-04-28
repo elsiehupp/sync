@@ -27,7 +27,7 @@ public class TestMoveAndTypeChange : AbstractTestSyncMove {
             ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
             GLib.assert_true (fake_folder.sync_once ());
             // BUG : This doesn't behave right
-            //GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+            //  GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         }
     }
 

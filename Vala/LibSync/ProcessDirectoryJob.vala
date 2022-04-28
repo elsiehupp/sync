@@ -506,9 +506,9 @@ public class ProcessDirectoryJob : GLib.Object {
         }
         this.local_normal_query_entries = new GLib.List<LocalInfo> ();
 
-        //
+        //  
         // Iterate over entries and process them
-        //
+        //  
         foreach (var f in entries) {
             var e = f.second;
 
@@ -602,7 +602,7 @@ public class ProcessDirectoryJob : GLib.Object {
         //  if (local_codec.mib_enum () != 106) {
         //      // If the locale codec is not UTF-8, we must check that the filename from the server can
         //      // be encoded in the local file system.
-        //      //
+        //      //  
         //      // We cannot use GMime.Encoding.can_encode () since that can incorrectly return true, see
         //      // https://bugreports.qt.io/browse/GLib.TBUG-6925.
         //      GLib.TextEncoder encoder = new GLib.TextEncoder (local_codec, GMime.Encoding.Convert_invalid_to_null);
@@ -1686,7 +1686,7 @@ public class ProcessDirectoryJob : GLib.Object {
             bool is_conflict = (server_entry.size != local_entry.size) || (server_entry.modtime != local_entry.modtime);
 
             // It could be a conflict even if size and mtime match!
-            //
+            //  
             // In older client versions we always treated these cases as a
             // non-conflict. This behavior is preserved in case the server
             // doesn't provide a content checksum.
@@ -1911,7 +1911,7 @@ public class ProcessDirectoryJob : GLib.Object {
             dest_perms = this.root_permissions;
         }
         var file_perms = src_perm;
-        //true when it is just a rename in the same directory. (not a move)
+        //  true when it is just a rename in the same directory. (not a move)
         bool is_rename = src_path.has_prefix (this.current_folder.original)
             && src_path.last_index_of ("/") == this.current_folder.original.size ();
         // Check if we are allowed to move to the destination.

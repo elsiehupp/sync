@@ -28,17 +28,17 @@ public class Config : GLib.Object {
     // set( APPLICATION_LICENSE    "${OEM_THEME_DIR}/license.txt )
 
     public const bool WITH_CRASHREPORTER = false; // "Build crashreporter"
-    //set( CRASHREPORTER_SUBMIT_URL "https://crash-reports.owncloud.com/submit" CACHE STRING "URL for crash reporter" )
-    //set( CRASHREPORTER_ICON ":/owncloud-icon.png" )
+    //  set( CRASHREPORTER_SUBMIT_URL "https://crash-reports.owncloud.com/submit" CACHE STRING "URL for crash reporter" )
+    //  set( CRASHREPORTER_ICON ":/owncloud-icon.png" )
 
-    //// Updater options
+    //  // Updater options
     public const bool BUILD_UPDATER = false; // "Build updater""Build updater"
 
     public const bool WITH_PROVIDERS = true; // "Build with providers list"
 
     public const bool ENFORCE_VIRTUAL_FILES_SYNC_FOLDER = false; // "Enforce use of virtual files sync folder when available"
 
-    //// Theming options
+    //  // Theming options
     public const string NEXTCLOUD_BACKGROUND_COLOR = "//0082c9"; //  "Default Nextcloud background color"
     public const string APPLICATION_WIZARD_HEADER_BACKGROUND_COLOR = NEXTCLOUD_BACKGROUND_COLOR; // "Hex color of the wizard header background")
     public const string APPLICATION_WIZARD_HEADER_TITLE_COLOR = "//ffffff"; // "Hex color of the text in the wizard header")

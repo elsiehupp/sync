@@ -82,7 +82,7 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
         this.async_auth.on_signal_start ();
 
         // Don't hide the wizard (avoid user confusion)!
-        //wizard ().hide ();
+        //  wizard ().hide ();
     }
 
 

@@ -209,7 +209,7 @@ public class ShareManager : GLib.Object {
             return;
         }
 
-        //Parse share
+        //  Parse share
         var data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
         unowned LinkShare share = new LinkShare (parse_link_share (data));
 
@@ -222,7 +222,7 @@ public class ShareManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_share_created (GLib.JsonDocument reply) {
-        //Parse share
+        //  Parse share
         var data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
         unowned Share share = new Share (parse_share (data));
 

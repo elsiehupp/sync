@@ -516,7 +516,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
         string the_content_checksum_type = this.propagator.account.capabilities.preferred_upload_checksum_type;
 
         // Reuse transmission checksum as content checksum.
-        //
+        //  
         // We could do this more aggressively and accept both MD5 and SHA1
         // instead of insisting on the exactly correct checksum type.
         if (the_content_checksum_type == checksum_type || the_content_checksum_type == "") {

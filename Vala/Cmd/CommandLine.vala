@@ -42,12 +42,16 @@ public class CommandLine : GLib.Application {
     ***********************************************************/
     CmdOptions opts;
 
-    //  private static void null_message_handler (QtMsgType message_type, GLib.MessageLogContext message_context, string message_text) { }
+    /***********************************************************
+    private static void null_message_handler (QtMsgType message_type, GLib.MessageLogContext message_context, string message_text) { }
+    ***********************************************************/
 
     /***********************************************************
     ***********************************************************/
     public CommandLine () {
-        //  base ();
+        /***********************************************************
+        base ();
+        ***********************************************************/
     }
 
 
@@ -136,13 +140,17 @@ public class CommandLine : GLib.Application {
         GLib.FileInfo file_info = new GLib.FileInfo (options.source_dir);
         if (!file_info.exists ()) {
             GLib.error ("Source directory '" + options.source_dir + "' does not exist.");
-            //  this.quit (1);
+            /***********************************************************
+            this.quit (1);
+            ***********************************************************/
             this.quit ();
         }
         options.source_dir = file_info.absolute_file_path;
 
         for (int index = 0; index < args.length (); index ++) {
-            // skip file name
+            /***********************************************************
+            Skip file name
+            ***********************************************************/
             if (index == 0) {
                 continue;
             }
@@ -229,7 +237,10 @@ public class CommandLine : GLib.Application {
         options.trust_s_sL = false;
         options.use_netrc = false;
         options.interactive = true;
-        options.ignore_hidden_files = false; // Default is to sync hidden files
+        /***********************************************************
+        Default is to sync hidden files
+        ***********************************************************/
+        options.ignore_hidden_files = false;
         options.restart_times = 3;
         options.uplimit = 0;
         options.downlimit = 0;
@@ -258,11 +269,15 @@ public class CommandLine : GLib.Application {
 
         GLib.Uri host_url = GLib.Uri.from_user_input ( (options.target_url.has_suffix ("/") || options.target_url.has_suffix ('\\')) ? options.target_url.chopped (1) : options.target_url);
 
-        // Order of retrieval attempt (later attempts override earlier ones):
-        // 1. From URL
-        // 2. From options
-        // 3. From netrc (if enabled)
-        // 4. From prompt (if interactive)
+        /***********************************************************
+        Order of retrieval attempt (later attempts override earlier
+        ones):
+    
+        1. From URL
+        2. From options
+        3. From netrc (if enabled)
+        4. From prompt (if interactive)
+        ***********************************************************/
 
         string user = host_url.user_name ();
         string password = host_url.password ();
@@ -296,7 +311,9 @@ public class CommandLine : GLib.Application {
             }
         }
 
-        // Find the folder and the original owncloud url
+        /***********************************************************
+        Find the folder and the original owncloud url
+        ***********************************************************/
 
         host_url.scheme (host_url.scheme ().replace ("owncloud", "http"));
 
@@ -311,8 +328,10 @@ public class CommandLine : GLib.Application {
 
             GLib.List<string> p_list = options.proxy.split (":");
             if (p_list.length == 3) {
-                // http : //192.168.178.23 : 8080
-                //  0            1            2
+                /***********************************************************
+                http://192.168.178.23:8080
+                0            1            2
+                ***********************************************************/
                 host = p_list[1];
                 if (host.has_prefix ("//")) {
                     host.remove (0, 2);
@@ -327,16 +346,20 @@ public class CommandLine : GLib.Application {
 
         var ssl_error_handler = new SimpleSslErrorHandler ();
 
-    //  #ifdef TOKEN_AUTH_ONLY
+        /***********************************************************
+        #ifdef TOKEN_AUTH_ONLY
+        ***********************************************************/
         var credentials = new TokenCredentials (user, password, "");
         account.credentials (credentials);
-    //  #else
-        //  var credentials = new HttpCredentialsText (user, password);
-        //  account.credentials (credentials);
-        //  if (options.trust_s_sL) {
-        //      credentials.s_sLTrusted (true);
-        //  }
-    //  #endif
+        /***********************************************************
+        #else
+        var credentials = new HttpCredentialsText (user, password);
+        account.credentials (credentials);
+        if (options.trust_s_sL) {
+            credentials.s_sLTrusted (true);
+        }
+        #endif
+        ***********************************************************/
 
         account.url (host_url);
         account.ssl_error_handler (ssl_error_handler);
@@ -361,7 +384,10 @@ public class CommandLine : GLib.Application {
         json_api_job.on_signal_start ();
         loop.exec ();
 
-        // much lower age than the default since this utility is usually made to be run right after a change in the tests
+        /***********************************************************
+        Much lower age than the default since this utility is
+        usually made to be run right after a change in the tests.
+        ***********************************************************/
         SyncEngine.minimum_file_age_for_upload = std.chrono.milliseconds (0);
 
         int restart_count = 0;
@@ -377,7 +403,9 @@ public class CommandLine : GLib.Application {
             if (!f.open (GLib.File.ReadOnly)) {
                 GLib.critical ("Could not open file containing the list of unsynced folders: " + options.unsynced_folders);
             } else {
-                // filter out empty lines and comments
+                /***********************************************************
+                Filter out empty lines and comments.
+                ***********************************************************/
                 selective_sync_list = f.read_all ().split ("\n").filter (GLib.Regex ("\\S+")).filter (GLib.Regex ("^[^#]"));
 
                 foreach (var item in selective_sync_list) {
@@ -412,16 +440,23 @@ public class CommandLine : GLib.Application {
             cmd.on_signal_sync_error
         );
 
-        // Exclude lists
-
+        /***********************************************************
+        Exclude lists
+        ***********************************************************/
         bool has_user_exclude_file = options.exclude != "";
         string system_exclude_file = ConfigFile.exclude_file_from_system ();
 
-        // Always try to load the user-provided exclude list if one is specified
+        /***********************************************************
+        Always try to load the user-provided exclude list if one is
+        specified.
+        ***********************************************************/
         if (has_user_exclude_file) {
             sync_engine.excluded_files ().add_exclude_file_path (options.exclude);
         }
-        // Load the system list if available, or if there's no user-provided list
+        /***********************************************************
+        Load the system list if available, or if there's no user-
+        provided list.
+        ***********************************************************/
         if (!has_user_exclude_file || GLib.File.exists (system_exclude_file)) {
             sync_engine.excluded_files ().add_exclude_file_path (system_exclude_file);
         }
@@ -431,7 +466,10 @@ public class CommandLine : GLib.Application {
             return EXIT_FAILURE;
         }
 
-        // Have to be done async, else, an error before exec () does not terminate the event loop.
+        /***********************************************************
+        Have to be done async, else, an error before exec () does
+        not terminate the event loop.
+        ***********************************************************/
         GLib.Object.invoke_method (&sync_engine, "on_signal_start_sync", GLib.QueuedConnection);
 
         int result_code = app.exec ();

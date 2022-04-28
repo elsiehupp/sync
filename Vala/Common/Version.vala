@@ -29,7 +29,7 @@ class Version : GLib.Object {
     //  const string MIRALL_VERSION_FULL = MIRALL_VERSION.to_string() + "." + MIRALL_VERSION_BUILD.to_string ();
     public const string MIRALL_VERSION_STRING = MIRALL_VERSION.to_string () + " (build " + MIRALL_VERSION_SUFFIX.to_string () + ")";
 
-    //define MIRALL_STRINGIFY(s) MIRALL_TOSTRING(s)
+    //  define MIRALL_STRINGIFY(s) MIRALL_TOSTRING(s)
 
 } // class Version
 

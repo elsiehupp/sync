@@ -1361,7 +1361,7 @@ public class SyncEngine : GLib.Object {
 
         // Did the sync see any conflict files that don't yet have records?
         // If so, add them now.
-        //
+        //  
         // This happens when the conflicts table is new or when conflict files
         // are downlaoded but the server doesn't send conflict headers.
         foreach (var path in q_as_const (this.seen_conflict_files)) {

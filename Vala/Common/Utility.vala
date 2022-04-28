@@ -199,7 +199,6 @@ public class Utility : GLib.Object {
     on startup will be hidden.
 
     Currently only implemented on Windows.
-
     ***********************************************************/
     public static bool has_system_launch_on_signal_startup (string app_name) {
         //  Q_UNUSED (app_name)
@@ -287,11 +286,10 @@ public class Utility : GLib.Object {
     Use this functions to retrieve uint32/int (often required by
     Qt and WIN32) from size_t without compiler warnings about
     possible truncation
-
     ***********************************************************/
     public static uint32 convert_size_to_uint (size_t convert_var) {
         if (convert_var > uint.MAX) {
-            //throw std.bad_cast ();
+            //  throw std.bad_cast ();
             convert_var = uint.MAX; // intentionally default to wrong value here to not crash: exception handling TBD
         }
         return (uint32)convert_var;
@@ -302,7 +300,7 @@ public class Utility : GLib.Object {
     ***********************************************************/
     public static int convert_size_to_int (size_t convert_var) {
         if (convert_var > int.MAX) {
-            //throw std.bad_cast ();
+            //  throw std.bad_cast ();
             convert_var = int.MAX; // intentionally default to wrong value here to not crash : exception handling TBD
         }
         return (int)convert_var;
@@ -313,7 +311,6 @@ public class Utility : GLib.Object {
     Return the amount of free space available.
 
     \a path must point to a directory
-
     ***********************************************************/
     public static int64 free_disk_space (string path) {
         struct StatVfs64;
@@ -332,7 +329,6 @@ public class Utility : GLib.Object {
     @param prec the precision.
     @param unit an optional unit that is appended if present.
     @return the formatted string.
-
     ***********************************************************/
     public static string compact_format_double (double value, int prec, string unit = "") {
         GLib.Locale locale = GLib.Locale.system ();
@@ -362,7 +358,6 @@ public class Utility : GLib.Object {
     /***********************************************************
     conversion function GLib.DateTime from time_t
     (because the ones built in work on only unsigned 32bit)
-
     ***********************************************************/
     public static GLib.DateTime q_date_time_from_time_t (int64 t) {
         return GLib.DateTime.from_m_secs_since_epoch (t * 1000);
@@ -383,7 +378,6 @@ public class Utility : GLib.Object {
 
     duration_to_descriptive_string1 describ
     unit, like "5 minutes" or "2 days".
-
     ***********************************************************/
     public static string duration_to_descriptive_string1 (uint64 msecs) {
         int p = 0;
@@ -402,7 +396,6 @@ public class Utility : GLib.Object {
 
     duration_to_descriptive_string2 uses two units where possible, so
     "5 minutes 43 seconds" or "1 month 3 days".
-
     ***********************************************************/
     public static string duration_to_descriptive_string2 (uint64 msecs) {
         int p = 0;
@@ -436,7 +429,6 @@ public class Utility : GLib.Object {
     (e.g. on OS X 10.10).
 
     @return bool which is true for systems with dark systray.
-
     ***********************************************************/
     public static bool has_dark_systray () {
         return has_dark_systray_private ();
@@ -501,7 +493,6 @@ public class Utility : GLib.Object {
 
     /***********************************************************
     er for --debug
-
     ***********************************************************/
     //  public static void crash () {
     //      volatile int a = (int *)null;
@@ -510,7 +501,6 @@ public class Utility : GLib.Object {
 
     /***********************************************************
     This can be overriden from the tests
-
     ***********************************************************/
     public static bool fs_case_preserving_override () {
         string env = qgetenv ("OWNCLOUD_TEST_CASE_PRESERVING");
@@ -526,7 +516,6 @@ public class Utility : GLib.Object {
     if this function returns true, the file system is case preserving,
     that means "test" means the same as "TEST" for filenames.
     if false, the two cases are two different files.
-
     ***********************************************************/
     public static bool fs_case_preserving () {
         return fs_case_preserving_override;
@@ -537,7 +526,6 @@ public class Utility : GLib.Object {
     Check if two pathes that MUST exist are equal. This function
     uses GLib.Dir.canonical_path to judge and cares for the
     system's case sensitivity.
-
     ***********************************************************/
     public static bool filenames_equal (string fn1, string fn2) {
         GLib.Dir fd1 = new GLib.Dir (fn1);
@@ -570,7 +558,6 @@ public class Utility : GLib.Object {
 
     This version only delivers output on linux, as Mac and Win get their
     restarting from the installer.
-
     ***********************************************************/
     public static string version_of_installed_binary (string command = "") {
         string re;
@@ -634,7 +621,6 @@ public class Utility : GLib.Object {
     the second timestamp in a human readable and understandable form.
 
     If the second parameter is ommitted, the current time is used.
-
     ***********************************************************/
     public static string time_ago_in_words (GLib.DateTime dt, GLib.DateTime from = new GLib.DateTime ()) {
         GLib.DateTime now = GLib.DateTime.current_date_time_utc ();
@@ -752,7 +738,6 @@ public class Utility : GLib.Object {
 
     /***********************************************************
     Appends concat_path and query_items to the url
-
     ***********************************************************/
     public static GLib.Uri concat_url_path (
         GLib.Uri url, string concat_path,
@@ -779,7 +764,6 @@ public class Utility : GLib.Object {
     /***********************************************************
     Returns a new settings pre-set in a specific group.  The Settings will be created
     with the given parent. If no parent is specified, the caller must destroy the settings
-
     ***********************************************************/
     // public static GLib.Settings settings_with_group (string group, GLib.Object parent = new GLib.Object ());
 
@@ -796,7 +780,6 @@ public class Utility : GLib.Object {
     - trailing periods and spaces
     - windows reserved filenames ("CON" etc)
     will pass unchanged.
-
     ***********************************************************/
     public static string sanitize_for_filename (string name) {
         string invalid = " (/?<>:*|\")";
@@ -816,7 +799,6 @@ public class Utility : GLib.Object {
     /***********************************************************
     Returns a file name based on \a fn that's suitable for a
     conflict.
-
     ***********************************************************/
     public static string make_conflict_filename (
         string fn, GLib.DateTime dt, string user) {
@@ -844,7 +826,6 @@ public class Utility : GLib.Object {
 
     /***********************************************************
     Returns whether a file name indicates a conflict file
-
     ***********************************************************/
     //  public static bool is_conflict_file (char name) {
     //      const string bname = std.strrchr (name, "/");
@@ -894,7 +875,6 @@ public class Utility : GLib.Object {
     Prefer to use the data from the conflicts table in the
     journal to determine a conflict's base file, see
     SyncJournal.conflict_file_base_name ()
-
     ***********************************************************/
     public static string conflict_file_base_name_from_pattern (string conflict_name) {
         // This function must be able to deal with conflict files for conflict files.
@@ -933,7 +913,6 @@ public class Utility : GLib.Object {
     /***********************************************************
     @brief Check whether the path is a root of a Windows drive
     partition ([c:/, d:/, e:/, etc.)
-
     ***********************************************************/
     public static bool is_path_windows_drive_partition_root (string path) {
         //  Q_UNUSED (path)
@@ -943,7 +922,6 @@ public class Utility : GLib.Object {
 
     /***********************************************************
     @brief Retrieves current logged-in user name from the OS
-
     ***********************************************************/
     public static string get_current_user_name () {
         return {};

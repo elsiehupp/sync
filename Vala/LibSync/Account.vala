@@ -911,7 +911,7 @@ public class Account : GLib.Object {
         // Fix : Password got written from Account Wizard, before finish.
         // Only write the app password for a connected account, else
         // there'll be a zombie keychain slot forever, never used again ;p
-        //
+        //  
         // Also don't write empty passwords (Log out . Relaunch)
         if (this.identifier == "" || APP_PASSWORD == "")
             return;

@@ -212,7 +212,7 @@ public class OcsJob : AbstractNetworkJob {
             status_code  = json_return_code (json, message);
         }
 
-        //... then it checks for the status_code
+        //  ... then it checks for the status_code
         if (!this.pass_status_codes.contains (status_code)) {
             GLib.warning ("Reply to"
                         + this.verb

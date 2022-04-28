@@ -47,7 +47,7 @@ public class CrashReporter {
         reporter.report_data ("Version", CRASHREPORTER_VERSION_STRING);
         reporter.report_data ("ReleaseChannel", CRASHREPORTER_RELEASE_CHANNEL);
 
-        //reporter.report_data ( "timestamp", string.number ( GLib.DateTime.current_date_time ().to_time_t () ) );
+        //  reporter.report_data ( "timestamp", string.number ( GLib.DateTime.current_date_time ().to_time_t () ) );
 
         // add parameters
 

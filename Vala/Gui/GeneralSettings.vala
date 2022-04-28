@@ -157,7 +157,7 @@ public class GeneralSettings : Gtk.Widget {
 
         load_misc_settings ();
         // updater info now set in : customize_style
-        //update_info ();
+        //  update_info ();
 
         // misc
         this.instance.mono_icons_check_box.toggled.connect (

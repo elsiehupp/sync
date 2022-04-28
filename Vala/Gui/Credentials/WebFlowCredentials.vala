@@ -658,7 +658,7 @@ public class WebFlowCredentials : AbstractCredentials {
 
             /***********************************************************
             ***********************************************************/
-            /// Used later for remote wipe
+            //  / Used later for remote wipe
             this.account.write_app_password_once (this.password);
         }
     }

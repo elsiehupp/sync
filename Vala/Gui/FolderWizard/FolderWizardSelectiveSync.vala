@@ -99,7 +99,7 @@ public class FolderWizardSelectiveSync : GLib.WizardPage {
                     this.virtual_files_check_box.disabled (true);
                 }
             }
-            //
+            //  
         }
 
         GLib.WizardPage.initialize_page ();

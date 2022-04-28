@@ -289,7 +289,7 @@ public class ConnectionValidator : GLib.Object {
             // Note: Why would this happen on a status.php request?
             this.errors.append (_("Authentication error : Either username or password are wrong."));
         } else {
-            //this.errors.append (_("Unable to connect to %1").printf (this.account.url.to_string ()));
+            //  this.errors.append (_("Unable to connect to %1").printf (this.account.url.to_string ()));
             this.errors.append (check_server_job.error_string);
         }
         report_result (StatusNotFound);
@@ -301,7 +301,7 @@ public class ConnectionValidator : GLib.Object {
     ***********************************************************/
     protected void on_signal_job_timeout (GLib.Uri url) {
         //  Q_UNUSED (url);
-        //this.errors.append (_("Unable to connect to %1").printf (url.to_string ()));
+        //  this.errors.append (_("Unable to connect to %1").printf (url.to_string ()));
         this.errors.append (_("Timeout"));
         report_result (Timeout);
     }

@@ -42,7 +42,6 @@ public class ProgressDispatcher : GLib.Object {
 
     @param[out]  folder The folder which is being processed
     @param[out]  progress   A struct with all progress info.
-
     ***********************************************************/
     internal signal void signal_progress_info (string folder, ProgressInfo progress);
 

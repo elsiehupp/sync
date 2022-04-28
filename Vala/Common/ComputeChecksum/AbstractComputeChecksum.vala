@@ -37,7 +37,6 @@ public abstract class AbstractComputeChecksum : GLib.Object {
     Example: "ADLER32:1231 SHA1:ab124124 MD5:2131affa21"
         . "SHA1:ab124124"
 
-
     ***********************************************************/
     protected static string find_best_checksum (string checksums) {
         if (checksums == "") {

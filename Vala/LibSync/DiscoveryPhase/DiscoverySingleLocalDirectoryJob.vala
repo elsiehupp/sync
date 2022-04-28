@@ -81,7 +81,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, GLib.Runnable*/ 
             if (state.invalid_chars > 0 || state.remaining_chars > 0) {
                 /* emit */ child_ignored (true);
                 var item = unowned new SyncFileItem ();
-                //item.file = this.current_folder.target + i.name;
+                //  item.file = this.current_folder.target + i.name;
                 // FIXME ^^ do we really need to use this.target or is local fine?
                 item.file = this.local_path + i.name;
                 item.instruction = CSync.SyncInstructions.IGNORE;

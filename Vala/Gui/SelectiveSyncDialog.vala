@@ -86,7 +86,7 @@ public class SelectiveSyncDialog : Gtk.Dialog {
                 this.folder_connection.on_signal_terminate_sync ();
             }
 
-            //The part that changed should not be read from the DB on next sync because there might be new folders
+            //  The part that changed should not be read from the DB on next sync because there might be new folders
             // (the ones that are no longer in the blocklist)
             var block_list_set = block_list.to_set ();
             var changes = (old_block_list_set - block_list_set) + (block_list_set - old_block_list_set);

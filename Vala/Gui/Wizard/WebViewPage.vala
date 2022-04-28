@@ -55,15 +55,15 @@ public class WebViewPage : AbstractCredentialsWizardPage {
     /***********************************************************
     ***********************************************************/
     //  ~WebViewPage () = default;
-    //{
+    //  {
     //    Soup.NetworkProxyFactory.use_system_configuration (this.use_system_proxy);
-    //}
+    //  }
 
 
     /***********************************************************
     ***********************************************************/
     public void initialize_page () {
-        //Soup.NetworkProxy.application_proxy (Soup.NetworkProxy.application_proxy ());
+        //  Soup.NetworkProxy.application_proxy (Soup.NetworkProxy.application_proxy ());
 
         string url;
         if (this.oc_wizard.registration ()) {

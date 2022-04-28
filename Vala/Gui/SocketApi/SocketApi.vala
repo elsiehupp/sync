@@ -313,7 +313,7 @@ public class SocketApi : GLib.Object {
         //  GLib.assert_true (socket);
 
         // Find the SocketListener
-        //
+        //  
         // It's possible for the disconnected () signal to be triggered before
         // the ready_read () signals are received - in that case there won't be a
         // valid listener. We execute the handler anyway, but it will work with
@@ -692,7 +692,7 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void command_SHARE_MENU_TITLE (string argument, SocketListener listener) {
-        //listener.on_signal_send_message ("SHARE_MENU_TITLE: " + _("Share with %1", "parameter is Nextcloud").printf (Theme.app_name_gui));
+        //  listener.on_signal_send_message ("SHARE_MENU_TITLE: " + _("Share with %1", "parameter is Nextcloud").printf (Theme.app_name_gui));
         listener.on_signal_send_message ("SHARE_MENU_TITLE:"  + Theme.app_name_gui);
     }
 
@@ -1054,7 +1054,7 @@ public class SocketApi : GLib.Object {
 
         // Disabled : only providing email option for private links would look odd,
         // and the copy option is more general.
-        //listener.on_signal_send_message ("MENU_ITEM:EMAIL_PRIVATE_LINK" + flag_string + _("Send private link by email …"));
+        //  listener.on_signal_send_message ("MENU_ITEM:EMAIL_PRIVATE_LINK" + flag_string + _("Send private link by email …"));
     }
 
 
@@ -1106,7 +1106,7 @@ public class SocketApi : GLib.Object {
 
             DirectEditor editor = direct_editor_for_local_file (file_data.local_path);
             if (editor) {
-                //listener.on_signal_send_message ("MENU_ITEM:EDIT" + flag_string + _("Edit via ") + editor.name ());
+                //  listener.on_signal_send_message ("MENU_ITEM:EDIT" + flag_string + _("Edit via ") + editor.name ());
                 listener.on_signal_send_message ("MENU_ITEM:EDIT" + flag_string + _("Edit"));
             } else {
                 listener.on_signal_send_message ("MENU_ITEM:OPEN_PRIVATE_LINK" + flag_string + _("Open in browser"));

@@ -81,7 +81,7 @@ public class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
             this.flow_2_auth_widget.start_auth (oc_wizard.account);
 
         // Don't hide the wizard (avoid user confusion)!
-        //wizard ().hide ();
+        //  wizard ().hide ();
 
         this.flow_2_auth_widget.on_signal_style_changed ();
     }

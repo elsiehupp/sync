@@ -230,7 +230,7 @@ public class Application : GLib.Application {
         }
 
         parse_options (arguments ());
-        //no need to waste time;
+        //  no need to waste time;
         if (this.help_only || this.version_only) {
             return;
         }
@@ -559,7 +559,7 @@ public class Application : GLib.Application {
             iterator.next ();
         }
 
-        //parse options; if help or bad option exit
+        //  parse options; if help or bad option exit
         while (iterator.has_next ()) {
             string option = iterator.next ();
             if (option == "--help" || option == "-h") {

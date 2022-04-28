@@ -917,7 +917,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
                 if (folder_connection.is_busy ()) {
                     folder_connection.on_signal_terminate_sync ();
                 }
-                //The part that changed should not be read from the DB on next sync because there might be new folders
+                //  The part that changed should not be read from the DB on next sync because there might be new folders
                 // (the ones that are no longer in the blocklist)
                 foreach (var change in changes) {
                     folder_connection.journal_database ().schedule_path_for_remote_discovery (change);
@@ -1133,7 +1133,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
         if (LibSync.ProgressInfo.is_size_dependent (cur_item)) {
             string s1 = Utility.octets_to_string (cur_item_progress);
             string s2 = Utility.octets_to_string (cur_item.size);
-            //uint64 estimated_bw = progress.file_progress (cur_item).estimated_bandwidth;
+            //  uint64 estimated_bw = progress.file_progress (cur_item).estimated_bandwidth;
             if (estimated_up_bandwidth || estimated_down_bandwidth) {
                 /***********************************************************
                 // : Example text: "uploading foobar.png (1MB of 2MB) time left 2 minutes at a rate of 24Kb/s"

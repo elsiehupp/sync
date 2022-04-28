@@ -721,7 +721,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
             this.instance.r_virtual_file_sync.on_signal_text (_("Use virtual files instead of downloading content immediately %1").printf (this.best_available_vfs_mode == AbstractVfs.WindowsCfApi ? "" : _(" (experimental)")));
             this.instance.r_virtual_file_sync.enabled (true);
         }
-        //
+        //  
     }
 
 } // class OwncloudAdvancedSetupPage

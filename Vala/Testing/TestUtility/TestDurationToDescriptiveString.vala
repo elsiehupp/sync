@@ -14,7 +14,7 @@ public class TestDurationToDescriptiveString : AbstractTestUtility {
     ***********************************************************/
     private TestDurationToDescriptiveString () {
         GLib.Locale.set_default (GLib.Locale ("C"));
-        //Note: in order for the plural to work we would need to load the english translation
+        //  Note: in order for the plural to work we would need to load the english translation
 
         uint64 sec = 1000;
         uint64 hour = 3600 * sec;

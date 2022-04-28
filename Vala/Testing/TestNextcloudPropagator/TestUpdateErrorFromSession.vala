@@ -13,7 +13,7 @@ public class TestUpdateErrorFromSession : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private TestUpdateErrorFromSession () {
-        //OwncloudPropagator propagator (null, "test1", "test2", new ProgressDatabase);
+        //  OwncloudPropagator propagator (null, "test1", "test2", new ProgressDatabase);
         GLib.assert_true ( true );
     }
 

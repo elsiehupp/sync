@@ -117,7 +117,7 @@ public class ClientSideEncryption : GLib.Object {
             return;
         }
         string key = BIO2Byte_array (private_key);
-        //this.private_key = GLib.SslKey (key, GLib.Ssl.Rsa, GLib.Ssl.Pem, GLib.Ssl.PrivateKey);
+        //  this.private_key = GLib.SslKey (key, GLib.Ssl.Rsa, GLib.Ssl.Pem, GLib.Ssl.PrivateKey);
         this.private_key = key;
 
         GLib.info ("Keys generated correctly, sending to server.");
@@ -324,7 +324,7 @@ public class ClientSideEncryption : GLib.Object {
             return;
         }
 
-        //this.private_key = GLib.SslKey (read_job.binary_data (), GLib.Ssl.Rsa, GLib.Ssl.Pem, GLib.Ssl.PrivateKey);
+        //  this.private_key = GLib.SslKey (read_job.binary_data (), GLib.Ssl.Rsa, GLib.Ssl.Pem, GLib.Ssl.PrivateKey);
         this.private_key = read_job.binary_data ();
 
         if (this.private_key == null) {
@@ -495,7 +495,7 @@ public class ClientSideEncryption : GLib.Object {
                 GLib.info ("Generated key: " + pass);
 
                 string private_key = EncryptionHelper.decrypt_private_key (pass, key);
-                //this.private_key = GLib.SslKey (private_key, GLib.Ssl.Rsa, GLib.Ssl.Pem, GLib.Ssl.PrivateKey);
+                //  this.private_key = GLib.SslKey (private_key, GLib.Ssl.Rsa, GLib.Ssl.Pem, GLib.Ssl.PrivateKey);
                 this.private_key = private_key;
 
                 GLib.info ("Private key: " + this.private_key.to_string ());
@@ -687,10 +687,10 @@ public class ClientSideEncryption : GLib.Object {
         return (uchar)array;
     }
 
-    //
+    //  
     // Simple classes for safe (RAII) handling of OpenSSL
     // data structures
-    //
+    //  
 
     string BIO2Byte_array (Biometric b) {
         var pending = (int)BIO_ctrl_pending (b);

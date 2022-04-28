@@ -27,7 +27,6 @@ public class FileSystem : GLib.Object {
 
     On linux this either revokes all 'w' permissions or
     restores permissions according to the umask.
-
     ***********************************************************/
     public static void file_read_only (string filename, bool read_only) {
         GLib.FileUtils.chmod ()
@@ -54,14 +53,16 @@ public class FileSystem : GLib.Object {
 
     This means that it will preserve explicitly set rw-r--r-- permissions even
     when the umask is 0002. (file_read_only () would adjust to rw-rw-r--)
-
     ***********************************************************/
     public static void file_read_only_weak (string filename, bool read_only) {
         GLib.File file = GLib.File.new_for_path (filename);
         GLib.File.Permissions permissions = file.permissions ();
 
         if (!read_only && (permissions & GLib.File.WriteOwner)) {
-            return; // already writable enough
+            /***********************************************************
+            Already writable enough
+            ***********************************************************/
+            return;
         }
 
         file_read_only (filename, read_only);
@@ -70,17 +71,15 @@ public class FileSystem : GLib.Object {
 
     /***********************************************************
     @brief Try to set permissions so that other users on the
-    local machine can not go into the folder.
-
+        local machine can not go into the folder.
     ***********************************************************/
     public static void folder_minimum_permissions (string filename) {
-        //  Q_UNUSED (filename);
     }
 
 
     /***********************************************************
-    convert a "normal" windows path into a path that can be 32k chars long.
-
+    Convert a "normal" windows path into a path that can be 32k
+    chars long.
     ***********************************************************/
     public static string long_win_path (string inpath) {
         return inpath;
@@ -92,13 +91,15 @@ public class FileSystem : GLib.Object {
 
     Use this over GLib.FileInfo.exists () and GLib.File.exists () to avoid bugs with lnk
     files, see above.
-
     ***********************************************************/
     public static bool file_exists (string filename, GLib.FileInfo file_info = new GLib.FileInfo ()) {
         bool re = file_info.exists ();
-        // if the filename is different from the filename in file_info, the file_info is
-        // not valid. There needs to be one initialised here. Otherwise the incoming
-        // file_info is re-used.
+        /***********************************************************
+        If the filename is different from the filename in file_info,
+        the file_info is not valid. There needs to be one
+        initialised here. Otherwise the incoming file_info is
+        reused.
+        ***********************************************************/
         if (file_info.file_path != filename) {
             GLib.FileInfo my_f_i = new GLib.FileInfo (filename);
             re = my_f_i.exists ();
@@ -108,29 +109,28 @@ public class FileSystem : GLib.Object {
 
 
     /***********************************************************
-    @brief Rename the file \a origin_filename to
-    \a destination_filename.
+    @brief Rename the file {origin_filename} to
+    {destination_filename}.
 
-    It behaves as GLib.File.rename () but handles .lnk files
+    It behaves as {GLib.File.rename ()} but handles {.lnk} files
     correctly on Windows.
-
     ***********************************************************/
     public static bool rename (
         string origin_filename,
         string destination_filename
     ) throws FileSystemError {
         bool success = false;
-        string error;
+        string error_string;
 
         GLib.File orig = GLib.File.new_for_path (origin_filename);
         success = orig.rename (destination_filename);
         if (!success) {
-            error = orig.error_string;
+            error_string = orig.error_string;
 
             GLib.warning (
                 "Error renaming file " + origin_filename
                 + " to " + destination_filename
-                + " failed: " + error
+                + " failed: " + error_string
             );
             throw new FileSystemError.RENAME_ERROR (error_string);
         }
@@ -150,9 +150,12 @@ public class FileSystem : GLib.Object {
 
         bool success = false;
         GLib.File orig = new GLib.File (origin_filename);
-        // We want a rename that also overwites.  GLib.File.rename does not overwite.
-        // Qt 5.1 has GLib.SaveFile.rename_overwrite we could use.
-        // ### FIXME
+        /***********************************************************
+        We want a rename that also overwites. GLib.File.rename does
+        not overwite. Qt 5.1 has GLib.SaveFile.rename_overwrite we
+        could use.
+        ### FIXME
+        ***********************************************************/
         success = true;
         bool dest_exists = file_exists (destination_filename);
         if (dest_exists && !GLib.File.remove (destination_filename)) {
@@ -176,7 +179,6 @@ public class FileSystem : GLib.Object {
 
     Equivalent to GLib.File.remove (), except on Windows, where it will also
     successfully remove read-only files.
-
     ***********************************************************/
     public static bool remove (string filename) throws FileSystemError {
         GLib.File file = GLib.File.new_for_path (filename);
@@ -192,60 +194,97 @@ public class FileSystem : GLib.Object {
     (Only implemented on linux)
     ***********************************************************/
     public static bool move_to_trash (string filename) throws FileSystemError {
-        // TODO : Qt 5.15 bool GLib.File.move_to_trash ()
+        /***********************************************************
+        TODO: Qt 5.15 bool GLib.File.move_to_trash ()
+        ***********************************************************/
         string trash_path;
         string trash_file_path;
         string trash_info_path;
         string xdg_data_home = GLib.File.decode_name (qgetenv ("XDG_DATA_HOME"));
         if (xdg_data_home == "") {
-            trash_path = GLib.Dir.home_path + "/.local/share/Trash/"; // trash path that should exist
+            /***********************************************************
+            Trash path that should exist
+            ***********************************************************/
+            trash_path = GLib.Dir.home_path + "/.local/share/Trash/";
         } else {
             trash_path = xdg_data_home + "/Trash/";
         }
-
-        trash_file_path = trash_path + "files/"; // trash file path contain delete files
-        trash_info_path = trash_path + "info/"; // trash info path contain delete files information
+        /***********************************************************
+        Trash file path contain delete files.
+        ***********************************************************/
+        trash_file_path = trash_path + "files/";
+        /***********************************************************
+        Trash info path contain delete files information.
+        ***********************************************************/
+        trash_info_path = trash_path + "info/";
 
         if (! (new GLib.Dir ().mkpath (trash_file_path) && new GLib.Dir ().mkpath (trash_info_path))) {
-            *error_string = _("FileSystem", "Could not make directories in trash");
-            return false; //mkpath will return true if path exists
+            error_string = _("FileSystem", "Could not make directories in trash");
+            /***********************************************************
+            Mkpath will return true if path exists.
+            ***********************************************************/
+            return false;
         }
 
         GLib.FileInfo file_info = new GLib.FileInfo (filename);
 
         GLib.Dir file;
         int suffix_number = 1;
-        if (file.exists (trash_file_path + file_info.filename ())) { //file in trash already exists, move to "filename.1"
+        /***********************************************************
+        File in trash already exists, move to "filename.1"
+        ***********************************************************/
+        if (file.exists (trash_file_path + file_info.filename ())) {
             string path = trash_file_path + file_info.filename () + '.';
-            while (file.exists (path + string.number (suffix_number))) { //or to "filename.2" if "filename.1" exists, etc
+            /***********************************************************
+            Or to "filename.2" if "filename.1" exists, etc
+            ***********************************************************/
+            while (file.exists (path + string.number (suffix_number))) {
                 suffix_number++;
             }
             if (!file.rename (file_info.absolute_file_path, path + string.number (suffix_number))) { // rename (file old path, file trash path)
-                *error_string = _("FileSystem", " (Could not move \"%1\" to \"%2\")")
+                error_string = _("FileSystem", " (Could not move \"%1\" to \"%2\")")
                                    .printf (file_info.absolute_file_path, path + string.number (suffix_number));
                 return false;
             }
         } else {
             if (!file.rename (file_info.absolute_file_path, trash_file_path + file_info.filename ())) { // rename (file old path, file trash path)
-                *error_string = _("FileSystem", " (Could not move \"%1\" to \"%2\")")
+                error_string = _("FileSystem", " (Could not move \"%1\" to \"%2\")")
                                    .printf (file_info.absolute_file_path, trash_file_path + file_info.filename ());
                 return false;
             }
         }
 
-        // create file format for trash info file----- START
+        /***********************************************************
+        Create file format for trash info file----- START
+        ***********************************************************/
         GLib.File info_file;
-        if (file.exists (trash_info_path + file_info.filename () + ".trashinfo")) { // TrashInfo file already exists, create "filename.1.trashinfo"
+        /***********************************************************
+        TrashInfo file already exists, create "filename.1.trashinfo"
+        ***********************************************************/
+        if (file.exists (trash_info_path + file_info.filename () + ".trashinfo")) {
             string filename = trash_info_path + file_info.filename () + '.' + string.number (suffix_number) + ".trashinfo";
-            info_file.filename (filename); //filename+.trashinfo //  create file information file in /.local/share/Trash/info/ folder
+            /***********************************************************
+            filename+.trashinfo
+            create file information file in /.local/share/Trash/info/
+            folder
+            ***********************************************************/
+            info_file.filename (filename);
         } else {
             string filename = trash_info_path + file_info.filename () + ".trashinfo";
-            info_file.filename (filename); //filename+.trashinfo //  create file information file in /.local/share/Trash/info/ folder
+            /***********************************************************
+            filename+.trashinfo
+            create file information file in /.local/share/Trash/info/
+            folder
+            ***********************************************************/
+            info_file.filename (filename);
         }
 
         info_file.open (GLib.IODevice.ReadWrite);
 
-        GLib.OutputStream stream = new GLib.OutputStream (info_file); // for write data on open file
+        /***********************************************************
+        For write data on open file
+        ***********************************************************/
+        GLib.OutputStream stream = new GLib.OutputStream (info_file);
 
         stream += "[Trash Info]\n"
                + "Path="
@@ -256,24 +295,28 @@ public class FileSystem : GLib.Object {
                + "\n";
         info_file.close ();
 
-        // create info file format of trash file----- END
+        /***********************************************************
+        Create info file format of trash file----- END
+        ***********************************************************/
 
         return true;
     }
 
 
     /***********************************************************
-    Replacement for GLib.File.open (ReadOnly) followed by a seek ().
-    This version sets a more permissive sharing mode on Windows.
+    Replacement for GLib.File.open (ReadOnly) followed by a
+    seek (). This version sets a more permissive sharing mode on
+    Windows.
 
-    Warning : The resulting file may have an empty filename and be unsuitable for use
-    with GLib.FileInfo! Calling seek () on the GLib.File with >32bit signed values will fail!
-
+    Warning: The resulting file may have an empty filename and
+    be unsuitable for use with GLib.FileInfo! Calling seek () on
+    the GLib.File with >32bit signed values will fail!
     ***********************************************************/
     public static bool open_and_seek_file_shared_read (
         GLib.File file,
         string error_or_null,
-        int64 seek) throws FileSystemError {
+        int64 seek
+    ) throws FileSystemError {
         if (!file.open (GLib.File.ReadOnly)) {
             throw new FileSystemError.OPEN_AND_SEEK_FILE_SHARED_ERROR (file.error_string);
         }

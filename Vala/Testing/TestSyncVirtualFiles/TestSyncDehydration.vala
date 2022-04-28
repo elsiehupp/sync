@@ -24,9 +24,9 @@ public class TestSyncDehydration : AbstractTestSyncVirtualFiles {
 
         TestSyncVirtualFiles.clean_up_test_sync_dehydration (complete_spy);
 
-        //
+        //  
         // Mark for dehydration and check
-        //
+        //  
 
         mark_for_dehydration (fake_folder, "A/a1");
 

@@ -103,7 +103,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
         this.instance.up_ui (this);
 
-        //Is this a file or folder?
+        //  Is this a file or folder?
         this.is_file = new GLib.FileInfo (local_path).is_file ();
 
         this.completer = new GLib.Completer (this);
@@ -181,7 +181,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
         // TODO Progress Indicator where should it go?
         // Setup the sharee search progress indicator
-        //this.instance.sharee_horizontal_layout.add_widget (this.pi_sharee);
+        //  this.instance.sharee_horizontal_layout.add_widget (this.pi_sharee);
 
         this.parent_scroll_area = parent_widget ().find_child<GLib.Scroll_area> ("scroll_area");
 

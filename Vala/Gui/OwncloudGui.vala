@@ -338,7 +338,7 @@ public class OwncloudGui : GLib.Object {
         if (FolderManager.instance.is_any_sync_running ()) {
             return;
         }
-        //this.action_status.on_signal_text (text);
+        //  this.action_status.on_signal_text (text);
     }
 
 
@@ -410,7 +410,7 @@ public class OwncloudGui : GLib.Object {
                         .printf (current_file)
                         .printf (total_file_count);
             }
-            //this.action_status.on_signal_text (message);
+            //  this.action_status.on_signal_text (message);
         } else {
             string total_size_str = Utility.octets_to_string (progress.total_size ());
             string message;
@@ -421,7 +421,7 @@ public class OwncloudGui : GLib.Object {
                 message = _("Syncing %1")
                         .printf (total_size_str);
             }
-            //this.action_status.on_signal_text (message);
+            //  this.action_status.on_signal_text (message);
         }
 
         if (!progress.last_completed_item == "") {

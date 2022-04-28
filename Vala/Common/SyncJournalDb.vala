@@ -91,7 +91,6 @@ public class SyncJournalDb : GLib.Object {
     Grouping for all functions relating to pin states,
 
     Use internal_pin_states to get at them.
-
     ***********************************************************/
     public class PinStateInterface : GLib.Object {
 
@@ -253,8 +252,8 @@ public class SyncJournalDb : GLib.Object {
                 PreparedSqlQueryManager.Key.SET_PIN_STATE_QUERY,
                 // If we had sqlite >=3.24.0 everywhere this could be an upsert,
                 // making further flags columns easy
-                //"INSERT INTO flags (path, pin_state) VALUES (?1, ?2)"
-                //" ON CONFLICT (path) DO UPDATE SET pin_state=?2;"),
+                //  "INSERT INTO flags (path, pin_state) VALUES (?1, ?2)"
+                //  " ON CONFLICT (path) DO UPDATE SET pin_state=?2;"),
                 // Simple version that doesn't work nicely with multiple columns:
                 "INSERT OR REPLACE INTO flags (path, pin_state) VALUES (?1, ?2);",
                 this.database.database

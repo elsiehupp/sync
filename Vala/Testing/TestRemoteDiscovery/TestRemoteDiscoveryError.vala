@@ -61,9 +61,9 @@ public class TestRemoteDiscoveryError : GLib.Object {
             GLib.assert_true (complete_spy.find_item ("A/z1").instruction == CSync.SyncInstructions.NEW);
         }
 
-        //
+        //  
         // Check the same discovery error on the sync root
-        //
+        //  
         error_folder = "dav/files/admin/";
         fatal_error_prefix = "Server replied with an error while reading directory \"\": ";
         error_spy == "";
