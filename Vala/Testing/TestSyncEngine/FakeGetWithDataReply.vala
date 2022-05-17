@@ -65,9 +65,10 @@ public class FakeGetWithDataReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public override void on_signal_abort () {
+    public override bool on_signal_abort () {
         set_error (OperationCanceledError, "Operation Canceled");
         aborted = true;
+        return false; // only run once
     }
 
 

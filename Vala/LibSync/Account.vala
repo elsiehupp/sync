@@ -165,7 +165,7 @@ public class Account : GLib.Object {
     /***********************************************************
     Access the server capabilities
     ***********************************************************/
-    public GLib.HashTable<string, GLib.Variant> capabilities {
+    public Capabilities capabilities {
         public get {
             return this.capabilities;
         }
@@ -390,7 +390,7 @@ public class Account : GLib.Object {
     ***********************************************************/
     private Account (GLib.Object parent = new GLib.Object ()) {
         base (parent);
-        this.capabilities = new GLib.HashTable<string, GLib.Variant> (str_hash, str_equal);
+        this.capabilities = new Capabilities (GLib.HashTable<string, GLib.Variant> (str_hash, str_equal));
         this.http2_supported = false;
         this.push_notifications = null;
         this.is_remote_wipe_requested_HACK = false;
@@ -635,10 +635,11 @@ public class Account : GLib.Object {
     public int server_version_int {
         public get {
             // FIXME: Use Qt 5.5 GLib.VersionNumber
-            var components = this.server_version.split (".");
-            return make_server_version (components.value (0).to_int (),
-                components.value (1).to_int (),
-                components.value (2).to_int ()
+            string[] components = this.server_version.split (".");
+            return make_server_version (
+                int.parse (components[0]),
+                int.parse (components[1]),
+                int.parse (components[2])
             );
         }
     }
@@ -670,9 +671,9 @@ public class Account : GLib.Object {
                 return false;
             }
             return server_version_int < make_server_version (
-                NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_MAJOR,
-                NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_MINOR,
-                NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_PATCH
+                NextcloudVersion.NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_MAJOR,
+                NextcloudVersion.NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_MINOR,
+                NextcloudVersion.NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_PATCH
             );
         }
     }
@@ -691,9 +692,10 @@ public class Account : GLib.Object {
     clear all cookies. (Session cookies or not)
     ***********************************************************/
     public void clear_cookie_jar () {
-        var jar = (CookieJar) this.soup_session.add_feature ();
+        this.soup_session.add_feature (new CookieJar ());
+        CookieJar jar = (CookieJar)this.soup_session.get_feature (typeof (CookieJar));
         //  GLib.assert_true (jar);
-        jar.all_cookies (new GLib.List<Soup.Cookie> ());
+        jar.all_cookies ();
         /* emit */ signal_wants_account_saved (this);
     }
 
@@ -704,7 +706,8 @@ public class Account : GLib.Object {
     of not losing its ownership.
     ***********************************************************/
     public void lend_cookie_jar_to (Soup.Session guest) {
-        var jar = this.soup_session.add_feature ();
+        this.soup_session.add_feature (new CookieJar ());
+        CookieJar jar = (CookieJar)this.soup_session.get_feature (typeof (CookieJar));
         var old_parent = jar.parent ();
         guest.add_feature (jar); // takes ownership of our precious cookie jar
         jar.parent (old_parent); // takes it back
@@ -1032,8 +1035,9 @@ public class Account : GLib.Object {
     /***********************************************************
     Used when forgetting credentials
     ***********************************************************/
-    public void on_signal_clear_access_manager_cache () {
+    public bool on_signal_clear_access_manager_cache () {
         this.soup_session.clear_access_cache ();
+        return false; // only run once
     }
 
 

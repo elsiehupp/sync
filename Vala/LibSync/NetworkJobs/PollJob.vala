@@ -37,7 +37,7 @@ public class PollJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public new void start () {
+    public new bool start () {
         on_signal_timeout (120 * 1000);
         GLib.Uri account_url = account.url;
         GLib.Uri final_url = GLib.Uri.from_user_input (account_url.scheme () + "://" + account_url.authority ()
@@ -47,6 +47,7 @@ public class PollJob : AbstractNetworkJob {
             this.on_signal_reset_timeout // GLib.UniqueConnection
         );
         base.start ();
+        return false; // only run once
     }
 
 
@@ -72,7 +73,7 @@ public class PollJob : AbstractNetworkJob {
                 /* emit */ signal_finished ();
                 return true;
             }
-            GLib.Timeout.single_shot (8 * 1000, this, PollJob.start);
+            GLib.Timeout.add (8 * 1000, this.start);
             return false;
         }
 
@@ -89,7 +90,7 @@ public class PollJob : AbstractNetworkJob {
 
         var status = json["status"].to_string ();
         if (status == "on_signal_init" || status == "started") {
-            GLib.Timeout.single_shot (5 * 1000, this, PollJob.start);
+            GLib.Timeout.add (5000, this.start);
             return false;
         }
 

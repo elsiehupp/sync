@@ -17,8 +17,8 @@ This job is tightly coupled with the DiscoveryPhase class.
 
 After being start ()'ed
 
-Internally, this job will call DiscoveryPhase.schedule_more_jobs when one of its sub-jobs is
-finished. DiscoveryPhase.schedule_more_jobs will call process_sub_jobs () to continue work until
+Internally, this job will call DiscoveryPhase.on_signal_schedule_more_jobs when one of its sub-jobs is
+finished. DiscoveryPhase.on_signal_schedule_more_jobs will call process_sub_jobs () to continue work until
 the job is finished.
 
 Results are fed outwards via the DiscoveryPhase.signal_item_discovered () signal.
@@ -565,7 +565,7 @@ public class ProcessDirectoryJob : GLib.Object {
             }
             process_file (std.move (path), e.local_entry, e.server_entry, e.database_entry);
         }
-        GLib.Timeout.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
+        GLib.Timeout.add (0, this.discovery_data.on_signal_schedule_more_jobs);
     }
 
 
@@ -1015,7 +1015,7 @@ public class ProcessDirectoryJob : GLib.Object {
         if (!result) {
             process_file_analyze_local_info (item, path, local_entry, server_entry, database_entry, this.query_server);
         }
-        GLib.Timeout.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
+        GLib.Timeout.add (0, this.discovery_data.on_signal_schedule_more_jobs);
     }
 
 
@@ -1048,7 +1048,7 @@ public class ProcessDirectoryJob : GLib.Object {
 
     private void on_signal_request_etag_job_finished_with_result (Result<T, HttpError><string> etag) /*mutable*/ {
         this.pending_async_jobs--;
-        GLib.Timeout.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
+        GLib.Timeout.add (0, this.discovery_data.on_signal_schedule_more_jobs);
         if (etag || etag.error.code != 404 ||
             // Somehow another item claimed this original path, consider as if it existed
             this.discovery_data.is_renamed (original_path)) {
@@ -1485,7 +1485,7 @@ public class ProcessDirectoryJob : GLib.Object {
         }
         process_file_finalize (item, path, item.is_directory (), NORMAL_QUERY, recurse_query_server);
         this.pending_async_jobs--;
-        GLib.Timeout.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
+        GLib.Timeout.add (0, this.discovery_data.on_signal_schedule_more_jobs);
     }
 
 
@@ -1994,7 +1994,7 @@ public class ProcessDirectoryJob : GLib.Object {
         int count = this.running_jobs.remove_all (process_directory_job);
         //  GLib.assert_true (count == 1);
         process_directory_job.delete_later ();
-        GLib.Timeout.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
+        GLib.Timeout.add (0, this.discovery_data.on_signal_schedule_more_jobs);
     }
 
 

@@ -148,7 +148,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
         update_status ();
 
         // ensure "next" gets the focus, not ob_select_local_folder
-        GLib.Timeout.single_shot (0, wizard ().button (GLib.Wizard.FinishButton), Gtk.Widget.focus);
+        GLib.Timeout.add (0, wizard ().button (GLib.Wizard.FinishButton).focus);
 
         var acc = ((OwncloudWizard)wizard ()).account;
         var quota_job = new PropfindJob (acc, this.remote_folder, this);
@@ -164,7 +164,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
                 "/"
             };
             radio_checked (this.instance.r_selective_sync);
-            GLib.Timeout.single_shot (0, this, OwncloudAdvancedSetupPage.on_signal_selective_sync_clicked);
+            GLib.Timeout.add (0, this.on_signal_selective_sync_clicked);
         }
 
         ConfigFile config_file;
@@ -333,7 +333,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_selective_sync_clicked () {
+    private bool on_signal_selective_sync_clicked () {
         unowned Account acc = ((OwncloudWizard) wizard ()).account;
         var dialog = new SelectiveSyncDialog (acc, this.remote_folder, this.selective_sync_blocklist, this);
         dialog.attribute (GLib.WA_DeleteOnClose);
@@ -343,6 +343,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
         );
 
         a.open ();
+        return false; // only run once
     }
 
 

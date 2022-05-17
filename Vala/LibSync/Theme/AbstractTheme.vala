@@ -775,7 +775,7 @@ public class Theme : GLib.Object {
                     .printf (Common.Config.APPLICATION_NAME);
 
             dev_string += _("<p>Version %1. For more information please click <a href='%2'>here</a>.</p>")
-                    .printf (Common.Version.MIRALL_VERSION + " (%1)".printf (os_name))
+                    .printf (Common.NextcloudVersion.MIRALL_VERSION + " (%1)".printf (os_name))
                     .printf (help_url);
 
             dev_string += _("<p><small>Using files plugin : %1</small></p>")
@@ -795,7 +795,7 @@ public class Theme : GLib.Object {
         public get {
             string dev_string;
             dev_string = _("<p>Version %1. For more information please click <a href='%2'>here</a>.</p>")
-                    .printf (Common.Version.MIRALL_VERSION_STRING)
+                    .printf (Common.NextcloudVersion.MIRALL_VERSION_STRING)
                     .printf (help_url);
 
             dev_string += _("<p>This release was supplied by %1</p>")

@@ -24,7 +24,7 @@ public class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    // public GLib.SslKey private_key;
+    // public GLib.ByteArray private_key;
 
     /***********************************************************
     ***********************************************************/
@@ -32,7 +32,7 @@ public class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.SslKey public_key;
+    public GLib.ByteArray public_key;
 
     /***********************************************************
     ***********************************************************/
@@ -117,7 +117,7 @@ public class ClientSideEncryption : GLib.Object {
             return;
         }
         string key = BIO2Byte_array (private_key);
-        //  this.private_key = GLib.SslKey (key, GLib.Ssl.Rsa, GLib.Ssl.Pem, GLib.Ssl.PrivateKey);
+        //  this.private_key = GLib.ByteArray (key, GLib.Ssl.Rsa, GLib.Ssl.Pem, GLib.Ssl.PrivateKey);
         this.private_key = key;
 
         GLib.info ("Keys generated correctly, sending to server.");
@@ -243,7 +243,7 @@ public class ClientSideEncryption : GLib.Object {
     public void forget_sensitive_data (Account account) {
         this.private_key = "";
         this.certificate = new GLib.TlsCertificate ();
-        this.public_key = new GLib.SslKey ();
+        this.public_key = new GLib.ByteArray ();
         this.mnemonic = "";
 
         var user = account.credentials.user;
@@ -319,12 +319,12 @@ public class ClientSideEncryption : GLib.Object {
         // Error or no valid public key error out
         if (read_job.error != NoError || read_job.binary_data ().length == 0) {
             this.certificate = new GLib.TlsCertificate ();
-            this.public_key = GLib.SslKey ();
+            this.public_key = GLib.ByteArray ();
             get_public_key_from_server (account);
             return;
         }
 
-        //  this.private_key = GLib.SslKey (read_job.binary_data (), GLib.Ssl.Rsa, GLib.Ssl.Pem, GLib.Ssl.PrivateKey);
+        //  this.private_key = GLib.ByteArray (read_job.binary_data (), GLib.Ssl.Rsa, GLib.Ssl.Pem, GLib.Ssl.PrivateKey);
         this.private_key = read_job.binary_data ();
 
         if (this.private_key == null) {
@@ -361,7 +361,7 @@ public class ClientSideEncryption : GLib.Object {
         // Error or no valid public key error out
         if (read_job.error != NoError || read_job.text_data ().length == 0) {
             this.certificate = new GLib.TlsCertificate ();
-            this.public_key = GLib.SslKey ();
+            this.public_key = GLib.ByteArray ();
             this.private_key = "";
             get_public_key_from_server (account);
             return;
@@ -444,7 +444,7 @@ public class ClientSideEncryption : GLib.Object {
                 } else {
                     GLib.info ("Error invalid server public key.");
                     this.certificate = GLib.TlsCertificate ();
-                    this.public_key = GLib.SslKey ();
+                    this.public_key = GLib.ByteArray ();
                     this.private_key = "";
                     get_public_key_from_server (account);
                     return;
@@ -495,7 +495,7 @@ public class ClientSideEncryption : GLib.Object {
                 GLib.info ("Generated key: " + pass);
 
                 string private_key = EncryptionHelper.decrypt_private_key (pass, key);
-                //  this.private_key = GLib.SslKey (private_key, GLib.Ssl.Rsa, GLib.Ssl.Pem, GLib.Ssl.PrivateKey);
+                //  this.private_key = GLib.ByteArray (private_key, GLib.Ssl.Rsa, GLib.Ssl.Pem, GLib.Ssl.PrivateKey);
                 this.private_key = private_key;
 
                 GLib.info ("Private key: " + this.private_key.to_string ());

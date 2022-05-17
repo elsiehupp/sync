@@ -397,22 +397,25 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
     Triggers a ping to the server to update state and connection
     status and errors.
     ***********************************************************/
-    public void on_signal_check_connectivity () {
+    public bool on_signal_check_connectivity () {
         if (is_signed_out || this.waiting_for_new_credentials) {
-            return;
+            return false;
         }
 
         if (this.connection_validator != null) {
             GLib.warning ("ConnectionValidator already running, ignoring " + account.display_name);
-            return;
+            return false;
         }
 
-        // If we never fetched credentials, do that now - otherwise connection attempts
-        // make little sense, we might be missing client certificates.
+        /***********************************************************
+        If we never fetched credentials, do that now. Otherwise
+        connection attempts make little sense, as we might be
+        missing client certificates.
+        ***********************************************************/
         if (!account.credentials ().was_fetched ()) {
             this.waiting_for_new_credentials = true;
             account.credentials ().fetch_from_keychain ();
-            return;
+            return false;
         }
 
         // IF the account is connected the connection check can be skipped
@@ -422,7 +425,7 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
         if (is_connected && this.time_of_last_e_tag_check.is_valid
             && elapsed <= polltime.length) {
             GLib.debug (account.display_name + "The last ETag check succeeded within the last " + polltime.length + "s (" + elapsed + "s). No connection check needed!");
-            return;
+            return false;
         }
 
         this.connection_validator = new ConnectionValidator (new AccountState (this));
@@ -491,7 +494,8 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
                 GLib.info ("AccountState reconnection: delaying for "
                     + this.maintenance_to_connected_delay.to_string () + "ms.");
                 this.time_since_maintenance_over.on_signal_start ();
-                GLib.Timeout.single_shot (this.maintenance_to_connected_delay + 100, this, AccountState.on_signal_check_connectivity);
+                //  GLib.Timeout.single_shot
+                GLib.Timeout.add (this.maintenance_to_connected_delay + 100, this.on_signal_check_connectivity);
                 return;
             } else if (this.time_since_maintenance_over.elapsed () < this.maintenance_to_connected_delay) {
                 GLib.info ("AccountState reconnection: only"

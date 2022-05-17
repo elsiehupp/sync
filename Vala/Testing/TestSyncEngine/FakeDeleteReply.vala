@@ -30,7 +30,9 @@ public class FakeDeleteReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public override void on_signal_abort () { }
+    public override bool on_signal_abort () {
+        return false; // only run once
+    }
 
     /***********************************************************
     ***********************************************************/

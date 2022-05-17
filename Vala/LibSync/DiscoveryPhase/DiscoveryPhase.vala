@@ -216,11 +216,12 @@ public class DiscoveryPhase : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    void schedule_more_jobs () {
+    internal bool on_signal_schedule_more_jobs () {
         int limit = int.max (1, this.sync_options.parallel_network_jobs);
         if (this.current_root_job && this.currently_active_jobs < limit) {
             this.current_root_job.process_sub_jobs (limit - this.currently_active_jobs);
         }
+        return false; // only run once
     }
 
 

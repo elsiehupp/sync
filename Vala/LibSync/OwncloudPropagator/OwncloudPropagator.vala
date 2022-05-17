@@ -546,7 +546,7 @@ public class OwncloudPropagator : GLib.Object {
             return; // don't schedule more than 1
         }
         this.job_scheduled = true;
-        GLib.Timeout.single_shot (3, this, OwncloudPropagator.on_signal_schedule_next_job_impl);
+        GLib.Timeout.add (3, this.on_signal_schedule_next_job_impl);
     }
 
 
@@ -574,7 +574,7 @@ public class OwncloudPropagator : GLib.Object {
                                       Q_ARG (AbstractPropagatorJob.AbortType, AbstractPropagatorJob.AbortType.ASYNCHRONOUS));
 
             // Give asynchronous abort 5000 msec to finish on its own
-            GLib.Timeout.single_shot (5000, this, SLOT (on_signal_abort_timeout ()));
+            GLib.Timeout.add (5000, this.on_signal_abort_timeout);
         } else {
             // No root job, call on_signal_propagate_root_directory_job_finished
             on_signal_propagate_root_directory_job_finished (SyncFileItem.Status.NORMAL_ERROR);
@@ -793,11 +793,12 @@ public class OwncloudPropagator : GLib.Object {
 
 
     /***********************************************************
+    Abort synchronously and finish
     ***********************************************************/
-    private void on_signal_abort_timeout () {
-        // Abort synchronously and finish
+    private bool on_signal_abort_timeout () {
         this.propagate_root_directory_job.abort (AbstractPropagatorJob.AbortType.SYNCHRONOUS);
         on_signal_propagate_root_directory_job_finished (SyncFileItem.Status.NORMAL_ERROR);
+        return false // only run once
     }
 
 
@@ -814,7 +815,7 @@ public class OwncloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_schedule_next_job_impl () {
+    private bool on_signal_schedule_next_job_impl () {
         // TODO: If we see that the automatic up-scaling has a bad impact we
         // need to check how to avoid this.
         // Down-scaling on slow networks? https://github.com/owncloud/client/issues/3382
@@ -844,6 +845,7 @@ public class OwncloudPropagator : GLib.Object {
                 }
             }
         }
+        return false; // only run once
     }
 
 

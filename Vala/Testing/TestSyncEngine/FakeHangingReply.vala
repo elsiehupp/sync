@@ -25,13 +25,14 @@ public class FakeHangingReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public override void on_signal_abort () {
+    public override bool on_signal_abort () {
         // Follow more or less the implementation of GLib.NetworkReplyImpl.on_signal_abort
         close ();
         set_error (OperationCanceledError, _("Operation canceled"));
         /* emit */ error_occurred (OperationCanceledError);
         set_finished (true);
         /* emit */ signal_finished ();
+        return false; // only run once
     }
 
 

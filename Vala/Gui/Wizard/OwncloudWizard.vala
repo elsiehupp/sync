@@ -11,7 +11,7 @@
 //  #include <owncloudgui.h>
 //  #include <cstdlib>
 //  #include <GLib.Wizard>
-//  #include <GLib.SslKey>
+//  #include <GLib.ByteArray>
 //  #include <GLib.SslCertificate>
 
 namespace Occ {
@@ -86,7 +86,7 @@ public class OwncloudWizard : GLib.Wizard {
     /***********************************************************
     Key extracted from pkcs12
     ***********************************************************/
-    public GLib.SslKey client_ssl_key;
+    public GLib.ByteArray client_ssl_key;
 
     /***********************************************************
     Cert extracted from pkcs12

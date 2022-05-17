@@ -31,26 +31,27 @@ public class FakePayloadReply : FakeReply {
         set_url (request.url);
         set_operation (operation);
         open (GLib.IODevice.ReadOnly);
-        GLib.Timeout.single_shot (delay, this, &FakePayloadReply.respond);
+        GLib.Timeout.add (delay, this.respond);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void respond () {
+    public bool respond () {
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 200);
         set_header (Soup.Request.ContentLengthHeader, this.body.size ());
         /* emit */ signal_meta_data_changed ();
         /* emit */ signal_ready_read ();
         set_finished (true);
         /* emit */ signal_finished ();
+        return false; // only run once
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public override void on_signal_abort () {
-        return;
+    public override bool on_signal_abort () {
+        return false; // only run once
     }
 
 

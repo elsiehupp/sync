@@ -37,7 +37,7 @@ public class UpdaterScheduler : GLib.Object {
         }
 
         // at startup, do a check in any case.
-        GLib.Timeout.single_shot (3000, this, UpdaterScheduler.on_signal_timer_fired);
+        GLib.Timeout.add (3000, this.on_signal_timer_fired);
 
         ConfigFile config;
         var check_interval = config.update_check_interval ();
@@ -47,7 +47,7 @@ public class UpdaterScheduler : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_timer_fired () {
+    private bool on_signal_timer_fired () {
         ConfigFile config;
 
         // re-set the check interval if it changed in the config file meanwhile
@@ -60,13 +60,14 @@ public class UpdaterScheduler : GLib.Object {
         // consider the skip_update_check and !auto_update_check flags in the config.
         if (config.skip_update_check () || !config.auto_update_check ()) {
             GLib.info ("Skipping update check because of config file.");
-            return;
+            return false; // only run once
         }
 
         AbstractUpdater updater = AbstractUpdater.instance;
         if (updater != null) {
             updater.on_signal_background_check_for_update ();
         }
+        return false; // only run once
     }
 
 } // class UpdaterScheduler

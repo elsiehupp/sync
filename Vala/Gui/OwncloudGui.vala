@@ -217,7 +217,7 @@ public class OwncloudGui : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_compute_overall_sync_status () {
+    public bool on_signal_compute_overall_sync_status () {
         bool all_signed_out = true;
         bool all_paused = true;
         bool all_disconnected = true;
@@ -258,19 +258,19 @@ public class OwncloudGui : GLib.Object {
             }
             this.tray.tool_tip (messages.join ("\n\n"));
     //  #endif
-            return;
+            return false; // only run once
         }
 
         if (all_signed_out) {
             this.tray.icon (Theme.folder_offline_icon_for_tray);
             this.tray.tool_tip (_("Please sign in"));
             status_text (_("Signed out"));
-            return;
+            return false; // only run once
         } else if (all_paused) {
             this.tray.icon (Theme.sync_state_icon (LibSync.SyncResult.Status.PAUSED, true));
             this.tray.tool_tip (_("Account synchronization is disabled"));
             status_text (_("Synchronization is paused"));
-            return;
+            return false; // only run once
         }
 
         // display the info of the least successful sync (eg. do not just display the result of the latest sync)
@@ -326,6 +326,7 @@ public class OwncloudGui : GLib.Object {
             this.tray.tool_tip (_("There are no sync folders configured."));
             status_text (_("No sync folders configured"));
         }
+        return false; // only run once
     }
 
 
@@ -390,7 +391,7 @@ public class OwncloudGui : GLib.Object {
             }
     //  #endif
         } else if (progress.status () == ProgressInfo.Status.DONE) {
-            GLib.Timeout.single_shot (2000, this, OwncloudGui.on_signal_compute_overall_sync_status);
+            GLib.Timeout.add (2000, this.on_signal_compute_overall_sync_status);
         }
         if (progress.status () != ProgressInfo.Status.PROPAGATION) {
             return;

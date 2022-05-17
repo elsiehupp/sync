@@ -31,12 +31,13 @@ public class TestErrorMessage : GLib.Object {
         fake_folder.set_server_override (this.override_delegate_error_message);
 
         bool timed_out = false;
-        GLib.Timeout.single_shot (
+        GLib.Timeout.add (
             10000,
             fake_folder.sync_engine,
             () => {
                 timed_out = true;
                 fake_folder.sync_engine.on_signal_abort ();
+                return false; // only run once
             });
         GLib.assert_true (!fake_folder.sync_once ());  // Fail because A/broken
         GLib.assert_true (!timed_out);

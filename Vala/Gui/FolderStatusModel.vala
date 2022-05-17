@@ -703,7 +703,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
 
         // Show "fetching data..." hint after a while.
         this.fetching_items[persistent_index].on_signal_start ();
-        GLib.Timeout.single_shot (1000, this, FolderStatusModel.on_signal_show_fetch_progress);
+        GLib.Timeout.add (1000, this.on_signal_show_fetch_progress);
     }
 
 
@@ -1518,7 +1518,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
     "In progress" labels for fetching data from the server are
     only added after some time to avoid popping.
     ***********************************************************/
-    private void on_signal_show_fetch_progress () {
+    private bool on_signal_show_fetch_progress () {
         var it = new GLib.MutableMapIterator<GLib.PersistentModelIndex, GLib.Timer> (this.fetching_items);
         while (it.has_next ()) {
             it.next ();
@@ -1538,6 +1538,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
                 it.remove ();
             }
         }
+        return false; // only run once
     }
 
 

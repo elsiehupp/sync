@@ -47,7 +47,7 @@ public class HttpCredentialsGui : HttpCredentials {
         // which (indirectly, through HttpCredentials.invalidate_token) schedules
         // a cache wipe of the soup_context. We can only execute a network job again once
         // the cache has been cleared, otherwise we'd interfere with the job.
-        GLib.Timeout.single_shot (100, this, HttpCredentialsGui.on_signal_ask_from_user_async);
+        GLib.Timeout.add (100, this.on_signal_ask_from_user_async);
     }
 
 
@@ -168,15 +168,17 @@ public class HttpCredentialsGui : HttpCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_ask_from_user_async () {
+    private bool on_signal_ask_from_user_async () {
         // First, we will check what kind of auth we need.
         var determine_auth_type_job = new LibSync.DetermineAuthTypeJob (
-            this.account.shared_from_this (), this
+            this.account.shared_from_this (),
+            this
         );
         determine_auth_type_job.signal_auth_type.connect (
             this.on_signal_auth_type
         );
         determine_auth_type_job.on_signal_start ();
+        return false; // only run once
     }
 
 

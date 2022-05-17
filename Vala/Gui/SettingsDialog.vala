@@ -171,7 +171,7 @@ public class SettingsDialog : Gtk.Dialog {
             signal_account_added (account_instance);
         }
 
-        GLib.Timeout.single_shot (1, this, SettingsDialog.show_first_page);
+        GLib.Timeout.add (1, this.on_signal_show_first_page);
 
         var show_log_window = new GLib.Action (this);
         show_log_window.shortcut (GLib.KeySequence ("F12"));
@@ -219,11 +219,12 @@ public class SettingsDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public void show_first_page () {
+    public bool on_signal_show_first_page () {
         GLib.List<GLib.Action> actions = this.tool_bar.actions ();
         if (!actions.empty ()) {
             actions.nth_data (0).trigger ();
         }
+        return false; // only run once
     }
 
 
@@ -382,7 +383,7 @@ public class SettingsDialog : Gtk.Dialog {
                 this.tool_bar.remove_action (it.key ());
 
                 if (this.instance.stack.current_widget () == it.value ()) {
-                    show_first_page ();
+                    on_signal_show_first_page ();
                 }
 
                 it.key ().delete_later ();

@@ -61,8 +61,9 @@ public abstract class AbstractCredentials : GLib.Object {
 
 
     /***********************************************************
+    User's password or OAuth access token
     ***********************************************************/
-    public abstract string password ();
+    public string password { public get; protected set; }
 
 
     /***********************************************************
@@ -74,7 +75,7 @@ public abstract class AbstractCredentials : GLib.Object {
     Whether there are credentials that can be used for a
     connection attempt.
     ***********************************************************/
-    public abstract bool ready ();
+    public bool ready { public get; protected set; }
 
 
     /***********************************************************

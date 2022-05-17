@@ -47,7 +47,7 @@ public class KeychainChunkReadJob : AbstractKeychainChunkJob {
 
     @see Secret.Collection.Job.start ()
     ***********************************************************/
-    public new void start () {
+    public new bool start () {
         this.chunk_count = 0;
         this.chunk_buffer == "";
         this.error = Secret.Collection.NoError;
@@ -68,6 +68,7 @@ public class KeychainChunkReadJob : AbstractKeychainChunkJob {
             this.on_signal_read_job_done
         );
         qkeychain_read_password_job.start ();
+        return false; // only run once
     }
 
 
@@ -117,7 +118,7 @@ public class KeychainChunkReadJob : AbstractKeychainChunkJob {
                     // (Issues #4274 and #6522)
                     // (For kwallet, the error is OtherError instead of NoBackendAvailable, maybe a bug in QtKeychain)
                     GLib.info ("Backend unavailable (yet?) Retrying in a few seconds. " + read_job.error_string);
-                    GLib.Timeout.single_shot (10000, this, ReadJob.start);
+                    GLib.Timeout.add (10000, this.start);
                     this.retry_on_signal_key_chain_error = false;
                     read_job.delete_later ();
                     return;

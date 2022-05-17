@@ -112,14 +112,14 @@ public class ConnectionValidator : GLib.Object {
     /***********************************************************
     How often should the Application ask this object to check for the connection?
     ***********************************************************/
-    const int DEFAULT_CALLING_INTERVAL_MILLISECONDS = 62 * 1000;
+    internal const int DEFAULT_CALLING_INTERVAL_MILLISECONDS = 62 * 1000;
 
     /***********************************************************
     Make sure the timeout for this job is less than how often we
     get called. This makes sure we get tried often enough
     without "ConnectionValidator already running".
     ***********************************************************/
-    const int64 TIMEOUT_TO_USE_MILLISECONDS = int64.max (1000, DEFAULT_CALLING_INTERVAL_MILLISECONDS - 5 * 1000);
+    internal const int64 TIMEOUT_TO_USE_MILLISECONDS = int64.max (1000, DEFAULT_CALLING_INTERVAL_MILLISECONDS - 5 * 1000);
 
     /***********************************************************
     ***********************************************************/
@@ -191,12 +191,12 @@ public class ConnectionValidator : GLib.Object {
     /***********************************************************
     Checks authentication only
     ***********************************************************/
-    public void on_signal_check_authentication () {
+    public bool on_signal_check_authentication () {
         AbstractCredentials creds = this.account.credentials ();
 
         if (!creds.ready ()) {
             report_result (CredentialsNotReady);
-            return;
+            return false; // only run once
         }
 
         // simply GET the webdav root, will fail if credentials are wrong.
@@ -212,6 +212,7 @@ public class ConnectionValidator : GLib.Object {
             this.on_signal_auth_failed
         );
         propfind_job.on_signal_start ();
+        return false; // only run once
     }
 
 
@@ -270,7 +271,7 @@ public class ConnectionValidator : GLib.Object {
         }
 
         // now check the authentication
-        GLib.Timeout.single_shot (0, this, ConnectionValidator.on_signal_check_authentication);
+        GLib.Timeout.add (0, this.on_signal_check_authentication);
     }
 
 

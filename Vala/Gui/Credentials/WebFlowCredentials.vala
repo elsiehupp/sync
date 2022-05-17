@@ -1,11 +1,10 @@
 // #include <GLib.SslCertificate>
-//  #include <GLib.SslKey>
+//  #include <GLib.ByteArray>
 //  #include <Soup.Request>
 //  #include <GLib.Queue>
 //  #include <GLib.Authenticator>
 //  #include <Soup.Context>
 //  #include <GLib.Pointe
-//  #include <GLib.Timeout>
 //  #include <Gtk.Dialog>
 //  #include <GLib.VBoxLayout>
 
@@ -48,7 +47,7 @@ public class WebFlowCredentials : AbstractCredentials {
     string password { public get; protected set; }
     bool ready { public get; protected set; }
 
-    protected GLib.SslKey client_ssl_key;
+    protected GLib.ByteArray client_ssl_key;
     protected GLib.SslCertificate client_ssl_certificate;
     protected GLib.List<GLib.SslCertificate> client_ssl_ca_certificates;
 
@@ -63,7 +62,7 @@ public class WebFlowCredentials : AbstractCredentials {
         string user,
         string password,
         GLib.SslCertificate certificate = GLib.SslCertificate (),
-        GLib.SslKey key = GLib.SslKey (),
+        GLib.ByteArray key = GLib.ByteArray (),
         GLib.List<GLib.SslCertificate> ca_certificates = GLib.List<GLib.SslCertificate> ()) {
         this.user = user;
         this.password = password;
@@ -168,7 +167,7 @@ public class WebFlowCredentials : AbstractCredentials {
         // indirectly) from GLib.NetworkAccessManagerPrivate.signal_authentication_required, which itself
         // is a called from a BlockingQueuedConnection from the Qt HTTP thread. And clearing the
         // cache needs to synchronize again with the HTTP thread.
-        GLib.Timeout.single_shot (0, this.account, Account.on_signal_clear_access_manager_cache);
+        GLib.Timeout.add (0, this.account.on_signal_clear_access_manager_cache);
     }
 
 
@@ -326,12 +325,12 @@ public class WebFlowCredentials : AbstractCredentials {
             string client_key_pem = read_job.binary_data ();
             // FIXME Unfortunately Qt has a bug and we can't just use GLib.Ssl.Opaque to let it
             // load whatever we have. So we try until it works.
-            this.client_ssl_key = GLib.SslKey (client_key_pem, GLib.Ssl.Rsa);
+            this.client_ssl_key = GLib.ByteArray (client_key_pem, GLib.Ssl.Rsa);
             if (this.client_ssl_key == null) {
-                this.client_ssl_key = GLib.SslKey (client_key_pem, GLib.Ssl.Dsa);
+                this.client_ssl_key = GLib.ByteArray (client_key_pem, GLib.Ssl.Dsa);
             }
             if (this.client_ssl_key == null) {
-                this.client_ssl_key = GLib.SslKey (client_key_pem, GLib.Ssl.Ec);
+                this.client_ssl_key = GLib.ByteArray (client_key_pem, GLib.Ssl.Ec);
             }
             if (this.client_ssl_key == null) {
                 GLib.warning ("Could not load SSL key into Qt!");

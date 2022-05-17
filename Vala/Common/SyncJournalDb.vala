@@ -2857,7 +2857,7 @@ public class SyncJournalDb : GLib.Object {
             }
 
             // Not comparing the BUILD identifier here, correct?
-            if (! (major == Common.Version.MIRALL_VERSION_MAJOR && minor == Common.Version.MIRALL_VERSION_MINOR && patch == Common.Version.MIRALL_VERSION_PATCH)) {
+            if (! (major == Common.NextcloudVersion.MIRALL_VERSION_MAJOR && minor == Common.NextcloudVersion.MIRALL_VERSION_MINOR && patch == Common.NextcloudVersion.MIRALL_VERSION_PATCH)) {
                 create_query.prepare (
                     "UPDATE version SET major=?1, minor=?2, patch =?3, custom=?4 "
                     + "WHERE major=?5 AND minor=?6 AND patch=?7;");

@@ -216,14 +216,15 @@ public class WebFlowCredentialsDialog : Gtk.Dialog {
     ***********************************************************/
     public void on_signal_show_settings_dialog () {
         // bring window to top but slightly delay, to avoid being hidden behind the SettingsDialog
-        GLib.Timeout.single_shot (100, this, on_signal_show_delayed);
+        GLib.Timeout.add (100, this.on_signal_show_delayed);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_show_delayed () {
+    private bool on_signal_show_delayed () {
         OwncloudGui.raise_dialog (this);
+        return false; // only run once
     }
 
 

@@ -198,10 +198,10 @@ public class FolderWatcher : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_start_notification_test_when_ready () {
+    private bool on_signal_start_notification_test_when_ready () {
         if (!this.d.ready) {
-            GLib.Timeout.single_shot (1000, this, FolderWatcher.on_signal_start_notification_test_when_ready);
-            return;
+            GLib.Timeout.add (1000, this.on_signal_start_notification_test_when_ready);
+            return false; // only run once
         }
 
         var path = this.test_notification_path;
@@ -213,17 +213,19 @@ public class FolderWatcher : GLib.Object {
             f.open (GLib.IODevice.WriteOnly | GLib.IODevice.Append);
         }
 
-        GLib.Timeout.single_shot (5000, this, on_timer);
+        GLib.Timeout.add (5000, this.on_timer);
+        return false; // only run once
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_timer () {
+    private bool on_timer () {
         if (this.test_notification_path != "") {
             /* emit */ signal_became_unreliable (_("The watcher did not receive a test notification."));
         }
         this.test_notification_path == "";
+        return false; // only run once
     }
 
 

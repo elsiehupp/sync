@@ -44,8 +44,8 @@ public class FakeMkcolReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public override void on_signal_abort () {
-        return;
+    public override bool on_signal_abort () {
+        return false; // only run once
     }
 
 

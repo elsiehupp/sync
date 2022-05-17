@@ -8,27 +8,31 @@ namespace Testing {
 /***********************************************************
 A delayed reply
 ***********************************************************/
-public class DelayedReply<OriginalReply> : GLib.Object {
+public class DelayedReply<OriginalReply> : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public uint64 delay_milliseconds;
+    public uint delay_milliseconds;
 
     /***********************************************************
     ***********************************************************/
-    //  //  public template <typename... Args>
-    //  public DelayedReply (uint64 delay_milliseconds, Args &&... args) {
-    //      base (std.forward<Args> (args)...);
-    //      this.delay_milliseconds = delay_milliseconds;
-    //  }
+    public DelayedReply (uint64 delay_milliseconds, GLib.Object parent = new GLib.Object ()) {
+        base (parent);
+        this.delay_milliseconds = delay_milliseconds;
+    }
 
     /***********************************************************
     ***********************************************************/
     public void respond () {
-        GLib.Timeout.single_shot (this.delay_milliseconds, (OriginalReply)this, () => {
-            // Explicit call to bases's respond ();
-            this.OriginalReply.respond ();
-        });
+        GLib.Timeout.add (this.delay_milliseconds, this.on_signal_timeout);
+    }
+
+
+    /***********************************************************
+    Explicit call to bases's respond ();
+    ***********************************************************/
+    private bool on_signal_timeout () {
+        ((OriginalReply)base).respond ();
     }
 
 } // class DelayedReply

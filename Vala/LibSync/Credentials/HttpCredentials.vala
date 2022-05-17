@@ -63,12 +63,8 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    string user { public get; protected set; }
+    //  string user { public get; protected set; }
 
-    /***********************************************************
-    User's password or OAuth access token
-    ***********************************************************/
-    string password { public get; protected set; }
 
     /***********************************************************
     OAuth this.refresh_token, set if OAuth is used.
@@ -85,10 +81,6 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    bool ready { public get; protected set; }
-
-    /***********************************************************
-    ***********************************************************/
     protected bool is_renewing_oauth_token = false;
 
     /***********************************************************
@@ -101,7 +93,7 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    protected GLib.SslKey client_ssl_key;
+    protected GLib.ByteArray client_ssl_key;
 
     /***********************************************************
     ***********************************************************/
@@ -130,6 +122,7 @@ public class HttpCredentials : AbstractCredentials {
     From wizard
     ***********************************************************/
     public HttpCredentials (string user, string password, string client_cert_bundle = "", string client_cert_password = "") {
+        this.auth_type_string = "http";
         this.user = user;
         this.password = password;
         this.ready = true;
@@ -144,14 +137,7 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public string auth_type_string () {
-        return "http";
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public Soup.Session create_access_manager () {
+    public override Soup.Session create_access_manager () {
         Soup.ClientContext soup_context = new HttpCredentialsAccessManager (this);
 
         soup_context.signal_authentication_required.connect (
@@ -166,7 +152,7 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public new void fetch_from_keychain () {
+    public override void fetch_from_keychain () {
         this.was_fetched = true;
 
         // User must be fetched from config file
@@ -190,7 +176,7 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public bool still_valid (GLib.InputStream input_stream) {
+    public override bool still_valid (GLib.InputStream input_stream) {
         return ( (input_stream.error != GLib.InputStream.AuthenticationRequiredError)
             // returned if user or password is incorrect
             && (input_stream.error != GLib.InputStream.OperationCanceledError
@@ -200,18 +186,18 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public void persist () {
+    public override void persist () {
         if (this.user == "") {
             // We never connected or fetched the user, there is nothing to save.
             return;
         }
 
-        this.account.credential_setting (USER_C, this.user);
-        this.account.credential_setting (IS_OAUTH_C, is_using_oauth ());
+        this.account.credential_setting_key_value (USER_C, this.user);
+        this.account.credential_setting_key_value (IS_OAUTH_C, is_using_oauth ());
         if (this.client_cert_bundle != "") {
             // Note that the this.client_cert_bundle will often be cleared after usage,
             // it's just written if it gets passed into the constructor.
-            this.account.credential_setting (CLIENT_CERT_BUNDLE_C, this.client_cert_bundle);
+            this.account.credential_setting_key_value (CLIENT_CERT_BUNDLE_C, this.client_cert_bundle);
         }
         this.account.signal_wants_account_saved (this.account);
 
@@ -254,7 +240,7 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public void invalidate_token () {
+    public override void invalidate_token () {
         if (this.password != "") {
             this.previous_password = this.password;
         }
@@ -285,19 +271,25 @@ public class HttpCredentials : AbstractCredentials {
         qkeychain_delete_password_job.key (keychain_key);
         qkeychain_delete_password_job.start ();
 
-        // let Soup.Session forget about the password
-        // This needs to be done later in the event loop because we might be called (directly or
-        // indirectly) from GLib.NetworkAccessManagerPrivate.signal_authentication_required, which itself
-        // is a called from a BlockingQueuedConnection from the Qt HTTP thread. And clearing the
-        // cache needs to synchronize again with the HTTP thread.
-        GLib.Timeout.single_shot (0, this.account, Account.on_signal_clear_access_manager_cache);
+        /***********************************************************
+        Let Soup.Session forget about the password. This needs to be
+        done later in the event loop because we might be called
+        (directly or indirectly) from GLib.NetworkAccessManagerPrivate.signal_authentication_required,
+        which itself is a called from a BlockingQueuedConnection
+        from the Qt HTTP thread. And clearing the cache needs to
+        synchronize again with the HTTP thread.
+        ***********************************************************/
+        GLib.Timeout.add (0, this.account.on_signal_clear_access_manager_cache);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void forget_sensitive_data () {
-        // need to be done before invalidate_token, so it actually deletes the refresh_token from the keychain
+    public override void forget_sensitive_data () {
+        /***********************************************************
+        Need to be done before invalidate_token, so it actually
+        deletes the refresh_token from the keychain.
+        ***********************************************************/
         this.refresh_token == "";
 
         invalidate_token ();
@@ -502,12 +494,12 @@ public class HttpCredentials : AbstractCredentials {
             string client_key_pem = read_job.binary_data ();
             // FIXME Unfortunately Qt has a bug and we can't just use GLib.Ssl.Opaque to let it
             // load whatever we have. So we try until it works.
-            this.client_ssl_key = GLib.SslKey (client_key_pem, GLib.Ssl.Rsa);
+            this.client_ssl_key = GLib.ByteArray (client_key_pem, GLib.Ssl.Rsa);
             if (this.client_ssl_key == null) {
-                this.client_ssl_key = GLib.SslKey (client_key_pem, GLib.Ssl.Dsa);
+                this.client_ssl_key = GLib.ByteArray (client_key_pem, GLib.Ssl.Dsa);
             }
             if (this.client_ssl_key == null) {
-                this.client_ssl_key = GLib.SslKey (client_key_pem, GLib.Ssl.Ec);
+                this.client_ssl_key = GLib.ByteArray (client_key_pem, GLib.Ssl.Ec);
             }
             if (this.client_ssl_key == null) {
                 GLib.warning ("Could not load SSL key into Qt!");
@@ -678,7 +670,7 @@ public class HttpCredentials : AbstractCredentials {
       on_signal_read_client_cert_pem_job_done to
       on_signal_read_job_done
     ***********************************************************/
-    protected void fetch_from_keychain_helper () {
+    protected bool fetch_from_keychain_helper () {
         this.client_cert_bundle = this.account.credential_setting (CLIENT_CERT_BUNDLE_C).to_byte_array ();
         if (this.client_cert_bundle != "") {
             // New case (>=2.6) : We have a bundle in the settings and read the password from
@@ -691,14 +683,15 @@ public class HttpCredentials : AbstractCredentials {
                 this.on_signal_read_client_cert_password_job_done
             );
             qkeychain_read_password_job.start ();
-            return;
+            return false; // only run once
         }
 
         // Old case (pre 2.6) : Read client cert and then key from keychain
         string keychain_key = keychain_key (
             this.account.url.to_string (),
             this.user + CLIENT_CERTIFICATE_PEM_C,
-            this.keychain_migration ? "" : this.account.identifier);
+            this.keychain_migration ? "" : this.account.identifier
+        );
 
         var qkeychain_read_password_job = new Secret.Collection.ReadPasswordJob (Theme.app_name);
         add_settings_to_job (this.account, qkeychain_read_password_job);
@@ -708,6 +701,7 @@ public class HttpCredentials : AbstractCredentials {
             this.on_signal_read_client_cert_pem_job_done
         );
         qkeychain_read_password_job.start ();
+        return false; // only run once
     }
 
 
@@ -748,7 +742,7 @@ public class HttpCredentials : AbstractCredentials {
             // (Issues #4274 and #6522)
             // (For kwallet, the error is OtherError instead of NoBackendAvailable, maybe a bug in QtKeychain)
             GLib.info ("Backend unavailable (yet?); Retrying in a few seconds. " + incoming.error_string);
-            GLib.Timeout.single_shot (10000, this, HttpCredentials.fetch_from_keychain_helper);
+            GLib.Timeout.add (10000, this.fetch_from_keychain_helper);
             this.retry_on_signal_key_chain_error = false;
             return true;
         }

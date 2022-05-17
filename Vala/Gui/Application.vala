@@ -144,10 +144,6 @@ public class Application : GLib.Application {
     private GLib.NetworkConfigurationManager network_configuration_manager;
 
     /***********************************************************
-    ***********************************************************/
-    private GLib.Timeout check_connection_timer;
-
-    /***********************************************************
     #if defined (WITH_CRASHREPORTER)
     ***********************************************************/
     private CrashReporter.Handler crash_handler;
@@ -235,7 +231,7 @@ public class Application : GLib.Application {
             return;
         }
         if (this.quit_instance) {
-            GLib.Timeout.single_shot (0, GLib.Application, GLib.Application.quit);
+            GLib.Timeout.add (0, this.on_timeout_quit);
             return;
         }
         if (is_running ()) {
@@ -291,7 +287,7 @@ public class Application : GLib.Application {
                     "file at %1. Please make sure the file can be accessed by your user.")
                         .printf (ConfigFile ().config_file ()),
                     _("Quit %1").printf (Theme.app_name_gui));
-                GLib.Timeout.single_shot (0, GLib.Application, SLOT (quit ()));
+                GLib.Timeout.add (0, this.on_timeout_quit);
                 return;
             }
         }
@@ -327,23 +323,20 @@ public class Application : GLib.Application {
         foreach (var account_instance in AccountManager.instance.accounts) {
             on_signal_account_state_added (account_instance);
         }
-
         FolderManager.instance.socket_api.signal_share_command_received.connect (
             this.gui.on_signal_show_share_dialog
         );
-
         FolderManager.instance.socket_api.signal_file_activity_command_received.connect (
             Systray.instance.show_file_activity_dialog
         );
 
         // startup procedure.
-        this.check_connection_timer.timeout.connect (
+        GLib.Timeout.add (
+            ConnectionValidator.DEFAULT_CALLING_INTERVAL_MILLISECONDS, // check for connection every 32 seconds.
             this.on_signal_check_connection
         );
-        this.check_connection_timer.interval (ConnectionValidator.DEFAULT_CALLING_INTERVAL_MILLISECONDS); // check for connection every 32 seconds.
-        this.check_connection_timer.on_signal_start ();
         // Also check immediately
-        GLib.Timeout.single_shot (0, this, Application.on_signal_check_connection);
+        GLib.Timeout.add (0, this.on_signal_check_connection);
 
         // Can't use online_state_changed because it is always true on modern systems because of many interfaces
         this.network_configuration_manager.configuration_changed.connect (
@@ -413,6 +406,12 @@ public class Application : GLib.Application {
         }
 
         display_help_text (help_text);
+    }
+
+
+    private bool on_timeout_quit () {
+        this.quit ();
+        return false;
     }
 
 
@@ -507,26 +506,25 @@ public class Application : GLib.Application {
     The argument is the filename of the virtual file (including
     the extension)
     ***********************************************************/
-    public void on_signal_open_virtual_file (string filename) {
+    public bool on_signal_open_virtual_file (string filename) {
         string virtual_file_ext = Common.Config.APPLICATION_DOTVIRTUALFILE_SUFFIX;
         if (!filename.has_suffix (virtual_file_ext)) {
             GLib.warning ("Can only handle file ending in .owncloud. Unable to open " + filename);
-            return;
+            return false; // only run once
         }
         var folder_connection = FolderManager.instance.folder_for_path (filename);
         if (folder_connection == null) {
             GLib.warning ("Can't find sync folder_connection for " + filename);
             // TODO: show a Gtk.MessageBox for errors
-            return;
+            return false; // only run once
         }
         string relative_path = GLib.Dir.clean_path (filename).mid (folder_connection.clean_path.length + 1);
         folder_connection.on_signal_implicitly_hydrate_file (relative_path);
         string normal_name = filename.left (filename.length - virtual_file_ext.length);
-        GLib.Object.Connection.create () = connect (
-            folder_connection,
-            FolderConnection.signal_sync_finished, folder_connection,
+        folder_connection.signal_sync_finished.connect (
             this.on_signal_sync_finished
         );
+        return false; // only run once
     }
 
 
@@ -544,9 +542,11 @@ public class Application : GLib.Application {
     Attempt to show () the tray icon again. Used if no systray
     was available initially.
     ***********************************************************/
-    public void on_signal_try_tray_again () {
+    public bool on_signal_try_tray_again () {
         GLib.info ("Trying tray icon, tray available: " + GLib.SystemTrayIcon.is_system_tray_available ());
         this.gui.hide_and_show_tray ();
+
+        return false; // only run once
     }
 
 
@@ -609,9 +609,8 @@ public class Application : GLib.Application {
                 this.version_only = true;
             } else if (option.has_suffix (APPLICATION_DOTVIRTUALFILE_SUFFIX)) {
                 // virtual file, open iterator after the FolderConnection were created (if the app is not terminated)
-                GLib.Timeout.single_shot (
+                GLib.Timeout.add (
                     0,
-                    this,
                     this.on_signal_open_virtual_file (option)
                 );
             } else {
@@ -751,7 +750,7 @@ public class Application : GLib.Application {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_check_connection () {
+    protected bool on_signal_check_connection () {
         foreach (var account_state in AccountManager.instance.accounts) {
             AccountState.State state = account_state.state;
 
@@ -773,6 +772,8 @@ public class Application : GLib.Application {
 
             this.check_connection_timer.stop (); // don't popup the wizard on interval;
         }
+
+        return false; // only run once
     }
 
 
@@ -885,7 +886,7 @@ public class Application : GLib.Application {
 
         // Did the client version change?
         // (The client version is adjusted further down)
-        bool version_changed = config_file.client_version_string != Common.Version.MIRALL_VERSION_STRING;
+        bool version_changed = config_file.client_version_string != Common.NextcloudVersion.MIRALL_VERSION_STRING;
 
         // We want to message the user either for destructive changes,
         // or if we're ignoring something and the client version changed.
@@ -919,7 +920,7 @@ public class Application : GLib.Application {
 
             box.exec ();
             if (box.clicked_button () != continue_btn) {
-                GLib.Timeout.single_shot (0, GLib.Application, SLOT (quit ()));
+                GLib.Timeout.add (0, this.on_timeout_quit);
                 return false;
             }
 

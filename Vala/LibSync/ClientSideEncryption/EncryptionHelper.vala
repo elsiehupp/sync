@@ -419,7 +419,7 @@ public class EncryptionHelper : GLib.Object {
 
 
     /***********************************************************
-    TODO: change those two EVP_PKEY into GLib.SslKey.
+    TODO: change those two EVP_PKEY into GLib.ByteArray.
     ***********************************************************/
     public static string encrypt_string_asymmetric (
         EVP_PKEY public_key,

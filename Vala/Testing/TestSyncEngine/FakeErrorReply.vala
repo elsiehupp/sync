@@ -37,19 +37,22 @@ public class FakeErrorReply : FakeReply {
         /* emit */ signal_meta_data_changed ();
         /* emit */ signal_ready_read ();
         // finishing can come strictly after signal_ready_read was called
-        GLib.Timeout.single_shot (5, this, &FakeErrorReply.on_signal_finished);
+        GLib.Timeout.add (5, this.on_signal_finished);
     }
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_finished () {
+    public bool on_signal_finished () {
         set_finished (true);
         /* emit */ signal_finished ();
+        return false; // only run once
     }
 
     /***********************************************************
     ***********************************************************/
-    public override void on_signal_abort () { }
+    public override bool on_signal_abort () {
+        return false; // only run once
+    }
 
     /***********************************************************
     ***********************************************************/

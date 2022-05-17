@@ -17,9 +17,9 @@ public class FakeChunkMoveReply : FakeReply {
         open (GLib.IODevice.ReadOnly);
         file_info = perform (uploads_file_info, remote_root_file_info, request);
         if (!file_info) {
-            GLib.Timeout.single_shot (0, this, &FakeChunkMoveReply.respond_precondition_failed);
+            GLib.Timeout.add (0, this.respond_precondition_failed);
         } else {
-            GLib.Timeout.single_shot (0, this, &FakeChunkMoveReply.respond);
+            GLib.Timeout.add (0, this.respond);
         }
     }
 
@@ -83,31 +83,34 @@ public class FakeChunkMoveReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public virtual void respond () {
+    public virtual bool respond () {
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 201);
         set_raw_header ("OC-ETag", file_info.etag);
         set_raw_header ("ETag", file_info.etag);
         set_raw_header ("OC-FileId", file_info.file_identifier);
         /* emit */ signal_meta_data_changed ();
         /* emit */ signal_finished ();
+        return false; // only run once
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void respond_precondition_failed () {
+    public bool respond_precondition_failed () {
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 412);
         set_error (InternalServerError, "Precondition Failed");
         /* emit */ signal_meta_data_changed ();
         /* emit */ signal_finished ();
+        return false; // only run once
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public override void on_signal_abort () {
+    public override bool on_signal_abort () {
         set_error (OperationCanceledError, "on_signal_abort");
         /* emit */ signal_finished ();
+        return false; // only run once
     }
 
 

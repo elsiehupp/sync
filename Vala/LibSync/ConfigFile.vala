@@ -1049,7 +1049,7 @@ public class ConfigFile : GLib.Object {
     public string update_channel {
         public get {
             string default_update_channel = "stable";
-            string suffix = Common.Version.MIRALL_VERSION_SUFFIX;
+            string suffix = Common.NextcloudVersion.MIRALL_VERSION_SUFFIX;
             if (suffix.has_prefix ("daily")
                 || suffix.has_prefix ("nightly")
                 || suffix.has_prefix ("alpha")

@@ -34,7 +34,6 @@ A folder_connection is scheduled if:
   (this.folder_watchers and FolderConnection.on_signal_watched_pat
 
 - The folder_connection etag on the server has changed
-  (this.etag_poll_timer)
 
 - The locks of a monitored file are released
   (this.lock_watcher and on_signal_watched_file_unlocked ())
@@ -140,19 +139,9 @@ public class FolderManager : GLib.Object {
     private GLib.List<string> additional_blocked_folder_aliases;
 
     /***********************************************************
-    Starts regular etag query jobs
-    ***********************************************************/
-    private GLib.Timeout etag_poll_timer;
-
-    /***********************************************************
     The currently running etag query
     ***********************************************************/
     private RequestEtagJob current_etag_job;
-
-    /***********************************************************
-    Occasionally schedules folders
-    ***********************************************************/
-    private GLib.Timeout time_scheduler;
 
     /***********************************************************
     Scheduled folders that should be synced as soon as possible
@@ -162,7 +151,36 @@ public class FolderManager : GLib.Object {
     /***********************************************************
     Picks the next scheduled folder_connection and starts the sync
     ***********************************************************/
-    private GLib.Timeout start_scheduled_sync_timer;
+    private int64 start_scheduled_sync_timer_delay {
+        get {
+            int64 ms_delay = 100; // 100ms minimum delay
+            int64 ms_since_last_sync = 0;
+
+            // Require a pause based on the duration of the last sync run.
+            FolderConnection last_folder = this.last_sync_folder;
+            if (last_folder != null) {
+                ms_since_last_sync = last_folder.microseconds_since_last_sync ().length;
+
+                //  1s   . 1.5s pause
+                // 10s   . 5s pause
+                //  1min . 12s pause
+                //  1h   . 90s pause
+                int64 pause = q_sqrt (last_folder.msec_last_sync_duration ().length) / 20.0 * 1000.0;
+                ms_delay = int64.max (ms_delay, pause);
+            }
+
+            // Delays beyond one minute seem too big, particularly since there
+            // could be things later in the queue that shouldn't be punished by a
+            // long delay!
+            ms_delay = int64.min (ms_delay, 60 * 1000ll);
+
+            // Time since the last sync run counts against the delay
+            ms_delay = int64.max (1ll, ms_delay - ms_since_last_sync);
+
+            GLib.info ("Starting the next scheduled sync in " + (ms_delay / 1000).to_string () + " seconds.");
+            this.start_scheduled_sync_timer.on_signal_start (ms_delay);
+        }
+    }
 
     /***********************************************************
     ***********************************************************/
@@ -219,23 +237,22 @@ public class FolderManager : GLib.Object {
         // std.chrono.milliseconds polltime_in_microseconds
         GLib.TimeSpan polltime_in_microseconds = config.remote_poll_interval ();
         GLib.info ("setting remote poll timer interval to " + polltime_in_microseconds.length + "msec");
-        this.etag_poll_timer.interval (polltime_in_microseconds.length);
-        this.etag_poll_timer.timeout.connect (
+
+        /***********************************************************
+        Starts regular etag query jobs
+        ***********************************************************/
+        GLib.Timeout.add (
+            polltime_in_microseconds.length,
             this.on_signal_etag_poll_timer_timeout
         );
-        this.etag_poll_timer.on_signal_start ();
-
-        this.start_scheduled_sync_timer.single_shot (true);
-        this.start_scheduled_sync_timer.timeout.connect (
+        GLib.Timeout.add (
+            this.start_scheduled_sync_timer_delay,
             this.on_signal_start_scheduled_folder_sync
         );
-        this.time_scheduler.interval (5000);
-        this.time_scheduler.single_shot (false);
-        this.time_scheduler.timeout.connect (
+        GLib.Timeout.add (
+            5000,
             this.on_signal_schedule_folder_by_time
         );
-        this.time_scheduler.on_signal_start ();
-
         AccountManager.instance.signal_remove_account_folders.connect (
             this.on_signal_remove_folders_for_account
         );
@@ -1459,7 +1476,7 @@ public class FolderManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_etag_poll_timer_timeout () {
+    private bool on_signal_etag_poll_timer_timeout () {
         GLib.info ("Etag poll timer timeout.");
         GLib.info ("Folders to sync: " + this.folder_map.size ().to_string ());
         GLib.List<FolderConnection> folders_to_run = new GLib.List<FolderConnection> ();
@@ -1474,6 +1491,8 @@ public class FolderManager : GLib.Object {
         GLib.info ("Number of folders that don't use push notifications: " + folders_to_run.length ());
 
         run_etag_jobs_if_possible (folders_to_run);
+
+        return false; // only run once
     }
 
 
@@ -1557,7 +1576,7 @@ public class FolderManager : GLib.Object {
     Either because a long time has passed since the last sync or
     because of previous failures.
     ***********************************************************/
-    private void on_signal_schedule_folder_by_time () {
+    private bool on_signal_schedule_folder_by_time () {
         foreach (FolderConnection folder_connection in this.folder_map) {
             // Never schedule if syncing is disabled or when we're currently
             // querying the server for etags
@@ -1601,6 +1620,7 @@ public class FolderManager : GLib.Object {
 
             // Do we want to retry failing syncs or another-sync-needed runs more often?
         }
+        return true; // run repeatedly
     }
 
 
@@ -1764,42 +1784,15 @@ public class FolderManager : GLib.Object {
     Will start a sync after a bit of delay.
     ***********************************************************/
     private void start_scheduled_sync_soon () {
-        if (this.start_scheduled_sync_timer.is_active ()) {
-            return;
-        }
+        //  if (this.start_scheduled_sync_timer.is_active ()) {
+        //      return;
+        //  }
         if (this.scheduled_folders.empty ()) {
             return;
         }
         if (is_any_sync_running ()) {
             return;
         }
-
-        int64 ms_delay = 100; // 100ms minimum delay
-        int64 ms_since_last_sync = 0;
-
-        // Require a pause based on the duration of the last sync run.
-        FolderConnection last_folder = this.last_sync_folder;
-        if (last_folder != null) {
-            ms_since_last_sync = last_folder.microseconds_since_last_sync ().length;
-
-            //  1s   . 1.5s pause
-            // 10s   . 5s pause
-            //  1min . 12s pause
-            //  1h   . 90s pause
-            int64 pause = q_sqrt (last_folder.msec_last_sync_duration ().length) / 20.0 * 1000.0;
-            ms_delay = int64.max (ms_delay, pause);
-        }
-
-        // Delays beyond one minute seem too big, particularly since there
-        // could be things later in the queue that shouldn't be punished by a
-        // long delay!
-        ms_delay = int64.min (ms_delay, 60 * 1000ll);
-
-        // Time since the last sync run counts against the delay
-        ms_delay = int64.max (1ll, ms_delay - ms_since_last_sync);
-
-        GLib.info ("Starting the next scheduled sync in " + (ms_delay / 1000).to_string () + " seconds.");
-        this.start_scheduled_sync_timer.on_signal_start (ms_delay);
     }
 
 

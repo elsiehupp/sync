@@ -165,7 +165,7 @@ public class Utility : GLib.Object {
         return "Mozilla/5.0 (%1) mirall/%2 (%3, %4-%5 ClientArchitecture : %6 OsArchitecture : %7)"
             .printf (
                 platform (),
-                Common.Version.MIRALL_VERSION_STRING,
+                Common.NextcloudVersion.MIRALL_VERSION_STRING,
                 GLib.Application.application_name (),
                 GLib.SysInfo.product_type (),
                 GLib.SysInfo.kernel_version (),

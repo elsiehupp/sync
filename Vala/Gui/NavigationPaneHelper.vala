@@ -30,11 +30,13 @@ public class NavigationPaneHelper : GLib.Object {
             foreach (FolderConnection folder_connection in this.folder_man.map ()) {
                 folder_connection.navigation_pane_clsid (value ? GLib.Uuid.create_uuid () : GLib.Uuid ());
             }
-
-            schedule_update_cloud_storage_registry ();
+                
+            GLib.Timeout.add (
+                500,
+                this.on_signal_update_cloud_storage_registry_timer_timeout
+            );
         }
     }
-    private GLib.Timeout update_cloud_storage_registry_timer;
 
     /***********************************************************
     ***********************************************************/
@@ -43,29 +45,20 @@ public class NavigationPaneHelper : GLib.Object {
         ConfigFile config;
         this.show_in_explorer_navigation_pane = config.show_in_explorer_navigation_pane ();
 
-        this.update_cloud_storage_registry_timer.single_shot (true);
-        this.update_cloud_storage_registry_timer.timeout.connect (
-            this.on_signal_update_cloud_storage_registry_timer_timeout
-        );
+        update_cloud_storage_registry ();
 
-        // Ensure that the folder_connection integration stays persistent in Explorer,
-        // the uninstaller removes the folder_connection upon updating the client.
+        /***********************************************************
+        Ensure that the folder_connection integration stays
+        persistent in Explorer, the uninstaller removes the
+        folder_connection upon updating the client.
+        ***********************************************************/
         this.show_in_explorer_navigation_pane = !this.show_in_explorer_navigation_pane;
     }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public void schedule_update_cloud_storage_registry () {
-        // Schedule the update to happen a bit later to avoid doing the update multiple times in a row.
-        if (!this.update_cloud_storage_registry_timer.is_active ()) {
-            this.update_cloud_storage_registry_timer.on_signal_start (500);
-        }
-    }
-
-
-    private void on_signal_update_cloud_storage_registry_timer_timeout () {
+    private bool on_signal_update_cloud_storage_registry_timer_timeout () {
         update_cloud_storage_registry ();
+        return false; // only run once
     }
 
 

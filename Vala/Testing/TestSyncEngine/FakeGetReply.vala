@@ -62,9 +62,10 @@ public class FakeGetReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_abort () {
+    public bool on_signal_abort () {
         set_error (OperationCanceledError, "Operation Canceled");
         aborted = true;
+        return false; // only run once
     }
 
 

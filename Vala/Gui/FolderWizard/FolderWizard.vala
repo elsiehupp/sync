@@ -76,9 +76,8 @@ public class FolderWizard : GLib.Wizard {
     public override bool event_filter (GLib.Object watched, Gdk.Event event) {
         if (event.type () == Gdk.Event.Layout_request) {
             // Workaround GLib.TBUG-3396: forces GLib.Wizard_private.update_layout ()
-            GLib.Timeout.single_shot (
+            GLib.Timeout.add (
                 0,
-                this,
                 this.on_event_filter_timer
             );
         }
@@ -88,8 +87,9 @@ public class FolderWizard : GLib.Wizard {
 
     /***********************************************************
     ***********************************************************/
-    private void on_event_filter_timer () {
+    private bool on_event_filter_timer () {
         title_format (title_format ());
+        return false; // only run once
     }
 
 

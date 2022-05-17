@@ -14,11 +14,9 @@ public class SlowFakePostReply : FakePostReply {
     ***********************************************************/
     public override void respond () {
         // override of FakePostReply.respond, will call the real one with a delay.
-        GLib.Timeout.single_shot (
+        GLib.Timeout.add (
             100,
-            this,
-            () => {
-                this.FakePostReply.respond ();
-            });
+            base.respond ()
+        );
     }
 }

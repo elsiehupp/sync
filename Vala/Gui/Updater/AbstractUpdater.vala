@@ -41,8 +41,8 @@ public abstract class AbstractUpdater : GLib.Object {
         }
 
         public static int64 current_version_to_int () {
-            return version_to_int (Common.Version.MIRALL_VERSION_MAJOR, Common.Version.MIRALL_VERSION_MINOR,
-                Common.Version.MIRALL_VERSION_PATCH, Common.Version.MIRALL_VERSION_BUILD);
+            return version_to_int (Common.NextcloudVersion.MIRALL_VERSION_MAJOR, Common.NextcloudVersion.MIRALL_VERSION_MINOR,
+                Common.NextcloudVersion.MIRALL_VERSION_PATCH, Common.NextcloudVersion.MIRALL_VERSION_BUILD);
         }
 
 
@@ -98,7 +98,7 @@ public abstract class AbstractUpdater : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected static string client_version () {
-        return Common.Version.MIRALL_VERSION_FULL;
+        return Common.NextcloudVersion.MIRALL_VERSION_FULL;
     }
 
 
@@ -150,7 +150,7 @@ public abstract class AbstractUpdater : GLib.Object {
             query.add_query_item ("build_arch", GLib.SysInfo.build_cpu_architecture ());
             query.add_query_item ("current_arch", GLib.SysInfo.current_cpu_architecture ());
 
-            string suffix = Common.Version.MIRALL_VERSION_SUFFIX;
+            string suffix = Common.NextcloudVersion.MIRALL_VERSION_SUFFIX;
             query.add_query_item ("versionsuffix", suffix);
 
             var channel = ConfigFile ().update_channel;

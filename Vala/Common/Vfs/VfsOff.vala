@@ -169,7 +169,7 @@ public class VfsOff : AbstractVfs {
             GLib.warning ("Plugin " + loader.filename () + " metadata type " + metadata["type"] + " is incorrect");
             return false;
         }
-        if (metadata["version"].to_string () != Common.Version.MIRALL_VERSION_STRING) {
+        if (metadata["version"].to_string () != Common.NextcloudVersion.MIRALL_VERSION_STRING) {
             GLib.warning ("Plugin " + loader.filename () + " version " + metadata["version"] + " is incorrect");
             return false;
         }

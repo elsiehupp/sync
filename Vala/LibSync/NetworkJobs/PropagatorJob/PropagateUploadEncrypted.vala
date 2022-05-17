@@ -234,9 +234,8 @@ public class PropagateUploadEncrypted : GLib.Object {
     ***********************************************************/
     private void on_signal_folder_locked_error (string file_identifier, int http_error_code) {
         //  Q_UNUSED (http_error_code);
-        GLib.Timeout.single_shot (
+        GLib.Timeout.add (
             5000,
-            this,
             this.on_signal_timer_complete
         );
 
@@ -244,20 +243,21 @@ public class PropagateUploadEncrypted : GLib.Object {
     }
 
 
-    private void on_signal_timer_complete (string file_identifier) {
+    private bool on_signal_timer_complete (string file_identifier) {
         if (!this.current_locking_in_progress) {
             GLib.debug ("Error locking the folder while no other update is locking it up.");
             GLib.debug ("Perhaps another client locked it.");
             GLib.debug ("Aborting.");
-            return;
+            return false; // only run once
         }
 
         // Perhaps I should remove the elapsed timer if the lock is from this client?
         if (this.folder_lock_first_try.elapsed () > /* five minutes */ 1000 * 60 * 5 ) {
             GLib.debug ("One minute passed, ignoring more attempts to lock the folder.");
-            return;
+            return false; // only run once
         }
         on_signal_try_lock (file_identifier);
+        return false; // only run once
     }
 
 

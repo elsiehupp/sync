@@ -121,7 +121,7 @@ public abstract class AbstractTestOAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected virtual GLib.OutputStream token_reply (Soup.Operation operation, Soup.Request request) {
+    protected virtual GLib.InputStream token_reply (Soup.Operation operation, Soup.Request request) {
         //  GLib.assert_true (state == AbstractTestOAuth.State.BROWSER_OPENED);
         state = AbstractTestOAuth.State.TOKEN_ASKED;
         //  GLib.assert_true (operation == Soup.PostOperation);

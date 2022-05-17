@@ -163,7 +163,7 @@ int main (int argc, char **argv) {
                 if (desktop_session != "ubuntu") {
                     GLib.info ("System tray still not available; showing window and trying again later.");
                     app.show_main_dialog ();
-                    GLib.Timeout.single_shot (10000, app, Application.on_signal_try_tray_again);
+                    GLib.Timeout.add (10000, app.on_signal_try_tray_again);
                 } else {
                     GLib.info ("System tray still not available; but assuming it's fine on 'ubuntu' desktop.");
                 }

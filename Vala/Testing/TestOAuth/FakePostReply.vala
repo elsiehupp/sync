@@ -35,7 +35,7 @@ public class FakePostReply : GLib.InputStream {
             set_error (OperationCanceledError, "Operation Canceled");
             /* emit */ signal_meta_data_changed ();
             /* emit */ signal_finished ();
-            return;
+            return false; // only run once
         } else if (redirect_to_policy) {
             set_header (Soup.Request.LocationHeader, "/my.policy");
             set_attribute (Soup.Request.RedirectionTargetAttribute, "/my.policy");
@@ -43,7 +43,7 @@ public class FakePostReply : GLib.InputStream {
             set_header (Soup.Request.ContentLengthHeader, 0);
             /* emit */ signal_meta_data_changed ();
             /* emit */ signal_finished ();
-            return;
+            return false; // only run once
         } else if (redirect_to_token) {
             // Redirect to self
             GLib.Variant destination = new GLib.Variant (s_oauth_test_server.to_string () + "/index.php/apps/oauth2/api/v1/token");
@@ -53,7 +53,7 @@ public class FakePostReply : GLib.InputStream {
             set_header (Soup.Request.ContentLengthHeader, 0);
             /* emit */ signal_meta_data_changed ();
             /* emit */ signal_finished ();
-            return;
+            return false; // only run once
         }
         set_header (Soup.Request.ContentLengthHeader, payload.size ());
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 200);
@@ -62,13 +62,15 @@ public class FakePostReply : GLib.InputStream {
             /* emit */ signal_ready_read ();
         }
         /* emit */ signal_finished ();
+        return false; // only run once
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public override void on_signal_abort () {
+    public override bool on_signal_abort () {
         aborted = true;
+        return false; // only run once
     }
 
 

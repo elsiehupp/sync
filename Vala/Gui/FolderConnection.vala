@@ -104,10 +104,6 @@ public class FolderConnection : GLib.Object {
     private SyncRunFileLog file_log;
 
     /***********************************************************
-    ***********************************************************/
-    private GLib.Timeout schedule_self_timer;
-
-    /***********************************************************
     When the same local path is synced to multiple accounts,
     only one of them can be stored in the settings in a way
     that's compatible with old clients that don't support it.
@@ -322,11 +318,8 @@ public class FolderConnection : GLib.Object {
         this.engine.add_error_to_gui.connect (
             this.on_signal_add_error_to_gui
         );
-        this.schedule_self_timer.single_shot (true);
-        this.schedule_self_timer.interval (
-            SyncEngine.minimum_file_age_for_upload
-        );
-        this.schedule_self_timer.timeout.connect (
+        GLib.Timeout.single_shot (
+            SyncEngine.minimum_file_age_for_upload,
             this.on_signal_schedule_this_folder
         );
         ProgressDispatcher.instance.signal_folder_conflicts.connect (
@@ -371,7 +364,7 @@ public class FolderConnection : GLib.Object {
             this.vfs.stop ();
         }
 
-        // Reset then engine first as it will on_signal_abort and try to access members of the FolderConnection
+        // Reset then engine first as it will abort and try to access members of the FolderConnection
         this.engine.on_signal_reset ();
     }
 
@@ -766,9 +759,9 @@ public class FolderConnection : GLib.Object {
     The delay doesn't reset with subsequent calls.
     ***********************************************************/
     public void schedule_this_folder_soon () {
-        if (!this.schedule_self_timer.is_active ()) {
-            this.schedule_self_timer.on_signal_start ();
-        }
+        //  if (!this.schedule_self_timer.is_active ()) {
+        //      this.schedule_self_timer.on_signal_start ();
+        //  }
     }
 
 
@@ -1296,7 +1289,7 @@ public class FolderConnection : GLib.Object {
         // file system change notifications are ignored for that folder_connection. And it takes
         // some time under certain conditions to make the file system notifications
         // all come in.
-        GLib.Timeout.single_shot (200, this, FolderConnection.on_signal_emit_finished_delayed);
+        GLib.Timeout.add (200, this.on_signal_emit_finished_delayed);
 
         this.last_sync_duration = std.chrono.milliseconds (this.time_since_last_sync_start.elapsed ());
         this.time_since_last_sync_done.on_signal_start ();
@@ -1421,7 +1414,7 @@ public class FolderConnection : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_emit_finished_delayed () {
+    private bool on_signal_emit_finished_delayed () {
         /* emit */ signal_sync_finished (this.sync_result);
 
         // Immediately check the etag again if there was some sync activity.
@@ -1434,6 +1427,7 @@ public class FolderConnection : GLib.Object {
                    || this.sync_result.first_new_conflict_item ())) {
             on_signal_run_etag_job ();
         }
+        return false; // only run once
     }
 
 
@@ -1488,8 +1482,9 @@ public class FolderConnection : GLib.Object {
     Adds this folder_connection to the list of scheduled folders in the
     FolderManager.
     ***********************************************************/
-    private void on_signal_schedule_this_folder () {
+    private bool on_signal_schedule_this_folder () {
         FolderManager.instance.schedule_folder (this);
+        return false; // only run once
     }
 
 

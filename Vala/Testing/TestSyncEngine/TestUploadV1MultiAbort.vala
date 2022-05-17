@@ -25,7 +25,7 @@ public class TestUploadV1MultiAbort : AbstractTestSyncEngine {
         fake_folder.set_server_override (this.override_delegate);
 
         fake_folder.local_modifier.insert ("file", 100, 'W');
-        GLib.Timeout.single_shot (100, fake_folder.sync_engine, () => { fake_folder.sync_engine.on_signal_abort (); });
+        GLib.Timeout.add (100, fake_folder.sync_engine.on_signal_abort);
         GLib.assert_true (!fake_folder.sync_once ());
 
         GLib.assert_true (number_of_put == 3);

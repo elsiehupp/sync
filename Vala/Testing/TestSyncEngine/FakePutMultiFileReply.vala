@@ -112,9 +112,10 @@ public class FakePutMultiFileReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public override void on_signal_abort () {
+    public override bool on_signal_abort () {
         set_error (OperationCanceledError, "on_signal_abort");
         /* emit */ signal_finished ();
+        return false; // only run once
     }
 
 
