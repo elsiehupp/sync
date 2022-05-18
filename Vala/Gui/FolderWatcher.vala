@@ -87,7 +87,7 @@ public class FolderWatcher : GLib.Object {
     @param root Path of the root of the folder_connection
     ***********************************************************/
     public void init (string root) {
-        this.d.on_signal_reset (new FolderWatcherPrivate (this, root));
+        this.d.reset (new FolderWatcherPrivate (this, root));
         this.timer.on_signal_start ();
     }
 
@@ -224,7 +224,7 @@ public class FolderWatcher : GLib.Object {
         if (this.test_notification_path != "") {
             signal_became_unreliable (_("The watcher did not receive a test notification."));
         }
-        this.test_notification_path == "";
+        this.test_notification_path = "";
         return false; // only run once
     }
 

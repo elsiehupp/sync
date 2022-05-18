@@ -69,7 +69,7 @@ public class Utility : GLib.Object {
             string places = gtk_bookmarks.read_all ();
             if (!places.contains (folder_url)) {
                 places += folder_url;
-                gtk_bookmarks.on_signal_reset ();
+                gtk_bookmarks.reset ();
                 gtk_bookmarks.write (places + "\n");
             }
         }
@@ -107,7 +107,7 @@ public class Utility : GLib.Object {
 
         GLib.File file = GLib.File.new_for_path (fname);
         if (file.open (GLib.IODevice.WriteOnly | GLib.IODevice.Text)) {
-            string outfile; // = new GLib.OutputStream (&file);
+            string outfile; // = new GLib.OutputStream (file);
             outfile = rand_string;
             // optional, as GLib.File destructor will already do it:
             file.close ();
@@ -262,7 +262,7 @@ public class Utility : GLib.Object {
             bool running_inside_app_image = !app_image_path == null && GLib.File.exists (app_image_path);
             string executable_path = running_inside_app_image ? app_image_path : GLib.Application.application_file_path;
 
-            string ts; // = new GLib.OutputStream (&ini_file);
+            string ts; // = new GLib.OutputStream (ini_file);
             //  ts.codec ("UTF-8");
             ts = "[Desktop Entry]\n"
                + "Name=" + gui_name + "\n"
@@ -797,12 +797,12 @@ public class Utility : GLib.Object {
 
 
     /***********************************************************
-    Returns a file name based on \a fn that's suitable for a
+    Returns a file name based on \a filename that's suitable for a
     conflict.
     ***********************************************************/
     public static string make_conflict_filename (
-        string fn, GLib.DateTime dt, string user) {
-        string conflict_filename = fn;
+        string filename, GLib.DateTime dt, string user) {
+        string conflict_filename = filename;
         // Add conflict tag before the extension.
         int dot_location = conflict_filename.last_index_of (".");
         // If no extension, add it at the end  (take care of cases like foo/.hidden or foo.bar/file)
@@ -923,8 +923,10 @@ public class Utility : GLib.Object {
     /***********************************************************
     @brief Retrieves current logged-in user name from the OS
     ***********************************************************/
-    public static string get_current_user_name () {
-        return {};
+    public string get_current_user_name {
+        public get {
+            return "";
+        }
     }
 
 

@@ -72,7 +72,7 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
         }
 
         menu.setTitle (helper.context_menu_title ());
-        menu.setIcon (Gtk.Icon.fromTheme (helper.context_menu_icon_name ()));
+        menu.setIcon (Gtk.IconInfo.fromTheme (helper.context_menu_icon_name ()));
         return { menu.menu_action () };
     }
 

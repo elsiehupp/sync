@@ -13,11 +13,11 @@ public class UserStatus : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public enum OnlineStatus {
-        Online,
-        DoNotDisturb,
-        Away,
-        Offline,
-        Invisible
+        ONLINE,
+        DO_NOT_DISTURB,
+        AWAY,
+        OFFLINE,
+        INVISIBLE
     }
 
     /***********************************************************
@@ -54,7 +54,7 @@ public class UserStatus : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public UserStatus (string identifier, string message, string icon,
-        OnlineStatus state = OnlineStatus.Online, bool message_predefined, Optional<ClearAt> clear_at = new Optional<ClearAt> ()) {
+        OnlineStatus state = OnlineStatus.ONLINE, bool message_predefined, Optional<ClearAt> clear_at = new Optional<ClearAt> ()) {
         this.identifier = identifier;
         this.message = message;
         this.icon = icon;
@@ -68,17 +68,17 @@ public class UserStatus : GLib.Object {
     ***********************************************************/
     public GLib.Uri state_icon () {
         switch (this.state) {
-        case UserStatus.OnlineStatus.Away:
+        case UserStatus.OnlineStatus.AWAY:
             return Theme.status_away_image_source;
 
-        case UserStatus.OnlineStatus.DoNotDisturb:
+        case UserStatus.OnlineStatus.DO_NOT_DISTURB:
             return Theme.status_do_not_disturb_image_source;
 
-        case UserStatus.OnlineStatus.Invisible:
-        case UserStatus.OnlineStatus.Offline:
+        case UserStatus.OnlineStatus.INVISIBLE:
+        case UserStatus.OnlineStatus.OFFLINE:
             return Theme.status_invisible_image_source;
 
-        case UserStatus.OnlineStatus.Online:
+        case UserStatus.OnlineStatus.ONLINE:
             return Theme.status_online_image_source;
         }
 

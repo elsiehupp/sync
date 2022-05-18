@@ -21,7 +21,7 @@
 //  #include <GLib.Plain_tex
 //  #include <GLib.OutputStream
 //  #include <Gtk.Dialog>
-//  #include <GLib.LineEdit>
+//  #include <Gtk.LineEdit>
 //  #include <GLib.PushButton>
 
 namespace Occ {
@@ -42,7 +42,7 @@ public class LogBrowser : Gtk.Dialog {
         window_title (_("Log Output"));
         minimum_width (600);
 
-        var main_layout = new GLib.VBoxLayout ();
+        var main_layout = new Gtk.Box (Gtk.Orientation.VERTICAL);
 
         var label = new Gtk.Label (
             _("The client can write debug logs to a temporary folder. "

@@ -116,7 +116,7 @@ public class DiscoverySingleDirectoryJob : GLib.Object {
             // Server older than 10.0 have performances issue if we ask for the share-types on every PROPFIND
             props.append ("http://owncloud.org/ns:share-types");
         }
-        if (this.account.capabilities.client_side_encryption_available ()) {
+        if (this.account.capabilities.client_side_encryption_available) {
             props.append ("http://nextcloud.org/ns:is-encrypted");
         }
 

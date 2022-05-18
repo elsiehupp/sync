@@ -96,8 +96,8 @@ public class UserInfo : GLib.Object {
     private LibSync.JsonApiJob json_api_job;
 
 
-    internal signal void quota_updated (int64 total, int64 used);
-    internal signal void fetched_last_info (UserInfo user_info);
+    internal signal void signal_quota_updated (int64 total, int64 used);
+    internal signal void signal_fetched_last_info (UserInfo user_info);
 
 
     /***********************************************************
@@ -169,7 +169,7 @@ public class UserInfo : GLib.Object {
         if (this.last_info_received == null || this.last_quota_used_bytes != used || this.last_quota_total_bytes != total) {
             this.last_quota_used_bytes = used;
             this.last_quota_total_bytes = total;
-            /* emit */ quota_updated (this.last_quota_total_bytes, this.last_quota_used_bytes);
+            signal_quota_updated (this.last_quota_total_bytes, this.last_quota_used_bytes);
         }
 
         GLib.Timeout.add (
@@ -182,13 +182,13 @@ public class UserInfo : GLib.Object {
         if (this.fetch_avatar_image) {
             var avatar_job = new AvatarJob (account, account.dav_user, 128, this);
             avatar_job.on_signal_timeout (20 * 1000);
-            avatar_job.avatar_pixmap.connect (
+            avatar_job.signal_avatar_pixmap.connect (
                 this.on_signal_avatar_image
             );
             avatar_job.on_signal_start ();
         }
         else
-            /* emit */ fetched_last_info (this);
+            signal_fetched_last_info (this);
     }
 
 
@@ -232,7 +232,7 @@ public class UserInfo : GLib.Object {
     private void on_signal_avatar_image (Gtk.Image img) {
         this.account_state.account.avatar (img);
 
-        /* emit */ fetched_last_info (this);
+        signal_fetched_last_info (this);
     }
 
 

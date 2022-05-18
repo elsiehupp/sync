@@ -91,11 +91,11 @@ public class HttpCredentialsGui : HttpCredentials {
         switch (r) {
         case OAuth.Result.NOT_SUPPORTED:
             on_signal_show_dialog ();
-            this.async_auth.on_signal_reset (null);
+            this.async_auth.reset (null);
             return;
         case OAuth.Error:
-            this.async_auth.on_signal_reset (null);
-            /* emit */ asked ();
+            this.async_auth.reset (null);
+            signal_asked ();
             return;
         case OAuth.Result.LOGGED_IN:
             break;
@@ -107,8 +107,8 @@ public class HttpCredentialsGui : HttpCredentials {
         this.refresh_token = refresh_token;
         this.ready = true;
         persist ();
-        this.async_auth.on_signal_reset (null);
-        /* emit */ asked ();
+        this.async_auth.reset (null);
+        signal_asked ();
     }
 
 
@@ -139,7 +139,7 @@ public class HttpCredentialsGui : HttpCredentials {
         dialog.window_title (_("Enter Password"));
         dialog.label_text (message);
         dialog.text_value (this.previous_password);
-        dialog.text_echo_mode (GLib.LineEdit.Password);
+        dialog.text_echo_mode (Gtk.LineEdit.Password);
         var dialog_label = dialog.find_child<Gtk.Label> ();
         if (dialog_label) {
             dialog_label.open_external_links (true);
@@ -158,11 +158,11 @@ public class HttpCredentialsGui : HttpCredentials {
     private void on_signal_finished_with_result (Gtk.Dialog dialog, int result) {
         if (result == Gtk.Dialog.Accepted) {
             this.password = dialog.text_value ();
-            this.refresh_token == "";
+            this.refresh_token = "";
             this.ready = true;
             persist ();
         }
-        /* emit */ asked ();
+        signal_asked ();
     }
 
 
@@ -187,7 +187,7 @@ public class HttpCredentialsGui : HttpCredentials {
     private void on_signal_auth_type (LibSync.DetermineAuthTypeJob.AuthType type) {
         if (type == LibSync.DetermineAuthTypeJob.AuthType.OAUTH) {
 
-            this.async_auth.on_signal_reset (new OAuth (this.account, this));
+            this.async_auth.reset (new OAuth (this.account, this));
             this.async_auth.expected_user = this.account.dav_user;
             this.async_auth.signal_result.connect (
                 this.on_signal_async_auth_result
@@ -202,7 +202,7 @@ public class HttpCredentialsGui : HttpCredentials {
         } else {
             // Shibboleth?
             GLib.warning ("Bad http auth type: " + type);
-            /* emit */ asked ();
+            signal_asked ();
         }
     }
 

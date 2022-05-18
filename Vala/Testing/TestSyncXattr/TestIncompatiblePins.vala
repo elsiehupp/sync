@@ -22,7 +22,7 @@ public class TestIncompatiblePins : AbstractTestSyncXAttr {
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
-        set_pin ("local", PinState.PinState.ALWAYS_LOCAL);
+        set_pin ("local", PinState.ALWAYS_LOCAL);
         set_pin ("online", Common.ItemAvailability.ONLINE_ONLY);
 
         fake_folder.local_modifier.insert ("local/file1");
@@ -37,8 +37,8 @@ public class TestIncompatiblePins : AbstractTestSyncXAttr {
 
         xaverify_nonvirtual (fake_folder, "online/file1");
         xaverify_virtual (fake_folder, "local/file1");
-        GLib.assert_true (vfs.pin_state ("online/file1") == PinState.PinState.UNSPECIFIED);
-        GLib.assert_true (vfs.pin_state ("local/file1") == PinState.PinState.UNSPECIFIED);
+        GLib.assert_true (vfs.pin_state ("online/file1") == PinState.UNSPECIFIED);
+        GLib.assert_true (vfs.pin_state ("local/file1") == PinState.UNSPECIFIED);
 
         // no change on another sync
         GLib.assert_true (fake_folder.sync_once ());

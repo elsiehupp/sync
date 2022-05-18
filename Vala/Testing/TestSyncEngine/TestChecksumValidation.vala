@@ -55,7 +55,7 @@ public class TestChecksumValidation : AbstractTestSyncEngine {
         content_md5_value = "bad";
         fake_folder.remote_modifier ().create ("A/a7", 16, 'A');
         GLib.assert_true (!fake_folder.sync_once ());
-        content_md5_value == "";
+        content_md5_value = "";
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 

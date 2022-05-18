@@ -25,11 +25,11 @@ public class TestSetPredefinedStatusEmitUserStatusChangedAndSetUserStatus : GLib
 
         GLib.SignalSpy user_status_changed_spy = new GLib.SignalSpy (
             model,
-            UserStatusSelectorModel.user_status_changed
+            UserStatusSelectorModel.signal_user_status_changed
         );
         GLib.SignalSpy clear_at_changed_spy = new GLib.SignalSpy (
             model,
-            UserStatusSelectorModel.clear_at_changed
+            UserStatusSelectorModel.signal_clear_at_changed
         );
 
         var fake_predefined_user_status_index = 0;

@@ -46,11 +46,11 @@ public class TestSelectiveSyncBigFolders : GLib.Object {
         GLib.assert_true (signal_new_big_folder.length == 1);
         GLib.assert_true (signal_new_big_folder.nth_data (0)[0].to_string () == "A/new_big_dir");
         GLib.assert_true (signal_new_big_folder.nth_data (0)[1].to_bool () == false);
-        signal_new_big_folder == "";
+        signal_new_big_folder = "";
 
         GLib.assert_true (size_requests.length == 2); // "A/new_big_dir" and "B/new_small_dir";
         GLib.assert_true (size_requests.filter ("/sub_directory").length == 0); // at no point we should request the size of the subdirectories
-        size_requests == "";
+        size_requests = "";
 
         var old_sync = fake_folder.current_local_state ();
         // syncing again should do the same
@@ -58,9 +58,9 @@ public class TestSelectiveSyncBigFolders : GLib.Object {
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == old_sync);
         GLib.assert_true (signal_new_big_folder.length == 1); // (since we don't have a real FolderConnection, the files were not added to any list)
-        signal_new_big_folder == "";
+        signal_new_big_folder = "";
         GLib.assert_true (size_requests.length == 1); // "A/new_big_dir";
-        size_requests == "";
+        size_requests = "";
 
         // Simulate that we accept all files by seting a wildcard allow list
         fake_folder.sync_engine.journal.set_selective_sync_list (

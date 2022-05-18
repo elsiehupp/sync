@@ -26,10 +26,10 @@ public class GLib.StringTokenizer : GLib.Tokenizer<string> {
         // If those differences overflow an int we'd have a veeeeeery long string in memory
         int begin = std.distance (d.begin, d.token_begin);
         int end = std.distance (d.token_begin, d.token_end);
-        if (!d.return_quotes && d.is_quote (*d.token_begin)) {
+        if (!d.return_quotes && d.is_quote (d.token_begin)) {
             begin++;
             end -= 2;
         }
-        return /* GLib.StringRef */ new string (&d.string, begin, end);
+        return /* GLib.StringRef */ new string (d.string, begin, end);
     }
 }

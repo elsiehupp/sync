@@ -33,7 +33,7 @@ public class HttpCredentialsText : HttpCredentials {
         this.password = query_password (user ());
         this.ready = true;
         persist ();
-        /* emit */ asked ();
+        signal_asked ();
     }
 
 

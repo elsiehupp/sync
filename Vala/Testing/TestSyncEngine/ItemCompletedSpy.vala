@@ -10,7 +10,7 @@ namespace Testing {
 public class ItemCompletedSpy : GLib.SignalSpy {
 
     ItemCompletedSpy (FakeFolder folder) {
-        base (&folder.sync_engine, &SyncEngine.signal_item_completed);
+        base (folder.sync_engine, SyncEngine.signal_item_completed);
     }
 
 
@@ -26,9 +26,9 @@ public class ItemCompletedSpy : GLib.SignalSpy {
 
     public SyncFileItem find_item_with_expected_rank (string path, int rank) {
         GLib.assert_true (size () > rank);
-        GLib.assert_true (! (*this)[rank] == "");
+        GLib.assert_true (! (this)[rank] == "");
 
-        var item = (*this)[rank][0].value<SyncFileItem> ();
+        var item = (this)[rank][0].value<SyncFileItem> ();
         if (item.destination () == path) {
             return item;
         } else {

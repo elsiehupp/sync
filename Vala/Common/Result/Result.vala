@@ -52,9 +52,9 @@ public class Result<T> : GLib.Object {
     //  public Result.from_other (Result other) {
     //      this.is_error = other.is_error;
     //      if (this.is_error) {
-    //          new (&this.error) Error (std.move (other.error));
+    //          new (this.error) Error (std.move (other.error));
     //      } else {
-    //          new (&this.result) T (std.move (other.result));
+    //          new (this.result) T (std.move (other.result));
     //      }
     //  }
 
@@ -74,12 +74,12 @@ public class Result<T> : GLib.Object {
     /***********************************************************
     ***********************************************************/
     //  public Result operator= (Result &&other) {
-    //      if (&other != this) {
+    //      if (other != this) {
     //          this.is_error = other.is_error;
     //          if (this.is_error) {
-    //              new (&this.error) Error (std.move (other.error));
+    //              new (this.error) Error (std.move (other.error));
     //          } else {
-    //              new (&this.result) T (std.move (other.result));
+    //              new (this.result) T (std.move (other.result));
     //          }
     //      }
     //      return this;
@@ -89,12 +89,12 @@ public class Result<T> : GLib.Object {
     /***********************************************************
     ***********************************************************/
     //  public Result operator= (Result other) {
-    //      if (&other != this) {
+    //      if (other != this) {
     //          this.is_error = other.is_error;
     //          if (this.is_error) {
-    //              new (&this.error) Error (other.error);
+    //              new (this.error) Error (other.error);
     //          } else {
-    //              new (&this.result) T (other.result);
+    //              new (this.result) T (other.result);
     //          }
     //      }
     //      return this;

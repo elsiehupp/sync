@@ -7,7 +7,7 @@
 namespace Occ {
 namespace Ui {
 
-public class ShareeModel : GLib.AbstractListModel {
+public class ShareeModel : GLib.Object {
 
     /***********************************************************
     FIXME: make it a GLib.List<Sharee> when Sharee can be compared

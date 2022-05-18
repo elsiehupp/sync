@@ -158,7 +158,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
 
         var account = this.propagator.account;
 
-        if (!account.capabilities.client_side_encryption_available () ||
+        if (!account.capabilities.client_side_encryption_available ||
             !parent_rec.is_valid ||
             !parent_rec.is_e2e_encrypted) {
             up_unencrypted_file ();
@@ -224,7 +224,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
         if (this.file_to_upload.size > quota_guess) {
             // Necessary for blocklisting logic
             this.item.http_error_code = 507;
-            /* emit */ this.propagator.signal_insufficient_remote_storage ();
+            this.propagator.signal_insufficient_remote_storage ();
             on_signal_done (SyncFileItem.Status.DETAIL_ERROR, _("Upload of %1 exceeds the quota for the folder").printf (Utility.octets_to_string (this.file_to_upload.size)));
             return;
         }
@@ -396,7 +396,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
         // But skip the file if the mtime is too close to 'now'!
         // That usually indicates a file that is still being changed
         // or not yet fully copied to the destination.
-        if (file_is_still_changing (*this.item)) {
+        if (file_is_still_changing (this.item)) {
             this.propagator.another_sync_needed = true;
             return on_signal_error_start_folder_unlock (SyncFileItem.Status.SOFT_ERROR, _("Local file changed during sync."));
         }
@@ -511,11 +511,11 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
             quota_it.value () -= this.file_to_upload.size;
 
         // Update the database entry
-        var result = this.propagator.update_metadata (*this.item);
+        var result = this.propagator.update_metadata (this.item);
         if (!result) {
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error));
             return;
-        } else if (*result == AbstractVfs.ConvertToPlaceholderResult.Locked) {
+        } else if (result == AbstractVfs.ConvertToPlaceholderResult.Locked) {
             on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").printf (this.item.file));
             return;
         }
@@ -527,7 +527,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
             var vfs = this.propagator.sync_options.vfs;
             var pin = vfs.pin_state (this.item.file);
             if (pin && *pin == Common.ItemAvailability.ONLINE_ONLY) {
-                if (!vfs.pin_state (this.item.file, PinState.PinState.UNSPECIFIED)) {
+                if (!vfs.pin_state (this.item.file, PinState.UNSPECIFIED)) {
                     GLib.warning ("Could not set pin state of " + this.item.file + " to unspecified");
                 }
             }
@@ -585,7 +585,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
                 continue;
             }
 
-            (*running_count)++;
+            (running_count)++;
 
             // If a job should not be aborted that means we'll never abort before
             // the hard abort timeout signal comes as running_count will never go to
@@ -605,7 +605,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
             input_stream.abort ();
         }
 
-        if (*running_count == 0 && abort_type == AbstractPropagatorJob.AbortType.ASYNCHRONOUS)
+        if (running_count == 0 && abort_type == AbstractPropagatorJob.AbortType.ASYNCHRONOUS)
             signal_abort_finished ();
     }
 
@@ -613,7 +613,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
     private int one_abort_finished (int running_count) {
         int count_copy = running_count - 1;
         if (count_copy == 0) {
-            /* emit */ this.signal_abort_finished ();
+            this.signal_abort_finished ();
         }
         return count_copy;
     }
@@ -687,7 +687,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
             // Set up the error
             status = SyncFileItem.Status.DETAIL_ERROR;
             error_string = _("Upload of %1 exceeds the quota for the folder").printf (Utility.octets_to_string (this.file_to_upload.size));
-            /* emit */ this.propagator.signal_insufficient_remote_storage ();
+            this.propagator.signal_insufficient_remote_storage ();
         }
 
         abort_with_error (status, error_string);

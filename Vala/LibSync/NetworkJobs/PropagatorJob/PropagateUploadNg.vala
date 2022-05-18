@@ -161,7 +161,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         this.sent = 0;
         this.current_chunk = 0;
 
-        this.propagator.report_progress (*this.item, 0);
+        this.propagator.report_progress (this.item, 0);
 
         Common.SyncJournalDb.UploadInfo pi;
         pi.valid = true;
@@ -378,7 +378,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         }
         bool ok = false;
         string chunk_name = name.mid (name.last_index_of ("/") + 1);
-        var chunk_id = chunk_name.to_long_long (&ok);
+        var chunk_id = chunk_name.to_long_long (ok);
         if (ok) {
             this.server_chunks[chunk_id] = ServerChunkInfo (
                 properties["getcontentlength"].to_long_long (),
@@ -604,7 +604,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         if (sent == 0 && total == 0) {
             return;
         }
-        this.propagator.report_progress (*this.item, this.sent + sent - total);
+        this.propagator.report_progress (this.item, this.sent + sent - total);
     }
 
 } // class PropagateUploadFileNG

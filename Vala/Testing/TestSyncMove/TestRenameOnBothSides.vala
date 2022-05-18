@@ -32,7 +32,7 @@ public class TestRenameOnBothSides : AbstractTestSyncMove {
         GLib.assert_true (counter.number_of_get == 0);
         GLib.assert_true (counter.number_of_put == 0);
         GLib.assert_true (counter.number_of_move == 2);
-        counter.on_signal_reset ();
+        counter.reset ();
 
         // 2) move alphabetically after
         fake_folder.remote_modifier ().rename ("this.A/a2", "this.A/a2m");

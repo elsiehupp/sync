@@ -70,17 +70,17 @@ public class CleanupPollsJob : GLib.Object {
         var poll_job = PollJob)sender ();
         //  GLib.assert_true (poll_job);
         if (poll_job.item.status == SyncFileItem.Status.FATAL_ERROR) {
-            /* emit */ aborted (poll_job.item.error_string);
+            signal_aborted (poll_job.item.error_string);
             delete_later ();
             return;
         } else if (poll_job.item.status != SyncFileItem.Status.SUCCESS) {
             GLib.warning ("There was an error with file " + poll_job.item.file + poll_job.item.error_string);
         } else {
-            if (!OwncloudPropagator.static_update_metadata (*poll_job.item, this.local_path, this.vfs, this.journal)) {
+            if (!OwncloudPropagator.static_update_metadata (poll_job.item, this.local_path, this.vfs, this.journal)) {
                 GLib.warning ("Database error");
                 poll_job.item.status = SyncFileItem.Status.FATAL_ERROR;
                 poll_job.item.error_string = _("Error writing metadata to the database");
-                /* emit */ aborted (poll_job.item.error_string);
+                signal_aborted (poll_job.item.error_string);
                 delete_later ();
                 return;
             }

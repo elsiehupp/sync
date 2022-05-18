@@ -23,9 +23,9 @@ public class TestNewVirtuals : AbstractTestSyncXAttr {
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
-        set_pin ("local", PinState.PinState.ALWAYS_LOCAL);
+        set_pin ("local", PinState.ALWAYS_LOCAL);
         set_pin ("online", Common.ItemAvailability.ONLINE_ONLY);
-        set_pin ("unspec", PinState.PinState.UNSPECIFIED);
+        set_pin ("unspec", PinState.UNSPECIFIED);
 
         // Test 1 : root is PinState.UNSPECIFIED
         fake_folder.remote_modifier ().insert ("file1");
@@ -40,7 +40,7 @@ public class TestNewVirtuals : AbstractTestSyncXAttr {
         xaverify_virtual (fake_folder, "unspec/file1");
 
         // Test 2 : change root to PinState.ALWAYS_LOCAL
-        set_pin ("", PinState.PinState.ALWAYS_LOCAL);
+        set_pin ("", PinState.ALWAYS_LOCAL);
 
         fake_folder.remote_modifier ().insert ("file2");
         fake_folder.remote_modifier ().insert ("online/file2");

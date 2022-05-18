@@ -17,7 +17,7 @@ public class TestCtorFetchStatusAndPredefinedStatuses : GLib.Object {
         string user_status_id = "fake-identifier";
         string user_status_message = "Some status";
         string user_status_icon = "❤";
-        LibSync.UserStatus.OnlineStatus user_status_state = LibSync.UserStatus.OnlineStatus.DoNotDisturb;
+        LibSync.UserStatus.OnlineStatus user_status_state = LibSync.UserStatus.OnlineStatus.DO_NOT_DISTURB;
         bool user_status_message_predefined = false;
         Optional<ClearAt> user_status_clear_at; {
             ClearAt clear_at;

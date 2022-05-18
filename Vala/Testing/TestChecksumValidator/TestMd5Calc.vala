@@ -17,7 +17,7 @@ public class TestMd5Calc : AbstractTestChecksumValidator {
 
         GLib.File file_device = new GLib.File (file);
         file_device.open (GLib.IODevice.ReadOnly);
-        string sum = calc_md5 (&file_device);
+        string sum = calc_md5 (file_device);
         file_device.close ();
 
         string s_sum = shell_sum ("md5sum", file);

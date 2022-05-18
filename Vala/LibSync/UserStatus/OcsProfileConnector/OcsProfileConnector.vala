@@ -10,8 +10,8 @@ public class OcsProfileConnector : GLib.Object {
     public Hovercard current_hovercard { public get; private set; }
 
     internal signal void signal_error ();
-    internal signal void hovercard_fetched ();
-    internal signal void icon_loaded (size_t hovercard_action_index);
+    internal signal void signal_hovercard_fetched ();
+    internal signal void signal_icon_loaded (size_t hovercard_action_index);
 
     /***********************************************************
     ***********************************************************/
@@ -51,7 +51,7 @@ public class OcsProfileConnector : GLib.Object {
         GLib.assert (json_data.is_array ());
         this.current_hovercard = json_to_hovercard (json_data.to_array ());
         fetch_icons ();
-        /* emit */ hovercard_fetched ();
+        signal_hovercard_fetched ();
     }
 
 
@@ -95,7 +95,7 @@ public class OcsProfileConnector : GLib.Object {
         var hovercard_action = this.current_hovercard.actions[index];
         GLib.PixmapCache.insert (hovercard_action.icon_url.to_string (), pixmap);
         hovercard_action.icon = pixmap;
-        /* emit */ icon_loaded (index);
+        signal_icon_loaded (index);
     }
 
 
@@ -155,7 +155,7 @@ public class OcsProfileConnector : GLib.Object {
         Gtk.Image scaled_svg = new Gtk.Image (image_size, Gtk.Image.FormatARGB32);
         scaled_svg.fill ("transparent");
         GLib.Painter svg_painter = new GLib.Painter (scaled_svg);
-        svg_renderer.render (&svg_painter);
+        svg_renderer.render (svg_painter);
         return Gdk.Pixbuf.from_image (scaled_svg);
     }
 

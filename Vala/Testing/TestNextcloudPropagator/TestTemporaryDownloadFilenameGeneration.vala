@@ -13,11 +13,11 @@ public class TestTemporaryDownloadFilenameGeneration : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private TestTemporaryDownloadFilenameGeneration () {
-        string fn;
+        string filename;
         // without directory
         for (int i = 1; i <= 1000; i++) {
-            fn+="F";
-            string temporary_file_name = create_download_temporary_filename (fn);
+            filename+="F";
+            string temporary_file_name = create_download_temporary_filename (filename);
             if (temporary_file_name.contains ("/")) {
                 temporary_file_name = temporary_file_name.mid (temporary_file_name.last_index_of ("/")+1);
             }
@@ -25,10 +25,10 @@ public class TestTemporaryDownloadFilenameGeneration : GLib.Object {
             GLib.assert_true ( temporary_file_name.length <= 254);
         }
         // with absolute directory
-        fn = "/Users/guruz/own_cloud/rocks/GPL";
+        filename = "/Users/guruz/own_cloud/rocks/GPL";
         for (int i = 1; i < 1000; i++) {
-            fn+="F";
-            string temporary_file_name = create_download_temporary_filename (fn);
+            filename+="F";
+            string temporary_file_name = create_download_temporary_filename (filename);
             if (temporary_file_name.contains ("/")) {
                 temporary_file_name = temporary_file_name.mid (temporary_file_name.last_index_of ("/")+1);
             }
@@ -36,10 +36,10 @@ public class TestTemporaryDownloadFilenameGeneration : GLib.Object {
             GLib.assert_true ( temporary_file_name.length <= 254);
         }
         // with relative directory
-        fn = "rocks/GPL";
+        filename = "rocks/GPL";
         for (int i = 1; i < 1000; i++) {
-            fn+="F";
-            string temporary_file_name = create_download_temporary_filename (fn);
+            filename+="F";
+            string temporary_file_name = create_download_temporary_filename (filename);
             if (temporary_file_name.contains ("/")) {
                 temporary_file_name = temporary_file_name.mid (temporary_file_name.last_index_of ("/")+1);
             }

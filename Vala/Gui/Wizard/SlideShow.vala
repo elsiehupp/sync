@@ -177,7 +177,7 @@ public class SlideShow : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_reset () {
+    public void reset () {
         on_signal_stop_show ();
         this.pixmaps = new GLib.List<Gdk.Pixbuf> ();
         this.labels = new GLib.List<string> ();

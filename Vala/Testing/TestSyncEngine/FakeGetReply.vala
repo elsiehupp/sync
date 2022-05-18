@@ -32,7 +32,7 @@ public class FakeGetReply : FakeReply {
             GLib.debug ("meh;");
         }
         Q_ASSERT_X (file_info, Q_FUNC_INFO, "Could not find file on the remote");
-        GLib.Object.invoke_method (this, &FakeGetReply.respond, GLib.QueuedConnection);
+        GLib.Object.invoke_method (this, FakeGetReply.respond, GLib.QueuedConnection);
     }
 
 

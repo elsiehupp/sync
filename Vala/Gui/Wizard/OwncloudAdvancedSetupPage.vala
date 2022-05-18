@@ -37,7 +37,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
     private OwncloudWizard oc_wizard;
 
 
-    internal signal void create_local_and_remote_folders (string value1, string value2);
+    internal signal void signal_create_local_and_remote_folders (string value1, string value2);
 
 
     /***********************************************************
@@ -88,7 +88,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
         );
 
         Theme theme = Theme.instance;
-        Gtk.Icon app_icon = theme.application_icon;
+        Gtk.IconInfo app_icon = theme.application_icon;
         int app_icon_size = Theme.is_hidpi () ? 128 : 64;
 
         this.instance.l_server_icon.pixmap (app_icon.pixmap (app_icon_size));
@@ -108,8 +108,8 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
 
     private void on_virtual_file_sync_toggled (bool checked) {
         if (checked) {
-            this.instance.l_selective_sync_size_label == "";
-            this.selective_sync_blocklist == "";
+            this.instance.l_selective_sync_size_label = "";
+            this.selective_sync_blocklist = "";
         }
     }
 
@@ -137,8 +137,8 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
         }
 
         this.checking = false;
-        this.instance.l_selective_sync_size_label == "";
-        this.instance.l_sync_everything_size_label == "";
+        this.instance.l_selective_sync_size_label = "";
+        this.instance.l_sync_everything_size_label = "";
 
         // Update the local folder - this is not guaranteed to find a good one
         string good_local_folder = FolderManager.instance.find_good_path_for_new_sync_folder (local_folder (), server_url ());
@@ -168,10 +168,10 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
         }
 
         ConfigFile config_file;
-        var new_folder_limit = config_file.new_big_folder_size_limit;
+        var new_folder_limit = ConfigFile.new_big_folder_size_limit;
         this.instance.conf_check_box_size.checked (new_folder_limit.first);
         this.instance.conf_spin_box.value (new_folder_limit.second);
-        this.instance.conf_check_box_external.checked (config_file.confirm_external_storage ());
+        this.instance.conf_check_box_external.checked (ConfigFile.confirm_external_storage ());
 
         fetch_user_avatar ();
         user_information ();
@@ -212,21 +212,20 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
             on_signal_error_string ("");
             this.checking = true;
             on_signal_start_spinner ();
-            /* emit */ complete_changed ();
+            signal_complete_changed ();
 
             if (this.instance.r_sync_everything.is_checked ()) {
-                ConfigFile config_file;
-                config_file.new_big_folder_size_limit (this.instance.conf_check_box_size.is_checked (),
+                ConfigFile.new_big_folder_size_limit (this.instance.conf_check_box_size.is_checked (),
                     this.instance.conf_spin_box.value ());
-                config_file.confirm_external_storage (this.instance.conf_check_box_external.is_checked ());
+                ConfigFile.confirm_external_storage (this.instance.conf_check_box_external.is_checked ());
             }
 
-            /* emit */ create_local_and_remote_folders (local_folder (), this.remote_folder);
+            signal_create_local_and_remote_folders (local_folder (), this.remote_folder);
             return false;
         } else {
             // connecting is running
             this.checking = false;
-            /* emit */ complete_changed ();
+            signal_complete_changed ();
             on_signal_stop_spinner ();
             return true;
         }
@@ -275,7 +274,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
         this.checking = false;
         this.created = true;
         on_signal_stop_spinner ();
-        /* emit */ complete_changed ();
+        signal_complete_changed ();
     }
 
 
@@ -289,7 +288,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
             this.instance.error_label.on_signal_text (error_string);
         }
         this.checking = false;
-        /* emit */ complete_changed ();
+        signal_complete_changed ();
     }
 
 
@@ -324,7 +323,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
     private void on_signal_sync_everything_clicked () {
         this.instance.l_selective_sync_size_label.on_signal_text ("");
         radio_checked (this.instance.r_sync_everything);
-        this.selective_sync_blocklist == "";
+        this.selective_sync_blocklist = "";
 
         string error_str = check_local_space (this.r_size);
         on_signal_error_string (error_str);
@@ -469,7 +468,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
 
         // check if the local folder exists. If so, and if its not empty, show a warning.
         string error_str = FolderManager.instance.check_path_validity_for_new_folder (loc_folder, server_url ());
-        this.local_folder_valid = error_str == "";
+        this.local_folder_valid = error_str = "";
 
         string status_string;
 
@@ -512,7 +511,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
         }
         on_signal_error_string (error_str);
 
-        /* emit */ complete_changed ();
+        signal_complete_changed ();
     }
 
 
@@ -557,9 +556,9 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
     /***********************************************************
     ***********************************************************/
     private int64 available_local_space () {
-        string local_dir = local_folder ();
-        string path = !GLib.Dir (local_dir).exists () && local_dir.contains (GLib.Dir.home_path) ?
-                    GLib.Dir.home_path : local_dir;
+        string local_directory = local_folder ();
+        string path = !GLib.Dir (local_directory).exists () && local_directory.contains (GLib.Dir.home_path) ?
+                    GLib.Dir.home_path : local_directory;
         GLib.StorageInfo storage = new GLib.StorageInfo (GLib.Dir.to_native_separators (path));
 
         return storage.bytes_available ();

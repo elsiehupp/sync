@@ -22,7 +22,7 @@ public class Logger : GLib.Object {
             return this.log_file_object.filename ();
         }
         public set {
-            GLib.MutexLocker locker = new GLib.MutexLocker (&this.mutex);
+            GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
             if (this.logstream != null) {
                 this.logstream.reset (null);
                 this.log_file_object.close ();
@@ -49,7 +49,7 @@ public class Logger : GLib.Object {
                 return;
             }
 
-            this.logstream.reset (new GLib.OutputStream (&this.log_file));
+            this.logstream.reset (new GLib.OutputStream (this.log_file));
             this.logstream.codec (GMime.Encoding.codec_for_name ("UTF-8"));
         }
     }
@@ -61,10 +61,12 @@ public class Logger : GLib.Object {
             return this.log_debug;
         }
         public set {
-            GLib.List<string> rules = {value ? "nextcloud.*.debug=true": ""};
+            GLib.List<string> rules = new GLib.List<string> ();
             if (value) {
+                rules.append ("nextcloud.*.debug=true")
                 add_log_rule (rules);
             } else {
+                rules.append ("");
                 remove_log_rule (rules);
             }
             this.log_debug = value;
@@ -95,10 +97,10 @@ public class Logger : GLib.Object {
     private GLib.List<string> crash_log;
     private int crash_log_index = 0;
 
-    internal signal void log_window_log (string value);
+    internal signal void signal_log_window_log (string value);
     internal signal void signal_gui_log (string value_1, string value_2);
-    internal signal void gui_message (string value_1, string value_2);
-    internal signal void optional_gui_log (string value_1, string value_2);
+    internal signal void signal_gui_message (string value_1, string value_2);
+    internal signal void signal_optional_gui_log (string value_1, string value_2);
 
 
     /***********************************************************
@@ -153,7 +155,7 @@ public class Logger : GLib.Object {
             this.crash_log_index = (this.crash_log_index + 1) % CRASH_LOG_SIZE;
             this.crash_log[this.crash_log_index] = message;
             if (this.logstream != null) {
-                (*this.logstream) + message + GLib.endl;
+                (this.logstream) + message + GLib.endl;
                 if (this.do_file_flush) {
                     this.logstream.flush ();
                 }
@@ -162,7 +164,7 @@ public class Logger : GLib.Object {
                 close ();
             }
         }
-        /* emit */ log_window_log (message);
+        signal_log_window_log (message);
     }
 
 
@@ -176,14 +178,14 @@ public class Logger : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void post_optional_gui_log (string title, string message) {
-        /* emit */ optional_gui_log (title, message);
+        signal_optional_gui_log (title, message);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void post_gui_message (string title, string message) {
-        /* emit */ gui_message (title, message);
+        signal_gui_message (title, message);
     }
 
 
@@ -348,7 +350,7 @@ public class Logger : GLib.Object {
     private void dump_crash_log () {
         GLib.File log_file = GLib.File.new_for_path (GLib.Dir.temp_path + "/" + Common.Config.APPLICATION_NAME + "-crash.log");
         if (log_file_object.open (GLib.File.WriteOnly)) {
-            GLib.OutputStream output = new GLib.OutputStream (&log_file);
+            GLib.OutputStream output = new GLib.OutputStream (log_file);
             for (int i = 1; i <= CRASH_LOG_SIZE; ++i) {
                 output += this.crash_log[ (this.crash_log_index + i) % CRASH_LOG_SIZE] + "\n";
             }

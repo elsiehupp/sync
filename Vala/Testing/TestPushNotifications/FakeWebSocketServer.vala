@@ -37,7 +37,7 @@ public class FakeWebSocketServer : GLib.Object {
             this.signal_closed
         );
         GLib.info ("Open fake websocket server on port: " + port.to_string ());
-        this.process_text_message_spy = std.make_unique<GLib.SignalSpy> (this, &FakeWebSocketServer.signal_process_text_message);
+        this.process_text_message_spy = std.make_unique<GLib.SignalSpy> (this, FakeWebSocketServer.signal_process_text_message);
     }
 
     ~FakeWebSocketServer () {
@@ -52,7 +52,7 @@ public class FakeWebSocketServer : GLib.Object {
     public GLib.WebSocket authenticate_account (Account account, BeforeAuthentication before_authentication, AfterAuthentication after_authentication) {
         var push_notifications = account.push_notifications ();
         GLib.assert_true (push_notifications);
-        GLib.SignalSpy ready_spy = new GLib.SignalSpy (push_notifications, &PushNotificationManager.ready);
+        GLib.SignalSpy ready_spy = new GLib.SignalSpy (push_notifications, PushNotificationManager.ready);
 
         before_authentication (push_notifications);
 
@@ -136,7 +136,7 @@ public class FakeWebSocketServer : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void clear_text_messages () {
-        this.process_text_message_spy == "";
+        this.process_text_message_spy = "";
     }
 
 

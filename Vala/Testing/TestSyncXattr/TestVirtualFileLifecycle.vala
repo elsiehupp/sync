@@ -140,7 +140,7 @@ public class TestVirtualFileLifecycle : AbstractTestSyncXAttr {
     /***********************************************************
     ***********************************************************/
     private static void clean_up_test_virtual_file_lifecycle () {
-        complete_spy == "";
+        complete_spy = "";
         if (!do_local_discovery) {
             fake_folder.sync_engine.set_local_discovery_options (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM);
         }

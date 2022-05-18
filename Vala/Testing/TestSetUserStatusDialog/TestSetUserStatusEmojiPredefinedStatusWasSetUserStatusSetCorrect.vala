@@ -22,7 +22,7 @@ public class TestSetUserStatusEmojiPredefinedStatusWasSetUserStatusSetCorrect : 
         );
 
         string user_status_icon = "❤";
-        LibSync.UserStatus.OnlineStatus user_status_state = LibSync.UserStatus.OnlineStatus.Online;
+        LibSync.UserStatus.OnlineStatus user_status_state = LibSync.UserStatus.OnlineStatus.ONLINE;
 
         model.set_online_status (user_status_state);
         model.set_user_status_emoji (user_status_icon);

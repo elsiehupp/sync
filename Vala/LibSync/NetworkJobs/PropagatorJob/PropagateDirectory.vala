@@ -180,12 +180,12 @@ public class PropagateDirectory : AbstractPropagatorJob {
             if (this.item.instruction == CSync.SyncInstructions.RENAME
                 || this.item.instruction == CSync.SyncInstructions.NEW
                 || this.item.instruction == CSync.SyncInstructions.UPDATE_METADATA) {
-                var result = this.propagator.update_metadata (*this.item);
+                var result = this.propagator.update_metadata (this.item);
                 if (!result) {
                     status = this.item.status = SyncFileItem.Status.FATAL_ERROR;
                     this.item.error_string = _("Error updating metadata : %1").printf (result.error);
                     GLib.warning ("Error writing to the database for file " + this.item.file + " with " + result.error);
-                } else if (*result == AbstractVfs.ConvertToPlaceholderResult.Locked) {
+                } else if (result == AbstractVfs.ConvertToPlaceholderResult.Locked) {
                     this.item.status = SyncFileItem.Status.SOFT_ERROR;
                     this.item.error_string = _("File is currently in use");
                 }

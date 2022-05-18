@@ -13,7 +13,7 @@ namespace LibSync {
 ***********************************************************/
 public class EntityExistsJob : AbstractNetworkJob {
 
-    internal signal void exists (GLib.InputStream reply);
+    internal signal void signal_exists (GLib.InputStream reply);
 
     /***********************************************************
     ***********************************************************/
@@ -33,7 +33,7 @@ public class EntityExistsJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private bool on_signal_finished () {
-        /* emit */ exists (this.reply);
+        signal_exists (this.reply);
         return true;
     }
 

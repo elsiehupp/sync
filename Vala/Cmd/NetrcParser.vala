@@ -100,7 +100,7 @@ public class NetrcParser : GLib.Object {
             this.entries.insert (machine, pair);
         }
         pair = q_make_pair ("", "");
-        machine == "";
+        machine = "";
         is_default = false;
     }
 

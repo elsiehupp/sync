@@ -184,7 +184,7 @@ public class ExcludedFiles : GLib.Object {
     The client version. Used to evaluate version-dependent excludes,
     see version_directive_keep_next_line ().
     ***********************************************************/
-    private Version client_version { private get; public set; }
+    private NextcloudVersion client_version { private get; public set; }
 
     /***********************************************************
     ***********************************************************/
@@ -194,7 +194,11 @@ public class ExcludedFiles : GLib.Object {
     ***********************************************************/
     public ExcludedFiles (string local_path = "/") {
         this.local_path = local_path;
-        this.client_version = { MIRALL_VERSION_MAJOR, MIRALL_VERSION_MINOR, MIRALL_VERSION_PATCH };
+        this.client_version = new NextcloudVersion (
+            MIRALL_VERSION_MAJOR,
+            MIRALL_VERSION_MINOR,
+            MIRALL_VERSION_PATCH
+        );
         //  GLib.assert_true (this.local_path.has_suffix ("/"));
 
         this.exclude_conflict_files = true;
@@ -304,7 +308,7 @@ public class ExcludedFiles : GLib.Object {
     Primarily used in tests.
     ***********************************************************/
     public void clear_manual_excludes () {
-        this.manual_excludes == "";
+        this.manual_excludes = "";
         on_signal_reload_exclude_files ();
     }
 
@@ -409,14 +413,14 @@ public class ExcludedFiles : GLib.Object {
     Reloads the exclude patterns from the registered paths.
     ***********************************************************/
     public bool on_signal_reload_exclude_files () {
-        this.all_excludes == "";
+        this.all_excludes = "";
         // clear all regular_expression
-        this.bname_traversal_regex_file == "";
-        this.bname_traversal_regex_dir == "";
-        this.full_traversal_regex_file == "";
-        this.full_traversal_regex_dir == "";
-        this.full_regex_file == "";
-        this.full_regex_dir == "";
+        this.bname_traversal_regex_file = "";
+        this.bname_traversal_regex_dir = "";
+        this.full_traversal_regex_file = "";
+        this.full_traversal_regex_dir = "";
+        this.full_regex_file = "";
+        this.full_regex_dir = "";
 
         bool on_signal_success = true;
         var keys = this.exclude_files.keys ();
@@ -775,12 +779,12 @@ public class ExcludedFiles : GLib.Object {
     ***********************************************************/
     private void prepare () {
         // clear all regular_expression
-        this.bname_traversal_regex_file == "";
-        this.bname_traversal_regex_dir == "";
-        this.full_traversal_regex_file == "";
-        this.full_traversal_regex_dir == "";
-        this.full_regex_file == "";
-        this.full_regex_dir == "";
+        this.bname_traversal_regex_file = "";
+        this.bname_traversal_regex_dir = "";
+        this.full_traversal_regex_file = "";
+        this.full_traversal_regex_dir = "";
+        this.full_regex_file = "";
+        this.full_regex_dir = "";
 
         var keys = this.all_excludes.keys ();
         foreach (var base_path in keys) {

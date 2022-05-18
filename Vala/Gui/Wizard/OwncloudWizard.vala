@@ -48,7 +48,7 @@ public class OwncloudWizard : GLib.Wizard {
 
     public string oc_url {
         public get {
-            return field ("OCUrl").to_string ().simplified ();
+            return field ("OcsUrl").to_string ().simplified ();
         }
         public set {
             this.setup_page.server_url (value);
@@ -97,15 +97,15 @@ public class OwncloudWizard : GLib.Wizard {
     ***********************************************************/
     public GLib.List<GLib.SslCertificate> client_ssl_ca_certificates;
 
-    internal signal void clear_pending_requests ();
-    internal signal void determine_auth_type (string value);
-    internal signal void connect_to_oc_url (string value);
-    internal signal void create_local_and_remote_folders (string value1, string value2);
+    internal signal void signal_clear_pending_requests ();
+    internal signal void signal_determine_auth_type (string value);
+    internal signal void signal_connect_to_ocs_url (string value);
+    internal signal void signal_create_local_and_remote_folders (string value1, string value2);
 
     /***********************************************************
     Make sure to connect to this, rather than on_signal_finished (int)!!
     ***********************************************************/
-    internal signal void basic_setup_finished (int value);
+    internal signal void signal_basic_setup_finished (int value);
     internal signal void skip_folder_configuration ();
     internal signal void need_certificate ();
     internal signal void signal_style_changed ();
@@ -143,7 +143,7 @@ public class OwncloudWizard : GLib.Wizard {
     //  #endif WITH_WEBENGINE
 
         this.signal_finished.connect (
-            this.basic_setup_finished
+            this.signal_basic_setup_finished
         );
 
         // note: start id is set by the calling class depending on if the
@@ -422,7 +422,7 @@ public class OwncloudWizard : GLib.Wizard {
         }
 
         if (identifier == WizardCommon.Pages.PAGE_SERVER_SETUP) {
-            /* emit */ clear_pending_requests ();
+            signal_clear_pending_requests ();
         }
 
         if (identifier == WizardCommon.Pages.PAGE_ADVANCED_SETUP && (this.credentials_page == this.browser_creds_page || this.credentials_page == this.flow_2_creds_page)) {
@@ -478,8 +478,8 @@ public class OwncloudWizard : GLib.Wizard {
 
         OwncloudGui.raise_dialog (this);
         if (next_id == -1) {
-            disconnect (this, Gtk.Dialog.signal_finished, this, OwncloudWizard.basic_setup_finished);
-            /* emit */ basic_setup_finished (Gtk.Dialog.Accepted);
+            disconnect (this, Gtk.Dialog.signal_finished, this, OwncloudWizard.signal_basic_setup_finished);
+            signal_basic_setup_finished (Gtk.Dialog.Accepted);
         } else {
             next ();
         }
@@ -501,7 +501,7 @@ public class OwncloudWizard : GLib.Wizard {
             break;
         case Gdk.Event.ActivationChange:
             if (is_active_window ())
-                /* emit */ activate ();
+                signal_activate ();
             break;
         default:
             break;

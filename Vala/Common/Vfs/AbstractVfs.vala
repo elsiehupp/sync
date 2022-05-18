@@ -293,7 +293,7 @@ public abstract class AbstractVfs : GLib.Object {
     protected bool is_pin_state_in_database (string folder_path, PinState state) {
         var path = folder_path.to_utf8 ();
         this.setup_params.journal.internal_pin_states.wipe_for_path_and_below (path);
-        if (state != PinState.PinState.INHERITED) {
+        if (state != PinState.INHERITED) {
             this.setup_params.journal.internal_pin_states.for_path (path, state);
         }
         return true;
@@ -329,7 +329,7 @@ public abstract class AbstractVfs : GLib.Object {
                 return ItemAvailability.ALL_DEHYDRATED;
             }
         } else if (hydration_status.has_hydrated) {
-            if (pin && *pin == PinState.PinState.ALWAYS_LOCAL) {
+            if (pin && *pin == PinState.ALWAYS_LOCAL) {
                 return ItemAvailability.PinState.ALWAYS_LOCAL;
             } else {
                 return ItemAvailability.ALL_HYDRATED;

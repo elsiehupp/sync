@@ -21,11 +21,11 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, GLib.Runnable*/ 
 
 
     internal signal void signal_finished (GLib.List<LocalInfo> result);
-    internal signal void finished_fatal_error (string error_string);
-    internal signal void finished_non_fatal_error (string error_string);
+    internal signal void signal_finished_fatal_error (string error_string);
+    internal signal void signal_finished_non_fatal_error (string error_string);
 
     internal signal void signal_item_discovered (unowned SyncFileItem item);
-    internal signal void child_ignored (bool b);
+    internal signal void signal_child_ignored (bool b);
 
     /***********************************************************
     ***********************************************************/
@@ -52,7 +52,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, GLib.Runnable*/ 
             string error_string = _("Error while opening directory %1").printf (local_path);
             if (errno == EACCES) {
                 error_string = _("Directory not accessible on client, permission denied");
-                /* emit */ finished_non_fatal_error (error_string);
+                signal_finished_non_fatal_error (error_string);
                 return;
             } else if (errno == ENOENT) {
                 error_string = _("Directory not found : %1").printf (local_path);
@@ -61,7 +61,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, GLib.Runnable*/ 
                 // Just consider it is empty
                 return;
             }
-            /* emit */ finished_fatal_error (error_string);
+            signal_finished_fatal_error (error_string);
             return;
         }
 
@@ -79,8 +79,8 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, GLib.Runnable*/ 
             GMime.Encoding.ConverterState state;
             i.name = codec.to_unicode (dirent.path, dirent.path.size (), state);
             if (state.invalid_chars > 0 || state.remaining_chars > 0) {
-                /* emit */ child_ignored (true);
-                var item = unowned new SyncFileItem ();
+                signal_child_ignored (true);
+                var item = new SyncFileItem ();
                 //  item.file = this.current_folder.target + i.name;
                 // FIXME ^^ do we really need to use this.target or is local fine?
                 item.file = this.local_path + i.name;
@@ -105,7 +105,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, GLib.Runnable*/ 
 
             // Note: Windows vio converts any error into EACCES
             GLib.warning ("readdir failed for file in " + local_path + " - errno: " + errno.to_string ());
-            /* emit */ finished_fatal_error (_("Error while reading directory %1").printf (local_path));
+            signal_finished_fatal_error (_("Error while reading directory %1").printf (local_path));
             return;
         }
 

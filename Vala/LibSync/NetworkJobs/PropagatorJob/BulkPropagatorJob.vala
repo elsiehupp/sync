@@ -188,7 +188,7 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
         // But skip the file if the mtime is too close to 'now'!
         // That usually indicates a file that is still being changed
         // or not yet fully copied to the destination.
-        if (file_is_still_changing (*item)) {
+        if (file_is_still_changing (item)) {
             this.propagator.another_sync_needed = true;
             this.pending_checksum_files.remove (item.file);
             on_signal_error_start_folder_unlock (item, SyncFileItem.Status.SOFT_ERROR, _("Local file changed during sync."));
@@ -250,7 +250,7 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
                 finalize_one_file (single_file);
             }
 
-            on_signal_done (single_file.item, single_file.item.status, {});
+            on_signal_done (single_file.item, single_file.item.status, "");
 
             single_file_it = this.files_to_upload.erase (single_file_it);
         }
@@ -263,11 +263,11 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
     ***********************************************************/
     private void finalize_one_file (BulkUploadItem one_file) {
         // Update the database entry
-        var result = this.propagator.update_metadata (*one_file.item);
+        var result = this.propagator.update_metadata (one_file.item);
         if (!result) {
             on_signal_done (one_file.item, SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error));
             return;
-        } else if (*result == AbstractVfs.ConvertToPlaceholderResult.Locked) {
+        } else if (result == AbstractVfs.ConvertToPlaceholderResult.Locked) {
             on_signal_done (one_file.item, SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").printf (one_file.item.file));
             return;
         }
@@ -278,7 +278,7 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
             || one_file.item.instruction == CSync.SyncInstructions.TYPE_CHANGE) {
             var vfs = this.propagator.sync_options.vfs;
             var pin = vfs.pin_state (one_file.item.file);
-            if (pin && *pin == Common.ItemAvailability.ONLINE_ONLY && !vfs.pin_state (one_file.item.file, PinState.PinState.UNSPECIFIED)) {
+            if (pin && *pin == Common.ItemAvailability.ONLINE_ONLY && !vfs.pin_state (one_file.item.file, PinState.UNSPECIFIED)) {
                 GLib.warning ("Could not set pin state of " + one_file.item.file + " to unspecified.");
             }
         }
@@ -397,7 +397,7 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
                 // If the file is currently locked, we want to retry the sync
                 // when it becomes available again.
                 if (FileSystem.is_file_locked (single_file.local_path)) {
-                    /* emit */ this.propagator.seen_locked_file (single_file.local_path);
+                    this.propagator.signal_seen_locked_file (single_file.local_path);
                 }
 
                 abort_with_error (single_file.item, SyncFileItem.Status.NORMAL_ERROR, device.error_string);
@@ -590,7 +590,7 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
 
         handle_job_done_errors (item, status);
 
-        /* emit */ this.propagator.signal_item_completed (item);
+        this.propagator.signal_item_completed (item);
     }
 
 

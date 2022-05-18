@@ -282,37 +282,39 @@ public class Capabilities : GLib.Object {
     /***********************************************************
     Returns true if the server supports client side encryption
     ***********************************************************/
-    public bool client_side_encryption_available () {
-        var it = this.capabilities.const_find ("end-to-end-encryption");
-        if (it == this.capabilities.const_end ()) {
-            return false;
+    public bool client_side_encryption_available {
+        public get {
+            var it = this.capabilities.const_find ("end-to-end-encryption");
+            if (it == this.capabilities.const_end ()) {
+                return false;
+            }
+    
+            var properties = (it).to_map ();
+            var enabled = properties.value ("enabled", false).to_bool ();
+            if (!enabled) {
+                return false;
+            }
+    
+            var version = properties.value ("api-version", "1.0").to_byte_array ();
+            GLib.info ("E2EE API version: " + version);
+            var splitted_version = version.split ('.');
+    
+            bool ok = false;
+            var major = !splitted_version == "" ? splitted_version.at (0).to_int (ok) : 0;
+            if (!ok) {
+                GLib.warning ("Didn't understand version scheme (major), E2EE disabled.");
+                return false;
+            }
+    
+            ok = false;
+            var minor = splitted_version.size () > 1 ? splitted_version.at (1).to_int (ok) : 0;
+            if (!ok) {
+                GLib.warning ("Didn't understand version scheme (minor), E2EE disabled.");
+                return false;
+            }
+    
+            return major == 1 && minor >= 1;
         }
-
-        var properties = (*it).to_map ();
-        var enabled = properties.value ("enabled", false).to_bool ();
-        if (!enabled) {
-            return false;
-        }
-
-        var version = properties.value ("api-version", "1.0").to_byte_array ();
-        GLib.info ("E2EE API version: " + version);
-        var splitted_version = version.split ('.');
-
-        bool ok = false;
-        var major = !splitted_version == "" ? splitted_version.at (0).to_int (&ok) : 0;
-        if (!ok) {
-            GLib.warning ("Didn't understand version scheme (major), E2EE disabled.");
-            return false;
-        }
-
-        ok = false;
-        var minor = splitted_version.size () > 1 ? splitted_version.at (1).to_int (&ok) : 0;
-        if (!ok) {
-            GLib.warning ("Didn't understand version scheme (minor), E2EE disabled.");
-            return false;
-        }
-
-        return major == 1 && minor >= 1;
     }
 
 

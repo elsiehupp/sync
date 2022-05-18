@@ -266,7 +266,7 @@ public class PushNotificationManager : GLib.Object {
             this.reconnect_timer_active = false;
         }
 
-        disconnect (this.web_socket, GLib.Overload<GLib.AbstractSocket.SocketError>.of (&GLib.WebSocket.error), this, PushNotificationManager.on_signal_web_socket_error);
+        disconnect (this.web_socket, GLib.Overload<GLib.AbstractSocket.SocketError>.of (GLib.WebSocket.error), this, PushNotificationManager.on_signal_web_socket_error);
         disconnect (this.web_socket, GLib.WebSocket.signal_ssl_errors, this, PushNotificationManager.on_signal_web_socket_ssl_errors);
 
         this.web_socket.close ();

@@ -47,7 +47,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
         this.folder_tree = new GLib.TreeWidget (this);
         this.loading = new Gtk.Label (_("Loading …"), this.folder_tree);
 
-        var layout = new GLib.VBoxLayout (this);
+        var layout = new Gtk.Box (Gtk.Orientation.VERTICAL);
         layout.contents_margins (0, 0, 0, 0);
 
         var header = new Gtk.Label (this);
@@ -215,7 +215,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
         // Since / cannot be in the blocklist, expand it to the actual
         // list of top-level folders as soon as possible.
         if (this.old_block_list == GLib.List<string> ("/")) {
-            this.old_block_list == "";
+            this.old_block_list = "";
             foreach (string path, list) {
                 path.remove (path_to_remove);
                 if (path == "") {
@@ -400,12 +400,12 @@ public class SelectiveSyncWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void refresh_folders () {
-        this.encrypted_paths == "";
+        this.encrypted_paths = "";
 
         var lscol_job = new LscolJob (this.account, this.folder_path, this);
         var props = GLib.List<string> ("resourcetype"
                                          + "http://owncloud.org/ns:size";
-        if (this.account.capabilities.client_side_encryption_available ()) {
+        if (this.account.capabilities.client_side_encryption_available) {
             props + "http://nextcloud.org/ns:is-encrypted";
         }
         lscol_job.properties (props);
@@ -419,7 +419,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
             this.on_signal_gather_encrypted_paths
         );
         lscol_job.on_signal_start ();
-        this.folder_tree == "";
+        this.folder_tree = "";
         this.loading.show ();
         this.loading.move (10, this.folder_tree.header ().height () + 10);
     }
@@ -442,7 +442,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
     ***********************************************************/
     private static void SelectiveSyncWidget.recursive_insert (GLib.TreeWidgetItem parent, GLib.List<string> path_trail, string path, int64 size) {
         GLib.FileIconProvider prov;
-        Gtk.Icon folder_icon = prov.icon (GLib.FileIconProvider.FolderConnection);
+        Gtk.IconInfo folder_icon = prov.icon (GLib.FileIconProvider.FolderConnection);
         if (path_trail.size () == 0) {
             if (path.has_suffix ("/")) {
                 path.chop (1);

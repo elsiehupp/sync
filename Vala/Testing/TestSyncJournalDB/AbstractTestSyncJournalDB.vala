@@ -32,7 +32,7 @@ public abstract class AbstractTestSyncJournalDB : GLib.Object {
         var state = this.database.internal_pin_states.effective_for_path (path);
         if (!state) {
             GLib.assert_fail ("couldn't read pin state", __FILE__, __LINE__);
-            return PinState.PinState.INHERITED;
+            return PinState.INHERITED;
         }
         return state;
     }
@@ -42,7 +42,7 @@ public abstract class AbstractTestSyncJournalDB : GLib.Object {
         var state = this.database.internal_pin_states.effective_for_path_recursive (path);
         if (!state) {
             GLib.assert_fail ("couldn't read pin state", __FILE__, __LINE__);
-            return PinState.PinState.INHERITED;
+            return PinState.INHERITED;
         }
         return state;
     }
@@ -52,7 +52,7 @@ public abstract class AbstractTestSyncJournalDB : GLib.Object {
         var state = this.database.internal_pin_states.raw_for_path (path);
         if (!state) {
             GLib.assert_fail ("couldn't read pin state", __FILE__, __LINE__);
-            return PinState.PinState.INHERITED;
+            return PinState.INHERITED;
         }
         return state;
     }

@@ -125,11 +125,11 @@ public class SyncJournalDb : GLib.Object {
 
             var next = query.next ();
             if (!next.ok) {
-                return {};
+                return PinState.UNKNOWN;
             }
             // no-entry means PinState.INHERITED
             if (!next.has_data) {
-                return PinState.PinState.INHERITED;
+                return PinState.INHERITED;
             }
 
             return (PinState)query.int_value (0);
@@ -145,7 +145,7 @@ public class SyncJournalDb : GLib.Object {
         The path should not have a trailing slash.
         It's valid to use the root path "".
 
-        Never returns PinState.PinState.INHERITED. If the root is "PinState.INHERITED"
+        Never returns PinState.INHERITED. If the root is "PinState.INHERITED"
         or there's an error, "PinState.ALWAYS_LOCAL" is returned.
 
         Returns none on database error.
@@ -153,7 +153,7 @@ public class SyncJournalDb : GLib.Object {
         public Optional<PinState> effective_for_path (string path) {
             GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.database.mutex);
             if (!this.database.check_connect ()) {
-                return {};
+                return PinState.UNKOWN;
             }
             PreparedSqlQuery query = this.database.query_manager.get_for_key_sql_and_database (
                 PreparedSqlQueryManager.Key.GET_EFFECTIVE_PIN_STATE_QUERY,
@@ -171,7 +171,7 @@ public class SyncJournalDb : GLib.Object {
 
             var next = query.next ();
             if (!next.ok) {
-                return {};
+                return PinState.UNKOWN;
             }
             // If the root path has no setting, assume PinState.ALWAYS_LOCAL
             if (!next.has_data) {
@@ -189,7 +189,7 @@ public class SyncJournalDb : GLib.Object {
         then that pin state will be returned.
 
         If some subitem's pin state is different from the path's state,
-        PinState.PinState.INHERITED will be returned. PinState.INHERITED isn't returned in
+        PinState.INHERITED will be returned. PinState.INHERITED isn't returned in
         any other cases.
 
         It's valid to use the root path "".
@@ -200,11 +200,11 @@ public class SyncJournalDb : GLib.Object {
             // against this.
             PreparedSqlQuery base_pin = effective_for_path (path);
             if (!base_pin) {
-                return {};
+                return PinState.UNKOWN;
             }
             GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.database.mutex);
             if (!this.database.check_connect ()) {
-                return {};
+                return PinState.UNKOWN;
             }
             // Find all the non-inherited pin states below the item
             PreparedSqlQuery query = this.database.query_manager.get_for_key_sql_and_database (
@@ -222,14 +222,14 @@ public class SyncJournalDb : GLib.Object {
             while (true) {
                 var next = query.next ();
                 if (!next.ok) {
-                    return {};
+                    return PinState.UNKOWN;
                 }
                 if (!next.has_data) {
                     break;
                 }
                 PreparedSqlQuery sub_pin = (PinState)query.int_value (0);
                 if (sub_pin != base_pin) {
-                    return PinState.PinState.INHERITED;
+                    return PinState.INHERITED;
                 }
             }
 
@@ -298,7 +298,7 @@ public class SyncJournalDb : GLib.Object {
         Optional<GLib.List<GLib.Pair<string, PinState>>> raw_list () {
             GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.database.mutex);
             if (!this.database.check_connect ()) {
-                return {};
+                return PinState.UNKOWN;
             }
             SqlQuery query = new SqlQuery ("SELECT path, pin_state FROM flags;", this.database.database);
             query.exec ();
@@ -307,7 +307,7 @@ public class SyncJournalDb : GLib.Object {
             while (true) {
                 var next = query.next ();
                 if (!next.ok) {
-                    return {};
+                    return PinState.UNKOWN;
                 }
                 if (!next.has_data) {
                     break;
@@ -520,7 +520,7 @@ public class SyncJournalDb : GLib.Object {
 
         // Reset the output var in case the caller is reusing it.
         //  GLib.assert_true (record);
-        record.path == "";
+        record.path = "";
         //  GLib.assert_true (!record.is_valid);
 
         if (this.metadata_table_is_empty) {
@@ -556,7 +556,7 @@ public class SyncJournalDb : GLib.Object {
                 return false;
             }
             if (next.has_data) {
-                fill_file_record_from_get_query (*record, *query);
+                fill_file_record_from_get_query (record, query);
             }
         }
         return true;
@@ -570,7 +570,7 @@ public class SyncJournalDb : GLib.Object {
 
         // Reset the output var in case the caller is reusing it.
         //  GLib.assert_true (record);
-        record.path == "";
+        record.path = "";
         //  GLib.assert_true (!record.is_valid);
 
         if (this.metadata_table_is_empty) {
@@ -606,7 +606,7 @@ public class SyncJournalDb : GLib.Object {
                 return false;
             }
             if (next.has_data) {
-                fill_file_record_from_get_query (*record, *query);
+                fill_file_record_from_get_query (record, query);
             }
         }
         return true;
@@ -620,7 +620,7 @@ public class SyncJournalDb : GLib.Object {
 
         // Reset the output var in case the caller is reusing it.
         //  GLib.assert_true (record);
-        //  record.path == "";
+        //  record.path = "";
         //  GLib.assert_true (!record.is_valid);
 
         if (inode == 0 || this.metadata_table_is_empty) {
@@ -688,7 +688,7 @@ public class SyncJournalDb : GLib.Object {
                 break;
             }
             SyncJournalFileRecord record;
-            fill_file_record_from_get_query (record, *query);
+            fill_file_record_from_get_query (record, query);
             row_callback (record);
         }
 
@@ -744,7 +744,7 @@ public class SyncJournalDb : GLib.Object {
             if (query == null) {
                 return false;
             }
-            return this.exec (*query);
+            return this.exec (query);
         } else {
             // This query is used to skip discovery and fill the tree from the
             // database instead
@@ -763,7 +763,7 @@ public class SyncJournalDb : GLib.Object {
                 return false;
             }
             query.bind_value (1, path);
-            return this.exec (*query);
+            return this.exec (query);
         }
     }
 
@@ -885,7 +885,7 @@ public class SyncJournalDb : GLib.Object {
             // Can't be true anymore.
             this.metadata_table_is_empty = false;
 
-            return {};
+            return null;
         } else {
             GLib.warning ("Failed to connect database.");
             return _("Failed to connect database."); // check_connect failed.
@@ -998,7 +998,7 @@ public class SyncJournalDb : GLib.Object {
                     "DELETE FROM metadata WHERE " + is_prefix_path_of ("?1", "path"),
                     this.database
                 );
-                if (!query) {
+                if (query == null) {
                     return false;
                 }
                 query.bind_value (1, filename);
@@ -1269,7 +1269,7 @@ public class SyncJournalDb : GLib.Object {
 
         GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
         if (check_connect ()) {
-            SqlQuery query = new SqlQuery ("SELECT count (*) FROM blocklist", this.database);
+            SqlQuery query = new SqlQuery ("SELECT count () FROM blocklist", this.database);
 
             if (!query.exec ()) {
                 sql_fail ("Count number of blocklist entries failed", query);
@@ -1306,7 +1306,7 @@ public class SyncJournalDb : GLib.Object {
             }
 
             if (query.next ().has_data) {
-                to_download_info (*query, download_info);
+                to_download_info (query, download_info);
             }
         }
         return download_info;
@@ -1393,7 +1393,7 @@ public class SyncJournalDb : GLib.Object {
             PreparedSqlQuery query = this.query_manager.get_for_key (
                 PreparedSqlQueryManager.Key.DELETE_DOWNLOAD_INFO_QUERY
             );
-            if (!delete_batch (*query, superfluous_paths, "downloadinfo")) {
+            if (!delete_batch (query, superfluous_paths, "downloadinfo")) {
                 return empty_result;
             }
         }
@@ -1409,7 +1409,7 @@ public class SyncJournalDb : GLib.Object {
 
         GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
         if (check_connect ()) {
-            SqlQuery query = new SqlQuery ("SELECT count (*) FROM downloadinfo", this.database);
+            SqlQuery query = new SqlQuery ("SELECT count () FROM downloadinfo", this.database);
 
             if (!query.exec ()) {
                 sql_fail ("Count number of downloadinfo entries failed", query);
@@ -1536,7 +1536,7 @@ public class SyncJournalDb : GLib.Object {
         PreparedSqlQuery delete_upload_info_query = this.query_manager.get_for_key (
             PreparedSqlQueryManager.Key.DELETE_UPLOAD_INFO_QUERY
         );
-        delete_batch (*delete_upload_info_query, superfluous_paths, "uploadinfo");
+        delete_batch (delete_upload_info_query, superfluous_paths, "uploadinfo");
         return ids;
     }
 
@@ -1974,24 +1974,24 @@ public class SyncJournalDb : GLib.Object {
                 return;
             }
 
-            PreparedSqlQuery data_fingerprint_query1 = this.query_manager.get_for_key_sql_and_database (
+            PreparedSqlQuery data_fingerprint_query_1 = this.query_manager.get_for_key_sql_and_database (
                 PreparedSqlQueryManager.Key.SET_DATA_FINGERPRINT_QUERY1,
                 "DELETE FROM datafingerprint;",
                 this.database
             );
-            PreparedSqlQuery data_fingerprint_query2 = this.query_manager.get_for_key_sql_and_database (
+            PreparedSqlQuery data_fingerprint_query_2 = this.query_manager.get_for_key_sql_and_database (
                 PreparedSqlQueryManager.Key.SET_DATA_FINGERPRINT_QUERY2,
                 "INSERT INTO datafingerprint (fingerprint) VALUES (?1);",
                 this.database
             );
-            if (!data_fingerprint_query1 || !data_fingerprint_query2) {
+            if (data_fingerprint_query_1 == null || data_fingerprint_query_2 == null) {
                 return;
             }
 
-            data_fingerprint_query1.exec ();
+            data_fingerprint_query_1.exec ();
 
-            data_fingerprint_query2.bind_value (1, value);
-            data_fingerprint_query2.exec ();
+            data_fingerprint_query_2.bind_value (1, value);
+            data_fingerprint_query_2.exec ();
         }
         get {
             GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
@@ -2202,7 +2202,7 @@ public class SyncJournalDb : GLib.Object {
     ***********************************************************/
     public PinStateInterface internal_pin_states {
         public get {
-            return {this};
+            return this;
         }
     }
 
@@ -2213,7 +2213,7 @@ public class SyncJournalDb : GLib.Object {
         GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
 
         SqlQuery query = new SqlQuery (this.database);
-        query.prepare ("SELECT COUNT (*) FROM metadata");
+        query.prepare ("SELECT COUNT () FROM metadata");
 
         if (!query.exec ()) {
             return -1;
@@ -2898,8 +2898,8 @@ public class SyncJournalDb : GLib.Object {
             "DELETE FROM downloadinfo WHERE path=?1",
             this.database
         );
-        if (!delete_download_info) {
-            return sql_fail ("prepare this.delete_download_info_query", *delete_download_info);
+        if (delete_download_info == null) {
+            return sql_fail ("prepare this.delete_download_info_query", delete_download_info);
         }
 
         PreparedSqlQuery delete_upload_info_query = this.query_manager.get_for_key_sql_and_database (
@@ -2907,8 +2907,8 @@ public class SyncJournalDb : GLib.Object {
             "DELETE FROM uploadinfo WHERE path=?1",
             this.database
         );
-        if (!delete_upload_info_query) {
-            return sql_fail ("prepare this.delete_upload_info_query", *delete_upload_info_query);
+        if (delete_upload_info_query == null) {
+            return sql_fail ("prepare this.delete_upload_info_query", delete_upload_info_query);
         }
 
         string sql_string = "SELECT last_try_etag, last_try_modtime, retrycount, errorstring, last_try_time, ignore_duration, rename_target, error_category, request_id "
@@ -2923,7 +2923,7 @@ public class SyncJournalDb : GLib.Object {
             sql_string,
             this.database
         );
-        if (!get_error_blocklist_query) {
+        if (get_error_blocklist_query == null) {
             return sql_fail ("prepare this.get_error_blocklist_query", get_error_blocklist_query);
         }
 

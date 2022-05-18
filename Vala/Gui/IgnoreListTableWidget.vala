@@ -2,7 +2,7 @@
 
 //  #include <Gtk.Widget>
 //  #include <GLib.InputDialog>
-//  #include <GLib.LineEdit>
+//  #include <Gtk.LineEdit>
 //  #include <Gtk.MessageBox>
 
 namespace Occ {
@@ -145,7 +145,7 @@ public class IgnoreListTableWidget : Gtk.Widget {
         // Otherwise we would not download the files/directories that are no longer
         // ignored (because the remote etag did not change)   (issue #3172)
         foreach (FolderConnection folder_connection in folder_man.map ()) {
-            folder_connection.journal_database ().force_remote_discovery_next_sync ();
+            folder_connection.journal_database.force_remote_discovery_next_sync ();
             folder_man.schedule_folder (folder_connection);
         }
     }
@@ -183,7 +183,7 @@ public class IgnoreListTableWidget : Gtk.Widget {
             this,
             _("Add Ignore Pattern"),
             _("Add a new ignore pattern:"),
-            GLib.LineEdit.Normal,
+            Gtk.LineEdit.Normal,
             "",
             ok_clicked
         );

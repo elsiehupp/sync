@@ -15,7 +15,7 @@ public abstract class AbstractTestSyncMove : GLib.Object {
         public int number_of_move = 0;
         public int number_of_delete = 0;
 
-        public void on_signal_reset () {
+        public void reset () {
             this.number_of_get = 0;
             this.number_of_put = 0;
             this.number_of_move = 0;

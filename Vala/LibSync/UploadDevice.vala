@@ -112,7 +112,7 @@ public class UploadDevice : GLib.OutputStream {
         var file_disk_size = FileSystem.get_size (this.file.filename ());
 
         string open_error;
-        if (!FileSystem.open_and_seek_file_shared_read (&this.file, open_error, this.start)) {
+        if (!FileSystem.open_and_seek_file_shared_read (this.file, open_error, this.start)) {
             on_signal_error_string (open_error);
             return false;
         }

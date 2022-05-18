@@ -207,7 +207,7 @@ public class SslErrorDialog : Gtk.Dialog {
 
         message += GLib.L ("<h3>") + _("Issuer : %1").printf (Utility.escape (cert.issuer_info (GLib.SslCertificate.Common_name))) + GLib.L ("</h3>");
         message += GLib.L ("<div identifier=\"issuer\">");
-        li == "";
+        li = "";
         li += _("Organization : %1").printf (Utility.escape (cert.issuer_info (GLib.SslCertificate.Organization)));
         li += _("Unit : %1").printf (Utility.escape (cert.issuer_info (GLib.SslCertificate.Organizational_unit_name)));
         li += _("Country : %1").printf (Utility.escape (cert.issuer_info (GLib.SslCertificate.Country_name)));

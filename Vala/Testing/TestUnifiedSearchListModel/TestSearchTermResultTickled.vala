@@ -39,7 +39,7 @@ public class TestSearchTermResultTickled : AbstractTestUnifiedSearchListmodel {
         GLib.DesktopServices.set_url_handler ("http", fake_desktop_services_url_handler, "signal_result_clicked");
         GLib.DesktopServices.set_url_handler ("https", fake_desktop_services_url_handler, "signal_result_clicked");
 
-        GLib.SignalSpy signal_result_clicked = new GLib.SignalSpy (fake_desktop_services_url_handler, &FakeDesktopServicesUrlHandler.signal_result_clicked);
+        GLib.SignalSpy signal_result_clicked = new GLib.SignalSpy (fake_desktop_services_url_handler, FakeDesktopServicesUrlHandler.signal_result_clicked);
 
         //  test click on a result item
         string url_for_clicked_result;

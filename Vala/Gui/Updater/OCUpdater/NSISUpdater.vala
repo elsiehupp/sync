@@ -131,13 +131,13 @@ public class NSISUpdater : OCUpdater {
         message_box.attribute (GLib.WA_DeleteOnClose);
         message_box.window_flags (message_box.window_flags () & ~GLib.WindowContextHelpButtonHint);
 
-        Gtk.Icon info_icon = message_box.this.style.standard_icon (GLib.Style.SP_Message_box_information);
+        Gtk.IconInfo info_icon = message_box.this.style.standard_icon (GLib.Style.SP_Message_box_information);
         int icon_size = message_box.this.style.pixel_metric (GLib.Style.PM_Message_box_icon_size);
 
         message_box.window_icon (info_icon);
 
-        var layout = new GLib.VBoxLayout (message_box);
-        var hlayout = new GLib.HBoxLayout ();
+        var layout = new Gtk.Box (Gtk.Orientation.VERTICAL); // message_box);
+        var hlayout = new Gtk.Box (Gtk.Orientation.HORIZONTAL);
         layout.add_layout (hlayout);
 
         message_box.window_title (_("New Version Available"));
@@ -195,13 +195,13 @@ public class NSISUpdater : OCUpdater {
         message_box.attribute (GLib.WA_DeleteOnClose);
         message_box.window_flags (message_box.window_flags () & ~GLib.WindowContextHelpButtonHint);
 
-        Gtk.Icon info_icon = message_box.this.style.standard_icon (GLib.Style.SP_Message_box_information);
+        Gtk.IconInfo info_icon = message_box.this.style.standard_icon (GLib.Style.SP_Message_box_information);
         int icon_size = message_box.this.style.pixel_metric (GLib.Style.PM_Message_box_icon_size);
 
         message_box.window_icon (info_icon);
 
-        var layout = new GLib.VBoxLayout (message_box);
-        var hlayout = new GLib.HBoxLayout ();
+        var layout = new Gtk.Box (Gtk.Orientation.VERTICAL); // message_box);
+        var hlayout = new Gtk.Box (Gtk.Orientation.HORIZONTAL);
         layout.add_layout (hlayout);
 
         message_box.window_title (_("Update Failed"));
@@ -323,7 +323,7 @@ public class NSISUpdater : OCUpdater {
                         this.on_signal_download_finished
                     );
                     download_state (DownloadState.DOWNLOADING);
-                    this.file.on_signal_reset (new GLib.TemporaryFile ());
+                    this.file.reset (new GLib.TemporaryFile ());
                     this.file.auto_remove (true);
                     this.file.open ();
                 }

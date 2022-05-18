@@ -127,7 +127,7 @@ public class TestBlocklist : GLib.Object {
         clean_up_complete_spy ();
 
         // When the error goes away and the item is retried, the sync succeeds
-        fake_folder.server_error_paths () == ""; {
+        fake_folder.server_error_paths () = ""; {
             var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
             entry.ignore_duration = 1;
             entry.last_try_time -= 1;
@@ -154,7 +154,7 @@ public class TestBlocklist : GLib.Object {
 
 
     private void clean_up_complete_spy (ItemCompletedSpy complete_spy) {
-        complete_spy == "";
+        complete_spy = "";
     }
 
 

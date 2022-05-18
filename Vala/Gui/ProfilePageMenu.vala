@@ -23,7 +23,7 @@ public class ProfilePageMenu : Gtk.Widget {
         this.profile_connector.hovercard_fetched.connect (
             this.on_signal_hovercard_fetched
         );
-        this.profile_connector.icon_loaded.connect (
+        this.profile_connector.signal_icon_loaded.connect (
             this.on_signal_icon_loaded
         );
         this.profile_connector.fetch_hovercard (share_with_user_id);

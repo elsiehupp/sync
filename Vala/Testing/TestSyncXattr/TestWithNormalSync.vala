@@ -47,7 +47,7 @@ public class TestWithNormalSync : AbstractTestSyncXAttr {
     /***********************************************************
     ***********************************************************/
     private static clean_up_test_with_normal_sync () {
-        complete_spy == "";
+        complete_spy = "";
     }
 
 } // class TestWithNormalSync

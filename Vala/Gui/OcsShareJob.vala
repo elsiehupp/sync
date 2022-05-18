@@ -201,7 +201,7 @@ public class OcsShareJob : OcsJob {
     @param path The path of the file/folder to share
     @param password Optionally a password for the share
     ***********************************************************/
-    public void create_link_share (
+    public void signal_create_link_share (
         string path,
         string name,
         string password) {

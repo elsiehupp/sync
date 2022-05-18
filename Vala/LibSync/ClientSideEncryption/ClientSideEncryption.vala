@@ -48,17 +48,17 @@ public class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    internal signal void initialization_finished ();
+    internal signal void signal_initialization_finished ();
 
 
     /***********************************************************
     ***********************************************************/
-    internal signal void mnemonic_generated (string mnemonic);
+    internal signal void signal_mnemonic_generated (string mnemonic);
 
 
     /***********************************************************
     ***********************************************************/
-    internal signal void show_mnemonic (string mnemonic);
+    internal signal void signal_show_mnemonic (string mnemonic);
 
 
     /***********************************************************
@@ -73,7 +73,7 @@ public class ClientSideEncryption : GLib.Object {
         GLib.info ("Initializing");
         if (!account.capabilities.client_side_encryption_available) {
             GLib.info ("No Client side encryption available on server.");
-            /* emit */ initialization_finished ();
+            signal_initialization_finished ();
             return;
         }
 
@@ -206,7 +206,7 @@ public class ClientSideEncryption : GLib.Object {
         this.new_mnemonic_generated = true;
         GLib.info ("Generated mnemonic: " + this.mnemonic);
 
-        /* emit */ mnemonic_generated (this.mnemonic);
+        signal_mnemonic_generated (this.mnemonic);
 
         string pass_phrase = string.joinv ("", list).down ();
         GLib.info ("Generated passphrase: " + pass_phrase);
@@ -227,7 +227,7 @@ public class ClientSideEncryption : GLib.Object {
                         write_private_key (account);
                         write_certificate (account);
                         write_mnemonic (account);
-                        /* emit */ initialization_finished ();
+                        signal_initialization_finished ();
                         break;
                     default:
                         GLib.info ("Store private key failed, return code: " + return_code);
@@ -264,7 +264,7 @@ public class ClientSideEncryption : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_request_mnemonic () {
-        /* emit */ show_mnemonic (this.mnemonic);
+        signal_show_mnemonic (this.mnemonic);
     }
 
 
@@ -371,7 +371,7 @@ public class ClientSideEncryption : GLib.Object {
 
         GLib.info ("Mnemonic key fetched from keychain: " + this.mnemonic);
 
-        /* emit */ initialization_finished ();
+        signal_initialization_finished ();
     }
 
 
@@ -470,7 +470,7 @@ public class ClientSideEncryption : GLib.Object {
         GLib.InputDialog dialog;
         dialog.window_title (_("Enter E2E passphrase"));
         dialog.label_text (message);
-        dialog.text_echo_mode (GLib.LineEdit.Normal);
+        dialog.text_echo_mode (Gtk.LineEdit.Normal);
 
         string prev;
 
@@ -514,7 +514,7 @@ public class ClientSideEncryption : GLib.Object {
             }
         }
 
-        /* emit */ initialization_finished ();
+        signal_initialization_finished ();
     }
 
 

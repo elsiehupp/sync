@@ -5,7 +5,6 @@
 ***********************************************************/
 
 //  #include <algorithm>
-//  #include <GLib.AbstractListModel>
 //  #include <GLib.DesktopServices>
 //  #include <limits>
 //  #include <QtCore>
@@ -19,7 +18,7 @@ namespace Ui {
 Simple list model to provide the list view with data for
 the Unified Search results.
 ***********************************************************/
-public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
+public class UnifiedSearchResultsListModel : GLib.Object {
 
     struct UnifiedSearchProvider {
         string identifier;
@@ -43,7 +42,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
     /***********************************************************
     ***********************************************************/
     public enum DataRole {
-        PROVIDER_NAME = GLib.USER_ROLE + 1,
+        PROVIDER_NAME, // GLib.USER_ROLE + 1,
         PROVIDER_IDENTIFIER,
         IMAGE_PLACEHOLDER,
         ICONS,
@@ -52,24 +51,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
         RESOURCE_URL,
         ROUNDED,
         TYPE,
-        TYPE_AS_STRING;
-
-        /***********************************************************
-        ***********************************************************/
-        public static GLib.HashTable<int, string> role_names () {
-            var roles = GLib.AbstractListModel.role_names ();
-            roles[DataRole.PROVIDER_NAME] = "provider_name";
-            roles[DataRole.PROVIDER_IDENTIFIER] = "provider_id";
-            roles[DataRole.ICONS] = "icons";
-            roles[DataRole.IMAGE_PLACEHOLDER] = "image_placeholder";
-            roles[DataRole.TITLE] = "result_title";
-            roles[DataRole.SUBLINE] = "subline";
-            roles[DataRole.RESOURCE_URL] = "resource_url_role";
-            roles[DataRole.TYPE] = "type";
-            roles[DataRole.TYPE_AS_STRING] = "Type.to_string";
-            roles[DataRole.ROUNDED] = "is_rounded";
-            return roles;
-        }
+        TYPE_AS_STRING
     }
 
 
@@ -84,7 +66,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.HashTable<string, UnifiedSearchProvider> providers;
+    private GLib.HashTable<string, UnifiedSearchProvider?> providers;
 
     /***********************************************************
     ***********************************************************/
@@ -164,15 +146,13 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public string search_term () {
-        return this.search_term;
-    }
+    public string search_term;
 
 
     /***********************************************************
     ***********************************************************/
     public bool is_search_in_progress () {
-        return !this.search_job_connections == "";
+        return this.search_job_connections != "";
     }
 
 
@@ -185,7 +165,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
             url_query.query_item_value ("scrollto", GLib.Uri.Component_formatting_option.Fully_decoded);
 
         if (provider_id.contains ("file", GLib.CaseInsensitive) && !directory == "" && !filename == "") {
-            if (!this.account_state || !this.account_state.account) {
+            if (this.account_state == null || this.account_state.account == null) {
                 return;
             }
 
@@ -206,7 +186,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
     /***********************************************************
     ***********************************************************/
     public void fetch_more_trigger_clicked (string provider_id) {
-        if (is_search_in_progress () || !this.current_fetch_more_in_progress_provider_id == "") {
+        if (is_search_in_progress () || this.current_fetch_more_in_progress_provider_id != "") {
             return;
         }
 
@@ -228,13 +208,13 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
 
         disconnect_and_clear_search_jobs ();
 
-        if (!this.account_state || !this.account_state.account) {
+        if (this.account_state == null || this.account_state.account == null) {
             return;
         }
 
         if (!this.results == "") {
             begin_reset_model ();
-            this.results == "";
+            this.results = "";
             end_reset_model ();
         }
 
@@ -249,7 +229,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
     private void start_search_for_provider (string provider_id, int32 cursor) {
         //  GLib.assert_true (this.account_state && this.account_state.account);
 
-        if (!this.account_state || !this.account_state.account) {
+        if (this.account_state == null || this.account_state.account == null) {
             return;
         }
 
@@ -491,8 +471,8 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
             }
         }
 
-        if (!this.search_job_connections == "") {
-            this.search_job_connections == "";
+        if (this.search_job_connections != null) {
+            this.search_job_connections = null;
             signal_is_search_in_progress_changed ();
         }
     }
@@ -501,8 +481,8 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
     /***********************************************************
     ***********************************************************/
     private void clear_current_fetch_more_in_progress_provider_id () {
-        if (!this.current_fetch_more_in_progress_provider_id == "") {
-            this.current_fetch_more_in_progress_provider_id == "";
+        if (this.current_fetch_more_in_progress_provider_id != "") {
+            this.current_fetch_more_in_progress_provider_id = "";
             signal_current_fetch_more_in_progress_provider_id_changed ();
         }
     }
@@ -518,8 +498,8 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
         this.search_term = term;
         signal_search_term_changed ();
 
-        if (!this.error_string == "") {
-            this.error_string == "";
+        if (this.error_string != "") {
+            this.error_string = "";
             signal_error_string_changed ();
         }
 
@@ -528,7 +508,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
         clear_current_fetch_more_in_progress_provider_id ();
 
         this.unified_search_text_editing_finished_timer_active = false;
-        if (!this.search_term == "") {
+        if (this.search_term != "") {
             this.unified_search_text_editing_finished_timer_active = true;
             GLib.Timeout.add (
                 SEARCH_TERM_EDITING_FINISHED_SEARCH_START_DELAY,
@@ -536,9 +516,9 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
             );
         }
 
-        if (!this.results == "") {
+        if (this.results != "") {
             begin_reset_model ();
-            this.results == "";
+            this.results = "";
             end_reset_model ();
         }
     }
@@ -552,7 +532,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
         }
         this.unified_search_text_editing_finished_timer_active = false;
 
-        if (!this.account_state || !this.account_state.account) {
+        if (this.account_state == null || this.account_state.account == null) {
             GLib.critical ("Account state is invalid. Could not on_signal_start search!");
             return;
         }
@@ -575,8 +555,8 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
     private void on_signal_fetch_providers_finished (LibSync.JsonApiJob json_api_job, GLib.JsonDocument json, int status_code) {
         var json_api_job = (LibSync.JsonApiJob)sender ();
 
-        if (!json_api_job) {
-            GLib.critical ("Failed to fetch providers.".printf (this.search_term));
+        if (json_api_job == null) {
+            GLib.critical ("Failed to fetch providers: " + this.search_term);
             this.error_string += _("Failed to fetch providers.") + "\n";
             signal_error_string_changed ();
             return;
@@ -635,10 +615,10 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
             return;
         }
 
-        if (!this.search_job_connections == "") {
+        if (this.search_job_connections != null) {
             this.search_job_connections.remove (provider_id);
 
-            if (this.search_job_connections == "") {
+            if (this.search_job_connections.length == 0) {
                 signal_is_search_in_progress_changed ();
             }
         }
@@ -789,10 +769,10 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
             if (fallack_icon_path_splitted.size () > 1) {
                 fallack_icon_copy += '?' + fallack_icon_path_splitted[1];
             }
-        } else if (!fallack_icon_copy == "") {
+        } else if (fallack_icon_copy != "") {
             // could be one of names for standard icons (e.g. icon-mail)
             var default_icon_url = icon_url_for_default_icon_name (fallack_icon_copy);
-            if (!default_icon_url == "") {
+            if (default_icon_url != "") {
                 fallack_icon_copy = default_icon_url;
             }
         }
@@ -816,11 +796,11 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
         var url_for_thumbnail = generate_url_for_thumbnail (thumbnail_url, server_url);
         var url_for_fallack_icon = generate_url_for_icon (fallack_icon, server_url);
 
-        if (url_for_thumbnail == "" && !url_for_fallack_icon == "") {
+        if (url_for_thumbnail == "" && url_for_fallack_icon != "") {
             return url_for_fallack_icon;
         }
 
-        if (!url_for_thumbnail == "" && url_for_fallack_icon == "") {
+        if (url_for_thumbnail != "" && url_for_fallack_icon == "") {
             return url_for_thumbnail;
         }
 

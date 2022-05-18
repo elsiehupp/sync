@@ -16,16 +16,16 @@ public class KMessageWidgetPrivate : GLib.Object {
     public Gdk.Frame content = null;
     public Gtk.Label icon_label = null;
     public Gtk.Label text_label = null;
-    public GLib.ToolButton close_button = null;
+    public Gtk.ToolButton close_button = null;
     public GLib.TimeLine time_line = null;
-    public Gtk.Icon icon;
+    public Gtk.IconInfo icon;
     public bool ignore_show_event_doing_animated_show = false;
 
     /***********************************************************
     ***********************************************************/
     public KMessageWidget.MessageType message_type;
     public bool word_wrap;
-    public GLib.List<GLib.ToolButton> buttons;
+    public GLib.List<Gtk.ToolButton> buttons;
     public Gdk.Pixbuf content_snap_shot;
 
     /***********************************************************
@@ -65,13 +65,13 @@ public class KMessageWidgetPrivate : GLib.Object {
         var close_action = new GLib.Action (widget);
         close_action.on_set_text (_("&Close"));
         close_action.set_tool_tip (_("Close message"));
-        close_action.on_signal_set_icon (Gtk.Icon (":/client/theme/close.svg")); // ivan : NC customization
+        close_action.on_signal_set_icon (Gtk.IconInfo (":/client/theme/close.svg")); // ivan : NC customization
 
         close_action.triggered.connect (
             widget.on_signal_animated_hide
         );
 
-        close_button = new GLib.ToolButton (content);
+        close_button = new Gtk.ToolButton (content);
         close_button.set_auto_raise (true);
         close_button.set_default_action (close_action);
 
@@ -87,10 +87,10 @@ public class KMessageWidgetPrivate : GLib.Object {
         content.resize (widget.size ());
 
         q_delete_all (buttons);
-        buttons == "";
+        buttons = "";
 
         foreach (GLib.Action action in widget.actions ()) {
-            var button = new GLib.ToolButton (content);
+            var button = new Gtk.ToolButton (content);
             button.set_default_action (action);
             button.set_tool_button_style (GLib.ToolButtonTextBesideIcon);
             buttons.append (button);
@@ -112,9 +112,9 @@ public class KMessageWidgetPrivate : GLib.Object {
                 layout.add_widget (close_button, 0, 2, 1, 1, GLib.AlignHCenter | GLib.AlignTop);
             } else {
                 // Use an additional layout in row 1 for the buttons.
-                var button_layout = new GLib.HBoxLayout ();
+                var button_layout = new Gtk.Box (Gtk.Orientation.HORIZONTAL);
                 button_layout.add_stretch ();
-                foreach (GLib.ToolButton button in buttons) {
+                foreach (Gtk.ToolButton button in buttons) {
                     // For some reason, calling show () is necessary if wordwrap is true,
                     // otherwise the buttons do not show up. It is not needed if
                     // wordwrap is false.
@@ -125,11 +125,11 @@ public class KMessageWidgetPrivate : GLib.Object {
                 layout.add_item (button_layout, 1, 0, 1, 2);
             }
         } else {
-            var layout = new GLib.HBoxLayout (content);
+            var layout = new Gtk.Box (Gtk.Orientation.HORIZONTAL); // content);
             layout.add_widget (icon_label);
             layout.add_widget (text_label);
 
-            foreach (GLib.ToolButton button in buttons) {
+            foreach (Gtk.ToolButton button in buttons) {
                 layout.add_widget (button);
             }
 
@@ -212,7 +212,7 @@ public class KMessageWidgetPrivate : GLib.Object {
         content_snap_shot = Gdk.Pixbuf (content.size () * widget.scale_factor);
         content_snap_shot.set_device_pixel_ratio (widget.scale_factor);
         content_snap_shot.fill (GLib.transparent);
-        content.render (&content_snap_shot, GLib.Point (), GLib.Region (), Gtk.Widget.DrawChildren);
+        content.render (content_snap_shot, GLib.Point (), GLib.Region (), Gtk.Widget.DrawChildren);
     }
 
 
@@ -234,11 +234,11 @@ public class KMessageWidgetPrivate : GLib.Object {
             content.set_geometry (0, 0, widget.width (), best_content_height ());
 
             // notify about on_finished animation
-            /* emit */ widget.show_animation_finished ();
+            widget.signal_show_animation_finished ();
         } else {
             // hide and notify about on_finished animation
             widget.hide ();
-            /* emit */ widget.hide_animation_finished ();
+            widget.signal_hide_animation_finished ();
         }
     }
 

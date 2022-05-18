@@ -326,7 +326,7 @@ public class SyncStatusSummary : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void clear_folder_errors () {
-        this.folders_with_errors == "";
+        this.folders_with_errors = "";
     }
 
 

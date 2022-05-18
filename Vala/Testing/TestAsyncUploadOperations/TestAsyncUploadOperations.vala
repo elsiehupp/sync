@@ -60,7 +60,7 @@ public class AbstractTestAsyncOp : GLib.Object {
         GLib.assert_true (n_get == 0);
         GLib.assert_true (fake_folder.current_local_state ().find ("success") ==
             fake_folder.current_remote_state ().find ("success"));
-        test_cases == "";
+        test_cases = "";
         test_cases["err/chunked_error"] = new TestCase (success_callback);
         test_cases["err/chunked_error2"] = new TestCase (success_callback);
         test_cases["err/single_error"] = new TestCase (success_callback);
@@ -217,7 +217,7 @@ public class AbstractTestAsyncOp : GLib.Object {
             var file = path.mid ("/async-poll/".size () - 1);
             GLib.assert_true (test_cases.contains (file));
             var test_case = test_cases[file];
-            return test_case.poll_request (&test_case, request);
+            return test_case.poll_request (test_case, request);
         }
 
         if (operation == Soup.PutOperation && !path.contains ("/uploads/")) {
@@ -255,7 +255,7 @@ public class AbstractTestAsyncOp : GLib.Object {
             var file = path.mid ("/async-poll/".size () - 1);
             GLib.assert_true (test_cases.contains (file));
             var test_case = test_cases[file];
-            return test_case.poll_request (&test_case, request);
+            return test_case.poll_request (test_case, request);
         } else if (operation == Soup.PutOperation) {
             number_of_put++;
         } else if (operation == Soup.GetOperation) {

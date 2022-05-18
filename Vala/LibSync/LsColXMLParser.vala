@@ -90,12 +90,12 @@ public class LscolXMLParser : GLib.Object {
                     folders.append (current_href);
                 } else if (name == "size") {
                     bool ok = false;
-                    var s = property_content.to_long_long (&ok);
+                    var s = property_content.to_long_long (ok);
                     if (ok && file_info) {
-                        (*file_info)[current_href].size = s;
+                        (file_info)[current_href].size = s;
                     }
                 } else if (name == "fileid") {
-                    (*file_info)[current_href].file_identifier = property_content.to_utf8 ();
+                    (file_info)[current_href].file_identifier = property_content.to_utf8 ();
                 }
                 current_temporary_properties.insert (reader.name ().to_string (), property_content);
             }
@@ -108,14 +108,14 @@ public class LscolXMLParser : GLib.Object {
                             current_href.chop (1);
                         }
                         signal_directory_listing_iterated (current_href, current_http200Properties);
-                        current_href == "";
-                        current_http200Properties == "";
+                        current_href = "";
+                        current_http200Properties = "";
                     } else if (reader.name () == "propstat") {
                         inside_propstat = false;
                         if (current_props_have_http200) {
                             current_http200Properties = new GLib.HashTable<string, string> (current_temporary_properties);
                         }
-                        current_temporary_properties == "";
+                        current_temporary_properties = "";
                         current_props_have_http200 = false;
                     } else if (reader.name () == "prop") {
                         inside_prop = false;

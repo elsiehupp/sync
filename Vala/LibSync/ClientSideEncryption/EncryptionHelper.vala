@@ -246,14 +246,14 @@ public class EncryptionHelper : GLib.Object {
         if (context == null) {
             GLib.info ("Error creating cipher");
             handle_errors ();
-            return {};
+            return "";
         }
 
         // Initialise the decryption operation.
         if (!EVP_Encrypt_init_ex (context, EVP_aes_128_gcm (), null, null, null)) {
             GLib.info ("Error initializing context with aes_128");
             handle_errors ();
-            return {};
+            return "";
         }
 
         // No padding
@@ -263,14 +263,14 @@ public class EncryptionHelper : GLib.Object {
         if (!EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_SET_IVLEN, initialization_vector.size (), null)) {
             GLib.info ("Error setting initialization_vector length");
             handle_errors ();
-            return {};
+            return "";
         }
 
         // Initialise key and Initialization Vector
         if (!EVP_Encrypt_init_ex (context, null, null, (uchar *)key.const_data (), (uchar *)initialization_vector.const_data ())) {
             GLib.info ("Error initialising key and initialization_vector");
             handle_errors ();
-            return {};
+            return "";
         }
 
         // We write the data base64 encoded
@@ -284,7 +284,7 @@ public class EncryptionHelper : GLib.Object {
         if (!EVP_Encrypt_update (context, unsigned_data (cipher_text), len, (uchar *)data_b64.const_data (), data_b64.size ())) {
             GLib.info ("Error encrypting");
             handle_errors ();
-            return {};
+            return "";
         }
 
         int clen = len;
@@ -297,7 +297,7 @@ public class EncryptionHelper : GLib.Object {
         if (1 != EVP_Encrypt_final_ex (context, unsigned_data (cipher_text) + len, len)) {
             GLib.info ("Error finalizing encryption");
             handle_errors ();
-            return {};
+            return "";
         }
         clen += len;
 
@@ -306,7 +306,7 @@ public class EncryptionHelper : GLib.Object {
         if (1 != EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_GET_TAG, Constants.E2EE_TAG_SIZE, unsigned_data (e2Ee_tag))) {
             GLib.info ("Error getting the e2Ee_tag");
             handle_errors ();
-            return {};
+            return "";
         }
 
         string cipher_text2;
@@ -482,32 +482,32 @@ public class EncryptionHelper : GLib.Object {
         if (context == null) {
             GLib.info ("Could not create the PKEY context.");
             handle_errors ();
-            return {};
+            return "";
         }
 
         err = EVP_PKEY_decrypt_init (context);
         if (err <= 0) {
             GLib.info ("Could not on_signal_init the decryption of the metadata.");
             handle_errors ();
-            return {};
+            return "";
         }
 
         if (EVP_PKEY_CTX_rsa_padding (context, RSA_PKCS1_OAEP_PADDING) <= 0) {
             GLib.info ("Error setting the encryption padding.");
             handle_errors ();
-            return {};
+            return "";
         }
 
         if (EVP_PKEY_CTX_rsa_oaep_md (context, EVP_sha256 ()) <= 0) {
             GLib.info ("Error setting OAEP SHA 256.");
             handle_errors ();
-            return {};
+            return "";
         }
 
         if (EVP_PKEY_CTX_rsa_mgf1_md (context, EVP_sha256 ()) <= 0) {
             GLib.info ("Error setting MGF1 padding.");
             handle_errors ();
-            return {};
+            return "";
         }
 
         size_t outlen = 0;
@@ -515,7 +515,7 @@ public class EncryptionHelper : GLib.Object {
         if (err <= 0) {
             GLib.info ("Could not determine the buffer length.");
             handle_errors ();
-            return {};
+            return "";
         } else {
             GLib.info ("Size of output is: " + outlen.to_string ());
             GLib.info ("Size of data is: " + data.size ().to_string ());
@@ -526,7 +526,7 @@ public class EncryptionHelper : GLib.Object {
         if (EVP_PKEY_decrypt (context, unsigned_data (output), outlen, (uchar *)data.const_data (), data.size ()) <= 0) {
             var error = handle_errors ();
             GLib.critical ("Could not decrypt the data. " + error);
-            return {};
+            return "";
         } else {
             GLib.info ("data decrypted successfully");
         }

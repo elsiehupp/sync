@@ -31,7 +31,7 @@ public class IconUtils : GLib.Object {
                     return result;
                 }
             }
-            result == "";
+            result = "";
         }
 
         return result;
@@ -129,7 +129,7 @@ public class IconUtils : GLib.Object {
 
         // check for existing Gdk.Pixbuf in cache
         if (GLib.PixmapCache.find (cache_key, cached_pixmap)) {
-            if (*original_size != null) {
+            if (original_size != null) {
                 *original_size = {};
             }
             return cached_pixmap;

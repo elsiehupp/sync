@@ -97,7 +97,7 @@ public class FolderManager : GLib.Object {
             }
             this.sync_enabled = value;
             // force a redraw in case the network connect status changed
-            /* emit */ (signal_folder_sync_state_change (null));
+            signal_folder_sync_state_change (null);
         }
         private get {
             return this.sync_enabled;
@@ -336,7 +336,7 @@ public class FolderManager : GLib.Object {
             // Should not happen : bad container keys should have been deleted
             GLib.warning ("FolderConnection structure " + group_name + " is too new; ignoring.");
         } else {
-            setup_folders_helper (*settings, account, skip_settings_keys, backwards_compatible, folders_with_placeholders);
+            setup_folders_helper (settings, account, skip_settings_keys, backwards_compatible, folders_with_placeholders);
         }
         settings.end_group ();
     }
@@ -585,13 +585,13 @@ public class FolderManager : GLib.Object {
         // file and try again.
         GLib.FileInfo config_file = new GLib.FileInfo (this.folder_config_path, file);
 
-        if (!config_file.exists) {
+        if (!ConfigFile.exists) {
             // try the escaped variant.
             escaped_alias = escape_alias (file);
-            config_file.file (this.folder_config_path, escaped_alias);
+            ConfigFile.file (this.folder_config_path, escaped_alias);
         }
-        if (!config_file.is_readable ()) {
-            GLib.warning ("Cannot read folder_connection definition for alias " + config_file.file_path);
+        if (!ConfigFile.is_readable ()) {
+            GLib.warning ("Cannot read folder_connection definition for alias " + ConfigFile.file_path);
             return folder_connection;
         }
 
@@ -642,7 +642,7 @@ public class FolderManager : GLib.Object {
             GLib.List<string> block_list = settings.get_value ("block_list").to_string_list ();
             if (!block_list.empty ()) {
                 // migrate settings
-                folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
+                folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
                 settings.remove ("block_list");
                 // FIXME: If you remove this codepath, you need to provide another way to do
                 // this via theme.h or the normal FolderManager.set_up_folders
@@ -710,7 +710,7 @@ public class FolderManager : GLib.Object {
                 if (local_folder.has_prefix (folder_connection.path)) {
                     this.socket_api.on_signal_unregister_path (folder_connection.alias ());
                 }
-                folder_connection.journal_database ().close ();
+                folder_connection.journal_database.close ();
                 folder_connection.on_signal_terminate_sync (); // Normally it should not be running, but viel hilft viel
             }
 
@@ -1022,7 +1022,7 @@ public class FolderManager : GLib.Object {
         while (true) {
             bool is_good =
                 !new GLib.FileInfo (folder_connection).exists ()
-                && FolderManager.instance.check_path_validity_for_new_folder (folder_connection, server_url) == "";
+                && FolderManager.instance.check_path_validity_for_new_folder (folder_connection, server_url) = "";
             if (is_good) {
                 break;
             }

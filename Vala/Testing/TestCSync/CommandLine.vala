@@ -87,7 +87,7 @@ public class TestCommandLine : GLib.Object {
         * be reflected in arguments.
         */
     //  #ifdef HAVE_ARGP_H
-        argp_parse (&argp, argc, argv, 0, 0, arguments);
+        argp_parse (argp, argc, argv, 0, 0, arguments);
     //  #else
         (void) argc;
         (void) argv;

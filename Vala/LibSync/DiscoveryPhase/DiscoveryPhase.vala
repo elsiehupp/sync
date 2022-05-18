@@ -82,7 +82,7 @@ public class DiscoveryPhase : GLib.Object {
     Input
     Absolute path to the local directory. ends with "/"
     ***********************************************************/
-    public string local_dir;
+    public string local_directory;
 
     /***********************************************************
     Input
@@ -200,7 +200,7 @@ public class DiscoveryPhase : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    internal signal void add_error_to_gui (SyncFileItem.Status status, string error_message, string subject);
+    internal signal void signal_add_error_to_gui (SyncFileItem.Status status, string error_message, string subject);
 
 
     /***********************************************************
@@ -371,35 +371,35 @@ public class DiscoveryPhase : GLib.Object {
         string old_etag;
         var it = this.deleted_item.find (original_path);
         if (it != this.deleted_item.end ()) {
-            CSync.SyncInstructions instruction = (*it).instruction;
-            if (instruction == CSync.SyncInstructions.IGNORE && (*it).type == ItemType.VIRTUAL_FILE) {
+            CSync.SyncInstructions instruction = (it).instruction;
+            if (instruction == CSync.SyncInstructions.IGNORE && (it).type == ItemType.VIRTUAL_FILE) {
                 // re-creation of virtual files count as a delete
                 // a file might be in an error state and thus gets marked as CSync.SyncInstructions.IGNORE
                 // after it was initially marked as CSync.SyncInstructions.REMOVE
                 // return true, to not trigger any additional actions on that file that could elad to dataloss
                 result = true;
-                old_etag = (*it).etag;
+                old_etag = (it).etag;
             } else {
                 if (! (instruction == CSync.SyncInstructions.REMOVE
                         // re-creation of virtual files count as a delete
-                        || ( (*it).type == ItemType.VIRTUAL_FILE && instruction == CSync.SyncInstructions.NEW)
-                        || ( (*it).is_restoration && instruction == CSync.SyncInstructions.NEW))) {
+                        || ( (it).type == ItemType.VIRTUAL_FILE && instruction == CSync.SyncInstructions.NEW)
+                        || ( (it).is_restoration && instruction == CSync.SyncInstructions.NEW))) {
                     GLib.warning ("ENFORCE (FAILING) " + original_path);
                     GLib.warning ("instruction == CSync.SyncInstructions.REMOVE " + (instruction == CSync.SyncInstructions.REMOVE));
-                    GLib.warning (" ( (*it).type == ItemType.VIRTUAL_FILE && instruction == CSync.SyncInstructions.NEW)"
-                                           + ( (*it).type == ItemType.VIRTUAL_FILE && instruction == CSync.SyncInstructions.NEW));
-                    GLib.warning (" ( (*it).is_restoration && instruction == CSync.SyncInstructions.NEW))"
-                                           + ( (*it).is_restoration && instruction == CSync.SyncInstructions.NEW));
+                    GLib.warning (" ( (it).type == ItemType.VIRTUAL_FILE && instruction == CSync.SyncInstructions.NEW)"
+                                           + ( (it).type == ItemType.VIRTUAL_FILE && instruction == CSync.SyncInstructions.NEW));
+                    GLib.warning (" ( (it).is_restoration && instruction == CSync.SyncInstructions.NEW))"
+                                           + ( (it).is_restoration && instruction == CSync.SyncInstructions.NEW));
                     GLib.warning ("instruction" + instruction);
-                    GLib.warning (" (*it).type" + (*it).type);
-                    GLib.warning (" (*it).is_restoration " + (*it).is_restoration);
+                    GLib.warning (" (it).type" + (it).type);
+                    GLib.warning (" (it).is_restoration " + (it).is_restoration);
                     GLib.assert (false);
-                    add_error_to_gui (SyncFileItem.Status.FatalError, _("Error while canceling delete of a file"), original_path);
+                    signal_add_error_to_gui (SyncFileItem.Status.FatalError, _("Error while canceling delete of a file"), original_path);
                     signal_fatal_error (_("Error while canceling delete of %1").printf (original_path));
                 }
-                (*it).instruction = CSync.SyncInstructions.NONE;
+                (it).instruction = CSync.SyncInstructions.NONE;
                 result = true;
-                old_etag = (*it).etag;
+                old_etag = (it).etag;
             }
             this.deleted_item.erase (it);
         }
@@ -473,7 +473,7 @@ public class DiscoveryPhase : GLib.Object {
         }
         --it;
         GLib.assert (it.has_suffix ("/")); // FolderConnection.selective_sync_block_list makes sure of that
-        return path_slash.has_prefix (*it);
+        return path_slash.has_prefix (it);
     }
 
 
@@ -492,7 +492,7 @@ public class DiscoveryPhase : GLib.Object {
             } else if (property == "getcontentlength") {
                 // See #4573, sometimes negative size values are returned
                 bool ok = false;
-                int64 ll = value.to_long_long (&ok);
+                int64 ll = value.to_long_long (ok);
                 if (ok && ll >= 0) {
                     result.size = ll;
                 } else {

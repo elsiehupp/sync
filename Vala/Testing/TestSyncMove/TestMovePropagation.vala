@@ -20,7 +20,7 @@ public class TestMovePropagation : AbstractTestSyncMove {
         fake_folder.set_server_override (counter.functor ());
 
         // Move {
-            counter.on_signal_reset ();
+            counter.reset ();
             local.rename ("A/a1", "A/a1m");
             remote.rename ("B/b1", "B/b1m");
             ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
@@ -39,7 +39,7 @@ public class TestMovePropagation : AbstractTestSyncMove {
         //  }
 
         // Touch+Move on same side
-        counter.on_signal_reset ();
+        counter.reset ();
         local.rename ("A/a2", "A/a2m");
         local.set_contents ("A/a2m", 'A');
         remote.rename ("B/b2", "B/b2m");
@@ -55,7 +55,7 @@ public class TestMovePropagation : AbstractTestSyncMove {
         GLib.assert_true (remote.find ("B/b2m").content_char == 'A');
 
         // Touch+Move on opposite sides
-        counter.on_signal_reset ();
+        counter.reset ();
         local.rename ("A/a1m", "A/a1m2");
         remote.set_contents ("A/a1m", 'B');
         remote.rename ("B/b1m", "B/b1m2");
@@ -77,7 +77,7 @@ public class TestMovePropagation : AbstractTestSyncMove {
         GLib.assert_true (remote.find ("B/b1m2").content_char == 'W');
 
         // Touch+create on one side, move on the other {
-            counter.on_signal_reset ();
+            counter.reset ();
             local.append_byte ("A/a1m");
             local.insert ("A/a1mt");
             remote.rename ("A/a1m", "A/a1mt");
@@ -101,7 +101,7 @@ public class TestMovePropagation : AbstractTestSyncMove {
         //  }
 
         // Create new on one side, move to new on the other {
-            counter.on_signal_reset ();
+            counter.reset ();
             local.insert ("A/a1N", 13);
             remote.rename ("A/a1mt", "A/a1N");
             remote.insert ("B/b1N", 13);
@@ -123,7 +123,7 @@ public class TestMovePropagation : AbstractTestSyncMove {
         //  }
 
         // Local move, remote move
-        counter.on_signal_reset ();
+        counter.reset ();
         local.rename ("C/c1", "C/c1m_l");
         remote.rename ("C/c1", "C/c1m_r");
         GLib.assert_true (fake_folder.sync_once ());
@@ -136,7 +136,7 @@ public class TestMovePropagation : AbstractTestSyncMove {
         GLib.assert_true (counter.number_of_delete == 0);
 
         // Rename/rename conflict on a folder
-        counter.on_signal_reset ();
+        counter.reset ();
         remote.rename ("C", "CMR");
         local.rename ("C", "CML");
         GLib.assert_true (fake_folder.sync_once ());
@@ -149,7 +149,7 @@ public class TestMovePropagation : AbstractTestSyncMove {
         GLib.assert_true (counter.number_of_delete == 0);
 
         // FolderConnection move {
-            counter.on_signal_reset ();
+            counter.reset ();
             local.rename ("A", "AM");
             remote.rename ("B", "BM");
             complete_spy = new ItemCompletedSpy (fake_folder);
@@ -169,7 +169,7 @@ public class TestMovePropagation : AbstractTestSyncMove {
         //  }
 
         // FolderConnection move with contents touched on the same side {
-            counter.on_signal_reset ();
+            counter.reset ();
             local.set_contents ("AM/a2m", 'C');
             // We must change the modtime for it is likely that it did not change between sync.
             // (Previous version of the client (<=2.5) would not need this because it was always doing
@@ -194,7 +194,7 @@ public class TestMovePropagation : AbstractTestSyncMove {
         //  }
 
         // FolderConnection rename with contents touched on the other tree
-        counter.on_signal_reset ();
+        counter.reset ();
         remote.set_contents ("A2/a2m", 'D');
         // set_contents alone may not produce updated mtime if the test is fast
         // and since we don't use checksums here, that matters.
@@ -214,7 +214,7 @@ public class TestMovePropagation : AbstractTestSyncMove {
         GLib.assert_true (remote.find ("B3/b2m").content_char == 'D');
 
         // FolderConnection rename with contents touched on both ends
-        counter.on_signal_reset ();
+        counter.reset ();
         remote.set_contents ("A3/a2m", 'R');
         remote.append_byte ("A3/a2m");
         local.set_contents ("A3/a2m", 'L');
@@ -251,7 +251,7 @@ public class TestMovePropagation : AbstractTestSyncMove {
         GLib.assert_true (remote.find ("B4/b2m").content_char == 'R');
 
         // Rename a folder and rename the contents at the same time
-        counter.on_signal_reset ();
+        counter.reset ();
         local.rename ("A4/a2m", "A4/a2m2");
         local.rename ("A4", "A5");
         remote.rename ("B4/b2m", "B4/b2m2");

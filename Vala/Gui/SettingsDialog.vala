@@ -9,9 +9,8 @@
 //  #include <GLib.PushButton>
 //  #include <GLib.Settings>
 //  #include <GLib.ToolBar>
-//  #include <GLib.ToolButton>
+//  #include <Gtk.ToolButton>
 //  #include <GLib.Layout>
-//  #include <GLib.VBoxLayout>
 //  #include <Gdk.Pixbuf>
 //  #include <Gtk.Image>
 //  #include <GLib.WidgetAction>
@@ -33,7 +32,7 @@ public class SettingsDialog : Gtk.Dialog {
 
         /***********************************************************
         ***********************************************************/
-        public ToolButtonAction (Gtk.Icon icon, string text, GLib.Object parent) {
+        public ToolButtonAction (Gtk.IconInfo icon, string text, GLib.Object parent) {
             base (parent);
             on_signal_text (text);
             icon (icon);
@@ -49,7 +48,7 @@ public class SettingsDialog : Gtk.Dialog {
                 return null;
             }
 
-            var btn = new GLib.ToolButton (parent);
+            var btn = new Gtk.ToolButton (parent);
             string object_name = "settingsdialog_toolbutton_";
             object_name += text ();
             btn.object_name (object_name);
@@ -65,9 +64,9 @@ public class SettingsDialog : Gtk.Dialog {
     ***********************************************************/
     private const string TOOLBAR_CSS =
         "GLib.ToolBar { background : %1; margin : 0; padding : 0; border : none; border-bottom : 1px solid %2; spacing : 0; } "
-        + "GLib.ToolBar GLib.ToolButton { background : %1; border : none; border-bottom : 1px solid %2; margin : 0; padding : 5px; } "
+        + "GLib.ToolBar Gtk.ToolButton { background : %1; border : none; border-bottom : 1px solid %2; margin : 0; padding : 5px; } "
         + "GLib.ToolBar GLib.Tool_bar_extension { padding:0; } "
-        + "GLib.ToolBar GLib.ToolButton:checked { background : %3; color : %4; }";
+        + "GLib.ToolBar Gtk.ToolButton:checked { background : %3; color : %4; }";
 
     /***********************************************************
     golden ratio
@@ -234,7 +233,7 @@ public class SettingsDialog : Gtk.Dialog {
         var user_model = UserModel.instance;
         var identifier = user_model.find_identifier_for_account (account);
         UserModel.instance.switch_current_user (identifier);
-        /* emit */ Systray.instance.show_window ();
+        Systray.instance.signal_show_window ();
     }
 
 
@@ -303,7 +302,7 @@ public class SettingsDialog : Gtk.Dialog {
             break;
         case Gdk.Event.ActivationChange:
             if (is_active_window ()) {
-                /* emit */ activate ();
+                signal_activate ();
             }
             break;
         default:
@@ -327,7 +326,7 @@ public class SettingsDialog : Gtk.Dialog {
             account_action = create_color_aware_action (":/client/theme/account.svg",
                 action_text);
         } else {
-            Gtk.Icon icon = new Gtk.Icon (Gdk.Pixbuf.from_image (AvatarJob.make_circular_avatar (avatar)));
+            Gtk.IconInfo icon = new Gtk.IconInfo (Gdk.Pixbuf.from_image (AvatarJob.make_circular_avatar (avatar)));
             account_action = create_action_with_icon (icon, action_text);
         }
 
@@ -416,9 +415,9 @@ public class SettingsDialog : Gtk.Dialog {
         this.tool_bar.style_sheet (TOOLBAR_CSS ().printf (background, dark, highlight_color, highlight_text_color));
 
         foreach (GLib.Action a in this.action_group.actions ()) {
-            Gtk.Icon icon = Theme.create_color_aware_icon (a.property ("icon_path").to_string (), palette ());
+            Gtk.IconInfo icon = Theme.create_color_aware_icon (a.property ("icon_path").to_string (), palette ());
             a.icon (icon);
-            var btn = (GLib.ToolButton)this.tool_bar.widget_for_action (a);
+            var btn = (Gtk.ToolButton)this.tool_bar.widget_for_action (a);
             if (btn) {
                 btn.icon (icon);
             }
@@ -430,14 +429,14 @@ public class SettingsDialog : Gtk.Dialog {
     ***********************************************************/
     private GLib.Action create_color_aware_action (string icon_name, string filename) {
         // all buttons must have the same size in order to keep a good layout
-        Gtk.Icon colored_icon = Theme.create_color_aware_icon (icon_path, palette ());
+        Gtk.IconInfo colored_icon = Theme.create_color_aware_icon (icon_path, palette ());
         return create_action_with_icon (colored_icon, filename, icon_path);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Action create_action_with_icon (Gtk.Icon icon, string text, string icon_path) {
+    private GLib.Action create_action_with_icon (Gtk.IconInfo icon, string text, string icon_path) {
         GLib.Action action = new ToolButtonAction (icon, text, this);
         action.checkable (true);
         if (!icon_path == "") {

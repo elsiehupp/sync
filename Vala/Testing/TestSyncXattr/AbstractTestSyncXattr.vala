@@ -66,7 +66,7 @@ public abstract class AbstractTestSyncXAttr : GLib.Object {
 
         // Using this directly doesn't recursively unpin everything and instead leaves
         // the files in the hydration that that they on_signal_start with
-        folder.sync_journal ().internal_pin_states.set_for_path ("", PinState.PinState.UNSPECIFIED);
+        folder.sync_journal ().internal_pin_states.set_for_path ("", PinState.UNSPECIFIED);
 
         return xattr_vfs;
     }

@@ -11,7 +11,7 @@
 //  #include <GLib.Abstract_proxy_model>
 //  #include <GLib.Completer>
 //  #include <GLib.Box_layout>
-//  #include <Gtk.Icon>
+//  #include <Gtk.IconInfo>
 //  #include <GLib.Layout>
 //  #include <GLib.PropertyAnimation>
 //  #include <GLib.Menu>
@@ -127,14 +127,14 @@ public class ShareUserGroupWidget : Gtk.Widget {
         this.instance.sharee_line_edit.completer (this.completer);
 
         var search_globally_action = new GLib.Action (this.instance.sharee_line_edit);
-        search_globally_action.icon (Gtk.Icon (":/client/theme/magnifying-glass.svg"));
+        search_globally_action.icon (Gtk.IconInfo (":/client/theme/magnifying-glass.svg"));
         search_globally_action.tool_tip (_("Search globally"));
 
         search_globally_action.triggered.connect (
             this.on_search_globally_action
         );
 
-        this.instance.sharee_line_edit.add_action (search_globally_action, GLib.LineEdit.Leading_position);
+        this.instance.sharee_line_edit.add_action (search_globally_action, Gtk.LineEdit.Leading_position);
 
         this.manager = new ShareManager (this.account, this);
         this.manager.signal_shares_fetched.connect (
@@ -196,7 +196,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
     }
 
 
-    private void on_completion_timer_timeout () {
+    private bool on_completion_timer_timeout () {
         if (!this.completion_timer_active) {
             return this.completion_timer_repeat;
         }
@@ -245,7 +245,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         GLib.Scroll_area scroll_area = this.parent_scroll_area;
 
         var new_view_port = new Gtk.Widget (scroll_area);
-        var layout = new GLib.VBoxLayout (new_view_port);
+        var layout = new Gtk.Box (Gtk.Orientation.VERTICAL); // new_view_port);
         layout.contents_margins (0, 0, 0, 0);
         int x = 0;
         int height = 0;
@@ -272,10 +272,10 @@ public class ShareUserGroupWidget : Gtk.Widget {
             //  GLib.assert_true (Share.is_share_type_user_group_email_room_or_remote (share.share_type));
             var user_group_share = (UserGroupShare)share;
             var share_user_line = new ShareUserLine (this.account, user_group_share, this.max_sharing_permissions, this.is_file, this.parent_scroll_area);
-            share_user_line.resize_requested.connect (
+            share_user_line.signal_resize_requested.connect (
                 this.on_signal_adjust_scroll_widget_size
             );
-            share_user_line.visual_deletion_done.connect (
+            share_user_line.signal_visual_deletion_done.connect (
                 this, ShareUserGroupWidget.on_signal_get_shares
             );
             share_user_line.background_role (
@@ -440,7 +440,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
         string password;
         if (sharee.type () == Sharee.Type.EMAIL && this.account.capabilities.share_email_password_enforced ()) {
-            this.instance.sharee_line_edit == "";
+            this.instance.sharee_line_edit = "";
             // always show a dialog for password-enforced email shares
             bool ok = false;
 
@@ -449,7 +449,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
                     this,
                     _("Password for share required"),
                     _("Please enter a password for your email share:"),
-                    GLib.LineEdit.Password,
+                    Gtk.LineEdit.Password,
                     "",
                     ok);
             } while (password == "" && ok);
@@ -466,7 +466,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         );
 
         this.instance.sharee_line_edit.enabled = false;
-        this.instance.sharee_line_edit == "";
+        this.instance.sharee_line_edit = "";
     }
 
 

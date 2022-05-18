@@ -22,7 +22,7 @@ public class TestNewFilesNotVirtual : AbstractTestSyncVirtualFiles {
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state ().find ("A/a1" + DVSUFFIX));
 
-        fake_folder.sync_journal ().internal_pin_states.set_for_path ("", PinState.PinState.ALWAYS_LOCAL);
+        fake_folder.sync_journal ().internal_pin_states.set_for_path ("", PinState.ALWAYS_LOCAL);
 
         // Create a new remote file, it'll not be virtual
         fake_folder.remote_modifier ().insert ("A/a2");

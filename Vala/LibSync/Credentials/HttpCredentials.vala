@@ -31,15 +31,15 @@ from the keychain
                 v
             on_signal_read_job_done
                 |        |
-                |        +------. emit fetched ()   if OAuth is not used
+                |        +------. emit signal_fetched ()   if OAuth is not used
                 |
                 v
             refresh_access_token ()
                 |
                 v
-              emit fetched ()
+              emit signal_fetched ()
 
-2) If the credentials is still not valid when fetched () is
+2) If the credentials is still not valid when signal_fetched () is
 emitted, the instance, will call ask_from_user () which is
 implemented in HttpCredentialsGui
 
@@ -166,7 +166,7 @@ public class HttpCredentials : AbstractCredentials {
         }
 
         if (this.ready) {
-            /* Q_EMIT */ fetched ();
+            signal_fetched ();
         } else {
             this.keychain_migration = false;
             fetch_from_keychain_helper ();
@@ -216,8 +216,8 @@ public class HttpCredentials : AbstractCredentials {
             qkeychain_write_password_job.key (keychain_key (this.account.url.to_string (), this.user + CLIENT_CERT_PASSWORD_C, this.account.identifier));
             qkeychain_write_password_job.binary_data (this.client_cert_password);
             qkeychain_write_password_job.start ();
-            this.client_cert_bundle == "";
-            this.client_cert_password == "";
+            this.client_cert_bundle = "";
+            this.client_cert_password = "";
         } else if (this.account.credential_setting (CLIENT_CERT_BUNDLE_C) == null && this.client_ssl_certificate != null) {
             // Option 2, pre 2.6 configs: We used to store the raw cert/key in the keychain and
             // still do so if no bundle is available. We can't currently migrate to Option 1
@@ -290,10 +290,10 @@ public class HttpCredentials : AbstractCredentials {
         Need to be done before invalidate_token, so it actually
         deletes the refresh_token from the keychain.
         ***********************************************************/
-        this.refresh_token == "";
+        this.refresh_token = "";
 
         invalidate_token ();
-        this.previous_password == "";
+        this.previous_password = "";
     }
 
 
@@ -314,7 +314,7 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     If we still have a valid refresh token, try to refresh it
-    asynchronously and emit fetched () otherwise return false
+    asynchronously and emit signal_fetched () otherwise return false
     ***********************************************************/
     public bool refresh_access_token () {
         if (this.refresh_token == "") {
@@ -351,7 +351,7 @@ public class HttpCredentials : AbstractCredentials {
                     // If the json was valid, but the input_stream did not contain an access token, the token
                     // is considered expired. (Usually the HTTP reply code is 400)
                     GLib.debug ("Expired refresh token. Logging out.");
-                    this.refresh_token == "";
+                    this.refresh_token = "";
                 } else {
                     this.ready = true;
                     this.password = access_token;
@@ -364,8 +364,8 @@ public class HttpCredentials : AbstractCredentials {
                         job_to_retry.retry ();
                     }
                 }
-                this.retry_queue == "";
-                /* emit */ fetched ();
+                this.retry_queue = "";
+                signal_fetched ();
             }
         );
         this.is_renewing_oauth_token = true;
@@ -445,8 +445,8 @@ public class HttpCredentials : AbstractCredentials {
         if (!unpack_client_cert_bundle ()) {
             GLib.warning ("Could not unpack client cert bundle.");
         }
-        this.client_cert_bundle == "";
-        this.client_cert_password == "";
+        this.client_cert_bundle = "";
+        this.client_cert_password = "";
 
         on_signal_read_password_from_keychain ();
     }
@@ -615,7 +615,7 @@ public class HttpCredentials : AbstractCredentials {
             // Still, the password can be empty which indicates a problem and
             // the password dialog has to be opened.
             this.ready = true;
-            /* emit */ fetched ();
+            signal_fetched ();
         } else {
             // we come here if the password is empty or any other keychain
             // error happend.
@@ -624,7 +624,7 @@ public class HttpCredentials : AbstractCredentials {
 
             this.password = "";
             this.ready = false;
-            /* emit */ fetched ();
+            signal_fetched ();
         }
 
         // If keychain data was read from legacy location, wipe these entries and store new ones
@@ -761,7 +761,7 @@ public class HttpCredentials : AbstractCredentials {
             return true;
         }
 
-        Soup.Buffer cert_buffer = new Soup.Buffer (&this.client_cert_bundle);
+        Soup.Buffer cert_buffer = new Soup.Buffer (this.client_cert_bundle);
         cert_buffer.open (GLib.IODevice.ReadOnly);
         GLib.List<GLib.TlsCertificate> client_ca_certificates;
         return GLib.TlsCertificate.import_pkcs12 (

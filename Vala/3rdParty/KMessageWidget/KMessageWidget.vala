@@ -81,7 +81,7 @@ public class KMessageWidget : Gdk.Frame {
     //  Q_PROPERTY (bool word_wrap READ word_wrap WRITE on_signal_set_word_wrap)
     //  Q_PROPERTY (bool close_button_visible READ is_close_button_visible WRITE on_signal_set_close_button_visible)
     //  Q_PROPERTY (MessageType message_type READ message_type WRITE on_signal_set_message_type)
-    //  Q_PROPERTY (Gtk.Icon icon READ icon WRITE on_signal_set_icon)
+    //  Q_PROPERTY (Gtk.IconInfo icon READ icon WRITE on_signal_set_icon)
 
     //  private Q_PRIVATE_SLOT (d, void on_time_line_changed (double))
     //  private Q_PRIVATE_SLOT (d, void on_time_line_finished ())
@@ -132,7 +132,7 @@ public class KMessageWidget : Gdk.Frame {
     @see on_signal_animated_hide ()
     @since 5.0
     ***********************************************************/
-    internal signal void hide_animation_finished ();
+    internal signal void signal_hide_animation_finished ();
 
     /***********************************************************
     This signal is emitted when the show animation is on_finished, started by
@@ -146,7 +146,7 @@ public class KMessageWidget : Gdk.Frame {
     @see on_signal_animated_show ()
     @since 5.0
     ***********************************************************/
-    internal signal void show_animation_finished ();
+    internal signal void signal_show_animation_finished ();
 
 
     /***********************************************************
@@ -283,7 +283,7 @@ public class KMessageWidget : Gdk.Frame {
     The icon shown on the left of the text. By default, no icon is shown.
     @since 4.11
     ***********************************************************/
-    public Gtk.Icon icon () {
+    public Gtk.IconInfo icon () {
         return d.icon;
     }
 
@@ -293,7 +293,7 @@ public class KMessageWidget : Gdk.Frame {
     is still running. If animations are disabled, this function always
     returns @e false.
 
-    @see on_signal_animated_hide (), hide_animation_finished ()
+    @see on_signal_animated_hide (), signal_hide_animation_finished ()
     @since 5.0
     ***********************************************************/
     public bool is_hide_animation_running () {
@@ -307,7 +307,7 @@ public class KMessageWidget : Gdk.Frame {
     is still running. If animations are disabled, this function always
     returns @e false.
 
-    @see on_signal_animated_show (), show_animation_finished ()
+    @see on_signal_animated_show (), signal_show_animation_finished ()
     @since 5.0
     ***********************************************************/
     public bool is_show_animation_running () {
@@ -387,18 +387,18 @@ public class KMessageWidget : Gdk.Frame {
         // Test before style_hint, as there might have been a style change while animation was running
         if (is_hide_animation_running ()) {
             d.time_line.stop ();
-            /* emit */ hide_animation_finished ();
+            signal_hide_animation_finished ();
         }
 
         if (!this.style.style_hint (GLib.Style.SH_WidgetAnimate, null, this)
             || (parent_widget () && !parent_widget ().is_visible ())) {
             show ();
-            /* emit */ show_animation_finished ();
+            signal_show_animation_finished ();
             return;
         }
 
         if (is_visible () && (d.time_line.state == GLib.TimeLine.NotRunning) && (height () == d.best_content_height ()) && (d.content.position ().y () == 0)) {
-            /* emit */ show_animation_finished ();
+            signal_show_animation_finished ();
             return;
         }
 
@@ -427,19 +427,19 @@ public class KMessageWidget : Gdk.Frame {
         // And before style_hint, as there might have been a style change while animation was running
         if (is_show_animation_running ()) {
             d.time_line.stop ();
-            /* emit */ show_animation_finished ();
+            signal_show_animation_finished ();
         }
 
         if (!this.style.style_hint (GLib.Style.SH_WidgetAnimate, null, this)) {
             hide ();
-            /* emit */ hide_animation_finished ();
+            signal_hide_animation_finished ();
             return;
         }
 
         if (!is_visible ()) {
             // explicitly hide it, so it stays hidden in case it is only not visible due to the parents
             hide ();
-            /* emit */ hide_animation_finished ();
+            signal_hide_animation_finished ();
             return;
         }
 
@@ -457,7 +457,7 @@ public class KMessageWidget : Gdk.Frame {
     Define an icon to be shown on the left of the text
     @since 4.11
     ***********************************************************/
-    public void on_signal_set_icon (Gtk.Icon icon) {
+    public void on_signal_set_icon (Gtk.IconInfo icon) {
         d.icon = icon;
         if (d.icon == null) {
             d.icon_label.hide ();

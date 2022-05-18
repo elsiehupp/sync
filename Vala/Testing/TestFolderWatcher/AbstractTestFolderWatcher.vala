@@ -33,9 +33,9 @@ public abstract class AbstractTestFolderWatcher : GLib.Object {
         Utility.write_random_file (this.root_path + "/a2/renamefile");
         Utility.write_random_file (this.root_path + "/a1/movefile");
 
-        this.watcher.on_signal_reset (new FolderWatcher ());
+        this.watcher.reset (new FolderWatcher ());
         this.watcher.init (this.root_path);
-        this.path_changed_spy.on_signal_reset (new GLib.SignalSpy (this.watcher, SIGNAL (path_changed (string))));
+        this.path_changed_spy.reset (new GLib.SignalSpy (this.watcher, SIGNAL (path_changed (string))));
     }
 
 
@@ -78,7 +78,7 @@ public abstract class AbstractTestFolderWatcher : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void init () {
-        this.path_changed_spy == "";
+        this.path_changed_spy = "";
         check_watch_count (count_folders (this.root_path) + 1);
     }
 

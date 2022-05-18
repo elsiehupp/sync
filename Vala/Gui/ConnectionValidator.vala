@@ -225,10 +225,10 @@ public class ConnectionValidator : GLib.Object {
         var check_job = new CheckServerJob (this.account, this);
         check_job.on_signal_timeout (TIMEOUT_TO_USE_MILLISECONDS);
         check_job.ignore_credential_failure (true);
-        check_job.instance_found.connect (
+        check_job.signal_instance_found.connect (
             this.on_signal_status_found
         );
-        check_job.instance_not_found.connect (
+        check_job.signal_instance_not_found.connect (
             this.on_signal_no_status_found
         );
         check_job.timeout.connect (
@@ -382,7 +382,7 @@ public class ConnectionValidator : GLib.Object {
         }
 
     //  #ifndef TOKEN_AUTH_ONLY
-        this.account.e2e.initialization_finished.connect (
+        this.account.e2e.signal_initialization_finished.connect (
             this.on_signal_report_connected
         );
         this.account.e2e.initialize (this.account);
@@ -426,7 +426,7 @@ public class ConnectionValidator : GLib.Object {
     ***********************************************************/
     private void fetch_user () {
         var user_info = new UserInfo (this.account_state, true, true, this);
-        user_info.fetched_last_info.connect (
+        user_info.signal_fetched_last_info.connect (
             this.on_signal_user_fetched
         );
         user_info.active = true;

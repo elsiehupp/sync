@@ -229,7 +229,7 @@ public class SqliteDatabase : GLib.Object {
     ***********************************************************/
     private CheckDbResult check_database () {
         // quick_check can fail with a disk IO error when diskspace is low
-        SqlQuery quick_check = new SqlQuery (*this);
+        SqlQuery quick_check = new SqlQuery (this);
 
         if (quick_check.prepare ("PRAGMA quick_check;", /*allow_failure=*/true) != Sqlite.OK) {
             GLib.warning ("Error preparing quick_check on database");

@@ -82,8 +82,8 @@ public abstract class AbstractComputeChecksum : GLib.Object {
     ***********************************************************/
     protected static bool parse_checksum_header (string header, string type, string checksum_string) {
         if (header == "") {
-            type == "";
-            checksum_string == "";
+            type = "";
+            checksum_string = "";
             return true;
         }
 

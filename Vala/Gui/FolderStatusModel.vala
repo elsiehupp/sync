@@ -30,7 +30,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
 
             bool is_null ()
             {
-                return this.progress_string == "" && this.warning_count == 0 && this.overall_sync_string == "";
+                return this.progress_string == "" && this.warning_count == 0 && this.overall_sync_string = "";
             }
         }
 
@@ -129,7 +129,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
             if (this.fetching_job) {
                 disconnect (this.fetching_job, null, model, null);
                 this.fetching_job.delete_later ();
-                this.fetching_job == "";
+                this.fetching_job = "";
             }
             if (has_label ()) {
                 model.begin_remove_rows (index, 0, 0);
@@ -138,7 +138,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
                 model.end_remove_rows ();
             } else if (!this.subs == "") {
                 model.begin_remove_rows (index, 0, this.subs.length - 1);
-                this.subs == "";
+                this.subs = "";
                 model.end_remove_rows ();
             }
         }
@@ -221,7 +221,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
             }
 
             end_reset_model ();
-            /* emit */ dirty_changed ();
+            signal_dirty_changed ();
         }
     }
 
@@ -239,14 +239,14 @@ public class FolderStatusModel : GLib.AbstractItemModel {
     private GLib.HashTable<GLib.PersistentModelIndex, GLib.Timer> fetching_items;
 
 
-    internal signal void dirty_changed ();
+    internal signal void signal_dirty_changed ();
 
 
     /***********************************************************
     Tell the view that this item should be expanded because it
     has an undecided item
     ***********************************************************/
-    internal signal void suggest_expand (GLib.ModelIndex index);
+    internal signal void signal_suggest_expand (GLib.ModelIndex index);
 
 
     //  friend struct SubFolderInfo;
@@ -335,9 +335,9 @@ public class FolderStatusModel : GLib.AbstractItemModel {
                 }
             case GLib.Decoration_role: {
                 if (x.is_encrypted) {
-                    return new Gtk.Icon (":/client/theme/lock-https.svg");
+                    return new Gtk.IconInfo (":/client/theme/lock-https.svg");
                 } else if (x.size > 0 && is_any_ancestor_encrypted (index)) {
-                    return new Gtk.Icon (":/client/theme/lock-broken.svg");
+                    return new Gtk.IconInfo (":/client/theme/lock-broken.svg");
                 }
                 return GLib.FileIconProvider ().icon (x.is_external ? GLib.FileIconProvider.Network : GLib.FileIconProvider.FolderConnection);
             }
@@ -532,8 +532,8 @@ public class FolderStatusModel : GLib.AbstractItemModel {
                 }
             }
             this.dirty = true;
-            /* emit */ dirty_changed ();
-            /* emit */ data_changed (index, index, GLib.List<int> () + role);
+            signal_dirty_changed ();
+            signal_data_changed (index, index, GLib.List<int> () + role);
             return true;
         }
         return GLib.AbstractItemModel.data (index, value, role);
@@ -677,7 +677,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
         props.append ("http://owncloud.org/ns:size");
         props.append ("http://owncloud.org/ns:permissions");
         props.append ("http://owncloud.org/ns:fileid");
-        if (this.account_state.account.capabilities.client_side_encryption_available ()) {
+        if (this.account_state.account.capabilities.client_side_encryption_available) {
             props.append ("http://nextcloud.org/ns:is-encrypted");
         }
         lscol_job.properties (props);
@@ -861,7 +861,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
     public void on_signal_update_folder_state (FolderConnection folder_connection) {
         for (int i = 0; i < this.folders.length (); ++i) {
             if (this.folders.at (i).folder_connection == folder_connection) {
-                /* emit */ data_changed (index (i), index (i));
+                signal_data_changed (index (i), index (i));
             }
         }
     }
@@ -872,7 +872,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
     public void on_signal_apply_selective_sync () {
         foreach (var folder_info in this.folders) {
             if (!folder_info.fetched) {
-                folder_info.folder_connection.journal_database ().selective_sync_list (
+                folder_info.folder_connection.journal_database.selective_sync_list (
                     SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST,
                     { });
                 continue;
@@ -880,33 +880,33 @@ public class FolderStatusModel : GLib.AbstractItemModel {
             FolderConnection folder_connection = folder_info.folder_connection;
 
             bool ok = false;
-            var old_block_list = folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
+            var old_block_list = folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
             if (!ok) {
                 GLib.warning ("Could not read selective sync list from database.");
                 continue;
             }
             GLib.List<string> block_list = create_block_list (folder_info, old_block_list);
-            folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
+            folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
 
             var block_list_set = block_list.to_set ();
             var old_block_list_set = old_block_list.to_set ();
 
             // The folders that were undecided or blocklisted and that are now checked should go on the allow list.
             // The user confirmed them already just now.
-            GLib.List<string> to_add_to_allow_list = ( (old_block_list_set + folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok).to_set ()) - block_list_set).values ();
+            GLib.List<string> to_add_to_allow_list = ( (old_block_list_set + folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok).to_set ()) - block_list_set).values ();
 
             if (!to_add_to_allow_list == "") {
-                var allow_list = folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, ok);
+                var allow_list = folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, ok);
                 if (ok) {
                     allow_list += to_add_to_allow_list;
-                    folder_connection.journal_database ().selective_sync_list (
+                    folder_connection.journal_database.selective_sync_list (
                         SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
                         allow_list
                     );
                 }
             }
             // clear the undecided list
-            folder_connection.journal_database ().selective_sync_list (
+            folder_connection.journal_database.selective_sync_list (
                 SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST,
                 { }
             );
@@ -920,7 +920,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
                 //  The part that changed should not be read from the DB on next sync because there might be new folders
                 // (the ones that are no longer in the blocklist)
                 foreach (var change in changes) {
-                    folder_connection.journal_database ().schedule_path_for_remote_discovery (change);
+                    folder_connection.journal_database.schedule_path_for_remote_discovery (change);
                     folder_connection.on_signal_schedule_path_for_local_discovery (change);
                 }
                 FolderManager.instance.schedule_folder (folder_connection);
@@ -943,7 +943,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
     public void on_signal_sync_all_pending_big_folders () {
         for (int i = 0; i < this.folders.length; ++i) {
             if (!this.folders[i].fetched) {
-                this.folders[i].folder_connection.journal_database ().selective_sync_list (
+                this.folders[i].folder_connection.journal_database.selective_sync_list (
                     SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST,
                     { }
                 );
@@ -952,7 +952,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
             var folder_connection = this.folders.at (i).folder_connection;
 
             bool ok = false;
-            var undecided_list = folder_connection.journal_database ().selective_sync_list (
+            var undecided_list = folder_connection.journal_database.selective_sync_list (
                 SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST,
                 ok
             );
@@ -967,7 +967,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
             }
 
             // Remove all undecided folders from the blocklist
-            var block_list = folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
+            var block_list = folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
             if (!ok) {
                 GLib.warning ("Could not read selective sync list from database.");
                 return;
@@ -975,13 +975,13 @@ public class FolderStatusModel : GLib.AbstractItemModel {
             foreach (var undecided_folder in undecided_list) {
                 block_list.remove_all (undecided_folder);
             }
-            folder_connection.journal_database ().selective_sync_list (
+            folder_connection.journal_database.selective_sync_list (
                 SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
                 block_list
             );
 
             // Add all undecided folders to the allow list
-            var allow_list = folder_connection.journal_database ().selective_sync_list (
+            var allow_list = folder_connection.journal_database.selective_sync_list (
                 SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
                 ok
             );
@@ -990,13 +990,13 @@ public class FolderStatusModel : GLib.AbstractItemModel {
                 return;
             }
             allow_list += undecided_list;
-            folder_connection.journal_database ().selective_sync_list (
+            folder_connection.journal_database.selective_sync_list (
                 SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
                 allow_list
             );
 
             // Clear the undecided list
-            folder_connection.journal_database ().selective_sync_list (
+            folder_connection.journal_database.selective_sync_list (
                 SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST,
                 { }
             );
@@ -1008,7 +1008,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
             // The part that changed should not be read from the DB on next sync because there might be new folders
             // (the ones that are no longer in the blocklist)
             foreach (var it in undecided_list) {
-                folder_connection.journal_database ().schedule_path_for_remote_discovery (it);
+                folder_connection.journal_database.schedule_path_for_remote_discovery (it);
                 folder_connection.on_signal_schedule_path_for_local_discovery (it);
             }
             FolderManager.instance.schedule_folder (folder_connection);
@@ -1026,7 +1026,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
             var folder_connection = this.folders.at (i).folder_connection;
 
             // clear the undecided list
-            folder_connection.journal_database ().selective_sync_list (
+            folder_connection.journal_database.selective_sync_list (
                 SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST,
                 { }
             );
@@ -1071,18 +1071,18 @@ public class FolderStatusModel : GLib.AbstractItemModel {
         if (progress.status () == LibSync.ProgressInfo.Status.DISCOVERY) {
             if (!progress.current_discovered_remote_folder == "") {
                 pi.overall_sync_string = _("Checking for changes in remote \"%1\"").printf (progress.current_discovered_remote_folder);
-                /* emit */ data_changed (index (folder_index), index (folder_index), roles);
+                signal_data_changed (index (folder_index), index (folder_index), roles);
                 return;
             } else if (!progress.current_discovered_local_folder == "") {
                 pi.overall_sync_string = _("Checking for changes in local \"%1\"").printf (progress.current_discovered_local_folder);
-                /* emit */ data_changed (index (folder_index), index (folder_index), roles);
+                signal_data_changed (index (folder_index), index (folder_index), roles);
                 return;
             }
         }
 
         if (progress.status () == LibSync.ProgressInfo.Status.RECONCILE) {
             pi.overall_sync_string = _("Reconciling changes");
-            /* emit */ data_changed (index (folder_index), index (folder_index), roles);
+            signal_data_changed (index (folder_index), index (folder_index), roles);
             return;
         }
 
@@ -1204,7 +1204,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
             overall_percent = q_round (double (completed_size + completed_file) / double (total_size + total_file_count) * 100.0);
         }
         pi.overall_percent = q_bound (0, overall_percent, 100);
-        /* emit */ data_changed (index (folder_index), index (folder_index), roles);
+        signal_data_changed (index (folder_index), index (folder_index), roles);
     }
 
 
@@ -1228,7 +1228,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
             end_remove_rows ();
         }
 
-        parent_info.last_error_string == "";
+        parent_info.last_error_string = "";
         parent_info.fetching_job = null;
         parent_info.fetched = true;
 
@@ -1241,9 +1241,9 @@ public class FolderStatusModel : GLib.AbstractItemModel {
         bool ok1 = true;
         bool ok2 = true;
         if (parent_info.checked == GLib.PartiallyChecked) {
-            selective_sync_block_list = parent_info.folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok1);
+            selective_sync_block_list = parent_info.folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok1);
         }
-        var selective_sync_undecided_list = parent_info.folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok2);
+        var selective_sync_undecided_list = parent_info.folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok2);
 
         if (! (ok1 && ok2)) {
             GLib.warning ("Could not retrieve selective sync info from journal.");
@@ -1284,7 +1284,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
             new_info.path = relative_path;
 
             SyncJournalFileRecord record;
-            parent_info.folder_connection.journal_database ().file_record_by_e2e_mangled_name (remove_trailing_slash (relative_path), record);
+            parent_info.folder_connection.journal_database.file_record_by_e2e_mangled_name (remove_trailing_slash (relative_path), record);
             if (record.is_valid) {
                 new_info.name = remove_trailing_slash (record.path).split ("/").last ();
                 if (record.is_e2e_encrypted && !record.e2e_mangled_name == "") {
@@ -1323,10 +1323,10 @@ public class FolderStatusModel : GLib.AbstractItemModel {
 
             var it = selective_sync_undecided_set.lower_bound (relative_path);
             if (it != selective_sync_undecided_set.end ()) {
-                if (*it == relative_path) {
+                if (it == relative_path) {
                     new_info.is_undecided = true;
                     selective_sync_undecided_set.erase (it);
-                } else if ( (*it).has_prefix (relative_path)) {
+                } else if ( (it).has_prefix (relative_path)) {
                     undecided_indexes.append (new_info.path_index.last ());
 
                     // Remove all the items from the selective_sync_undecided_set that starts with this path
@@ -1346,7 +1346,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
         }
 
         foreach (int undecided_index in undecided_indexes) {
-            suggest_expand (index (undecided_index, 0, index));
+            signal_suggest_expand (index (undecided_index, 0, index));
         }
 
         /* Try to remove the the undecided lists the items that are not on the server. */
@@ -1360,9 +1360,9 @@ public class FolderStatusModel : GLib.AbstractItemModel {
         }
         if (iterator != selective_sync_undecided_list.end ()) {
             selective_sync_undecided_list.erase (it, selective_sync_undecided_list.end ());
-            parent_info.folder_connection.journal_database ().selective_sync_list (
+            parent_info.folder_connection.journal_database.selective_sync_list (
                 SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, selective_sync_undecided_list);
-            /* emit */ dirty_changed ();
+            signal_dirty_changed ();
         }
     }
 
@@ -1509,8 +1509,8 @@ public class FolderStatusModel : GLib.AbstractItemModel {
 
         reset_and_fetch (index (folder_index));
 
-        /* emit */ suggest_expand (index (folder_index));
-        /* emit */ dirty_changed ();
+        signal_suggest_expand (index (folder_index));
+        signal_dirty_changed ();
     }
 
 

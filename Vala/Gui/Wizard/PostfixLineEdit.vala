@@ -6,7 +6,7 @@
 
 //  #include <GLib.Style>
 //  #include <GLib.Style_option_frame>
-//  #include <GLib.LineEdit>
+//  #include <Gtk.LineEdit>
 //  #include <GLib.PaintEvent>
 //  #include <GLib.Painter>
 
@@ -18,7 +18,7 @@ namespace Ui {
 
 Useful e.g. for setting a fixed domain name.
 ***********************************************************/
-public class PostfixLineEdit : GLib.LineEdit {
+public class PostfixLineEdit : Gtk.LineEdit {
 
     const int HORIZONTAL_MARGIN = 4;
     const int VERTICAL_MARGIN = 4;
@@ -68,7 +68,7 @@ public class PostfixLineEdit : GLib.LineEdit {
     /***********************************************************
     ***********************************************************/
     protected void paint_event (GLib.PaintEvent event) {
-        GLib.LineEdit.paint_event (event);
+        Gtk.LineEdit.paint_event (event);
         GLib.Painter p = new GLib.Painter (this);
 
         p.pen (palette ().color (Gtk.Palette.Disabled, Gtk.Palette.Text));

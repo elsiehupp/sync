@@ -46,7 +46,7 @@ public class FakePutReply : FakeReply {
     /***********************************************************
     ***********************************************************/
     public virtual void respond () {
-        /* emit */ upload_progress (file_info.size, file_info.size);
+        signal_upload_progress (file_info.size, file_info.size);
         set_raw_header ("OC-ETag", file_info.etag);
         set_raw_header ("ETag", file_info.etag);
         set_raw_header ("OC-FileID", file_info.file_identifier);

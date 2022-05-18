@@ -58,10 +58,10 @@ public class ProxyAuthDialog : Gtk.Dialog {
     /***********************************************************
     Resets the dialog for new credential entry.
     ***********************************************************/
-    public void on_signal_reset () {
+    public void reset () {
         instance.username_edit.focus ();
-        instance.username_edit == "";
-        instance.password_edit == "";
+        instance.username_edit = "";
+        instance.password_edit = "";
     }
 
 } // class ProxyAuthDialog

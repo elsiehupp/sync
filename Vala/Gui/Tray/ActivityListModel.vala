@@ -5,7 +5,6 @@
 ***********************************************************/
 
 //  #include <QtCore>
-//  #include <GLib.AbstractListModel>
 //  #include <GLib.DesktopServices>
 //  #include <Gtk.Widget>
 //  #include <Json.Object>
@@ -22,12 +21,12 @@ namespace Ui {
 
 Simple list model to provide the list view with data.
 ***********************************************************/
-public class ActivityListModel : GLib.AbstractListModel {
+public class ActivityListModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
     public enum DataRole {
-        ACTION_ICON = GLib.USER_ROLE + 1,
+        ACTION_ICON, // GLib.USER_ROLE + 1,
         USER_ICON,
         ACCOUNT,
         OBJECT_TYPE,
@@ -72,22 +71,23 @@ public class ActivityListModel : GLib.AbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    AccountState account_state { public get; protected set; }
-    bool currently_fetching { protected get; protected set; }
-    bool display_actions { private get; protected set; }
-    bool done_fetching { private get; protected set; }
-    bool hide_old_activities { private get; protected set; }
+    public AccountState account_state { public get; protected set; }
+    protected bool currently_fetching { protected get; protected set; }
+    protected bool display_actions { private get; protected set; }
+    protected bool done_fetching { private get; protected set; }
+    protected bool hide_old_activities { private get; protected set; }
 
 
-    internal signal void activity_job_status_code (int status_code);
-    internal signal void send_notification_request (string account_name, string link, string verb, int row);
+    internal signal void signal_activity_job_status_code (int status_code);
+    internal signal void signal_send_notification_request (string account_name, string link, string verb, int row);
 
 
     /***********************************************************
     ***********************************************************/
     public ActivityListModel (
         AccountState account_state = null,
-        GLib.Object parent) {
+        GLib.Object parent
+    ) {
         base (parent);
         this.account_state = account_state;
         this.currently_fetching = false;
@@ -99,16 +99,16 @@ public class ActivityListModel : GLib.AbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public override int row_count (GLib.ModelIndex parent = new GLib.ModelIndex ()) {
-        return this.final_list.length;
+    public uint row_count () {
+        return this.final_list.length ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public override bool can_fetch_more (GLib.ModelIndex index) {
+    public bool can_fetch_more (GLib.ModelIndex index) {
         // We need to be connected to be able to fetch more
-        if (this.account_state && this.account_state.is_connected) {
+        if (this.account_state != null && this.account_state.is_connected) {
             // If the fetching is reported to be done or we are currently fetching we can't fetch more
             if (!this.done_fetching && !this.currently_fetching) {
                 return true;
@@ -121,7 +121,7 @@ public class ActivityListModel : GLib.AbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public override void fetch_more (GLib.ModelIndex index) {
+    public void fetch_more (GLib.ModelIndex index) {
         if (can_fetch_activities ()) {
             start_fetch_job ();
         } else {
@@ -141,7 +141,7 @@ public class ActivityListModel : GLib.AbstractListModel {
     /***********************************************************
     ***********************************************************/
     public GLib.List<Activity> errors_list () {
-        return;
+        return null;
     }
 
 
@@ -255,8 +255,8 @@ public class ActivityListModel : GLib.AbstractListModel {
             return GLib.Variant ();
 
         activity = this.final_list.at (index.row ());
-        unowned AccountState ast = AccountManager.instance.account (activity.acc_name);
-        if (!ast && this.account_state != ast)
+        unowned AccountState new_account_state = AccountManager.instance.account (activity.acc_name);
+        if (!new_account_state && this.account_state != new_account_state)
             return GLib.Variant ();
 
         switch (role) {
@@ -267,7 +267,7 @@ public class ActivityListModel : GLib.AbstractListModel {
                 if (folder_connection) {
                     relative_path.prepend (folder_connection.remote_path);
                 }
-                var local_files = FolderManager.instance.find_file_in_local_folders (relative_path, ast.account);
+                var local_files = FolderManager.instance.find_file_in_local_folders (relative_path, new_account_state.account);
                 if (local_files.length > 0) {
                     if (relative_path.has_prefix ("/") || relative_path.has_prefix ('\\')) {
                         return relative_path.remove (0, 1);
@@ -287,7 +287,7 @@ public class ActivityListModel : GLib.AbstractListModel {
                 }
 
                 // get relative path to the file so we can open it in the file manager
-                var local_files = FolderManager.instance.find_file_in_local_folders (GLib.FileInfo (relative_path).path, ast.account);
+                var local_files = FolderManager.instance.find_file_in_local_folders (GLib.FileInfo (relative_path).path, new_account_state.account);
 
                 if (local_files == "") {
                     return "";
@@ -297,7 +297,7 @@ public class ActivityListModel : GLib.AbstractListModel {
                 // hiding the share button which is what we want
                 if (folder_connection) {
                     SyncJournalFileRecord record;
-                    folder_connection.journal_database ().file_record (activity.file.mid (1), record);
+                    folder_connection.journal_database.file_record (activity.file.mid (1), record);
                     if (record.is_valid && (record.is_e2e_encrypted || !record.e2e_mangled_name == "")) {
                         return "";
                     }
@@ -313,7 +313,7 @@ public class ActivityListModel : GLib.AbstractListModel {
                 if (folder_connection) {
                     relative_path.prepend (folder_connection.remote_path);
                 }
-                var local_files = FolderManager.instance.find_file_in_local_folders (relative_path, ast.account);
+                var local_files = FolderManager.instance.find_file_in_local_folders (relative_path, new_account_state.account);
                 if (!local_files.empty ()) {
                     return local_files.const_first ();
                 } else {
@@ -405,7 +405,7 @@ public class ActivityListModel : GLib.AbstractListModel {
             //  return activity.id == -1 ? "" : "%1 - %2".printf (Utility.time_ago_in_words (activity.date_time.to_local_time ()), activity.date_time.to_local_time ().to_string (GLib.Default_locale_short_date));
             return activity.id == -1 ? "" : Utility.time_ago_in_words (activity.date_time.to_local_time ());
         case DataRole.ACCOUNT_CONNECTED:
-            return (ast && ast.is_connected);
+            return (new_account_state && new_account_state.is_connected);
         case DataRole.DISPLAY_ACTIONS:
             return this.display_actions;
         case DataRole.SHAREABLE:
@@ -437,7 +437,7 @@ public class ActivityListModel : GLib.AbstractListModel {
             var folder_connection = FolderManager.instance.folder_by_alias (activity.folder_connection);
 
             var conflicted_relative_path = activity.file;
-            var base_relative_path = folder_connection.journal_database ().conflict_file_base_name (conflicted_relative_path.to_utf8 ());
+            var base_relative_path = folder_connection.journal_database.conflict_file_base_name (conflicted_relative_path.to_utf8 ());
 
             var directory = GLib.Dir (folder_connection.path);
             var conflicted_path = directory.file_path (conflicted_relative_path);
@@ -445,7 +445,7 @@ public class ActivityListModel : GLib.AbstractListModel {
 
             var base_name = GLib.FileInfo (base_path).filename ();
 
-            if (!this.current_conflict_dialog == null) {
+            if (this.current_conflict_dialog != null) {
                 this.current_conflict_dialog.close ();
             }
             this.current_conflict_dialog = new ConflictDialog ();
@@ -526,7 +526,7 @@ public class ActivityListModel : GLib.AbstractListModel {
             return;
         }
 
-        /* emit */ send_notification_request (activity.acc_name, action.link, action.verb, activity_index);
+        signal_send_notification_request (activity.acc_name, action.link, action.verb, activity_index);
     }
 
 
@@ -551,8 +551,8 @@ public class ActivityListModel : GLib.AbstractListModel {
     /***********************************************************
     ***********************************************************/
     public void on_signal_remove_account () {
-        this.final_list == "";
-        this.activity_lists == "";
+        this.final_list = "";
+        this.activity_lists = "";
         this.currently_fetching = false;
         this.done_fetching = false;
         this.current_item = 0;
@@ -567,8 +567,8 @@ public class ActivityListModel : GLib.AbstractListModel {
         var activities = json.object ().value ("ocs").to_object ().value ("data").to_array ();
 
         GLib.List<Activity> list;
-        var ast = this.account_state;
-        if (!ast) {
+        var this.account_state = this.account_state;
+        if (this.account_state == null) {
             return;
         }
 
@@ -587,7 +587,7 @@ public class ActivityListModel : GLib.AbstractListModel {
             Activity activity;
             activity.type = Activity.Type.ACTIVITY;
             activity.object_type = json.value ("object_type").to_string ();
-            activity.acc_name = ast.account.display_name;
+            activity.acc_name = this.account_state.account.display_name;
             activity.id = json.value ("activity_id").to_int ();
             activity.file_action = json.value ("type").to_string ();
             activity.subject = json.value ("subject").to_string ();
@@ -611,31 +611,9 @@ public class ActivityListModel : GLib.AbstractListModel {
 
         this.activity_lists.append (list);
 
-        /* emit */ activity_job_status_code (status_code);
+        signal_activity_job_status_code (status_code);
 
         combine_activity_lists ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    protected GLib.HashTable<int, string> role_names () {
-        GLib.HashTable<int, string> roles;
-        roles[DataRole.DISPLAY_PATH] = "display_path";
-        roles[DataRole.PATH] = "path";
-        roles[DataRole.ABSOLUTE_PATH] = "absolute_path";
-        roles[DataRole.LINK] = "link";
-        roles[DataRole.MESSAGE] = "message";
-        roles[DataRole.ACTION] = "type";
-        roles[DataRole.ACTION_ICON] = "icon";
-        roles[DataRole.ACTION_TEXT] = "subject";
-        roles[DataRole.ACTION_LINKS] = "links";
-        roles[DataRole.ACTION_TEXT_COLOR] = "activity_text_title_color";
-        roles[DataRole.OBJECT_TYPE] = "object_type";
-        roles[DataRole.POINT_IN_TIME] = "date_time";
-        roles[DataRole.DISPLAY_ACTIONS] = "display_actions";
-        roles[DataRole.SHAREABLE] = "is_shareable";
-        return roles;
     }
 
 

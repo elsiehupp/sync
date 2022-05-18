@@ -43,18 +43,18 @@ public class PropagateLocalMkdir : AbstractPropagateItemJob {
     ***********************************************************/
     private void start_local_mkdir () {
         GLib.Dir new_dir = new GLib.Dir (this.propagator.full_local_path (this.item.file));
-        string new_dir_str = GLib.Dir.to_native_separators (new_dir.path);
+        string new_directory_string = GLib.Dir.to_native_separators (new_dir.path);
 
         // When turning something that used to be a file into a directory
         // we need to delete the file first.
-        GLib.FileInfo file_info = GLib.File.new_for_path (new_dir_str);
+        GLib.FileInfo file_info = GLib.File.new_for_path (new_directory_string);
         if (file_info.exists () && file_info.is_file ()) {
             if (this.delete_existing_file) {
                 string remove_error;
-                if (!FileSystem.remove (new_dir_str, remove_error)) {
+                if (!FileSystem.remove (new_directory_string, remove_error)) {
                     on_signal_done (SyncFileItem.Status.NORMAL_ERROR,
                         _("could not delete file %1, error : %2")
-                            .printf (new_dir_str, remove_error));
+                            .printf (new_directory_string, remove_error));
                     return;
                 }
             } else if (this.item.instruction == CSync.SyncInstructions.CONFLICT) {
@@ -68,13 +68,13 @@ public class PropagateLocalMkdir : AbstractPropagateItemJob {
 
         if (Utility.fs_case_preserving () && this.propagator.local_filename_clash (this.item.file)) {
             GLib.warning ("New folder to create locally already exists with different case:" + this.item.file);
-            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Attention, possible case sensitivity clash with %1").printf (new_dir_str));
+            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Attention, possible case sensitivity clash with %1").printf (new_directory_string));
             return;
         }
-        /* emit */ this.propagator.signal_touched_file (new_dir_str);
-        GLib.Dir local_dir = new GLib.Dir (this.propagator.local_path);
-        if (!local_dir.mkpath (this.item.file)) {
-            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Could not create folder %1").printf (new_dir_str));
+        this.propagator.signal_touched_file (new_directory_string);
+        GLib.Dir local_directory = new GLib.Dir (this.propagator.local_path);
+        if (!local_directory.mkpath (this.item.file)) {
+            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Could not create folder %1").printf (new_directory_string));
             return;
         }
 
@@ -89,7 +89,7 @@ public class PropagateLocalMkdir : AbstractPropagateItemJob {
         if (!result) {
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error));
             return;
-        } else if (*result == AbstractVfs.ConvertToPlaceholderResult.Locked) {
+        } else if (result == AbstractVfs.ConvertToPlaceholderResult.Locked) {
             on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").printf (signal_new_item.file));
             return;
         }

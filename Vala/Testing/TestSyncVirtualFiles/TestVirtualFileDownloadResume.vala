@@ -39,7 +39,7 @@ public class TestVirtualFileDownloadResume : AbstractTestSyncVirtualFiles {
         GLib.assert_true (!database_record (fake_folder, "A/a1").is_valid);
         TestSyncVirtualFiles.clean_up_test_virtual_file_download_resume (complete_spy, fake_folder);
 
-        fake_folder.server_error_paths () == "";
+        fake_folder.server_error_paths () = "";
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (item_instruction (complete_spy, "A/a1", CSync.SyncInstructions.SYNC));
         GLib.assert_true (item_instruction (complete_spy, "A/a1" + DVSUFFIX, CSync.SyncInstructions.NONE));
@@ -52,7 +52,7 @@ public class TestVirtualFileDownloadResume : AbstractTestSyncVirtualFiles {
     /***********************************************************
     ***********************************************************/
     private static void clean_up_test_virtual_file_download_resume (ItemCompletedSpy complete_spy, FakeFolder fake_folder) {
-        complete_spy == "";
+        complete_spy = "";
         fake_folder.sync_journal ().wipe_error_blocklist ();
     }
 

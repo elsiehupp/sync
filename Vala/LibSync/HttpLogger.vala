@@ -39,7 +39,7 @@ public class HttpLogger : GLib.Object {
             GLib.InputStream.signal_finished,
             reply,
             () => {
-            log_http (request_verb (*reply),
+            log_http (request_verb (reply),
                 reply.url.to_string (),
                 reply.request ().raw_header (X_REQUEST_ID ()),
                 reply.header (Soup.Request.ContentTypeHeader).to_string (),
@@ -83,7 +83,7 @@ public class HttpLogger : GLib.Object {
         var reply = (GLib.InputStream) device;
         var content_length = device.size ();
         string message;
-        GLib.OutputStream stream = new GLib.OutputStream (&message);
+        GLib.OutputStream stream = new GLib.OutputStream (message);
         stream += identifier + ": ";
         if (reply == null) {
             stream += "Request: ";

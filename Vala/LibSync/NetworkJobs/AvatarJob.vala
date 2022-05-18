@@ -22,9 +22,9 @@ public class AvatarJob : AbstractNetworkJob {
 
 
     /***********************************************************
-    @brief avatar_pixmap - returns either a valid pixmap or not.
+    @brief signal_avatar_pixmap - returns either a valid pixmap or not.
     ***********************************************************/
-    internal signal void avatar_pixmap (Gtk.Image image);
+    internal signal void signal_avatar_pixmap (Gtk.Image image);
 
 
     /***********************************************************
@@ -56,7 +56,7 @@ public class AvatarJob : AbstractNetworkJob {
     ***********************************************************/
     public static Gtk.Image make_circular_avatar (Gtk.Image base_avatar) {
         if (base_avatar == null) {
-            return {};
+            return null;
         }
 
         int dim = base_avatar.width ();
@@ -64,7 +64,7 @@ public class AvatarJob : AbstractNetworkJob {
         Gtk.Image avatar = new Gtk.Image (dim, dim, Gtk.Image.FormatARGB32);
         avatar.fill (GLib.transparent);
 
-        GLib.Painter painter = new GLib.Painter (&avatar);
+        GLib.Painter painter = new GLib.Painter (avatar);
         painter.render_hint (GLib.Painter.Antialiasing);
 
         GLib.PainterPath path;
@@ -93,7 +93,7 @@ public class AvatarJob : AbstractNetworkJob {
                 }
             }
         }
-        /* emit */ (avatar_pixmap (av_image));
+        signal_avatar_pixmap (av_image);
         return true;
     }
 

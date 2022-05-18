@@ -16,7 +16,7 @@ public class TestSetClearSetClearAtStage1EmitClearAtChangedAndClearAtSet : GLib.
         UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
         GLib.SignalSpy clear_at_changed_spy = new GLib.SignalSpy (
             model,
-            UserStatusSelectorModel.clear_at_changed
+            UserStatusSelectorModel.signal_clear_at_changed
         );
 
         var clear_at_index = 1;

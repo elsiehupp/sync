@@ -30,7 +30,7 @@ public class KeychainChunkReadJob : AbstractKeychainChunkJob {
         this.keychain_migration = keychain_migration;
 
         this.chunk_count = 0;
-        this.chunk_buffer == "";
+        this.chunk_buffer = "";
     }
 
 
@@ -49,7 +49,7 @@ public class KeychainChunkReadJob : AbstractKeychainChunkJob {
     ***********************************************************/
     public new bool start () {
         this.chunk_count = 0;
-        this.chunk_buffer == "";
+        this.chunk_buffer = "";
         this.error = Secret.Collection.NoError;
 
         string keychain_key = this.account ? AbstractCredentials.keychain_key (
@@ -92,7 +92,7 @@ public class KeychainChunkReadJob : AbstractKeychainChunkJob {
         }
 
         this.chunk_count = 0;
-        this.chunk_buffer == "";
+        this.chunk_buffer = "";
         if (this.error != EntryNotFound) {
             GLib.warning ("ReadPasswordJob failed with " + this.error_string);
         }

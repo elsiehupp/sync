@@ -57,21 +57,21 @@ public class VfsOff : AbstractVfs {
     /***********************************************************
     ***********************************************************/
     public override Result<void, string> update_metadata (string file_path, time_t modtime, int64 size, string file_id) {
-        return {};
+        return null;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public override Result<void, string> create_placeholder (SyncFileItem sync_file_item) {
-        return {};
+        return null;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public override Result<void, string> dehydrate_placeholder (SyncFileItem sync_file_item) {
-        return {};
+        return null;
     }
 
 

@@ -10,7 +10,7 @@ not, because when the client starts the upload request we
 don't know if the folder is encrypted on the server.
 
 emits:
-finalized () if the encrypted file is ready to be
+signal_finalized () if the encrypted file is ready to be
 error () if there was an error with the encryption
 folder_not_encrypted () if the file is within a folder that's not encrypted.
 ***********************************************************/
@@ -49,7 +49,7 @@ public class PropagateUploadEncrypted : GLib.Object {
     /***********************************************************
     Emmited after the file is encrypted and everything is set up.
     ***********************************************************/
-    internal signal void finalized (string path, string filename, uint64 size);
+    internal signal void signal_finalized (string path, string filename, uint64 size);
 
     /***********************************************************
     ***********************************************************/
@@ -408,7 +408,7 @@ public class PropagateUploadEncrypted : GLib.Object {
 
         GLib.debug ("Encrypted info: " + output_info.path + output_info.filename () + output_info.size ());
         GLib.debug ("Finalizing the upload part; now the actual uploader will take over.");
-        /* emit */ finalized (output_info.path + "/" + output_info.filename (),
+        signal_finalized (output_info.path + "/" + output_info.filename (),
             this.remote_parent_path + "/" + output_info.filename (),
             output_info.size ());
     }

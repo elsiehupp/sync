@@ -145,14 +145,14 @@ public class Share : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_ocs_share_job_error (int status_code, string message) {
-        /* emit */ server_error (status_code, message);
+        signal_server_error (status_code, message);
     }
 
 
     /***********************************************************
     ***********************************************************/
     protected void on_signal_password_set (GLib.JsonDocument reply, GLib.Variant value) {
-        this.password_is_set = !value.to_string () == "";
+        this.password_is_set = !value.to_string () = "";
         signal_password_set ();
     }
 

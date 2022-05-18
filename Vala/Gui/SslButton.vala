@@ -19,7 +19,7 @@ namespace Ui {
 @brief The SslButton class
 @ingroup gui
 ***********************************************************/
-public class SslButton : GLib.ToolButton {
+public class SslButton : Gtk.ToolButton {
 
     /***********************************************************
     ***********************************************************/
@@ -30,7 +30,7 @@ public class SslButton : GLib.ToolButton {
     ***********************************************************/
     public SslButton (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
-        popup_mode (GLib.ToolButton.Instant_popup);
+        popup_mode (Gtk.ToolButton.Instant_popup);
         auto_raise (true);
 
         this.menu = new GLib.Menu (this);
@@ -44,7 +44,7 @@ public class SslButton : GLib.ToolButton {
     /***********************************************************
     ***********************************************************/
     public void update_account_state (AccountState account_state) {
-        if (!account_state || !account_state.is_connected) {
+        if (account_state == null || !account_state.is_connected) {
             visible (false);
             return;
         } else {
@@ -54,11 +54,11 @@ public class SslButton : GLib.ToolButton {
 
         unowned Account account = this.account_state.account;
         if (account.url.scheme () == "https") {
-            icon (Gtk.Icon (":/client/theme/lock-https.svg"));
+            icon (Gtk.IconInfo (":/client/theme/lock-https.svg"));
             GLib.SslCipher cipher = account.session_cipher;
             tool_tip (_("This connection is encrypted using %1 bit %2.\n").printf (cipher.used_bits ()).printf (cipher.name ()));
         } else {
-            icon (Gtk.Icon (":/client/theme/lock-http.svg"));
+            icon (Gtk.IconInfo (":/client/theme/lock-http.svg"));
             tool_tip (_("This connection is NOT secure as it is not encrypted.\n"));
         }
     }
@@ -67,9 +67,9 @@ public class SslButton : GLib.ToolButton {
     /***********************************************************
     ***********************************************************/
     public void on_signal_update_menu () {
-        this.menu == "";
+        this.menu = "";
 
-        if (!this.account_state) {
+        if (this.account_state == null) {
             return;
         }
 

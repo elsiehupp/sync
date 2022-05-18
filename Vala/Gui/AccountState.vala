@@ -468,7 +468,7 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
         ocs_navigation_apps_job.signal_apps_job_finished.connect (
             this.on_signal_navigation_apps_fetched
         );
-        ocs_navigation_apps_job.etag_response_header_received.connect (
+        ocs_navigation_apps_job.signal_etag_response_header_received.connect (
             this.on_signal_etag_response_header_received
         );
         ocs_navigation_apps_job.signal_error.connect (
@@ -620,7 +620,7 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
             if (status_code == 304) {
                 GLib.warning ("Status code " + status_code.to_string () + " Not Modified - No new navigation app_list.");
             } else {
-                this.app_list == "";
+                this.app_list = "";
 
                 if (reply != "") {
                     var element = reply.object ().value ("ocs").to_object ().value ("data");

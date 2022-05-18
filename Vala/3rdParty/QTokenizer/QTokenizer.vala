@@ -172,7 +172,7 @@ public class GLib.Tokenizer<T> : GLib.Object {
                 return false;
             }
             tokenizer_private.token_end++;
-            if (tokenizer_private.next_char (&state, *tokenizer_private.token_begin)) {
+            if (tokenizer_private.next_char (state, tokenizer_private.token_begin)) {
                 break;
             }
             if (tokenizer_private.return_delimiters) {
@@ -180,7 +180,7 @@ public class GLib.Tokenizer<T> : GLib.Object {
                 return true;
             }
         }
-        while (tokenizer_private.token_end != tokenizer_private.end && tokenizer_private.next_char (&state, *tokenizer_private.token_end)) {
+        while (tokenizer_private.token_end != tokenizer_private.end && tokenizer_private.next_char (state, tokenizer_private.token_end)) {
             tokenizer_private.token_end++;
         }
         return true;
@@ -212,7 +212,7 @@ public class GLib.Tokenizer<T> : GLib.Object {
     public T next () {
         int len = std.distance (tokenizer_private.token_begin, tokenizer_private.token_end);
         ConstIterator temporary_start = tokenizer_private.token_begin;
-        if (!tokenizer_private.return_quotes && len > 1 && tokenizer_private.is_quote (*tokenizer_private.token_begin)) {
+        if (!tokenizer_private.return_quotes && len > 1 && tokenizer_private.is_quote (tokenizer_private.token_begin)) {
             temporary_start++;
             len -= 2;
         }

@@ -34,7 +34,7 @@ public class TestMoveFileToDifferentFolderOnBothSides : AbstractTestSyncMove {
         GLib.assert_true (counter.number_of_get == 2);
         GLib.assert_true (counter.number_of_put == 2);
         GLib.assert_true (counter.number_of_delete == 0);
-        counter.on_signal_reset ();
+        counter.reset ();
 
     }
 

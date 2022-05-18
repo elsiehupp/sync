@@ -83,7 +83,7 @@ public class ComputeChecksum : AbstractComputeChecksum {
     /***********************************************************
     Computes the checksum for the given file path.
 
-    on_signal_done () is emitted when the calculation finishes.
+    signal_done () is emitted when the calculation finishes.
     ***********************************************************/
     public void start_for_path (string file_path) {
         GLib.info ("Computing " + this.checksum_type + " checksum of " + file_path + " in a thread.");
@@ -94,7 +94,7 @@ public class ComputeChecksum : AbstractComputeChecksum {
     /***********************************************************
     Computes the checksum for the given device.
 
-    on_signal_done () is emitted when the calculation finishes.
+    signal_done () is emitted when the calculation finishes.
 
     The device ownership transfers into the thread that
     will compute the checksum. It must not have a parent.
@@ -152,7 +152,7 @@ public class ComputeChecksum : AbstractComputeChecksum {
             return "";
         }
 
-        return compute_now (&file, checksum_type);
+        return compute_now (file, checksum_type);
     }
 
 
@@ -164,9 +164,9 @@ public class ComputeChecksum : AbstractComputeChecksum {
     private void on_signal_calculation_done () {
         string checksum = this.watcher.future ().result ();
         if (!checksum == null) {
-            /* emit */ done (this.checksum_type, checksum);
+            signal_done (this.checksum_type, checksum);
         } else {
-            /* emit */ done ("", "");
+            signal_done ("", "");
         }
     }
 

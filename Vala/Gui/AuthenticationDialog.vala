@@ -4,8 +4,7 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <GLib.LineEdit>
-//  #include <GLib.VBoxLayout>
+//  #include <Gtk.LineEdit>
 //  #include <GLib.FormLayout>
 //  #include <GLib.DialogButtonBox>
 //  #include <Gtk.Dialog>
@@ -22,17 +21,18 @@ public class AuthenticationDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.LineEdit user;
-    private GLib.LineEdit password;
+    private Gtk.LineEdit user;
+    private Gtk.LineEdit password;
 
     /***********************************************************
     ***********************************************************/
     public AuthenticationDialog (string realm, string domain, Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
-        this.user = new GLib.LineEdit ();
-        this.password = new GLib.LineEdit ();
+        this.user = new Gtk.LineEdit ();
+        this.password = new Gtk.LineEdit ();
         this.window_title (_("Authentication Required"));
-        var vertical_box_layout = new GLib.VBoxLayout (this);
+        var vertical_box_layout = new Gtk.Box (Gtk.Orientation.VERTICAL);
+
         var label = new Gtk.Label (_("Enter username and password for \"%1\" at %2.").printf (realm, domain));
         label.text_format (GLib.UpdateStatusStringFormat.PLAIN_TEXT);
         vertical_box_layout.add_widget (label);
@@ -41,7 +41,7 @@ public class AuthenticationDialog : Gtk.Dialog {
         form.add_row (_("&User:"), this.user);
         form.add_row (_("&Password:"), this.password);
         vertical_box_layout.add_layout (form);
-        this.password.echo_mode (GLib.LineEdit.Password);
+        this.password.echo_mode (Gtk.LineEdit.Password);
 
         var dialog_button_box = new GLib.DialogButtonBox (GLib.DialogButtonBox.Ok | GLib.DialogButtonBox.Cancel, GLib.Horizontal);
         dialog_button_box.accepted.connect (

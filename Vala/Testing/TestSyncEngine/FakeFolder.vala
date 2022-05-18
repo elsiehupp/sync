@@ -46,7 +46,7 @@ public class FakeFolder : GLib.Object {
         GLib.Dir root_directory = new GLib.Dir (this.temporary_directory.path);
         GLib.debug ("FakeFolder operating on " + root_directory);
         if (local_file_info) {
-            to_disk (root_directory, *local_file_info);
+            to_disk (root_directory, local_file_info);
         } else {
             to_disk (root_directory, template_file_info);
         }
@@ -273,7 +273,7 @@ public class FakeFolder : GLib.Object {
         GLib.Timer t;
         t.on_signal_start ();
         while (t.elapsed () < 5000) {
-            spy == "";
+            spy = "";
             GLib.assert_true (spy.wait ());
             foreach (GLib.List<GLib.Variant> args in spy) {
                 var item = args[0].value<SyncFileItem> ();
@@ -354,7 +354,7 @@ public class FakeFolder : GLib.Object {
         var child_name = components.path_root ();
         var it = base_file_info.children.find (child_name);
         if (it != base_file_info.children.end ()) {
-            return find_or_create_directories (*it, components.sub_components ());
+            return find_or_create_directories (it, components.sub_components ());
         }
         var new_directory = base_file_info.children[child_name] = new FileInfo (child_name);
         new_directory.parent_path = base_file_info.path;

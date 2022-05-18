@@ -43,7 +43,7 @@ public class FolderMetadata : GLib.Object {
 
         if (decrypt_result == "") {
         GLib.debug ("ERROR. Could not decrypt the metadata key.");
-        return {};
+        return "";
         }
         return string.from_base64 (decrypt_result);
     }

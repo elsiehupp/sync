@@ -94,7 +94,6 @@ https://www.gnu.org/licenses/gpl-3.0.html.
 ****************************************************************************/
 
 //  #include <Gtk.Widget>
-//  #include <GLib.VBoxLayout>
 //  #include <GLib.Painte
 //  #include <GLib.Style>
 //  #include <GLib.Application>

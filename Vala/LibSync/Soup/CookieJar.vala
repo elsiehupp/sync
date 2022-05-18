@@ -27,7 +27,7 @@ public class CookieJar : Soup.CookieJar {
     ***********************************************************/
     public bool cookies_from_url (GLib.List<Soup.Cookie> cookie_list, GLib.Uri url) {
         if (Soup.CookieJar.cookies_from_url (cookie_list, url)) {
-            /* Q_EMIT */ new_cookies_for_url (cookie_list, url);
+            /* emit */ new_cookies_for_url (cookie_list, url);
             return true;
         }
 
@@ -115,7 +115,7 @@ public class CookieJar : Soup.CookieJar {
 
 
     //  GLib.DataStream operator>> (GLib.DataStream stream, GLib.List<Soup.Cookie> list) {
-    //      list == "";
+    //      list = "";
 
     //      uint32 version = 0;
     //      stream >> version;

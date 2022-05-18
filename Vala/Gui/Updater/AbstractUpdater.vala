@@ -114,7 +114,7 @@ public abstract class AbstractUpdater : GLib.Object {
             string output = process.read_all_standard_output ();
             GLib.debug ("Sys Info size: " + output.length);
             if (output.length > 1024)
-                output == ""; // don't send too much.
+                output = ""; // don't send too much.
 
             return string.from_local8Bit (output.to_base64 ());
         }

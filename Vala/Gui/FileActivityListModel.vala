@@ -24,10 +24,10 @@ public class FileActivityListModel : ActivityListModel {
     ***********************************************************/
     public void on_signal_load (AccountState account_state, string file_id) {
         //  GLib.assert_true (account_state);
-        if (!account_state || currently_fetching ()) {
+        if (account_state == null || this.currently_fetching) {
             return;
         }
-        account_state (account_state);
+        this.account_state = account_state;
 
         var folder = FolderManager.instance.folder_for_path (local_path);
         if (!folder) {
@@ -36,7 +36,7 @@ public class FileActivityListModel : ActivityListModel {
 
         var file = folder.file_from_local_path (local_path);
         SyncJournalFileRecord file_record;
-        if (!folder.journal_database ().file_record (file, file_record) || !file_record.is_valid) {
+        if (!folder.journal_database.file_record (file, file_record) || !file_record.is_valid) {
             return;
         }
 

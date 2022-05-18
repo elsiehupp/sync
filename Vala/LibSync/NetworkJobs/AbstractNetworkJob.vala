@@ -140,7 +140,7 @@ public class AbstractNetworkJob : GLib.Object {
     \a target_url Where to redirect to
     \a redirect_count Counts redirect hops, first is 0.
     ***********************************************************/
-    internal signal void redirected (GLib.InputStream input_stream, GLib.Uri target_url, int redirect_count);
+    internal signal void signal_redirected (GLib.InputStream input_stream, GLib.Uri target_url, int redirect_count);
 
     /***********************************************************
     ***********************************************************/
@@ -231,7 +231,7 @@ public class AbstractNetworkJob : GLib.Object {
             } else if (this.input_stream.has_raw_header ("OC-ErrorString")) {
                 return this.input_stream.raw_header ("OC-ErrorString");
             } else {
-                return network_reply_error_string (*this.input_stream);
+                return network_reply_error_string (this.input_stream);
             }
         }
     }
@@ -277,7 +277,7 @@ public class AbstractNetworkJob : GLib.Object {
         //  ENFORCE (this.input_stream);
         var request = this.input_stream.request ();
         GLib.Uri requested_url = request.url;
-        string verb = HttpLogger.request_verb (*this.input_stream);
+        string verb = HttpLogger.request_verb (this.input_stream);
         GLib.info ("Restarting " + verb + requested_url);
         reset_timeout ();
         if (this.request_body != null) {
@@ -466,7 +466,7 @@ public class AbstractNetworkJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private GLib.InputStream add_timer (GLib.InputStream input_stream) {
-        input_stream.property ("timer", GLib.Variant.from_value (&this.timer));
+        input_stream.property ("timer", GLib.Variant.from_value (this.timer));
         return input_stream;
     }
 
@@ -484,7 +484,7 @@ public class AbstractNetworkJob : GLib.Object {
         }
         // Qt doesn't yet transparently resend HTTP2 requests, do so here
         var max_http2Resends = 3;
-        string verb = HttpLogger.request_verb (*this.input_stream);
+        string verb = HttpLogger.request_verb (this.input_stream);
         if (this.input_stream.error == GLib.InputStream.ContentReSendError
             && this.input_stream.attribute (Soup.Request.HTTP2WasUsedAttribute).to_bool ()) {
 
@@ -567,7 +567,7 @@ public class AbstractNetworkJob : GLib.Object {
             } else if (verb == "") {
                 GLib.warning (this + " cannot redirect request: could not detect original verb.");
             } else {
-                /* emit */ redirected (this.input_stream, redirect_url, this.redirect_count);
+                signal_redirected (this.input_stream, redirect_url, this.redirect_count);
 
                 // The signal emission may have changed this value
                 if (this.follow_redirects) {

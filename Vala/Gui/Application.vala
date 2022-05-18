@@ -38,22 +38,21 @@ public class Application : GLib.Application {
 
     /***********************************************************
     ***********************************************************/
-    GLib.List<string> OPTIONS = {
-        "Options:\n",
-        "  --help, -h           : show this help screen.\n",
-        "  --version, -v        : show version information.\n",
-        "  -q --quit            : quit the running instance\n",
-        "  --logwindow, -l      : open a window to show log output.\n",
-        "  --logfile <filename> : write log output to file <filename>.\n",
-        "  --logdir <name>      : write each sync log output in a new file\n",
-        "                         in folder_connection <name>.\n",
-        "  --logexpire <hours>  : removes logs older than <hours> hours.\n",
-        "                         (to be used with --logdir)\n",
-        "  --logflush           : flush the log file after every write.\n",
-        "  --logdebug           : also output debug-level messages in the log.\n",
-        "  --confdir <dirname>  : Use the given configuration folder_connection.\n",
-        "  --background         : launch the application in the background.\n"
-    };
+    string option_list =
+        "Options:\n" +
+        "  --help, -h           : show this help screen.\n" +
+        "  --version, -v        : show version information.\n" +
+        "  -q --quit            : quit the running instance\n" +
+        "  --logwindow, -l      : open a window to show log output.\n" +
+        "  --logfile <filename> : write log output to file <filename>.\n" +
+        "  --logdir <name>      : write each sync log output in a new file\n" +
+        "                         in folder_connection <name>.\n" +
+        "  --logexpire <hours>  : removes logs older than <hours> hours.\n" +
+        "                         (to be used with --logdir)\n" +
+        "  --logflush           : flush the log file after every write.\n" +
+        "  --logdebug           : also output debug-level messages in the log.\n" +
+        "  --confdir <dirname>  : Use the given configuration folder_connection.\n" +
+        "  --background         : launch the application in the background.\n";
 
     /***********************************************************
     ***********************************************************/
@@ -240,7 +239,7 @@ public class Application : GLib.Application {
     //  #if defined (WITH_CRASHREPORTER)
         if (ConfigFile ().crash_reporter ()) {
             var reporter = CRASHREPORTER_EXECUTABLE;
-            this.crash_handler.on_signal_reset (new CrashReporter.Handler (GLib.Dir.temp_path, true, reporter));
+            this.crash_handler.reset (new CrashReporter.Handler (GLib.Dir.temp_path, true, reporter));
         }
     //  #endif
 
@@ -267,7 +266,7 @@ public class Application : GLib.Application {
             GLib.info ("VFS suffix plugin is available");
         }
 
-        this.folder_manager.on_signal_reset (new FolderManager ());
+        this.folder_manager.reset (new FolderManager ());
 
         this.signal_message_received.connect (
             this.on_signal_parse_message
@@ -397,7 +396,7 @@ public class Application : GLib.Application {
 
         stream += "File synchronisation desktop utility." + endl
             endl
-            OPTIONS;
+            option_list;
 
         if (this.theme.app_name == "own_cloud") {
             stream += endl
@@ -489,7 +488,7 @@ public class Application : GLib.Application {
                 Utility.launch_on_signal_startup (this.theme.app_name, this.theme.app_name_gui, true);
             }
 
-            Systray.instance.show_window ();
+            Systray.instance.signal_show_window ();
         }
     }
 
@@ -886,7 +885,7 @@ public class Application : GLib.Application {
 
         // Did the client version change?
         // (The client version is adjusted further down)
-        bool version_changed = config_file.client_version_string != Common.NextcloudVersion.MIRALL_VERSION_STRING;
+        bool version_changed = ConfigFile.client_version_string != Common.NextcloudVersion.MIRALL_VERSION_STRING;
 
         // We want to message the user either for destructive changes,
         // or if we're ignoring something and the client version changed.
@@ -895,7 +894,7 @@ public class Application : GLib.Application {
         if (!version_changed && !warning_message) {
             return true;
         }
-        var backup_file = config_file.create_backup ();
+        var backup_file = ConfigFile.create_backup ();
 
         if (warning_message) {
             string bold_message;
@@ -932,7 +931,7 @@ public class Application : GLib.Application {
                 settings.remove (bad_key);
         }
 
-        config_file.client_version_string (MIRALL_VERSION_STRING);
+        ConfigFile.client_version_string (MIRALL_VERSION_STRING);
         return true;
     }
 

@@ -50,7 +50,7 @@ public class PathComponents : GLib.Object {
     ***********************************************************/
     //  public PathComponents sub_components () {
     //      remove_first ();
-    //      return std.move (*this);
+    //      return std.move (this);
     //  }
 
 

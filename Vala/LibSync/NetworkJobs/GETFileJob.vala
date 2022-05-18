@@ -319,7 +319,7 @@ public class GETFileJob : AbstractNetworkJob {
 
             int64 read_bytes = this.input_stream.read (buffer, to_read);
             if (read_bytes < 0) {
-                this.error_string = network_reply_error_string (*this.input_stream);
+                this.error_string = network_reply_error_string (this.input_stream);
                 this.error_status = SyncFileItem.Status.NORMAL_ERROR;
                 GLib.warning ("Error while reading from device: " + this.error_string);
                 this.input_stream.abort ();
@@ -408,7 +408,7 @@ public class GETFileJob : AbstractNetworkJob {
         }
 
         bool ok = false;
-        this.content_length = this.input_stream.header (Soup.Request.ContentLengthHeader).to_long_long (&ok);
+        this.content_length = this.input_stream.header (Soup.Request.ContentLengthHeader).to_long_long (ok);
         if (ok && this.expected_content_length != -1 && this.content_length != this.expected_content_length) {
             GLib.warning ("We received a different content length than expected! "
                     + this.expected_content_length.to_string () + " vs " + this.content_length.to_string ());

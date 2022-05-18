@@ -336,7 +336,7 @@ public class CommandLine : GLib.Application {
                 if (host.has_prefix ("//")) {
                     host.remove (0, 2);
                 }
-                port = p_list[2].to_int (&ok);
+                port = p_list[2].to_int (ok);
                 Soup.NetworkProxyFactory.use_system_configuration (false);
                 Soup.NetworkProxy.application_proxy (Soup.NetworkProxy (Soup.NetworkProxy.HttpProxy, host, port));
             } else {
@@ -421,7 +421,7 @@ public class CommandLine : GLib.Application {
         SyncJournalDb database = new SyncJournalDb (db_path);
 
         if (!selective_sync_list.empty ()) {
-            selective_sync_fixup (&database, selective_sync_list);
+            selective_sync_fixup (database, selective_sync_list);
         }
 
         SyncOptions opt;
@@ -470,7 +470,7 @@ public class CommandLine : GLib.Application {
         Have to be done async, else, an error before exec () does
         not terminate the event loop.
         ***********************************************************/
-        GLib.Object.invoke_method (&sync_engine, "on_signal_start_sync", GLib.QueuedConnection);
+        GLib.Object.invoke_method (sync_engine, "on_signal_start_sync", GLib.QueuedConnection);
 
         int result_code = app.exec ();
 

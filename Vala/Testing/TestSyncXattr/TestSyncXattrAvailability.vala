@@ -26,9 +26,9 @@ public class TestSyncXattrAvailability : AbstractTestSyncXAttr {
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
-        set_pin ("local", PinState.PinState.ALWAYS_LOCAL);
+        set_pin ("local", PinState.ALWAYS_LOCAL);
         set_pin ("online", Common.ItemAvailability.ONLINE_ONLY);
-        set_pin ("unspec", PinState.PinState.UNSPECIFIED);
+        set_pin ("unspec", PinState.UNSPECIFIED);
 
         fake_folder.remote_modifier ().insert ("file1");
         fake_folder.remote_modifier ().insert ("online/file1");
@@ -50,19 +50,19 @@ public class TestSyncXattrAvailability : AbstractTestSyncXAttr {
         // Subitem pin states can ruin "pure" availabilities
         set_pin ("local/sub", Common.ItemAvailability.ONLINE_ONLY);
         GLib.assert_true (vfs.availability ("local") == Common.ItemAvailability.ALL_HYDRATED);
-        set_pin ("online/sub", PinState.PinState.UNSPECIFIED);
+        set_pin ("online/sub", PinState.UNSPECIFIED);
         GLib.assert_true (vfs.availability ("online") == Common.ItemAvailability.ALL_DEHYDRATED);
 
         trigger_download (fake_folder, "unspec/file1");
         set_pin ("local/file2", Common.ItemAvailability.ONLINE_ONLY);
-        set_pin ("online/file2", PinState.PinState.ALWAYS_LOCAL);
+        set_pin ("online/file2", PinState.ALWAYS_LOCAL);
         GLib.assert_true (fake_folder.sync_once ());
 
         GLib.assert_true (vfs.availability ("unspec") == Common.ItemAvailability.ALL_HYDRATED);
         GLib.assert_true (vfs.availability ("local") == Common.ItemAvailability.MIXED);
         GLib.assert_true (vfs.availability ("online") == Common.ItemAvailability.MIXED);
 
-        GLib.assert_true (vfs.set_pin_state ("local", PinState.PinState.ALWAYS_LOCAL));
+        GLib.assert_true (vfs.set_pin_state ("local", PinState.ALWAYS_LOCAL));
         GLib.assert_true (vfs.set_pin_state ("online", Common.ItemAvailability.ONLINE_ONLY));
         GLib.assert_true (fake_folder.sync_once ());
 

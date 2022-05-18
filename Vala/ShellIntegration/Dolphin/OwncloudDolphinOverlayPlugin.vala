@@ -43,7 +43,7 @@ public class OwncloudDolphinPlugin : KOverlayIconPlugin {
 
         GLib.HashTable<string, string>.iterator it = status_map.find (local_file);
         if (it != status_map.const_end ()) {
-            return  overlaysForString (*it);
+            return  overlaysForString (it);
         }
         return { };
     }
@@ -92,6 +92,6 @@ public class OwncloudDolphinPlugin : KOverlayIconPlugin {
             return;
         status = tokens[1];
 
-        /* emit */ overlaysChanged (GLib.Uri.fromLocalFile (string.fromUtf8 (name)), overlaysForString (status));
+        signal_overlays_changed (GLib.Uri.fromLocalFile (string.fromUtf8 (name)), overlaysForString (status));
     }
 }

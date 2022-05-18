@@ -113,8 +113,8 @@ public class ProxyAuthHandler : GLib.Object {
 
             // If the user explicitly configured the proxy in the
             // network settings, don't ask about it.
-            if (this.config_file.proxy_type () == Soup.NetworkProxy.HttpProxy
-                || this.config_file.proxy_type () == Soup.NetworkProxy.Socks5Proxy) {
+            if (this.ConfigFile.proxy_type () == Soup.NetworkProxy.HttpProxy
+                || this.ConfigFile.proxy_type () == Soup.NetworkProxy.Socks5Proxy) {
                 this.blocked = true;
             }
         }
@@ -149,8 +149,8 @@ public class ProxyAuthHandler : GLib.Object {
             )
         )) {
             GLib.info ("Invalidating old credentials " + key);
-            this.username == "";
-            this.password == "";
+            this.username = "";
+            this.password = "";
             invalidated = true;
             for (GLib.Object receiver in this.gave_credentials_to) {
                 this.gave_credentials_to.remove_all (receiver);
@@ -193,8 +193,8 @@ public class ProxyAuthHandler : GLib.Object {
     private ProxyAuthHandler () {
         this.dialog = new ProxyAuthDialog ();
 
-        this.config_file.on_signal_reset (new ConfigFile ());
-        this.settings.on_signal_reset (new GLib.Settings (this.config_file.config_file (), GLib.Settings.IniFormat));
+        this.ConfigFile.reset (new ConfigFile ());
+        this.settings.reset (new GLib.Settings (this.ConfigFile.config_file (), GLib.Settings.IniFormat));
         this.settings.begin_group ("Proxy");
         this.settings.begin_group ("Credentials");
     }
@@ -207,7 +207,7 @@ public class ProxyAuthHandler : GLib.Object {
     private bool creds_from_dialog () {
         // Open the credentials dialog
         if (this.waiting_for_dialog <= 0) {
-            this.dialog.on_signal_reset ();
+            this.dialog.reset ();
             this.dialog.proxy_address (this.proxy);
             this.dialog.open ();
         }
@@ -250,7 +250,7 @@ public class ProxyAuthHandler : GLib.Object {
                 return false;
             }
 
-            this.read_password_job.on_signal_reset (new ReadPasswordJob (Theme.app_name));
+            this.read_password_job.reset (new ReadPasswordJob (Theme.app_name));
             this.read_password_job.settings (this.settings);
             this.read_password_job.insecure_fallback (false);
             this.read_password_job.key (keychain_password_key ());
@@ -273,7 +273,7 @@ public class ProxyAuthHandler : GLib.Object {
             return true;
         }
 
-        this.username == "";
+        this.username = "";
         if (this.read_password_job.error != EntryNotFound) {
             GLib.warning ("ReadPasswordJob failed with " + this.read_password_job.error_string);
         }

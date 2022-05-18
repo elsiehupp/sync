@@ -61,7 +61,7 @@ public class AsyncImageResponse : GLib.QuickImageResponse {
         }
 
         if (this.image_paths.at (this.index).has_prefix (":/client")) {
-            image_and_emit_finished (Gtk.Icon (this.image_paths.at (this.index)).pixmap (this.requested_image_size).to_image ());
+            image_and_emit_finished (Gtk.IconInfo (this.image_paths.at (this.index)).pixmap (this.requested_image_size).to_image ());
             return;
         }
 

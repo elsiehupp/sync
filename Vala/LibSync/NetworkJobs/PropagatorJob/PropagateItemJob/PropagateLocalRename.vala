@@ -32,7 +32,7 @@ public class PropagateLocalRename : AbstractPropagateItemJob {
         // if the file is a file underneath a moved directory, the this.item.file is equal
         // to this.item.rename_target and the file is not moved as a result.
         if (this.item.file != this.item.rename_target) {
-            this.propagator.report_progress (*this.item, 0);
+            this.propagator.report_progress (this.item, 0);
             GLib.debug ("MOVE " + existing_file + " => " + target_file);
 
             if (string.compare (this.item.file, this.item.rename_target, GLib.CaseInsensitive) != 0
@@ -49,8 +49,8 @@ public class PropagateLocalRename : AbstractPropagateItemJob {
                 return;
             }
 
-            /* emit */ this.propagator.signal_touched_file (existing_file);
-            /* emit */ this.propagator.signal_touched_file (target_file);
+            this.propagator.signal_touched_file (existing_file);
+            this.propagator.signal_touched_file (target_file);
             string rename_error;
             if (!FileSystem.rename (existing_file, target_file, rename_error)) {
                 on_signal_done (SyncFileItem.Status.NORMAL_ERROR, rename_error);
@@ -64,14 +64,14 @@ public class PropagateLocalRename : AbstractPropagateItemJob {
 
         var vfs = this.propagator.sync_options.vfs;
         var pin_state = vfs.pin_state (this.item.original_file);
-        if (!vfs.pin_state (this.item.original_file, PinState.PinState.INHERITED)) {
+        if (!vfs.pin_state (this.item.original_file, PinState.INHERITED)) {
             GLib.warning ("Could not set pin state of " + this.item.original_file + " to inherited.");
         }
 
         var old_file = this.item.file;
 
         if (!this.item.is_directory ()) { // Directories are saved at the end
-            SyncFileItem signal_new_item = new SyncFileItem (*this.item);
+            SyncFileItem signal_new_item = new SyncFileItem (this.item);
             if (old_record.is_valid) {
                 signal_new_item.checksum_header = old_record.checksum_header;
             }
@@ -79,7 +79,7 @@ public class PropagateLocalRename : AbstractPropagateItemJob {
             if (!result) {
                 on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error));
                 return;
-            } else if (*result == AbstractVfs.ConvertToPlaceholderResult.Locked) {
+            } else if (result == AbstractVfs.ConvertToPlaceholderResult.Locked) {
                 on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").printf (signal_new_item.file));
                 return;
             }
@@ -90,8 +90,8 @@ public class PropagateLocalRename : AbstractPropagateItemJob {
                 return;
             }
         }
-        if (pin_state && *pin_state != PinState.PinState.INHERITED
-            && !vfs.pin_state (this.item.rename_target, *pin_state)) {
+        if (pin_state && *pin_state != PinState.INHERITED
+            && !vfs.pin_state (this.item.rename_target, pin_state)) {
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Error setting pin state"));
             return;
         }

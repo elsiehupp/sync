@@ -37,8 +37,8 @@ public class TestFetchMoreClicked : AbstractTestUnifiedSearchListmodel {
 
         // test fetch more results
         GLib.SignalSpy current_fetch_more_in_progress_provider_id_changed = new GLib.SignalSpy (
-            model, &UnifiedSearchResultsListModel.current_fetch_more_in_progress_provider_id_changed);
-        GLib.SignalSpy rows_inserted = new GLib.SignalSpy (model, &UnifiedSearchResultsListModel.rows_inserted);
+            model, UnifiedSearchResultsListModel.current_fetch_more_in_progress_provider_id_changed);
+        GLib.SignalSpy rows_inserted = new GLib.SignalSpy (model, UnifiedSearchResultsListModel.rows_inserted);
         for (int i = 0; i < model.row_count (); ++i) {
             var type = model.data (model.index (i), UnifiedSearchResultsListModel.DataRole.TypeRole);
 
@@ -78,10 +78,10 @@ public class TestFetchMoreClicked : AbstractTestUnifiedSearchListmodel {
 
         // make sure the FetchMoreTrigger gets removed when no more results available
         if (!provider_id_fetch_more_triggered == "") {
-            current_fetch_more_in_progress_provider_id_changed == "";
-            rows_inserted == "";
+            current_fetch_more_in_progress_provider_id_changed = "";
+            rows_inserted = "";
 
-            GLib.SignalSpy rows_removed = new GLib.SignalSpy (model, &UnifiedSearchResultsListModel.rows_removed);
+            GLib.SignalSpy rows_removed = new GLib.SignalSpy (model, UnifiedSearchResultsListModel.rows_removed);
 
             for (int i = 0; i < 10; ++i) {
                 model.fetch_more_trigger_clicked (provider_id_fetch_more_triggered);

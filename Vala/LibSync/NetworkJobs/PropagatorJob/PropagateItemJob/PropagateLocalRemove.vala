@@ -62,7 +62,7 @@ public class PropagateLocalRemove : AbstractPropagateItemJob {
                 }
             }
         }
-        this.propagator.report_progress (*this.item, 0);
+        this.propagator.report_progress (this.item, 0);
         this.propagator.journal.delete_file_record (this.item.original_file, this.item.is_directory ());
         this.propagator.journal.commit ("Local remove");
         on_signal_done (SyncFileItem.Status.SUCCESS);
@@ -75,7 +75,7 @@ public class PropagateLocalRemove : AbstractPropagateItemJob {
     in the database.  But in case of error, we need to remove the entries from the database of the files
     that were deleted.
 
-    \a path is relative to this.propagator.local_dir + this.item.file and should start with a slash
+    \a path is relative to this.propagator.local_directory + this.item.file and should start with a slash
     ***********************************************************/
     private bool remove_recursively (string path) {
         string absolute = this.propagator.full_local_path (this.item.file + path);

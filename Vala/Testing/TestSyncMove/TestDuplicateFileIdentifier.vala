@@ -65,7 +65,7 @@ public class TestDuplicateFileIdentifier : AbstractTestSyncMove {
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         GLib.assert_true (counter.number_of_get == 1);
-        counter.on_signal_reset ();
+        counter.reset ();
 
         // remove localy, and remote move at the same time
         fake_folder.local_modifier.remove ("A/Q/W/a1m");
@@ -74,7 +74,7 @@ public class TestDuplicateFileIdentifier : AbstractTestSyncMove {
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         GLib.assert_true (counter.number_of_get == 1);
-        counter.on_signal_reset ();
+        counter.reset ();
     }
 
 } // class TestDuplicateFileIdentifier

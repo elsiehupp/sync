@@ -22,7 +22,7 @@ public class TestResumeServerDeletedChunks : AbstractTestChunkingNg {
         var chunking_identifier = fake_folder.upload_state ().children.nth_data (0).name;
 
         // Delete the chunks on the server
-        fake_folder.upload_state ().children == "";
+        fake_folder.upload_state ().children = "";
         GLib.assert_true (fake_folder.sync_once ());
 
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());

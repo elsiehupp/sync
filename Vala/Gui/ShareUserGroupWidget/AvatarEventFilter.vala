@@ -27,7 +27,7 @@ public class AvatarEventFilter : GLib.Object {
             if (!context_menu_event) {
                 return false;
             }
-            /* emit */ context_menu (context_menu_event.global_pos ());
+            signal_context_menu (context_menu_event.global_pos ());
             return true;
         }
         return GLib.Object.event_filter (object, event);

@@ -79,15 +79,15 @@ public class VfsSuffix : Common.AbstractVfs {
         }
 
         // The concrete shape of the placeholder is also used in is_dehydrated_placeholder () below
-        string fn = this.setup_params.filesystem_path + item.file;
-        if (!fn.has_suffix (file_suffix ())) {
+        string filename = this.setup_params.filesystem_path + item.file;
+        if (!filename.has_suffix (file_suffix ())) {
             //  GLib.assert_true (false, "vfs file isn't ending with suffix");
             return "vfs file isn't ending with suffix";
         }
 
-        GLib.File file = GLib.File.new_for_path (fn);
+        GLib.File file = GLib.File.new_for_path (filename);
         if (file.exists () && file.size () > 1
-            && !FileSystem.verify_file_unchanged (fn, item.size, item.modtime)) {
+            && !FileSystem.verify_file_unchanged (filename, item.size, item.modtime)) {
             return "Cannot create a placeholder because a file with the placeholder name already exist";
         }
 
@@ -96,7 +96,7 @@ public class VfsSuffix : Common.AbstractVfs {
 
         file.write (" ");
         file.close ();
-        FileSystem.mod_time (fn, item.modtime);
+        FileSystem.mod_time (filename, item.modtime);
         return {};
     }
 
@@ -116,15 +116,15 @@ public class VfsSuffix : Common.AbstractVfs {
 
         // Move the item's pin state
         var pin = this.setup_params.journal.internal_pin_states.raw_for_path (item.file.to_utf8 ());
-        if (pin && *pin != PinState.PinState.INHERITED) {
-            pin_state (item.rename_target, *pin);
-            pin_state (item.file, PinState.PinState.INHERITED);
+        if (pin && *pin != PinState.INHERITED) {
+            pin_state (item.rename_target, pin);
+            pin_state (item.file, PinState.INHERITED);
         }
 
         // Ensure the pin state isn't contradictory
         pin = pin_state (item.rename_target);
-        if (pin && *pin == PinState.PinState.ALWAYS_LOCAL)
-            pin_state (item.rename_target, PinState.PinState.UNSPECIFIED);
+        if (pin && *pin == PinState.ALWAYS_LOCAL)
+            pin_state (item.rename_target, PinState.UNSPECIFIED);
         return {};
     }
 

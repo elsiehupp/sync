@@ -5,7 +5,6 @@
 ***********************************************************/
 
 //  #include <GLib.DialogButtonBox>
-//  #include <GLib.VBoxLayout>
 //  #include <GLib.TreeWidget>
 //  #include <qpushbutton.h>
 //  #include <GLib.FileIconProvider>
@@ -13,7 +12,6 @@
 //  #include <GLib.Settings>
 //  #include <GLib.ScopedValueRollback>
 //  #include <GLib.TreeWidgetItem>
-//  #include <GLib.VBoxLayout>
 
 //  #include <Gtk.Dialog>
 //  #include <GLib.TreeWidget>
@@ -45,7 +43,7 @@ public class SelectiveSyncDialog : Gtk.Dialog {
         this.ok_button = null; // defined in on_signal_init ()
         bool ok = false;
         on_signal_init (account);
-        GLib.List<string> selective_sync_list = this.folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
+        GLib.List<string> selective_sync_list = this.folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
         if (ok) {
             this.selective_sync.folder_info (this.folder_connection.remote_path, this.folder_connection.alias (), selective_sync_list);
         } else {
@@ -74,12 +72,12 @@ public class SelectiveSyncDialog : Gtk.Dialog {
     public override void on_signal_accept () {
         if (this.folder_connection != null) {
             bool ok = false;
-            var old_block_list_set = this.folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok).to_set ();
+            var old_block_list_set = this.folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok).to_set ();
             if (!ok) {
                 return;
             }
             GLib.List<string> block_list = this.selective_sync.create_block_list ();
-            this.folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
+            this.folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
 
             FolderManager folder_man = FolderManager.instance;
             if (this.folder_connection.is_busy ()) {
@@ -91,7 +89,7 @@ public class SelectiveSyncDialog : Gtk.Dialog {
             var block_list_set = block_list.to_set ();
             var changes = (old_block_list_set - block_list_set) + (block_list_set - old_block_list_set);
             foreach (var it in changes) {
-                this.folder_connection.journal_database ().schedule_path_for_remote_discovery (it);
+                this.folder_connection.journal_database.schedule_path_for_remote_discovery (it);
                 this.folder_connection.on_signal_schedule_path_for_local_discovery (it);
             }
 
@@ -127,7 +125,8 @@ public class SelectiveSyncDialog : Gtk.Dialog {
     ***********************************************************/
     private void on_signal_init (unowned Account account) {
         window_title (_("Choose What to Sync"));
-        var layout = new GLib.VBoxLayout (this);
+        var layout = new Gtk.Box (Gtk.Orientation.VERTICAL);
+
         this.selective_sync = new SelectiveSyncWidget (account, this);
         layout.add_widget (this.selective_sync);
         var button_box = new GLib.DialogButtonBox (GLib.Horizontal);

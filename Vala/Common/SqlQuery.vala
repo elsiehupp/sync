@@ -151,7 +151,7 @@ public class SqlQuery : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string byte_array_value (int index) {
-        return string (
+        return (string)(
             (char)this.sqlite_statement.column_blob (index),
             this.sqlite_statement.column_bytes (index)
         );

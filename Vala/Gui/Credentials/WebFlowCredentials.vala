@@ -6,7 +6,6 @@
 //  #include <Soup.Context>
 //  #include <GLib.Pointe
 //  #include <Gtk.Dialog>
-//  #include <GLib.VBoxLayout>
 
 //  #ifdef WITH_WEBENGINE
 //  #endif // WITH_WEBENGINE
@@ -107,7 +106,7 @@ public class WebFlowCredentials : AbstractCredentials {
         fetch_user ();
 
         if (ready ()) {
-            /* emit */ fetched ();
+            signal_fetched ();
         } else {
             GLib.info ("Fetching from keychain!");
             fetch_from_keychain_helper ();
@@ -285,7 +284,7 @@ public class WebFlowCredentials : AbstractCredentials {
     private void on_signal_ask_from_user_cancelled () {
         GLib.debug ("User cancelled reauth!");
 
-        /* emit */ asked ();
+        signal_asked ();
 
         this.ask_dialog.delete_later ();
         this.ask_dialog = null;
@@ -335,13 +334,13 @@ public class WebFlowCredentials : AbstractCredentials {
             if (this.client_ssl_key == null) {
                 GLib.warning ("Could not load SSL key into Qt!");
             }
-            client_key_pem == "";
+            client_key_pem = "";
         } else {
             GLib.warning ("Unable to read client key " + read_job.error_string);
         }
 
         // Start fetching client CA certificates
-        this.client_ssl_ca_certificates == "";
+        this.client_ssl_ca_certificates = "";
 
         read_single_client_ca_cert_pem ();
     }
@@ -413,7 +412,7 @@ public class WebFlowCredentials : AbstractCredentials {
         } else {
             this.ready = false;
         }
-        /* emit */ fetched ();
+        signal_fetched ();
 
         // If keychain data was read from legacy location, wipe these entries and store new ones
         if (this.keychain_migration && this.ready) {
@@ -452,7 +451,7 @@ public class WebFlowCredentials : AbstractCredentials {
     ***********************************************************/
     private void on_signal_write_client_key_pem_job_done (KeychainChunkWriteJob write_job) {
         //  Q_UNUSED (write_job)
-        this.client_ssl_ca_certificates_write_queue == "";
+        this.client_ssl_ca_certificates_write_queue = "";
 
         // write ca certificates if there are any
         if (!this.client_ssl_ca_certificates == "") {
@@ -552,7 +551,7 @@ public class WebFlowCredentials : AbstractCredentials {
             if (index > (this.client_ssl_ca_certificates_max_count - 1)) {
                 GLib.warning ("Maximum client CA cert count exceeded while writing slot " + index.to_string () + " cutting off after " + this.client_ssl_ca_certificates_max_count.to_string () + " certificates.");
 
-                this.client_ssl_ca_certificates_write_queue == "";
+                this.client_ssl_ca_certificates_write_queue = "";
 
                 on_signal_write_client_ca_certificates_pem_job_done (null);
                 return;
@@ -695,7 +694,7 @@ public class WebFlowCredentials : AbstractCredentials {
         this.ready = true;
         this.credentials_valid = true;
         persist ();
-        /* emit */ asked ();
+        signal_asked ();
 
         this.ask_dialog.close ();
         this.ask_dialog.delete_later ();

@@ -49,7 +49,7 @@ public class WebViewPageUrlSchemeHandler : GLib.WebEngineUrlSchemeHandler {
         }
         GLib.info ("Got user: " + user + ", server: " + server);
 
-        /* emit */ url_catched (user, password, server);
+        signal_url_caught (user, password, server);
     }
 
 } // class WebViewPageUrlSchemeHandler

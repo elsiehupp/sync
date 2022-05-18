@@ -128,10 +128,10 @@ public class OwncloudGui : GLib.Object {
         LibSync.Logger.instance.signal_gui_log.connect (
             this.on_signal_show_tray_message
         );
-        LibSync.Logger.instance.optional_gui_log.connect (
+        LibSync.Logger.instance.signal_optional_gui_log.connect (
             this.on_signal_show_optional_tray_message
         );
-        LibSync.Logger.instance.gui_message.connect (
+        LibSync.Logger.instance.signal_gui_message.connect (
             this.on_signal_show_gui_message
         );
     }
@@ -294,7 +294,7 @@ public class OwncloudGui : GLib.Object {
             icon_status = LibSync.SyncResult.Status.PROBLEM;
         }
 
-        Gtk.Icon status_icon = Theme.sync_state_icon (icon_status, true);
+        Gtk.IconInfo status_icon = Theme.sync_state_icon (icon_status, true);
         this.tray.icon (status_icon);
 
         // create the tray blob message, check if we have an defined state
@@ -488,7 +488,7 @@ public class OwncloudGui : GLib.Object {
                 if (AccountManager.instance.accounts == null) {
                     this.on_signal_open_settings_dialog ();
                 } else {
-                    this.tray.show_window ();
+                    this.tray.signal_show_window ();
                 }
 
             }
@@ -610,7 +610,7 @@ public class OwncloudGui : GLib.Object {
     ***********************************************************/
     public void on_signal_open_main_dialog () {
         if (!this.tray.is_open) {
-            this.tray.show_window ();
+            this.tray.signal_show_window ();
         }
     }
 
@@ -677,7 +677,7 @@ public class OwncloudGui : GLib.Object {
         SyncJournalFileRecord file_record;
 
         bool resharing_allowed = true; // lets assume the good
-        if (folder_connection.journal_database ().file_record (file, file_record) && file_record.is_valid) {
+        if (folder_connection.journal_database.file_record (file, file_record) && file_record.is_valid) {
             // check the permission : Is resharing allowed?
             if (!file_record.remote_permissions == null && !file_record.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_RESHARE)) {
                 resharing_allowed = false;
@@ -746,7 +746,7 @@ public class OwncloudGui : GLib.Object {
         var list = AccountManager.instance.accounts;
         var account = (AccountState) sender ().property (PROPERTY_ACCOUNT_C);
         if (account) {
-            list == "";
+            list = "";
             list.append (account);
         }
 

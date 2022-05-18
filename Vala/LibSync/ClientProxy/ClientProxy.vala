@@ -40,7 +40,7 @@ public class ClientProxy : GLib.Object {
     ***********************************************************/
     public void lookup_system_proxy_async (GLib.Uri url, GLib.Object destination, DestinationDelegate destination_delegate) {
         SystemProxyRunnable system_proxy_runnable = new SystemProxyRunnable (url);
-        system_proxy_runnable.system_proxy_looked_up.connect (
+        system_proxy_runnable.signal_system_proxy_looked_up.connect (
             destination.destination_delegate
         );
         GLib.ThreadPool.global_instance.start (system_proxy_runnable); // takes ownership and deletes

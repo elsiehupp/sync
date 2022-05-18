@@ -25,9 +25,9 @@ public class TestSyncVirtualFilesAvailability : AbstractTestSyncVirtualFiles {
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
-        TestSyncVirtualFiles.set_pin ("local", PinState.PinState.ALWAYS_LOCAL);
+        TestSyncVirtualFiles.set_pin ("local", PinState.ALWAYS_LOCAL);
         TestSyncVirtualFiles.set_pin ("online", Common.ItemAvailability.ONLINE_ONLY);
-        TestSyncVirtualFiles.set_pin ("unspec", PinState.PinState.UNSPECIFIED);
+        TestSyncVirtualFiles.set_pin ("unspec", PinState.UNSPECIFIED);
 
         fake_folder.remote_modifier ().insert ("file1");
         fake_folder.remote_modifier ().insert ("online/file1");
@@ -49,19 +49,19 @@ public class TestSyncVirtualFilesAvailability : AbstractTestSyncVirtualFiles {
         // Subitem pin states can ruin "pure" availabilities
         TestSyncVirtualFiles.set_pin ("local/sub", Common.ItemAvailability.ONLINE_ONLY);
         GLib.assert_true (vfs.availability ("local") == Common.ItemAvailability.ALL_HYDRATED);
-        TestSyncVirtualFiles.set_pin ("online/sub", PinState.PinState.UNSPECIFIED);
+        TestSyncVirtualFiles.set_pin ("online/sub", PinState.UNSPECIFIED);
         GLib.assert_true (vfs.availability ("online") == Common.ItemAvailability.ALL_DEHYDRATED);
 
         trigger_download (fake_folder, "unspec/file1");
         TestSyncVirtualFiles.set_pin ("local/file2", Common.ItemAvailability.ONLINE_ONLY);
-        TestSyncVirtualFiles.set_pin ("online/file2" + DVSUFFIX, PinState.PinState.ALWAYS_LOCAL);
+        TestSyncVirtualFiles.set_pin ("online/file2" + DVSUFFIX, PinState.ALWAYS_LOCAL);
         GLib.assert_true (fake_folder.sync_once ());
 
         GLib.assert_true (vfs.availability ("unspec") == Common.ItemAvailability.ALL_HYDRATED);
         GLib.assert_true (vfs.availability ("local") == Common.ItemAvailability.MIXED);
         GLib.assert_true (vfs.availability ("online") == Common.ItemAvailability.MIXED);
 
-        GLib.assert_true (vfs.set_pin_state ("local", PinState.PinState.ALWAYS_LOCAL));
+        GLib.assert_true (vfs.set_pin_state ("local", PinState.ALWAYS_LOCAL));
         GLib.assert_true (vfs.set_pin_state ("online", Common.ItemAvailability.ONLINE_ONLY));
         GLib.assert_true (fake_folder.sync_once ());
 

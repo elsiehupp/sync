@@ -76,7 +76,7 @@ public class GetOrCreatePublicLinkShare : GLib.Object {
 
         // otherwise create a new one
         GLib.debug ("Creating new share";
-        this.share_manager.create_link_share (this.local_file, share_name, "");
+        this.share_manager.signal_create_link_share (this.local_file, share_name, "");
     }
 
 
@@ -95,7 +95,7 @@ public class GetOrCreatePublicLinkShare : GLib.Object {
         string password = GLib.InputDialog.text (null,
                                                  _("Password for share required"),
                                                  _("Please enter a password for your link share:"),
-                                                 GLib.LineEdit.Normal,
+                                                 Gtk.LineEdit.Normal,
                                                  "",
                                                  ok);
 
@@ -105,7 +105,7 @@ public class GetOrCreatePublicLinkShare : GLib.Object {
         }
 
         // Try to create the link share again with the newly entered password
-        this.share_manager.create_link_share (this.local_file, "", password);
+        this.share_manager.signal_create_link_share (this.local_file, "", password);
     }
 
 
@@ -136,7 +136,7 @@ public class GetOrCreatePublicLinkShare : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_success (string link) {
-        /* emit */ done (link);
+        signal_done (link);
         delete_later ();
     }
 

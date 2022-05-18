@@ -38,11 +38,11 @@ public class TestRenameError : AbstractTestSyncFileStatusTracker {
         GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusWarning);
         GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusUpToDate);
         GLib.assert_true (status_spy.status_of ("B/b1m") == SyncFileStatus.StatusUpToDate);
-        status_spy == "";
+        status_spy = "";
 
         GLib.assert_true (!fake_folder.sync_once ());
         verify_that_push_matches_pull (fake_folder, status_spy);
-        status_spy == "";
+        status_spy = "";
         GLib.assert_true (!fake_folder.sync_once ());
         verify_that_push_matches_pull (fake_folder, status_spy);
         GLib.assert_true (status_spy.status_of ("A/a1m") == SyncFileStatus.StatusError);
@@ -51,7 +51,7 @@ public class TestRenameError : AbstractTestSyncFileStatusTracker {
         GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusWarning);
         GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusNone);
         GLib.assert_true (status_spy.status_of ("B/b1m") == SyncFileStatus.StatusNone);
-        status_spy == "";
+        status_spy = "";
     }
 
 } // class TestRenameError

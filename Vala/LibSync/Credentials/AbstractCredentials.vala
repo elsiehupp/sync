@@ -82,7 +82,7 @@ public abstract class AbstractCredentials : GLib.Object {
     Trigger (async) fetching of credential information
 
     Should set this.was_fetched = true, and later emit
-    fetched () when done.
+    signal_fetched () when done.
     ***********************************************************/
     public abstract void fetch_from_keychain ();
 
@@ -90,7 +90,7 @@ public abstract class AbstractCredentials : GLib.Object {
     /***********************************************************
     Ask credentials from the user (typically async)
 
-    Should emit asked () when done.
+    Should emit signal_asked () when done.
     ***********************************************************/
     public abstract void ask_from_user ();
 

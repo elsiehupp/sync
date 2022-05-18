@@ -23,7 +23,7 @@ public class FolderWizardSelectiveSync : GLib.WizardPage {
     /***********************************************************
     ***********************************************************/
     public FolderWizardSelectiveSync (Account account) {
-        var layout = new GLib.VBoxLayout (this);
+        var layout = new Gtk.Box (Gtk.Orientation.VERTICAL);
         this.selective_sync = new SelectiveSyncWidget (account, this);
         layout.add_widget (this.selective_sync);
 

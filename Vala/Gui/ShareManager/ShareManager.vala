@@ -37,7 +37,7 @@ public class ShareManager : GLib.Object {
 
     @param message the error message reported by the server
 
-    See create_link_share ().
+    See signal_create_link_share ().
     ***********************************************************/
     internal signal void signal_link_share_requires_password (string message);
 
@@ -62,7 +62,7 @@ public class ShareManager : GLib.Object {
     For older server the on_signal_link_share_requires_password signal is emitted when it seems appropiate
     In case of a server error the on_signal_server_error signal is emitted
     ***********************************************************/
-    public void create_link_share (
+    public void signal_create_link_share (
         string path,
         string name,
         string password) {
@@ -73,7 +73,7 @@ public class ShareManager : GLib.Object {
         create_link_share_job.signal_error.connect (
             this.on_signal_ocs_share_job_error
         );
-        create_link_share_job.create_link_share (path, name, password);
+        create_link_share_job.signal_create_link_share (path, name, password);
     }
 
 
@@ -189,7 +189,7 @@ public class ShareManager : GLib.Object {
         }
 
         GLib.debug ("Sending " + shares.length.to_string () + " shares.");
-        /* emit */ shares_fetched (shares);
+        signal_shares_fetched (shares);
     }
 
 
@@ -205,7 +205,7 @@ public class ShareManager : GLib.Object {
         meant that a share was password protected
         ***********************************************************/
         if (code == 403) {
-            /* emit */ link_share_requires_password (message);
+            signal_link_share_requires_password (message);
             return;
         }
 
@@ -213,7 +213,7 @@ public class ShareManager : GLib.Object {
         var data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
         unowned LinkShare share = new LinkShare (parse_link_share (data));
 
-        /* emit */ link_share_created (share);
+        signal_link_share_created (share);
 
         update_folder (this.account, share.path);
     }
@@ -235,7 +235,7 @@ public class ShareManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_ocs_share_job_error (int status_code, string message) {
-        /* emit */ server_error (status_code, message);
+        signal_server_error (status_code, message);
     }
 
 
@@ -357,7 +357,7 @@ public class ShareManager : GLib.Object {
                 // Workaround the fact that the server does not invalidate the etags of parent directories
                 // when something is shared.
                 var relative = path.mid_ref (folder_connection.remote_path_trailing_slash.length);
-                folder_connection.journal_database ().schedule_path_for_remote_discovery (relative.to_string ());
+                folder_connection.journal_database.schedule_path_for_remote_discovery (relative.to_string ());
 
                 // Schedule a sync so it can update the remote permission flag and let the socket API
                 // know about the shared icon.

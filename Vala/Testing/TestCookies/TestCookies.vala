@@ -17,8 +17,10 @@ public class TestCookies : GLib.Object {
         GLib.NetworkCookie cookie_a = new GLib.NetworkCookie ("foo", "bar");
         // tomorrow rounded
         cookie_a.set_expiration_date (GLib.DateTime.current_date_time_utc ().add_days (1).date ().start_of_day ());
-        GLib.List<GLib.NetworkCookie> cookies = {cookie_a, GLib.NetworkCookie ("foo2", "bar")};
-        CookieJar jar;
+        GLib.List<GLib.NetworkCookie> cookies = new GLib.List<GLib.NetworkCookie> ();
+        cookies.append (cookie_a);
+        cookies.append (GLib.NetworkCookie ("foo2", "bar"));
+        Soup.CookieJar jar;
         jar.set_all_cookies (cookies);
         GLib.assert_true (cookies == jar.all_cookies ());
         GLib.assert_true (jar.save (temporary.file_path ("test.db")));

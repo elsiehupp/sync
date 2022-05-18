@@ -51,7 +51,7 @@ public class FolderStatusDelegate : GLib.StyledItemDelegate {
 
     /***********************************************************
     ***********************************************************/
-    private Gtk.Icon icon_more;
+    private Gtk.IconInfo icon_more;
 
 
     /***********************************************************
@@ -108,7 +108,7 @@ public class FolderStatusDelegate : GLib.StyledItemDelegate {
         }
         painter.save ();
 
-        var status_icon = (Gtk.Icon)index.data (DataRole.FOLDER_STATUS_ICON_ROLE);
+        var status_icon = (Gtk.IconInfo)index.data (DataRole.FOLDER_STATUS_ICON_ROLE);
         var alias_text = (string)index.data (DataRole.HEADER_ROLE);
         var path_text = (string)index.data (DataRole.FOLDER_PATH_ROLE);
         var remote_path = (string)index.data (DataRole.FOLDER_SECOND_PATH_ROLE);
@@ -157,7 +157,7 @@ public class FolderStatusDelegate : GLib.StyledItemDelegate {
 
         var options_button_visual_rect = options_button_rect (option.rect, option.direction);
 
-        Gdk.Pixbuf pm = status_icon.pixmap (icon_size, icon_size, sync_enabled ? Gtk.Icon.Normal : Gtk.Icon.Disabled);
+        Gdk.Pixbuf pm = status_icon.pixmap (icon_size, icon_size, sync_enabled ? Gtk.IconInfo.Normal : Gtk.IconInfo.Disabled);
         painter.draw_pixmap (GLib.Style.visual_rect (option.direction, option.rect, icon_rect).left (),
             icon_rect.top (), pm);
 
@@ -170,8 +170,8 @@ public class FolderStatusDelegate : GLib.StyledItemDelegate {
             warn_rect.width (16);
             warn_rect.height (16);
 
-            Gtk.Icon warn_icon = new Gtk.Icon (":/client/theme/warning");
-            Gdk.Pixbuf pm = warn_icon.pixmap (16, 16, sync_enabled ? Gtk.Icon.Normal : Gtk.Icon.Disabled);
+            Gtk.IconInfo warn_icon = new Gtk.IconInfo (":/client/theme/warning");
+            Gdk.Pixbuf pm = warn_icon.pixmap (16, 16, sync_enabled ? Gtk.IconInfo.Normal : Gtk.IconInfo.Disabled);
             warn_rect = GLib.Style.visual_rect (option.direction, option.rect, warn_rect);
             painter.draw_pixmap (GLib.Point (warn_rect.left (), warn_rect.top ()), pm);
         }
@@ -202,7 +202,7 @@ public class FolderStatusDelegate : GLib.StyledItemDelegate {
         painter.font (alias_font);
         painter.draw_text (GLib.Style.visual_rect (option.direction, option.rect, alias_rect), text_align, elided_alias);
 
-        bool show_progess = !overall_string == "" || !item_string == "";
+        bool show_progess = !overall_string == "" || !item_string = "";
         if (!show_progess) {
             painter.font (sub_font);
             string elided_remote_path_text = sub_font_metrics.elided_text (

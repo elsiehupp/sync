@@ -50,8 +50,8 @@ public class TestCSyncIsWindowsReservedWord : AbstractTestCSyncExclude {
 
     /***********************************************************
     ***********************************************************/
-    private static bool csync_is_windows_reserved_word (string fn) {
-        string s = fn;
+    private static bool csync_is_windows_reserved_word (string filename) {
+        string s = filename;
         //  extern bool csync_is_windows_reserved_word (/* GLib.StringRef */ string filename);
         return csync_is_windows_reserved_word (s);
     }

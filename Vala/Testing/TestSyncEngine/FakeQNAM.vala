@@ -62,7 +62,7 @@ public class FakeQNAM : Soup {
         ReplyFunction reply_function) {
         var full_reply = new Json.Object ();
         var put_payload = outgoing_data.peek (outgoing_data.bytes_available ());
-        outgoing_data.on_signal_reset ();
+        outgoing_data.reset ();
         string string_put_payload = put_payload;
         int boundary_position = "multipart/related; boundary=".length;
         string boundary_value = "--" + content_type.mid (boundary_position, content_type.length - boundary_position - 1) + "\r\n";

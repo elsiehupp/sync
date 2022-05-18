@@ -10,7 +10,7 @@ public class TestClearDoesContainNotificationClearNotifications : GLib.Object {
         Gui.NotificationCache.Notification notification = new Gui.NotificationCache.Notification ("Title", "message");
 
         notification_cache.insert (notification);
-        notification_cache == "";
+        notification_cache = "";
 
         GLib.assert_true (!notification_cache.contains (notification));
     }

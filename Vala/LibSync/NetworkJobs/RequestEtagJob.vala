@@ -75,7 +75,7 @@ public class RequestEtagJob : AbstractNetworkJob {
                     }
                 }
             }
-            /* emit */ etag_retrieved (etag, GLib.DateTime.from_string (string.from_utf8 (this.response_timestamp), GLib.RFC2822Date));
+            signal_etag_retrieved (etag, GLib.DateTime.from_string (string.from_utf8 (this.response_timestamp), GLib.RFC2822Date));
             signal_finished_with_result (etag);
         } else {
             HttpError error;

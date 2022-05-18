@@ -104,7 +104,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
         this.propagator.journal.get_file_record (parent_path, parent_rec);
 
         var account = this.propagator.account;
-        if (!account.capabilities.client_side_encryption_available () ||
+        if (!account.capabilities.client_side_encryption_available ||
             !parent_rec.is_valid ||
             !parent_rec.is_e2e_encrypted) {
             start_after_is_encrypted_is_checked ();
@@ -185,7 +185,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
 
             // Apply the server mtime locally if necessary, ensuring the journal
             // and local mtimes end up identical
-            var fn = this.propagator.full_local_path (this.item.file);
+            var filename = this.propagator.full_local_path (this.item.file);
             GLib.assert (this.item.modtime > 0);
             if (this.item.modtime <= 0) {
                 GLib.warning ("invalid modified time" + this.item.file.to_string () + this.item.modtime.to_string ());
@@ -193,10 +193,10 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             }
             if (this.item.modtime != this.item.previous_modtime) {
                 GLib.assert (this.item.modtime > 0);
-                FileSystem.mod_time (fn, this.item.modtime);
-                /* emit */ this.propagator.signal_touched_file (fn);
+                FileSystem.mod_time (filename, this.item.modtime);
+                this.propagator.signal_touched_file (filename);
             }
-            this.item.modtime = FileSystem.get_mod_time (fn);
+            this.item.modtime = FileSystem.get_mod_time (filename);
             GLib.assert (this.item.modtime > 0);
             if (this.item.modtime <= 0) {
                 GLib.warning ("Invalid modified time " + this.item.file.to_string () + this.item.modtime.to_string ());
@@ -222,7 +222,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             return;
         }
 
-        this.propagator.report_progress (*this.item, 0);
+        this.propagator.report_progress (this.item, 0);
 
         string temporary_filename;
         string expected_etag_for_resume;
@@ -269,7 +269,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
                 // these detail errors only in the error view.
                 on_signal_done (SyncFileItem.Status.DETAIL_ERROR,
                     _("The download would reduce free local disk space below the limit"));
-                /* emit */ this.propagator.signal_insufficient_local_storage ();
+                this.propagator.signal_insufficient_local_storage ();
             } else if (disk_space_result == OwncloudPropagator.DiskSpaceResult.CRITICAL) {
                 on_signal_done (SyncFileItem.Status.FATAL_ERROR,
                     _("Free space on disk is less than %1").printf (Utility.octets_to_string (critical_free_space_limit ())));
@@ -368,7 +368,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             if (this.item.direct_download_url != "" && err != GLib.InputStream.OperationCanceledError) {
                 // If this was with a direct download, retry without direct download
                 GLib.warning ("Direct download of" + this.item.direct_download_url + " failed. Retrying through owncloud.");
-                this.item.direct_download_url == "";
+                this.item.direct_download_url = "";
                 start ();
                 return;
             }
@@ -395,7 +395,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             }
 
             string error_body;
-            string error_string = this.item.http_error_code >= 400 ? get_file_job.error_string_parsing_body (&error_body)
+            string error_string = this.item.http_error_code >= 400 ? get_file_job.error_string_parsing_body (error_body)
                                                             : get_file_job.error_string;
             SyncFileItem.Status status = get_file_job.error_status;
             if (status == SyncFileItem.Status.NO_STATUS) {
@@ -433,7 +433,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
         ***********************************************************/
         string size_header = "Content-Length";
         int64 body_size = get_file_job.input_stream.raw_header (size_header).to_long_long ();
-        bool has_size_header = !get_file_job.input_stream.raw_header (size_header) == "";
+        bool has_size_header = !get_file_job.input_stream.raw_header (size_header) = "";
 
         // Qt removes the content-length header for transparently decompressed HTTP1 replies
         // but not for HTTP2 or SPDY replies. For these it remains and contains the size
@@ -556,7 +556,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
     ***********************************************************/
     private void on_signal_download_finished () {
         //  GLib.assert_true (!this.temporary_file.is_open);
-        string fn = this.propagator.full_local_path (this.item.file);
+        string filename = this.propagator.full_local_path (this.item.file);
 
         // In case of file name clash, report an error
         // This can happen if another parallel download saved a clashing file.
@@ -588,17 +588,17 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             GLib.warning ("Invalid modified time: " + this.item.file.to_string () + this.item.modtime.to_string ());
         }
 
-        bool previous_file_exists = FileSystem.file_exists (fn);
+        bool previous_file_exists = FileSystem.file_exists (filename);
         if (previous_file_exists) {
             // Preserve the existing file permissions.
-            GLib.FileInfo existing_file = GLib.File.new_for_path (fn);
+            GLib.FileInfo existing_file = GLib.File.new_for_path (filename);
             if (existing_file.permissions () != this.temporary_file.permissions ()) {
                 this.temporary_file.permissions (existing_file.permissions ());
             }
             preserve_group_ownership (this.temporary_file.filename (), existing_file);
 
             // Make the file a hydrated placeholder if possible
-            var result = this.propagator.sync_options.vfs.convert_to_placeholder (this.temporary_file.filename (), this.item, fn);
+            var result = this.propagator.sync_options.vfs.convert_to_placeholder (this.temporary_file.filename (), this.item, filename);
             if (!result) {
                 on_signal_done (SyncFileItem.Status.NORMAL_ERROR, result.error);
                 return;
@@ -609,7 +609,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
         FileSystem.file_read_only_weak (this.temporary_file.filename (), !this.item.remote_permissions == null && !this.item.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_WRITE));
 
         bool is_conflict = this.item.instruction == CSync.SyncInstructions.CONFLICT
-            && (GLib.File.new_for_path (fn).query_info ().get_file_type () == FileType.DIRECTORY || !FileSystem.file_equals (fn, this.temporary_file.filename ()));
+            && (GLib.File.new_for_path (filename).query_info ().get_file_type () == FileType.DIRECTORY || !FileSystem.file_equals (filename, this.temporary_file.filename ()));
         if (is_conflict) {
             string error;
             if (!this.propagator.create_conflict (this.item, this.associated_composite, error)) {
@@ -630,7 +630,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             // phase by comparing size and mtime to the previous values. This
             // is necessary to avoid overwriting user changes that happened between
             // the discovery phase and now.
-            if (!FileSystem.verify_file_unchanged (fn, this.item.previous_size, this.item.previous_modtime)) {
+            if (!FileSystem.verify_file_unchanged (filename, this.item.previous_size, this.item.previous_modtime)) {
                 this.propagator.another_sync_needed = true;
                 on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("File has changed since discovery"));
                 return;
@@ -638,14 +638,14 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
         }
 
         string error;
-        /* emit */ this.propagator.signal_touched_file (fn);
+        this.propagator.signal_touched_file (filename);
         // The file_changed () check is done above to generate better error messages.
-        if (!FileSystem.unchecked_rename_replace (this.temporary_file.filename (), fn, error)) {
-            GLib.warning ("Rename failed: %1 => %2".printf (this.temporary_file.filename ()).printf (fn));
+        if (!FileSystem.unchecked_rename_replace (this.temporary_file.filename (), filename, error)) {
+            GLib.warning ("Rename failed: %1 => %2".printf (this.temporary_file.filename ()).printf (filename));
             // If the file is locked, we want to retry this sync when it
             // becomes available again, otherwise try again directly
-            if (FileSystem.is_file_locked (fn)) {
-                /* emit */ this.propagator.seen_locked_file (fn);
+            if (FileSystem.is_file_locked (filename)) {
+                this.propagator.signal_seen_locked_file (filename);
             } else {
                 this.propagator.another_sync_needed = true;
             }
@@ -656,7 +656,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
 
         // Maybe we downloaded a newer version of the file than we thought we would...
         // Get up to date information for the journal.
-        this.item.size = FileSystem.get_size (fn);
+        this.item.size = FileSystem.get_size (filename);
 
         // Maybe what we downloaded was a conflict file? If so, set a conflict record.
         // (the data was prepared in on_signal_get_file_job_finished above)
@@ -668,18 +668,18 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             // entry, remove it transfer its old pin state.
             if (this.item.type == ItemType.VIRTUAL_FILE_DOWNLOAD) {
                 string virtual_file = this.item.file + vfs.file_suffix ();
-                var fn = this.propagator.full_local_path (virtual_file);
-                GLib.debug ("Download of previous virtual file finished: " + fn);
-                GLib.File.remove (fn);
+                var filename = this.propagator.full_local_path (virtual_file);
+                GLib.debug ("Download of previous virtual file finished: " + filename);
+                GLib.File.remove (filename);
                 this.propagator.journal.delete_file_record (virtual_file);
 
                 // Move the pin state to the new location
                 var pin = this.propagator.journal.internal_pin_states.raw_for_path (virtual_file.to_utf8 ());
-                if (pin && *pin != PinState.PinState.INHERITED) {
-                    if (!vfs.pin_state (this.item.file, *pin)) {
+                if (pin && *pin != PinState.INHERITED) {
+                    if (!vfs.pin_state (this.item.file, pin)) {
                         GLib.warning ("Could not set pin state of " + this.item.file);
                     }
-                    if (!vfs.pin_state (virtual_file, PinState.PinState.INHERITED)) {
+                    if (!vfs.pin_state (virtual_file, PinState.INHERITED)) {
                         GLib.warning ("Could not set pin state of " + virtual_file + " to inherited.");
                     }
                 }
@@ -688,7 +688,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             // Ensure the pin state isn't contradictory
             var pin = vfs.pin_state (this.item.file);
             if (pin && *pin == Common.ItemAvailability.ONLINE_ONLY)
-                if (!vfs.pin_state (this.item.file, PinState.PinState.UNSPECIFIED)) {
+                if (!vfs.pin_state (this.item.file, PinState.UNSPECIFIED)) {
                     GLib.warning ("Could not set pin state of " + this.item.file + " to unspecified.");
                 }
         }
@@ -701,12 +701,12 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
     Called when it's time to update the database metadata
     ***********************************************************/
     private void update_metadata (bool is_conflict) {
-        string fn = this.propagator.full_local_path (this.item.file);
-        var result = this.propagator.update_metadata (*this.item);
+        string filename = this.propagator.full_local_path (this.item.file);
+        var result = this.propagator.update_metadata (this.item);
         if (!result) {
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error));
             return;
-        } else if (*result == AbstractVfs.ConvertToPlaceholderResult.Locked) {
+        } else if (result == AbstractVfs.ConvertToPlaceholderResult.Locked) {
             on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").printf (this.item.file));
             return;
         }
@@ -725,7 +725,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
         if (!this.item.remote_permissions.has_permission (RemotePermissions.Permissions.IS_SHARED)
             && (this.item.file == ".sys.admin#recall#"
                 || this.item.file.has_suffix ("/.sys.admin#recall#"))) {
-            handle_recall_file (fn, this.propagator.local_path, *this.propagator.journal);
+            handle_recall_file (filename, this.propagator.local_path, this.propagator.journal);
         }
 
         int64 duration = this.stopwatch.elapsed ();
@@ -755,7 +755,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             return;
         }
         this.download_progress = received;
-        this.propagator.report_progress (*this.item, this.resume_start + received);
+        this.propagator.report_progress (this.item, this.resume_start + received);
     }
 
 
@@ -786,7 +786,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             }
 
             GLib.debug ("Dehydrating file " + this.item.file);
-            var r = vfs.dehydrate_placeholder (*this.item);
+            var r = vfs.dehydrate_placeholder (this.item);
             if (!r) {
                 on_signal_done (SyncFileItem.Status.NORMAL_ERROR, r.error);
                 return;
@@ -817,7 +817,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
                 on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 can not be downloaded because of a local file name clash!").printf (GLib.Dir.to_native_separators (this.item.file)));
                 return;
             }
-            var r = vfs.create_placeholder (*this.item);
+            var r = vfs.create_placeholder (this.item);
             if (!r) {
                 on_signal_done (SyncFileItem.Status.NORMAL_ERROR, r.error);
                 return;
@@ -909,8 +909,8 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
     /***********************************************************
     Anonymous namespace for the recall feature
     ***********************************************************/
-    static string make_recall_filename (string fn) {
-        string recall_filename = fn;
+    static string make_recall_filename (string filename) {
+        string recall_filename = filename;
         // Add this.recall-XXXX  before the extension.
         int dot_location = recall_filename.last_index_of ('.');
         // If no extension, add it at the end  (take care of cases like foo/.hidden or foo.bar/file)

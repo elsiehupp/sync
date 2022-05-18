@@ -13,7 +13,7 @@ public class TestAddExcludeFilePathAddSameFilePathListSizeDoesNotIncrease : Abst
     /***********************************************************
     ***********************************************************/
     private TestAddExcludeFilePathAddSameFilePathListSizeDoesNotIncrease () {
-        excluded_files.on_signal_reset (new ExcludedFiles ());
+        excluded_files.reset (new ExcludedFiles ());
         var file_path = "exclude/.sync-exclude.lst";
 
         excluded_files.add_exclude_file_path (file_path);

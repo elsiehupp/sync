@@ -63,7 +63,7 @@ public class FakeDateTimeProvider : AbstractDateTimeProvider {
         string user_status_id = "fake-identifier";
         string user_status_message = "Predefined status";
         string user_status_icon = "🏖";
-        LibSync.UserStatus.OnlineStatus user_status_state = LibSync.UserStatus.OnlineStatus.Online;
+        LibSync.UserStatus.OnlineStatus user_status_state = LibSync.UserStatus.OnlineStatus.ONLINE;
         bool user_status_message_predefined = true;
         Optional<ClearAt> user_status_clear_at;
         ClearAt clear_at;

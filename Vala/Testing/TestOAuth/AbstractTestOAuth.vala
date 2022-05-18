@@ -65,7 +65,7 @@ public abstract class AbstractTestOAuth : GLib.Object {
             this.on_signal_open_browser_hook
         );
 
-        oauth.on_signal_reset (new Gui.OAuth (account, null));
+        oauth.reset (new Gui.OAuth (account, null));
         oauth.signal_result.connect (
             this.on_signal_oauth_result
         );

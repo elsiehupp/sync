@@ -33,7 +33,58 @@ public class UserStatusSelectorModel : GLib.Object {
         ONE_HOUR,
         FOUR_HOUR,
         TODAY,
-        WEEK
+        WEEK;
+
+        
+        /***********************************************************
+        Q_REQUIRED_RESULT
+        ***********************************************************/
+        public static string to_string (ClearStageType stage) {
+            switch (stage) {
+            case ClearStageType.DO_NOT_CLEAR:
+                return _("Do not clear");
+
+            case ClearStageType.HALF_HOUR:
+                return _("30 minutes");
+
+            case ClearStageType.ONE_HOUR:
+                return _("1 hour");
+
+            case ClearStageType.FOUR_HOUR:
+                return _("4 hours");
+
+            case ClearStageType.TODAY:
+                return _("Today");
+
+            case ClearStageType.WEEK:
+                return _("This week");
+
+            default:
+                GLib.assert_not_reached ();
+            }
+        }
+
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private static GLib.List<ClearStageType> clear_stages;
+    public static GLib.List<string> clear_at_stages { public get; private set; }
+
+    static construct {
+        clear_stages = new GLib.List<ClearStageType> ();
+        clear_stages.append (ClearStageType.DO_NOT_CLEAR);
+        clear_stages.append (ClearStageType.HALF_HOUR);
+        clear_stages.append (ClearStageType.ONE_HOUR);
+        clear_stages.append (ClearStageType.FOUR_HOUR);
+        clear_stages.append (ClearStageType.TODAY);
+        clear_stages.append (ClearStageType.WEEK);
+
+        clear_at_stages = new GLib.List<string> ();
+        foreach (ClearStageType stage_type in clear_stages) {
+            clear_at_stages.append (ClearStageType.to_string (stage_type));
+        }
     }
 
     /***********************************************************
@@ -47,22 +98,11 @@ public class UserStatusSelectorModel : GLib.Object {
     ***********************************************************/
     string error_message { public get; private set; }
 
-    /***********************************************************
-    ***********************************************************/
-    private GLib.List<ClearStageType> clear_stages = {
-        ClearStageType.DO_NOT_CLEAR,
-        ClearStageType.HALF_HOUR,
-        ClearStageType.ONE_HOUR,
-        ClearStageType.FOUR_HOUR,
-        ClearStageType.TODAY,
-        ClearStageType.WEEK
-    };
 
-
-    internal signal void error_message_changed ();
-    internal signal void user_status_changed ();
-    internal signal void online_status_changed ();
-    internal signal void clear_at_changed ();
+    internal signal void signal_error_message_changed ();
+    internal signal void signal_user_status_changed ();
+    internal signal void signal_online_status_changed ();
+    internal signal void signal_clear_at_changed ();
     internal signal void predefined_statuses_changed ();
     internal signal void signal_finished ();
 
@@ -80,10 +120,11 @@ public class UserStatusSelectorModel : GLib.Object {
     ***********************************************************/
     public UserStatusSelectorModel.with_connector (
         LibSync.AbstractUserStatusConnector user_status_connector,
-        GLib.Object parent = new GLib.Object ()) {
+        GLib.Object parent = new GLib.Object ()
+    ) {
         base (parent);
         this.user_status_connector = user_status_connector;
-        this.user_status = new LibSync.UserStatus ("no-identifier", "", "😀", LibSync.UserStatus.OnlineStatus.Online, false, {});
+        this.user_status = new LibSync.UserStatus ("no-identifier", "", "😀", LibSync.UserStatus.OnlineStatus.ONLINE, false, {});
         this.date_time_provider = new GLib.DateTime ();
         this.user_status.icon ("😀");
         on_signal_init ();
@@ -95,7 +136,8 @@ public class UserStatusSelectorModel : GLib.Object {
     public UserStatusSelectorModel.with_connector_and_provider (
         LibSync.AbstractUserStatusConnector user_status_connector,
         GLib.DateTime date_time_provider = new GLib.DateTime (),
-        GLib.Object parent = new GLib.Object ()) {
+        GLib.Object parent = new GLib.Object ()
+    ) {
         base (parent);
         this.user_status_connector = user_status_connector;
         this.date_time_provider = std.move (date_time_provider);
@@ -110,7 +152,8 @@ public class UserStatusSelectorModel : GLib.Object {
     public UserStatusSelectorModel.with_user_status_and_provider (
         LibSync.UserStatus user_status,
         GLib.DateTime date_time_provider,
-        GLib.Object parent = new GLib.Object ()) {
+        GLib.Object parent = new GLib.Object ()
+    ) {
         base (parent);
         this.user_status = user_status;
         this.date_time_provider = std.move (date_time_provider);
@@ -122,7 +165,8 @@ public class UserStatusSelectorModel : GLib.Object {
     ***********************************************************/
     public UserStatusSelectorModel.with_user_status (
         LibSync.UserStatus user_status,
-        GLib.Object parent = new GLib.Object ()) {
+        GLib.Object parent = new GLib.Object ()
+    ) {
         base (parent);
         this.user_status = user_status;
         this.user_status.icon ("😀");
@@ -139,7 +183,7 @@ public class UserStatusSelectorModel : GLib.Object {
             }
 
             this.user_status.state (value);
-            /* emit */ online_status_changed ();
+            signal_online_status_changed ();
         }
     }
 
@@ -147,53 +191,61 @@ public class UserStatusSelectorModel : GLib.Object {
     /***********************************************************
     Q_REQUIRED_RESULT
     ***********************************************************/
-    public GLib.Uri online_icon () {
-        return Theme.status_online_image_source;
+    public GLib.Uri online_icon {
+        public get {
+            return Theme.status_online_image_source;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public GLib.Uri away_icon () {
-        return Theme.status_away_image_source;
+    public GLib.Uri away_icon {
+        public get {
+            return Theme.status_away_image_source;
+        }
     }
 
 
     /***********************************************************
     Q_REQUIRED_RESULT
     ***********************************************************/
-    public GLib.Uri dnd_icon () {
-        return Theme.status_do_not_disturb_image_source;
+    public GLib.Uri dnd_icon {
+        public get {
+            return Theme.status_do_not_disturb_image_source;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public GLib.Uri invisible_icon () {
-        return Theme.status_invisible_image_source;
+    public GLib.Uri invisible_icon {
+        public get {
+            return Theme.status_invisible_image_source;
+        }
     }
 
 
-    string user_status_message {
+    public string user_status_message {
         public get {
             return this.user_status.message ();
         }
         public set {
             this.user_status.message (value);
             this.user_status.message_predefined (false);
-            /* emit */ user_status_changed ();
+            signal_user_status_changed ();
         }
     }
 
 
-    string user_status_emoji {
+    public string user_status_emoji {
         public get {
             return this.user_status.icon ();
         }
         public set {
             this.user_status.icon (value);
             this.user_status.message_predefined (false);
-            /* emit */ user_status_changed ();
+            signal_user_status_changed ();
         }
     }
 
@@ -235,14 +287,14 @@ public class UserStatusSelectorModel : GLib.Object {
     ***********************************************************/
     public LibSync.UserStatus predefined_status_for_index (int index) {
         //  GLib.assert_true (0 <= index && index < (int)this.predefined_statuses.size ());
-        return this.predefined_statuses[index];
+        return this.predefined_statuses.nth_data (index);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public string predefined_status_clear_at (int index) {
-        return clear_at_readable (predefined_status (index).clear_at ());
+        return clear_at_readable (this.predefined_statuses.nth_data (index).clear_at ());
     }
 
 
@@ -258,26 +310,8 @@ public class UserStatusSelectorModel : GLib.Object {
         this.user_status.icon (predefined_status.icon ());
         this.user_status.clear_at (predefined_status.clear_at ());
 
-        /* emit */ user_status_changed ();
-        /* emit */ clear_at_changed ();
-    }
-
-
-    /***********************************************************
-    Q_REQUIRED_RESULT
-    ***********************************************************/
-    public GLib.List<string> clear_at_values () {
-        GLib.List<string> clear_at_stages;
-        std.transform (
-            this.clear_stages.begin (),
-            this.clear_stages.end (),
-            std.back_inserter (clear_at_stages)
-            //  [this] (ClearStageType stage) => {
-            //      return clear_at_stage_to_string (stage);
-            //  }
-        );
-
-        return clear_at_stages;
+        signal_user_status_changed ();
+        signal_clear_at_changed ();
     }
 
 
@@ -292,9 +326,9 @@ public class UserStatusSelectorModel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void clear_at_for_index (int index) {
-        //  GLib.assert_true (0 <= index && index < (int)this.clear_stages.size ());
-        this.user_status.clear_at (clear_stage_type_to_date_time (this.clear_stages[index]));
-        /* emit */ clear_at_changed ();
+        //  GLib.assert_true (0 <= index && index < (int)clear_stages.size ());
+        this.user_status.clear_at (clear_stage_type_to_date_time (clear_stages.get (index)));
+        signal_clear_at_changed ();
     }
 
 
@@ -305,19 +339,19 @@ public class UserStatusSelectorModel : GLib.Object {
             return;
         }
 
-        this.user_status_connector.get ().signal_user_status_fetched.connect (
+        this.user_status_connector.signal_user_status_fetched.connect (
             this.on_signal_user_status_fetched
         );
-        this.user_status_connector.get ().signal_predefined_statuses_fetched.connect (
+        this.user_status_connector.signal_predefined_statuses_fetched.connect (
             this.on_signal_predefined_statuses_fetched
         );
-        this.user_status_connector.get ().error.connect (
+        this.user_status_connector.signal_error.connect (
             this.on_signal_error
         );
-        this.user_status_connector.get ().signal_user_status_set.connect (
+        this.user_status_connector.signal_user_status_set.connect (
             this.on_signal_user_status_set
         );
-        this.user_status_connector.get ().message_cleared.connect (
+        this.user_status_connector.signal_message_cleared.connect (
             this.on_signal_message_cleared
         );
 
@@ -329,7 +363,7 @@ public class UserStatusSelectorModel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_load (int identifier) {
-        on_signal_reset ();
+        reset ();
         this.user_status_connector = UserModel.instance.user_status_connector (identifier);
         on_signal_init ();
     }
@@ -337,21 +371,21 @@ public class UserStatusSelectorModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_reset () {
+    private void reset () {
         if (this.user_status_connector) {
-            this.user_status_connector.get ().signal_user_status_fetched.disconnect (
+            this.user_status_connector.signal_user_status_fetched.disconnect (
                 this.on_signal_user_status_fetched
             );
-            this.user_status_connector.get ().signal_predefined_statuses_fetched.disconnect (
+            this.user_status_connector.signal_predefined_statuses_fetched.disconnect (
                 this.on_signal_predefined_statuses_fetched
             );
-            this.user_status_connector.get ().signal_error.disconnect (
+            this.user_status_connector.signal_error.disconnect (
                 this.on_signal_error
             );
-            this.user_status_connector.get ().signal_user_status_set.disconnect (
+            this.user_status_connector.signal_user_status_set.disconnect (
                 this.on_signal_user_status_set
             );
-            this.user_status_connector.get ().signal_message_cleared.disconnect (
+            this.user_status_connector.signal_message_cleared.disconnect (
                 this.on_signal_message_cleared
             );
         }
@@ -362,7 +396,7 @@ public class UserStatusSelectorModel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_user_status_fetched (LibSync.UserStatus user_status) {
-        if (user_status.state != LibSync.UserStatus.OnlineStatus.Offline) {
+        if (user_status.state != LibSync.UserStatus.OnlineStatus.OFFLINE) {
             this.user_status.state (user_status.state);
         }
         this.user_status.message (user_status.message ());
@@ -374,9 +408,9 @@ public class UserStatusSelectorModel : GLib.Object {
             this.user_status.icon (user_status.icon ());
         }
 
-        /* emit */ user_status_changed ();
-        /* emit */ online_status_changed ();
-        /* emit */ clear_at_changed ();
+        signal_user_status_changed ();
+        signal_online_status_changed ();
+        signal_clear_at_changed ();
     }
 
 
@@ -384,7 +418,7 @@ public class UserStatusSelectorModel : GLib.Object {
     ***********************************************************/
     private void on_signal_predefined_statuses_fetched (GLib.List<LibSync.UserStatus> statuses) {
         this.predefined_statuses = statuses;
-        /* emit */ predefined_statuses_changed ();
+        predefined_statuses_changed ();
     }
 
 
@@ -434,35 +468,6 @@ public class UserStatusSelectorModel : GLib.Object {
         }
 
         GLib.assert_not_reached ();
-    }
-
-
-    /***********************************************************
-    Q_REQUIRED_RESULT
-    ***********************************************************/
-    private string clear_at_stage_to_string (ClearStageType stage) {
-        switch (stage) {
-        case ClearStageType.DO_NOT_CLEAR:
-            return _("Don't clear");
-
-        case ClearStageType.HALF_HOUR:
-            return _("30 minutes");
-
-        case ClearStageType.ONE_HOUR:
-            return _("1 hour");
-
-        case ClearStageType.FOUR_HOUR:
-            return _("4 hours");
-
-        case ClearStageType.TODAY:
-            return _("Today");
-
-        case ClearStageType.WEEK:
-            return _("This week");
-
-        default:
-            GLib.assert_not_reached ();
-        }
     }
 
 
@@ -582,7 +587,7 @@ public class UserStatusSelectorModel : GLib.Object {
     ***********************************************************/
     private void error (string reason) {
         this.error_message = reason;
-        /* emit */ error_message_changed ();
+        signal_error_message_changed ();
     }
 
 

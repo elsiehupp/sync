@@ -166,7 +166,7 @@ public class ConflictDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private void update_group (GLib.MimeDatabase mime_database, string filename, Gtk.Label link_label, string link_text, Gtk.Label mtime_label, Gtk.Label size_label, GLib.ToolButton button) {
+    private void update_group (GLib.MimeDatabase mime_database, string filename, Gtk.Label link_label, string link_text, Gtk.Label mtime_label, Gtk.Label size_label, Gtk.ToolButton button) {
         string file_url = GLib.Uri.from_local_file (filename).to_string ();
         link_label.on_signal_text ("<a href='%1'>%2</a>".printf (file_url).printf (link_text));
 
@@ -175,10 +175,10 @@ public class ConflictDialog : Gtk.Dialog {
         size_label.on_signal_text (locale ().formatted_data_size (info.size ()));
 
         string mime = mime_database.mime_type_for_file (filename);
-        if (Gtk.Icon.has_theme_icon (mime.icon_name ())) {
-            button.icon (Gtk.Icon.from_theme (mime.icon_name ()));
+        if (Gtk.IconInfo.has_theme_icon (mime.icon_name ())) {
+            button.icon (Gtk.IconInfo.from_theme (mime.icon_name ()));
         } else {
-            button.icon (Gtk.Icon (":/qt-project.org/styles/commonstyle/images/file-128.png"));
+            button.icon (Gtk.IconInfo (":/qt-project.org/styles/commonstyle/images/file-128.png"));
         }
     }
 

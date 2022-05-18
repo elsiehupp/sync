@@ -69,7 +69,7 @@ public class QtLocalPeer : GLib.Object {
             timespec ts = {
                 ms / 1000, (ms % 1000) * 1000 * 1000
             };
-            nanosleep (&ts, null);
+            nanosleep (ts, null);
         }
         if (!conn_ok) {
             return false;

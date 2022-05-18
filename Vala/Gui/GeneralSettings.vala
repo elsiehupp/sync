@@ -36,35 +36,43 @@ public class GeneralSettings : Gtk.Widget {
         public string local_filename;
         public string zip_filename;
 
-        public static ZipEntry file_info_to_zip_entry (GLib.FileInfo info) {
+        private ZipEntry (
+            string local_filename,
+            string zip_filename
+        ) {
+            this.local_filename = local_filename;
+            this.zip_filename = zip_filename;
+        }
+
+        public static ZipEntry file_info_to_zip_entry (GLib.File info) {
             return new ZipEntry (
-                info.absolute_file_path,
-                info.filename ()
+                info.get_path (),
+                info.get_basename ()
             );
         }
 
-        public static ZipEntry file_info_to_log_zip_entry (GLib.FileInfo info) {
+        public static ZipEntry file_info_to_log_zip_entry (GLib.File info) {
             var entry = file_info_to_zip_entry (info);
-            entry.zip_filename.prepend ("logs/");
+            entry.zip_filename = "logs/" + entry.zip_filename;
             return entry;
         }
 
-        public static ZipEntry sync_folder_to_zip_entry (FolderConnection f) {
-            var journal_path = f.journal_database ().database_file_path;
-            var journal_info = new GLib.FileInfo (journal_path);
+        public static ZipEntry sync_folder_to_zip_entry (FolderConnection folder_connection) {
+            var journal_info = GLib.File.new_for_path (folder_connection.journal_database.database_file_path);
             return file_info_to_zip_entry (journal_info);
         }
 
         public static GLib.List<ZipEntry> create_file_list () {
             var list = new GLib.List<ZipEntry> ();
-            ConfigFile config;
-
-            list.append (file_info_to_zip_entry (new GLib.FileInfo (config.config_file ())));
+            list.append (file_info_to_zip_entry (GLib.File.new_for_path (ConfigFile.config_file)));
 
             var logger = LibSync.Logger.instance;
 
             if (!logger.log_dir () == "") {
-                list.append ({"", "logs"});
+                list.append (new ZipEntry (
+                    "",
+                    "logs"
+                ));
 
                 GLib.Dir directory = new GLib.Dir (logger.log_dir ());
                 var info_list = directory.entry_info_list (GLib.Dir.Files);
@@ -269,13 +277,13 @@ public class GeneralSettings : Gtk.Widget {
         }
         ConfigFile config_file;
         bool is_checked = this.instance.mono_icons_check_box.is_checked ();
-        config_file.mono_icons (is_checked);
+        ConfigFile.mono_icons (is_checked);
         Theme.systray_use_mono_icons (is_checked);
-        config_file.crash_reporter (this.instance.crashreporter_check_box.is_checked ());
+        ConfigFile.crash_reporter (this.instance.crashreporter_check_box.is_checked ());
 
-        config_file.new_big_folder_size_limit (this.instance.new_folder_limit_check_box.is_checked (),
+        ConfigFile.new_big_folder_size_limit (this.instance.new_folder_limit_check_box.is_checked (),
             this.instance.new_folder_limit_spin_box.value ());
-        config_file.confirm_external_storage (this.instance.new_external_storage.is_checked ());
+        ConfigFile.confirm_external_storage (this.instance.new_external_storage.is_checked ());
     }
 
 
@@ -291,7 +299,7 @@ public class GeneralSettings : Gtk.Widget {
     ***********************************************************/
     private void on_signal_toggle_optional_server_notifications (bool enable) {
         ConfigFile config_file;
-        config_file.optional_server_notifications (enable);
+        ConfigFile.optional_server_notifications (enable);
     }
 
 
@@ -299,7 +307,7 @@ public class GeneralSettings : Gtk.Widget {
     ***********************************************************/
     private void on_signal_show_in_explorer_navigation_pane (bool checked) {
         ConfigFile config_file;
-        config_file.show_in_explorer_navigation_pane (checked);
+        ConfigFile.show_in_explorer_navigation_pane (checked);
         // Now update the registry with the change.
         FolderManager.instance.navigation_pane_helper.show_in_explorer_navigation_pane = checked;
     }
@@ -342,15 +350,15 @@ public class GeneralSettings : Gtk.Widget {
     private void load_misc_settings () {
         var scope = new GLib.ScopedValueRollback<bool> (this.currently_loading, true);
         ConfigFile config_file;
-        this.instance.mono_icons_check_box.checked (config_file.mono_icons ());
-        this.instance.server_notifications_check_box.checked (config_file.optional_server_notifications ());
-        this.instance.show_in_explorer_navigation_pane_check_box.checked (config_file.show_in_explorer_navigation_pane ());
-        this.instance.crashreporter_check_box.checked (config_file.crash_reporter ());
-        var new_folder_limit = config_file.new_big_folder_size_limit;
+        this.instance.mono_icons_check_box.checked (ConfigFile.mono_icons ());
+        this.instance.server_notifications_check_box.checked (ConfigFile.optional_server_notifications ());
+        this.instance.show_in_explorer_navigation_pane_check_box.checked (ConfigFile.show_in_explorer_navigation_pane ());
+        this.instance.crashreporter_check_box.checked (ConfigFile.crash_reporter ());
+        var new_folder_limit = ConfigFile.new_big_folder_size_limit;
         this.instance.new_folder_limit_check_box.checked (new_folder_limit.first);
         this.instance.new_folder_limit_spin_box.value (new_folder_limit.second);
-        this.instance.new_external_storage.checked (config_file.confirm_external_storage ());
-        this.instance.mono_icons_check_box.checked (config_file.mono_icons ());
+        this.instance.new_external_storage.checked (ConfigFile.confirm_external_storage ());
+        this.instance.mono_icons_check_box.checked (ConfigFile.mono_icons ());
     }
 
 

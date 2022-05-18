@@ -44,7 +44,7 @@ public class OwncloudSetupPage : GLib.WizardPage {
     private AddCertificateDialog add_certificate_dialog = null;
 
 
-    internal signal void determine_auth_type (string value);
+    internal signal void signal_determine_auth_type (string value);
 
 
     /***********************************************************
@@ -65,7 +65,7 @@ public class OwncloudSetupPage : GLib.WizardPage {
             this.instance.le_url.enabled (false);
         }
 
-        register_field ("OCUrl*", this.instance.le_url);
+        register_field ("OcsUrl*", this.instance.le_url);
 
         var size_policy = this.progress_indicator.size_policy ();
         size_policy.retain_size_when_hidden (true);
@@ -119,7 +119,7 @@ public class OwncloudSetupPage : GLib.WizardPage {
 
         this.instance.le_url.focus ();
 
-        var is_server_url_overridden = !Theme.override_server_url == "";
+        var is_server_url_overridden = !Theme.override_server_url = "";
         if (is_server_url_overridden && !Theme.force_override_server_url) {
             // If the url is overwritten but we don't force to use that url
             // Just focus the next button to let the user navigate quicker
@@ -154,15 +154,15 @@ public class OwncloudSetupPage : GLib.WizardPage {
             on_signal_error_string ("", false);
             this.checking = true;
             on_signal_start_spinner ();
-            /* emit */ complete_changed ();
+            signal_complete_changed ();
 
-            /* emit */ determine_auth_type (u);
+            signal_determine_auth_type (u);
             return false;
         } else {
             // connecting is running
             on_signal_stop_spinner ();
             this.checking = false;
-            /* emit */ complete_changed ();
+            signal_complete_changed ();
             return true;
         }
     }
@@ -197,7 +197,7 @@ public class OwncloudSetupPage : GLib.WizardPage {
         this.oc_wizard.registration = false;
         this.oc_url = new_url;
         if (this.oc_url == "") {
-            this.instance.le_url == "";
+            this.instance.le_url = "";
             return;
         }
 
@@ -273,7 +273,7 @@ public class OwncloudSetupPage : GLib.WizardPage {
             this.instance.error_label.on_signal_text (err);
         }
         this.checking = false;
-        /* emit */ complete_changed ();
+        signal_complete_changed ();
         on_signal_stop_spinner ();
     }
 

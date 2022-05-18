@@ -103,7 +103,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
 
         this.current_chunk = 0;
 
-        this.propagator.report_progress (*this.item, 0);
+        this.propagator.report_progress (this.item, 0);
         on_signal_start_next_chunk ();
     }
 
@@ -429,7 +429,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
             // sender () is the only current job, no need to look at the byte_written properties
             amount += sent;
         }
-        this.propagator.report_progress (*this.item, amount);
+        this.propagator.report_progress (this.item, amount);
     }
 
 } // class PropagateUploadV1

@@ -62,7 +62,7 @@ public class TestMovedWithError : AbstractTestSyncMove {
         fake_folder.sync_once ();
 
         if (vfs_mode != AbstractVfs.Off) {
-            fake_folder.sync_journal ().internal_pin_states.set_for_path ("", PinState.PinState.ALWAYS_LOCAL);
+            fake_folder.sync_journal ().internal_pin_states.set_for_path ("", PinState.ALWAYS_LOCAL);
             fake_folder.sync_once ();
         }
 

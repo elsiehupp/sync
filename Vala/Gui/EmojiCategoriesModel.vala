@@ -13,7 +13,7 @@
 namespace Occ {
 namespace Ui {
 
-public class EmojiCategoriesModel : GLib.AbstractListModel {
+public class EmojiCategoriesModel : GLib.Object {
 
 
     /***********************************************************
@@ -34,79 +34,68 @@ public class EmojiCategoriesModel : GLib.AbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.List<Category> CATEGORIES = {
-        {
-            "⌛️",
-            "history"
-        },
-        {
-            "😏",
-            "people"
-        },
-        {
-            "🌲",
-            "nature"
-        },
-        {
-            "🍛",
-            "food"
-        },
-        {
-            "🚁",
-            "activity"
-        },
-        {
-            "🚅",
-            "travel"
-        },
-        {
-            "💡",
-            "objects"
-        },
-        {
-            "🔣",
-            "symbols"
-        },
-        {
-            "🏁",
-            "flags"
-        },
-    };
+    private GLib.HashTable<string, string> category_hash_table = new GLib.HashTable<string, string> (str_hash, str_equal);
+    category_hash_table.set (
+        "⌛️",
+        "history"
+    );
+    category_hash_table.set (
+        "😏",
+        "people"
+    );
+    category_hash_table.set (
+        "🌲",
+        "nature"
+    );
+    category_hash_table.set (
+        "🍛",
+        "food"
+    );
+    category_hash_table.set (
+        "🚁",
+        "activity"
+    );
+    category_hash_table.set (
+        "🚅",
+        "travel"
+    );
+    category_hash_table.set (
+        "💡",
+        "objects"
+    );
+    category_hash_table.set (
+        "🔣",
+        "symbols"
+    );
+    category_hash_table.set (
+        "🏁",
+        "flags"
+    );
 
     /***********************************************************
     ***********************************************************/
-    public override GLib.Variant data (GLib.ModelIndex index, int role) {
+    public GLib.Variant data (int index, int role) {
         if (!index.is_valid) {
-            return {};
+            return null;
         }
 
         switch (role) {
         case Roles.EMOJI_ROLE:
-            return CATEGORIES[index.row ()].emoji;
+            return category_hash_table.get (index.row ());
 
         case Roles.LABEL_ROLE:
-            return CATEGORIES[index.row ()].label;
+            return category_hash_table.get (index.row ()).key;
         }
 
-        return {};
+        return null;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public override int row_count (GLib.ModelIndex parent = GLib.ModelIndex ()) {
+    public int row_count (GLib.ModelIndex parent = GLib.ModelIndex ()) {
         //  Q_UNUSED (parent);
-        return (int)CATEGORIES.size ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public override GLib.HashTable<int, string> role_names () {
-        GLib.HashTable<int, string> roles;
-        roles[Roles.EMOJI_ROLE] = "emoji";
-        roles[Roles.LABEL_ROLE] = "label";
-        return roles;
+        return (int)category_hash_table.size ();
     }
 
 } // class EmojiCategoriesModel

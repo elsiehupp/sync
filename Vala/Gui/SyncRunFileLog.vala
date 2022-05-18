@@ -81,7 +81,7 @@ public class SyncRunFileLog : GLib.Object {
             GLib.File.remove (new_filename);
             GLib.File.rename (filename, new_filename);
         }
-        this.file.on_signal_reset (GLib.File.new_for_path (filename));
+        this.file.reset (GLib.File.new_for_path (filename));
 
         this.file.open (GLib.IODevice.WriteOnly | GLib.IODevice.Append | GLib.IODevice.Text);
         this.out.device (this.file);

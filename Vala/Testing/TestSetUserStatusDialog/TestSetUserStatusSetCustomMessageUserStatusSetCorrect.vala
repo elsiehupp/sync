@@ -21,7 +21,7 @@ public class TestSetUserStatusSetCustomMessageUserStatusSetCorrect : GLib.Object
 
         string user_status_message = "Some status";
         string user_status_icon = "❤";
-        LibSync.UserStatus.OnlineStatus user_status_state = LibSync.UserStatus.OnlineStatus.Online;
+        LibSync.UserStatus.OnlineStatus user_status_state = LibSync.UserStatus.OnlineStatus.ONLINE;
 
         model.set_online_status (user_status_state);
         model.set_user_status_message (user_status_message);

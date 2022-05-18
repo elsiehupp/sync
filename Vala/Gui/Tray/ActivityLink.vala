@@ -6,7 +6,7 @@
 
 //  #include <QtCore>
 //  #include <QtCore>
-//  #include <Gtk.Icon>
+//  #include <Gtk.IconInfo>
 
 namespace Occ {
 namespace Ui {

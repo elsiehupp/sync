@@ -20,7 +20,7 @@ public class FakeUserStatusConnector : AbstractUserStatusConnector {
         }
 
         this.user_status_set_by_caller_of_set_user_status = value;
-        /* emit */ AbstractUserStatusConnector.signal_user_status_set ();}
+        signal_user_status_set ();}
     }
     private GLib.List<UserStatus> predefined_statuses;
     private bool is_message_cleared = false;

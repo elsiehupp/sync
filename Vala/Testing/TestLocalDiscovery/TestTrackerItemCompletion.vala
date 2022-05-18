@@ -53,7 +53,7 @@ public class TestTrackerItemCompletion : GLib.Object {
         GLib.assert_true (tracker_contains ("A/a4")); // had an error, still here
         GLib.assert_true (!tracker_contains ("A/spurious")); // removed due to full discovery
 
-        fake_folder.server_error_paths () == "";
+        fake_folder.server_error_paths () = "";
         fake_folder.sync_journal ().wipe_error_blocklist ();
         tracker.add_touched_path ("A/newspurious"); // will be removed due to successful sync
 

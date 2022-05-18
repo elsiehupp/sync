@@ -70,19 +70,19 @@ public class JsonApiJob : AbstractNetworkJob {
 
 
     /***********************************************************
-    @brief etag_response_header_received - signal to report the ETag response header value
+    @brief signal_etag_response_header_received - signal to report the ETag response header value
     from ocs api v2
     @param value - the ETag response header value
     @param status_code - the OCS status code : 100 (!) for on_signal_success
     ***********************************************************/
-    internal signal void etag_response_header_received (string value, int status_code);
+    internal signal void signal_etag_response_header_received (string value, int status_code);
 
 
     /***********************************************************
     @brief desktop_notification_status_received - signal to report if notifications are allowed
     @param status - set desktop notifications allowed status
     ***********************************************************/
-    internal signal void allow_desktop_notifications_changed (bool is_allowed);
+    internal signal void signal_allow_desktop_notifications_changed (bool is_allowed);
 
 
     /***********************************************************
@@ -168,11 +168,11 @@ public class JsonApiJob : AbstractNetworkJob {
 
         // save new ETag value
         if (this.reply.raw_header_list ().contains ("ETag"))
-            /* emit */ etag_response_header_received (this.reply.raw_header ("ETag"), status_code);
+            signal_etag_response_header_received (this.reply.raw_header ("ETag"), status_code);
 
         var desktop_notifications_allowed = this.reply.raw_header ("X-Nextcloud-User-Status");
         if (!desktop_notifications_allowed == "") {
-            /* emit */ allow_desktop_notifications_changed (desktop_notifications_allowed == "online");
+            signal_allow_desktop_notifications_changed (desktop_notifications_allowed == "online");
         }
 
         Json.ParserError error;

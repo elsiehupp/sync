@@ -1,6 +1,5 @@
 
 //  #include <Gtk.Dialog>
-//  #include <GLib.VBoxLayout>
 
 namespace Occ {
 namespace Ui {
@@ -22,8 +21,8 @@ public class WebFlowCredentialsDialog : Gtk.Dialog {
     ***********************************************************/
     private Gtk.Label error_label;
     private Gtk.Label info_label;
-    private GLib.VBoxLayout layout;
-    private GLib.VBoxLayout container_layout;
+    private Gtk.Box layout;
+    private Gtk.Box container_layout;
     private HeaderBanner header_banner;
 
 
@@ -43,13 +42,13 @@ public class WebFlowCredentialsDialog : Gtk.Dialog {
     //  #endif // WITH_WEBENGINE
         window_flags (window_flags () & ~GLib.WindowContextHelpButtonHint);
 
-        this.layout = new GLib.VBoxLayout (this);
+        this.layout = new Gtk.Box (Gtk.Orientation.VERTICAL);
         int spacing = this.layout.spacing ();
         int margin = this.layout.margin ();
         this.layout.spacing (0);
         this.layout.margin (0);
 
-        this.container_layout = new GLib.VBoxLayout (this);
+        this.container_layout = new Gtk.Box (Gtk.Orientation.VERTICAL);
         this.container_layout.spacing (spacing);
         this.container_layout.margin (margin);
 
@@ -171,7 +170,7 @@ public class WebFlowCredentialsDialog : Gtk.Dialog {
             this.flow_2_auth_widget = null;
         }
 
-        /* emit */ close ();
+        signal_close ();
     }
 
 
@@ -189,7 +188,7 @@ public class WebFlowCredentialsDialog : Gtk.Dialog {
             break;
         case Gdk.Event.ActivationChange:
             if (is_active_window ())
-                /* emit */ activate ();
+                signal_activate ();
             break;
         default:
             break;
@@ -204,7 +203,7 @@ public class WebFlowCredentialsDialog : Gtk.Dialog {
     public void on_signal_flow_2_auth_result (Flow2Auth.Result r, string error_string, string user, string app_password) {
         //  Q_UNUSED (error_string)
         if (r == Flow2Auth.Result.LOGGED_IN) {
-            /* emit */ url_catched (user, app_password, "");
+            signal_url_caught (user, app_password, "");
         } else {
             // bring window to top
             on_signal_show_settings_dialog ();

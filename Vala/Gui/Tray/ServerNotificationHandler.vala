@@ -54,10 +54,10 @@ public class ServerNotificationHandler : GLib.Object {
         this.notification_job.signal_json_received.connect (
             this.on_signal_notifications_received
         );
-        this.notification_job.etag_response_header_received.connect (
+        this.notification_job.signal_etag_response_header_received.connect (
             this.on_signal_etag_response_header_received
         );
-        this.notification_job.allow_desktop_notifications_changed.connect (
+        this.notification_job.signal_allow_desktop_notifications_changed.connect (
             this.on_signal_allow_desktop_notifications_changed
         );
         this.notification_job.property (PROPERTY_ACCOUNT_STATE, GLib.Variant.from_value<AccountState> (this.account_state));

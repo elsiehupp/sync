@@ -13,17 +13,16 @@ public class TestRecursiveDelete : AbstractTestSyncJournalDB {
     ***********************************************************/
     private TestRecursiveDelete () {
 
-        GLib.List<string> elements = {
-            "foo",
-            "foo/file",
-            "bar",
-            "moo",
-            "moo/file",
-            "foo%bar",
-            "foo bla bar/file",
-            "fo_",
-            "fo_/file"
-        };
+        GLib.List<string> elements = new GLib.List<string> ();
+        elements.append ("foo");
+        elements.append ("foo/file");
+        elements.append ("bar");
+        elements.append ("moo");
+        elements.append ("moo/file");
+        elements.append ("foo%bar");
+        elements.append ("foo bla bar/file");
+        elements.append ("fo_");
+        elements.append ("fo_/file");
         foreach (var elem in elements) {
             make_entry (elem);
         }
@@ -31,16 +30,16 @@ public class TestRecursiveDelete : AbstractTestSyncJournalDB {
         this.database.delete_file_record ("moo", true);
         elements.remove_all ("moo");
         elements.remove_all ("moo/file");
-        GLib.assert_true (check_elements ());
+        GLib.assert_true (check_elements (elements));
 
         this.database.delete_file_record ("fo_", true);
         elements.remove_all ("fo_");
         elements.remove_all ("fo_/file");
-        GLib.assert_true (check_elements ());
+        GLib.assert_true (check_elements (elements));
 
         this.database.delete_file_record ("foo%bar", true);
         elements.remove_all ("foo%bar");
-        GLib.assert_true (check_elements ());
+        GLib.assert_true (check_elements (elements));
     }
 
 
@@ -53,7 +52,7 @@ public class TestRecursiveDelete : AbstractTestSyncJournalDB {
 
 
 
-    private void check_elements () {
+    private bool check_elements (GLib.List<string> elements) {
         bool ok = true;
         foreach (var element in elements) {
             SyncJournalFileRecord record;

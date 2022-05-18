@@ -127,7 +127,7 @@ public class TestVirtualFileDownload : AbstractTestSyncVirtualFiles {
     /***********************************************************
     ***********************************************************/
     private static void clean_up_test_virtual_file_download (ItemCompletedSpy complete_spy) {
-        complete_spy == "";
+        complete_spy = "";
     }
 
 } // class TestVirtualFileDownload

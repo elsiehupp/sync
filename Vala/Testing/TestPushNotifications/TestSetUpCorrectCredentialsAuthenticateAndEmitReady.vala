@@ -30,19 +30,19 @@ public class TestSetUpCorrectCredentialsAuthenticateAndEmitReady : AbstractTestP
 
 
     private void authentication_delegate_setup_correct_credentials_authenticate_and_emit_read_1 (PushNotificationManager push_notifications) {
-        files_changed_spy.on_signal_reset (
+        files_changed_spy.reset (
             new GLib.SignalSpy (
                 push_notifications,
                 PushNotificationManager.files_changed
             )
         );
-        notifications_changed_spy.on_signal_reset (
+        notifications_changed_spy.reset (
             new GLib.SignalSpy (
                 push_notifications,
                 PushNotificationManager.notifications_changed
             )
         );
-        activities_changed_spy.on_signal_reset (
+        activities_changed_spy.reset (
             new GLib.SignalSpy (
                 push_notifications,
                 PushNotificationManager.activities_changed
@@ -52,9 +52,9 @@ public class TestSetUpCorrectCredentialsAuthenticateAndEmitReady : AbstractTestP
 
 
     private void authentication_delegate_setup_correct_credentials_authenticate_and_emit_read_2 () {
-        GLib.assert_true (verify_called_once_with_account (*files_changed_spy, account));
-        GLib.assert_true (verify_called_once_with_account (*notifications_changed_spy, account));
-        GLib.assert_true (verify_called_once_with_account (*activities_changed_spy, account));
+        GLib.assert_true (verify_called_once_with_account (files_changed_spy, account));
+        GLib.assert_true (verify_called_once_with_account (notifications_changed_spy, account));
+        GLib.assert_true (verify_called_once_with_account (activities_changed_spy, account));
     }
 
 } // class TestSetUpCorrectCredentialsAuthenticateAndEmitReady

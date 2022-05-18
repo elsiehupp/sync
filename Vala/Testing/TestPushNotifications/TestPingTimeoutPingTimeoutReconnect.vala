@@ -34,19 +34,19 @@ public class TestPingTimeoutPingTimeoutReconnect : AbstractTestPushNotifications
 
 
     private void authentication_delegate_ping_timeout_ping_timed_out_reconnect_1 (PushNotificationManager push_notifications) {
-        files_changed_spy.on_signal_reset (
+        files_changed_spy.reset (
             new GLib.SignalSpy (
                 push_notifications,
                 PushNotificationManager.files_changed
             )
         );
-        notifications_changed_spy.on_signal_reset (
+        notifications_changed_spy.reset (
             new GLib.SignalSpy (
                 push_notifications,
                 PushNotificationManager.notifications_changed
             )
         );
-        activities_changed_spy.on_signal_reset (
+        activities_changed_spy.reset (
             new GLib.SignalSpy (
                 push_notifications,
                 PushNotificationManager.activities_changed
@@ -56,9 +56,9 @@ public class TestPingTimeoutPingTimeoutReconnect : AbstractTestPushNotifications
 
 
     private void authentication_delegate_ping_timeout_ping_timed_out_reconnect_2 () {
-        GLib.assert_true (verify_called_once_with_account (*files_changed_spy, account));
-        GLib.assert_true (verify_called_once_with_account (*notifications_changed_spy, account));
-        GLib.assert_true (verify_called_once_with_account (*activities_changed_spy, account));
+        GLib.assert_true (verify_called_once_with_account (files_changed_spy, account));
+        GLib.assert_true (verify_called_once_with_account (notifications_changed_spy, account));
+        GLib.assert_true (verify_called_once_with_account (activities_changed_spy, account));
     }
 
 } // class TestPingTimeoutPingTimeoutReconnect

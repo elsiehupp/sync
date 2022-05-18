@@ -15,7 +15,7 @@ public class TestSetUpMaxConnectionAttemptsReachedDisablePushNotifications : Abs
     private TestSetUpMaxConnectionAttemptsReachedDisablePushNotifications () {
         FakeWebSocketServer fake_server;
         var account = FakeWebSocketServer.create_account ();
-        GLib.SignalSpy push_notifications_disabled_spy = new GLib.SignalSpy (account, &Account.push_notifications_disabled);
+        GLib.SignalSpy push_notifications_disabled_spy = new GLib.SignalSpy (account, Account.push_notifications_disabled);
 
         GLib.assert_true (fail_three_authentication_attempts (fake_server, account));
         // Account disabled the push notifications

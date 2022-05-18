@@ -309,7 +309,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
         data_object.insert ("message", user_status.message ());
         var clear_at = user_status.clear_at;
         if (clear_at) {
-            data_object.insert ("clear_at", (int)clear_at_to_timestamp (*clear_at));
+            data_object.insert ("clear_at", (int)clear_at_to_timestamp (clear_at));
         } else {
             data_object.insert ("clear_at", GLib.JsonValue ());
         }
@@ -325,41 +325,44 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
 
     private static UserStatus.OnlineStatus string_to_user_online_status (string status) {
         // it needs to match the Status enum
-        GLib.HashTable<string, UserStatus.OnlineStatus> pre_defined_status = {
-            {
-                "online", UserStatus.OnlineStatus.Online
-            },
-            {
-                "dnd", UserStatus.OnlineStatus.DoNotDisturb
-            },
-            {
-                "away", UserStatus.OnlineStatus.Away
-            },
-            {
-                "offline", UserStatus.OnlineStatus.Offline
-            },
-            {
-                "invisible", UserStatus.OnlineStatus.Invisible
-            }
-        };
+        GLib.HashTable<string, UserStatus.OnlineStatus> pre_defined_status = new GLib.HashTable<string, UserStatus.OnlineStatus> (str_hash, str_equal);
+        pre_defined_status.set (
+            "online", UserStatus.OnlineStatus.ONLINE
+        );
+        pre_defined_status.set (
+            "dnd", UserStatus.OnlineStatus.DO_NOT_DISTURB
+        );
+        pre_defined_status.set (
+            "away", UserStatus.OnlineStatus.AWAY
+        );
+        pre_defined_status.set (
+            "offline", UserStatus.OnlineStatus.OFFLINE
+        );
+        pre_defined_status.set (
+            "invisible", UserStatus.OnlineStatus.INVISIBLE
+        );
 
         // api should return invisible, dnd,... down () it is to make sure
         // it matches this.pre_defined_status, otherwise the default is online (0)
-        return pre_defined_status.value (status.down (), UserStatus.OnlineStatus.Online);
+        if (pre_defined_status.contains (status.down ())) {
+            return pre_defined_status.get (status.down ());
+        } else {
+            return UserStatus.OnlineStatus.ONLINE;
+        }
     }
 
 
     private static string online_status_to_string (UserStatus.OnlineStatus status) {
         switch (status) {
-        case UserStatus.OnlineStatus.Online:
+        case UserStatus.OnlineStatus.ONLINE:
             return "online";
-        case UserStatus.OnlineStatus.DoNotDisturb:
+        case UserStatus.OnlineStatus.DO_NOT_DISTURB:
             return "dnd";
-        case UserStatus.OnlineStatus.Away:
+        case UserStatus.OnlineStatus.AWAY:
             return "offline";
-        case UserStatus.OnlineStatus.Offline:
+        case UserStatus.OnlineStatus.OFFLINE:
             return "offline";
-        case UserStatus.OnlineStatus.Invisible:
+        case UserStatus.OnlineStatus.INVISIBLE:
             return "invisible";
         }
         return "online";
@@ -458,7 +461,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
 
     private static uint64 clear_at_to_timestamp_optional (Optional<ClearAt> clear_at) {
         if (clear_at) {
-            return clear_at_to_timestamp (*clear_at);
+            return clear_at_to_timestamp (clear_at);
         }
         return 0;
     }
@@ -494,7 +497,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
             json_object.value ("identifier").to_string () + "no-identifier",
             json_object.value ("message").to_string () + "No message",
             json_object.value ("icon").to_string () + "no-icon",
-            UserStatus.OnlineStatus.Online,
+            UserStatus.OnlineStatus.ONLINE,
             true,
             json_to_clear_at (json_object)
         );

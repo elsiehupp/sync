@@ -48,14 +48,14 @@ public class DummyCredentials : AbstractCredentials {
     ***********************************************************/
     public override void fetch_from_keychain () {
         this.was_fetched = true;
-        /* Q_EMIT */ fetched ();
+        signal_fetched ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public override void ask_from_user () {
-        /* Q_EMIT */ (asked ());
+        /* emit */ (signal_asked ());
     }
 
 

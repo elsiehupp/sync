@@ -52,19 +52,19 @@ public class OwncloudSetupWizard : GLib.Object {
         this.oc_wizard = new OwncloudWizard ();
         this.remote_folder;
 
-        this.oc_wizard.determine_auth_type.connect (
+        this.oc_wizard.signal_determine_auth_type.connect (
             this.on_signal_check_server
         );
-        this.oc_wizard.connect_to_oc_url.connect (
+        this.oc_wizard.signal_connect_to_ocs_url.connect (
             this.on_signal_connect_to_oc_url
         );
-        this.oc_wizard.create_local_and_remote_folders.connect (
+        this.oc_wizard.signal_create_local_and_remote_folders.connect (
             this.on_signal_create_local_and_remote_folders
         );
-        /* basic_setup_finished might be called from a reply from the network.
+        /* signal_basic_setup_finished might be called from a reply from the network.
            on_signal_assistant_finished might destroy the temporary Soup.Context.
            Therefore GLib.QueuedConnection is required */
-        this.oc_wizard.basic_setup_finished.connect (
+        this.oc_wizard.signal_basic_setup_finished.connect (
             this.on_signal_assistant_finished // GLib.QueuedConnection
         );
         this.oc_wizard.on_signal_finished.connect (
@@ -183,10 +183,10 @@ public class OwncloudSetupWizard : GLib.Object {
         // Step 1: Check url/status.php
         var check_server_job = new CheckServerJob (account, this);
         check_server_job.ignore_credential_failure (true);
-        check_server_job.instance_found.connect (
+        check_server_job.signal_instance_found.connect (
             this.on_signal_found_server
         );
-        check_server_job.instance_not_found.connect (
+        check_server_job.signal_instance_not_found.connect (
             this.on_signal_find_server_behind_redirect
         );
         check_server_job.timeout.connect (
@@ -238,10 +238,10 @@ public class OwncloudSetupWizard : GLib.Object {
     private void on_redirect_check_job_finished (unowned Account account) {
         var check_server_job = new CheckServerJob (account, this);
         check_server_job.ignore_credential_failure (true);
-        check_server_job.instance_found.connect (
+        check_server_job.signal_instance_found.connect (
             this.on_signal_found_server
         );
-        check_server_job.instance_not_found.connect (
+        check_server_job.signal_instance_not_found.connect (
             this.on_signal_no_server_found
         );
         check_server_job.timeout.connect (
@@ -354,7 +354,7 @@ public class OwncloudSetupWizard : GLib.Object {
         this.oc_wizard.account.dav_user (user_id);
         this.oc_wizard.account.dav_display_name (display_name);
 
-        this.oc_wizard.field ("OCUrl", url);
+        this.oc_wizard.field ("OcsUrl", url);
         this.oc_wizard.on_signal_append_to_configuration_log (
             _("Trying to connect to %1 at %2 …")
                 .printf (Theme.app_name_gui)
@@ -502,12 +502,12 @@ public class OwncloudSetupWizard : GLib.Object {
                 + "<br/>Please go back and check your credentials.</p>"),
                 OwncloudWizard.LogType.LOG_HTML
             );
-            this.remote_folder == "";
+            this.remote_folder = "";
             on_signal_success = false;
         } else {
             this.oc_wizard.on_signal_append_to_configuration_log (_("Remote folder %1 creation failed with error <tt>%2</tt>.").printf (Utility.escape (this.remote_folder)).printf (error), OwncloudWizard.LogType.LOG_PLAIN);
             this.oc_wizard.on_signal_display_error (_("Remote folder %1 creation failed with error <tt>%2</tt>.").printf (Utility.escape (this.remote_folder)).printf (error), false);
-            this.remote_folder == "";
+            this.remote_folder = "";
             on_signal_success = false;
         }
 
@@ -551,11 +551,11 @@ public class OwncloudSetupWizard : GLib.Object {
                     if (folder_definition.virtual_files_mode != AbstractVfs.Off && this.oc_wizard.use_virtual_file_sync ()) {
                         f.root_pin_state (Common.ItemAvailability.ONLINE_ONLY);
                     }
-                    f.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
+                    f.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
                         this.oc_wizard.selective_sync_blocklist ());
                     if (!this.oc_wizard.is_confirm_big_folder_checked ()) {
                         // The user already accepted the selective sync dialog. everything is in the allow list
-                        f.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
+                        f.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
                             { } + "/");
                     }
                 }
@@ -577,7 +577,7 @@ public class OwncloudSetupWizard : GLib.Object {
     private void on_signal_skip_folder_configuration () {
         apply_account_changes ();
 
-        disconnect (this.oc_wizard, OwncloudWizard.basic_setup_finished,
+        disconnect (this.oc_wizard, OwncloudWizard.signal_basic_setup_finished,
             this, OwncloudSetupWizard.on_signal_assistant_finished);
         this.oc_wizard.close ();
         signal_own_cloud_wizard_done (Gtk.Dialog.Accepted);

@@ -16,9 +16,9 @@ public class TestMissingData : GLib.Object {
         FakeFolder fake_folder = new FakeFolder ( FileInfo ());
         fake_folder.remote_modifier ().insert ("good");
         fake_folder.remote_modifier ().insert ("noetag");
-        fake_folder.remote_modifier ().find ("noetag").etag == "";
+        fake_folder.remote_modifier ().find ("noetag").etag = "";
         fake_folder.remote_modifier ().insert ("nofileid");
-        fake_folder.remote_modifier ().find ("nofileid").file_identifier == "";
+        fake_folder.remote_modifier ().find ("nofileid").file_identifier = "";
         fake_folder.remote_modifier ().mkdir ("nopermissions");
         fake_folder.remote_modifier ().insert ("nopermissions/A");
 

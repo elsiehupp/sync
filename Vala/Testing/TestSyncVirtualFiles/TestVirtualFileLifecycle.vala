@@ -134,7 +134,7 @@ public class TestVirtualFileLifecycle : AbstractTestSyncVirtualFiles {
     /***********************************************************
     ***********************************************************/
     private static void clean_up_test_virtual_file_lifecycle (ItemCompletedSpy complete_spy, bool do_local_discovery, FakeFolder fake_folder) {
-        complete_spy == "";
+        complete_spy = "";
         if (!do_local_discovery) {
             fake_folder.sync_engine.set_local_discovery_options (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM);
         }

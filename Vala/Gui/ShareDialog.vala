@@ -83,7 +83,7 @@ public class ShareDialog : Gtk.Dialog {
         // Set icon
         GLib.FileInfo file_info = new GLib.FileInfo (this.local_path);
         GLib.FileIconProvider icon_provider;
-        Gtk.Icon icon = icon_provider.icon (file_info);
+        Gtk.IconInfo icon = icon_provider.icon (file_info);
         var pixmap = icon.pixmap (THUMBNAIL_SIZE, THUMBNAIL_SIZE);
         if (pixmap.width () > 0) {
             this.instance.label_icon.pixmap (pixmap);
@@ -301,7 +301,7 @@ public class ShareDialog : Gtk.Dialog {
         if (this.share_manager != null) {
             bool ask_optional_password = this.account_state.account.capabilities.share_public_link_ask_optional_password ();
             string password = ask_optional_password ? create_random_password (): "";
-            this.share_manager.create_link_share (this.share_path, "", password);
+            this.share_manager.signal_create_link_share (this.share_path, "", password);
         }
     }
 
@@ -315,7 +315,7 @@ public class ShareDialog : Gtk.Dialog {
             this.share_manager.signal_link_share_requires_password.connect (
                 share_link_widget.on_signal_create_share_requires_password
             );
-            share_link_widget.create_password_processed.connect (
+            share_link_widget.signal_create_password_processed.connect (
                 this.on_signal_create_password_for_link_share_processed
             );
             share_link_widget.link_share ().password (password);
@@ -334,7 +334,7 @@ public class ShareDialog : Gtk.Dialog {
             this.share_manager.signal_link_share_requires_password.disconnect (
                 share_link_widget.on_signal_create_share_requires_password
             );
-            share_link_widget.create_password_processed.disconnect (
+            share_link_widget.signal_create_password_processed.disconnect (
                 this.on_signal_create_password_for_link_share_processed
             );
         } else {
@@ -350,7 +350,7 @@ public class ShareDialog : Gtk.Dialog {
         string password = GLib.InputDialog.text (this,
                                                  _("Password for share required"),
                                                  _("Please enter a password for your link share:"),
-                                                 GLib.LineEdit.Password,
+                                                 Gtk.LineEdit.Password,
                                                  "",
                                                  ok);
 
@@ -362,7 +362,7 @@ public class ShareDialog : Gtk.Dialog {
 
         if (this.share_manager != null) {
             // Try to create the link share again with the newly entered password
-            this.share_manager.create_link_share (this.share_path, "", password);
+            this.share_manager.signal_create_link_share (this.share_path, "", password);
         }
     }
 
@@ -464,18 +464,18 @@ public class ShareDialog : Gtk.Dialog {
         this.signal_toggle_share_link_animation.connect (
             link_share_widget.on_signal_toggle_share_link_animation
         );
-        link_share_widget.create_link_share.connect (
+        link_share_widget.signal_create_link_share.connect (
             this.on_signal_create_link_share
         );
-        link_share_widget.delete_link_share.connect (
+        link_share_widget.signal_delete_link_share.connect (
             this.on_signal_delete_share
         );
-        link_share_widget.create_password.connect (
+        link_share_widget.signal_create_password.connect (
             this.on_signal_create_password_for_link_share
         );
 
         //  connect (
-        //      this.link_widget_list.at (index), ShareLinkWidget.resize_requested,
+        //      this.link_widget_list.at (index), ShareLinkWidget.signal_resize_requested,
         //      this, ShareDialog.on_signal_adjust_scroll_widget_size
         //  );
 
@@ -498,16 +498,16 @@ public class ShareDialog : Gtk.Dialog {
             this.empty_share_link_widget = new ShareLinkWidget (this.account_state.account, this.share_path, this.local_path, this.max_sharing_permissions, this);
             this.link_widget_list.append (this.empty_share_link_widget);
 
-            this.empty_share_link_widget.resize_requested.connect (
+            this.empty_share_link_widget.signal_resize_requested.connect (
                 this.on_signal_adjust_scroll_widget_size
             );
             this.signal_toggle_share_link_animation.connect (
                 this.empty_share_link_widget.on_signal_toggle_share_link_animation
             );
-            this.empty_share_link_widget.create_link_share.connect (
+            this.empty_share_link_widget.signal_create_link_share.connect (
                 this.on_signal_create_link_share
             );
-            this.empty_share_link_widget.create_password.connect (
+            this.empty_share_link_widget.signal_create_password.connect (
                 this.on_signal_create_password_for_link_share
             );
 

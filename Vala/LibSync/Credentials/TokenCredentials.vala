@@ -73,7 +73,7 @@ public class TokenCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     public new void ask_from_user () {
-        /* emit */ asked ();
+        signal_asked ();
     }
 
 
@@ -81,7 +81,7 @@ public class TokenCredentials : AbstractCredentials {
     ***********************************************************/
     public new void fetch_from_keychain () {
         this.was_fetched = true;
-        /* Q_EMIT */ fetched ();
+        signal_fetched ();
     }
 
 

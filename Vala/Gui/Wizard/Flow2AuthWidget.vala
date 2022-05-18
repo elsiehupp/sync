@@ -15,30 +15,30 @@ public class Flow2AuthWidget : Gtk.Widget {
     ***********************************************************/
     private Account account = null;
     private Flow2Auth async_auth;
-    private Ui_Flow2Auth_widget instance;
+    private static Flow2AuthWidget instance;
 
     /***********************************************************
     ***********************************************************/
     private GLib.ProgressIndicator progress_indicator;
     private int status_update_skip_count = 0;
 
-    internal signal void auth_result (Flow2Auth.Result result, string error_string, string user, string app_password);
-    internal signal void poll_now ();
+    internal signal void signal_auth_result (Flow2Auth.Result result, string error_string, string user, string app_password);
+    internal signal void signal_poll_now ();
 
     /***********************************************************
     ***********************************************************/
     public Flow2AuthWidget (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.progress_indicator = new GLib.ProgressIndicator (this);
-        this.instance.setupUi (this);
+        Flow2AuthWidget.instance.setupUi (this);
 
-        WizardCommon.initErrorLabel (this.instance.error_label);
-        this.instance.error_label.setTextFormat (GLib.RichText);
+        WizardCommon.initErrorLabel (Flow2AuthWidget.instance.error_label);
+        Flow2AuthWidget.instance.error_label.setTextFormat (GLib.RichText);
 
-        this.instance.open_link_label.clicked.connect (
+        Flow2AuthWidget.instance.open_link_label.clicked.connect (
             this.on_signal_open_browser
         );
-        this.instance.copy_link_label.clicked.connect (
+        Flow2AuthWidget.instance.copy_link_label.clicked.connect (
             this.on_signal_copy_link_to_clipboard
         );
 
@@ -46,7 +46,7 @@ public class Flow2AuthWidget : Gtk.Widget {
         size_policy.retain_size_when_hidden (true);
         this.progress_indicator.setSizePolicy (size_policy);
 
-        this.instance.progress_layout.add_widget (this.progress_indicator);
+        Flow2AuthWidget.instance.progress_layout.add_widget (this.progress_indicator);
         stop_spinner (false);
 
         customize_style ();
@@ -96,10 +96,10 @@ public class Flow2AuthWidget : Gtk.Widget {
     ***********************************************************/
     public void error (string error) {
         if (error == "") {
-            this.instance.error_label.hide ();
+            Flow2AuthWidget.instance.error_label.hide ();
         } else {
-            this.instance.error_label.text (error);
-            this.instance.error_label.show ();
+            Flow2AuthWidget.instance.error_label.text (error);
+            Flow2AuthWidget.instance.error_label.show ();
         }
     }
 
@@ -112,55 +112,55 @@ public class Flow2AuthWidget : Gtk.Widget {
         switch (r) {
         case Flow2Auth.NotSupported:
             /* Flow2Auth can't open browser */
-            this.instance.error_label.text (_("Unable to open the Browser, please copy the link to your Browser."));
-            this.instance.error_label.show ();
+            Flow2AuthWidget.instance.error_label.text (_("Unable to open the Browser, please copy the link to your Browser."));
+            Flow2AuthWidget.instance.error_label.show ();
             break;
         case Flow2Auth.Error:
             /* Error while getting the access token.  (Timeout, or the server did not accept our client credentials */
-            this.instance.error_label.text (error_string);
-            this.instance.error_label.show ();
+            Flow2AuthWidget.instance.error_label.text (error_string);
+            Flow2AuthWidget.instance.error_label.show ();
             break;
         case Flow2Auth.LoggedIn: {
-            this.instance.error_label.hide ();
+            Flow2AuthWidget.instance.error_label.hide ();
             break;
         }
         }
 
-        /* emit */ auth_result (r, error_string, user, application_password);
+        signal_auth_result (r, error_string, user, application_password);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void on_signal_poll_now () {
-        /* emit */ poll_now ();
+        signal_poll_now ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_status_changed (Flow2Auth.PollStatus status, int seconds_left) {
+    public void on_signal_status_changed (Flow2Auth.PollStatus status, int64 seconds_left) {
         switch (status) {
         case Flow2Auth.statusPollCountdown:
             if (this.status_update_skip_count > 0) {
                 this.status_update_skip_count--;
                 break;
             }
-            this.instance.status_label.setext (_("Waiting for authorization") + "… (%1)".printf (secondsLeft));
+            Flow2AuthWidget.instance.status_label.setext (_("Waiting for authorization") + "… (%1)".printf (secondsLeft));
             stop_spinner (true);
             break;
         case Flow2Auth.statusPollNow:
             this.status_update_skip_count = 0;
-            this.instance.status_label.text (_("Polling for authorization") + "…");
+            Flow2AuthWidget.instance.status_label.text (_("Polling for authorization") + "…");
             startSpinner ();
             break;
         case Flow2Auth.statusFetchToken:
             this.status_update_skip_count = 0;
-            this.instance.status_label.text (_("Starting authorization") + "…");
+            Flow2AuthWidget.instance.status_label.text (_("Starting authorization") + "…");
             startSpinner ();
             break;
         case Flow2Auth.statusCopyLinkToClipboard:
-            this.instance.status_label.text (_("Link copied to clipboard."));
+            Flow2AuthWidget.instance.status_label.text (_("Link copied to clipboard."));
             this.status_update_skip_count = 3;
             stop_spinner (true);
             break;
@@ -178,8 +178,8 @@ public class Flow2AuthWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_open_browser () {
-        if (this.instance.error_label != null) {
-            this.instance.error_label.hide ();
+        if (Flow2AuthWidget.instance.error_label != null) {
+            Flow2AuthWidget.instance.error_label.hide ();
         }
 
         if (this.async_auth != null) {
@@ -191,8 +191,8 @@ public class Flow2AuthWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_copy_link_to_clipboard () {
-        if (this.instance.error_label != null) {
-            this.instance.error_label.hide ();
+        if (Flow2AuthWidget.instance.error_label != null) {
+            Flow2AuthWidget.instance.error_label.hide ();
         }
 
         if (this.async_auth != null) {
@@ -204,26 +204,26 @@ public class Flow2AuthWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_start_spinner () {
-        this.instance.progress_layout.enabled (true);
-        this.instance.status_label.visible (true);
+        Flow2AuthWidget.instance.progress_layout.enabled (true);
+        Flow2AuthWidget.instance.status_label.visible (true);
         this.progress_indicator.visible (true);
         this.progress_indicator.start_animation ();
 
-        this.instance.open_link_label.enabled (false);
-        this.instance.copy_link_label.enabled (false);
+        Flow2AuthWidget.instance.open_link_label.enabled (false);
+        Flow2AuthWidget.instance.copy_link_label.enabled (false);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_stop_spinner (bool show_status_label) {
-        this.instance.progress_layout.enabled (false);
-        this.instance.status_label.visible (show_status_label);
+        Flow2AuthWidget.instance.progress_layout.enabled (false);
+        Flow2AuthWidget.instance.status_label.visible (show_status_label);
         this.progress_indicator.visible (false);
         this.progress_indicator.stop_animation ();
 
-        this.instance.open_link_label.enabled (this.status_update_skip_count == 0);
-        this.instance.copy_link_label.enabled (this.status_update_skip_count == 0);
+        Flow2AuthWidget.instance.open_link_label.enabled (this.status_update_skip_count == 0);
+        Flow2AuthWidget.instance.copy_link_label.enabled (this.status_update_skip_count == 0);
     }
 
 
@@ -241,13 +241,13 @@ public class Flow2AuthWidget : Gtk.Widget {
             }
         }
 
-        this.instance.open_link_label.text (_("Reopen Browser"));
-        this.instance.open_link_label.alignment (GLib.AlignCenter);
+        Flow2AuthWidget.instance.open_link_label.text (_("Reopen Browser"));
+        Flow2AuthWidget.instance.open_link_label.alignment (GLib.AlignCenter);
 
-        this.instance.copy_link_label.text (_("Copy Link"));
-        this.instance.copy_link_label.alignment (GLib.AlignCenter);
+        Flow2AuthWidget.instance.copy_link_label.text (_("Copy Link"));
+        Flow2AuthWidget.instance.copy_link_label.alignment (GLib.AlignCenter);
 
-        WizardCommon.customize_hint_label (this.instance.status_label);
+        WizardCommon.customize_hint_label (Flow2AuthWidget.instance.status_label);
     }
 
 
@@ -258,7 +258,7 @@ public class Flow2AuthWidget : Gtk.Widget {
         var logo_icon_filename = Theme.is_branded
             ? Theme.hidpi_filename ("external.png", background_color)
             : Theme.hidpi_filename (":/client/theme/colored/external.png");
-        this.instance.logo_label.pixmap (logo_icon_filename);
+        Flow2AuthWidget.instance.logo_label.pixmap (logo_icon_filename);
     }
 
 }

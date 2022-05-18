@@ -33,22 +33,22 @@ public class AbstractTestUnifiedSearchListmodel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_init_test_case () {
-        fake_access_manager.on_signal_reset (new FakeQNAM ({}));
+        fake_access_manager.reset (new FakeQNAM ({}));
         account = Account.create ();
         account.set_credentials (new FakeCredentials (fake_access_manager));
         account.set_url (GLib.Uri ("http://example.de"));
 
-        account_state.on_signal_reset (new AccountState (account));
+        account_state.reset (new AccountState (account));
 
         fake_access_manager.set_override (
             this.init_test_case_override_delegate
         );
 
-        model.on_signal_reset (new UnifiedSearchResultsListModel (account_state));
+        model.reset (new UnifiedSearchResultsListModel (account_state));
 
-        model_tester.on_signal_reset (new GLib.AbstractItemModelTester (model));
+        model_tester.reset (new GLib.AbstractItemModelTester (model));
 
-        fake_desktop_services_url_handler.on_signal_reset (new FakeDesktopServicesUrlHandler ());
+        fake_desktop_services_url_handler.reset (new FakeDesktopServicesUrlHandler ());
     }
 
 

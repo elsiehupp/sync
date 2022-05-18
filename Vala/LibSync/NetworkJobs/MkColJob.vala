@@ -78,9 +78,9 @@ public class MkColJob : AbstractNetworkJob {
             + " finished with status " + reply_status_string ());
 
         if (this.reply.error != GLib.InputStream.NoError) {
-            /* Q_EMIT */ signal_finished_with_error (this.reply);
+            signal_finished_with_error (this.reply);
         } else {
-            /* Q_EMIT */ signal_finished_without_error ();
+            signal_finished_without_error ();
         }
         return true;
     }

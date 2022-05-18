@@ -111,7 +111,7 @@ public class TestSyncDehydration : AbstractTestSyncXAttr {
     /***********************************************************
     ***********************************************************/
     private static void clean_up_test_sync_dehydration () {
-        complete_spy == "";
+        complete_spy = "";
     }
 
 

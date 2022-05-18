@@ -4343,7 +4343,7 @@ public class EmojiModel : GLib.Object {
 
         var history_emojis_iter = history_emojis.begin ();
         while (history_emojis_iter != history_emojis.end ()) {
-            if ( (*history_emojis_iter).value<Emoji> ().unicode == model_data.value<Emoji> ().unicode) {
+            if ( (history_emojis_iter).value<Emoji> ().unicode == model_data.value<Emoji> ().unicode) {
                 history_emojis_iter = history_emojis.erase (history_emojis_iter);
             } else {
                 history_emojis_iter++;

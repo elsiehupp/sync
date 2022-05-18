@@ -67,8 +67,8 @@ public class AccountManager : GLib.Object {
         settings.get_value (VERSION_C, MAX_ACCOUNTS_VERSION);
         foreach (var acc in this.accounts) {
             settings.begin_group (acc.account.identifier);
-            save_account_helper (acc.account, *settings, save_credentials);
-            acc.write_to_settings (*settings);
+            save_account_helper (acc.account, settings, save_credentials);
+            acc.write_to_settings (settings);
             settings.end_group ();
         }
 
@@ -203,13 +203,13 @@ public class AccountManager : GLib.Object {
         account.account.delete_app_token ();
 
         signal_account_sync_connection_removed (account);
-        /* emit */ account_removed (account);
+        signal_account_removed (account);
     }
 
 
     /***********************************************************
     Creates an account and sets up some basic handlers.
-    Does not* add the account to the account manager just yet.
+    Does *not* add the account to the account manager just yet.
     ***********************************************************/
     public static Account create_account () {
         Account acc = Account.create ();
@@ -245,8 +245,8 @@ public class AccountManager : GLib.Object {
 
 
     /***********************************************************
+    saving and loading Account to settings
     ***********************************************************/
-    // saving and loading Account to settings
     private void save_account_helper (Account account, GLib.Settings settings, bool save_credentials = true) {
         settings.get_value (VERSION_C, MAX_ACCOUNT_VERSION);
         settings.get_value (URL_C, acc.url.to_string ());
@@ -254,10 +254,13 @@ public class AccountManager : GLib.Object {
         settings.get_value (SERVER_VERSION_C, acc.server_version);
         if (acc.credentials) {
             if (save_credentials) {
-                // Only persist the credentials if the parameter is set, on migration from 1.8.x
-                // we want to save the accounts but not overwrite the credentials
-                // (This is easier than asynchronously fetching the credentials from keychain and then
-                // re-persisting them)
+                /***********************************************************
+                Only persist the credentials if the parameter is set, on
+                migration from 1.8.x. We want to save the accounts but not
+                overwrite the credentials. (This is easier than
+                asynchronously fetching the credentials from keychain and
+                then re-persisting them).
+                ***********************************************************/
                 acc.credentials.persist ();
             }
             foreach (var key in acc.settings_map.keys ()) {
@@ -265,13 +268,17 @@ public class AccountManager : GLib.Object {
             }
             settings.get_value (AUTH_TYPE_C, acc.credentials.auth_type ());
 
-            // HACK : Save http_user also as user
+            /***********************************************************
+            HACK: Save http_user also as user
+            ***********************************************************/
             if (acc.settings_map.contains (HTTP_USER_C)) {
                 settings.get_value (USER_C, acc.settings_map.get_value (HTTP_USER_C));
             }
         }
 
-        // Save accepted certificates.
+        /***********************************************************
+        Save accepted certificates.
+        ***********************************************************/
         settings.begin_group ("General");
         GLib.info ("Saving " + acc.approved_certificates ().length + " unknown certificates.");
         string certificates;
@@ -283,7 +290,9 @@ public class AccountManager : GLib.Object {
         }
         settings.end_group ();
 
-        // Save cookies.
+        /***********************************************************
+        Save cookies.
+        ***********************************************************/
         if (acc.am) {
             var jar = (Soup.CookieJar)acc.am.cookie_jar ();
             if (jar) {
@@ -301,7 +310,9 @@ public class AccountManager : GLib.Object {
     private unowned Account load_account_helper (GLib.Settings settings) {
         var url_config = settings.get_value (URL_C);
         if (!url_config.is_valid) {
-            // No URL probably means a corrupted entry in the account settings
+            /***********************************************************
+            No URL probably means a corrupted entry in the account settings
+            ***********************************************************/
             GLib.warning ("No URL for account " + settings.group ());
             return new Account ();
         }
@@ -334,7 +345,7 @@ public class AccountManager : GLib.Object {
         // Migrate to webflow
         if (auth_type == "http") {
             auth_type = "webflow";
-            settings.get_value (AUTH_TYPE_C, auth_type);
+            auth_type = settings.get_value (AUTH_TYPE_C);
 
             foreach (string key in settings.child_keys ()) {
                 if (!key.has_prefix ("http_")) {
@@ -452,16 +463,12 @@ public class AccountManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private string generate_free_account_id ();
-    string AccountManager.generate_free_account_id () {
-        int i = 0;
-        while (true) {
-            string identifier = string.number (i);
-            if (is_account_id_available (identifier)) {
-                return identifier;
-            }
-            ++i;
+    private string generate_free_account_id () {
+        int index = 0;
+        while (!is_account_id_available (index.to_string ())) {
+            index++;
         }
+        return index.to_string ();
     }
 
 
@@ -487,7 +494,7 @@ public class AccountManager : GLib.Object {
         GLib.debug ("Saving account " + a.url.to_string ());
         var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
         settings.begin_group (a.identifier);
-        save_account_helper (a, *settings, false); // don't save credentials they might not have been loaded yet
+        save_account_helper (a, settings, false); // don't save credentials they might not have been loaded yet
         settings.end_group ();
 
         settings.sync ();
@@ -502,7 +509,7 @@ public class AccountManager : GLib.Object {
         GLib.debug ("Saving account state " + a.account.url.to_string ());
         var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
         settings.begin_group (a.account.identifier);
-        a.write_to_settings (*settings);
+        a.write_to_settings (settings);
         settings.end_group ();
 
         settings.sync ();

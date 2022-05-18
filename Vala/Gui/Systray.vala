@@ -108,7 +108,7 @@ public class Systray : GLib.SystemTrayIcon {
     internal signal void signal_shutdown ();
 
     internal signal void hide_window ();
-    internal signal void show_window ();
+    internal signal void signal_show_window ();
     internal signal void open_share_dialog (string share_path, string local_path);
     internal signal void show_file_activity_dialog (string share_path, string local_path);
 
@@ -242,7 +242,7 @@ public class Systray : GLib.SystemTrayIcon {
             this.tray_engine.on_signal_load ("qrc:/qml/src/gui/tray/Window.qml");
         }
         hide_window ();
-        /* emit */ activated (GLib.SystemTrayIcon.Activation_reason.Unknown);
+        signal_activated (GLib.SystemTrayIcon.Activation_reason.Unknown);
 
         var folder_map = FolderManager.instance.map ();
         foreach (var folder_connection in folder_map) {

@@ -40,7 +40,7 @@ public class TestMoveCustomRemoteRoot : AbstractTestSyncMove {
         fake_folder.set_server_override (counter.functor ());
 
         // Move file and then move it back again
-        counter.on_signal_reset ();
+        counter.reset ();
         local_modifier.rename ("AS/f1", "f1");
 
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);

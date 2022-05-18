@@ -1,7 +1,6 @@
 
 //  #include <GLib.WebEngineUrlRequestJob>
 //  #include <GLib.ProgressBar>
-//  #include <GLib.VBoxLayout>
 //  #include <Soup.NetworkProxyFactory>
 //  #include <Gdk.Monitor>
 
@@ -28,7 +27,7 @@ public class WebViewPage : AbstractCredentialsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    internal signal void connect_to_oc_url (string value);
+    internal signal void signal_connect_to_ocs_url (string value);
 
     /***********************************************************
     ***********************************************************/
@@ -39,7 +38,7 @@ public class WebViewPage : AbstractCredentialsWizardPage {
         GLib.info ("Time for a webview!");
         this.web_view = new WebView (this);
 
-        var layout = new GLib.VBoxLayout (this);
+        var layout = new Gtk.Box (Gtk.Orientation.VERTICAL);
         layout.margin (0);
         layout.add_widget (this.web_view);
         layout (layout);
@@ -136,8 +135,8 @@ public class WebViewPage : AbstractCredentialsWizardPage {
         unowned Account account = this.oc_wizard.account;
         account.url (host);
 
-        GLib.info ("URL: " + field ("OCUrl").to_string ());
-        /* emit */ connect_to_oc_url (host);
+        GLib.info ("URL: " + field ("OcsUrl").to_string ());
+        signal_connect_to_ocs_url (host);
     }
 
 

@@ -21,7 +21,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
     private OwncloudWizard oc_wizard;
 
 
-    internal signal void connect_to_oc_url (string value);
+    internal signal void signal_connect_to_ocs_url (string value);
 
 
     /***********************************************************
@@ -116,8 +116,8 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
     /***********************************************************
     ***********************************************************/
     public void clean_up_page () {
-        this.instance.le_username == "";
-        this.instance.le_password == "";
+        this.instance.le_username = "";
+        this.instance.le_password = "";
     }
 
 
@@ -136,15 +136,15 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
             var oc_wizard = (OwncloudWizard)wizard ();
             oc_wizard.account.clear_cookie_jar ();
 
-            /* emit */ complete_changed ();
-            /* emit */ connect_to_oc_url (field ("OCUrl").to_string ().simplified ());
+            signal_complete_changed ();
+            signal_connect_to_ocs_url (field ("OcsUrl").to_string ().simplified ());
 
             return false;
         } else {
             // Reset, to require another connection attempt next time
             this.connected = false;
 
-            /* emit */ complete_changed ();
+            signal_complete_changed ();
             on_signal_stop_spinner ();
             return true;
         }
@@ -178,7 +178,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
             this.instance.error_label.visible (true);
             this.instance.error_label.on_signal_text (error_string);
         }
-        /* emit */ complete_changed ();
+        signal_complete_changed ();
         on_signal_stop_spinner ();
     }
 

@@ -16,7 +16,7 @@ public class SystemProxyRunnable : GLib.Object /*, GLib.Runnable*/ {
 
     /***********************************************************
     ***********************************************************/
-    internal signal void system_proxy_looked_up (Soup.ProxyResolverDefault url);
+    internal signal void signal_system_proxy_looked_up (Soup.ProxyResolverDefault url);
 
     /***********************************************************
     ***********************************************************/
@@ -33,9 +33,9 @@ public class SystemProxyRunnable : GLib.Object /*, GLib.Runnable*/ {
         GLib.List<Soup.ProxyResolverDefault> proxies = Soup.NetworkProxyFactory.system_proxy_for_query (GLib.NetworkProxyQuery (this.url));
 
         if (proxies == "") {
-            /* emit */ system_proxy_looked_up (new Soup.ProxyResolverDefault (Soup.ProxyResolverDefault.NoProxy));
+            signal_system_proxy_looked_up (new Soup.ProxyResolverDefault (Soup.ProxyResolverDefault.NoProxy));
         } else {
-            /* emit */ system_proxy_looked_up (proxies.nth_data (0));
+            signal_system_proxy_looked_up (proxies.nth_data (0));
             // FIXME Would we really ever return more?
         }
     }

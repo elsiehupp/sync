@@ -19,8 +19,8 @@ public class PropagateDownloadEncrypted : GLib.Object {
     public string error_string { public get; protected set; }
 
 
-    internal signal void file_metadata_found ();
-    internal signal void failed ();
+    internal signal void signal_file_metadata_found ();
+    internal signal void signal_failed ();
     internal signal void decryption_finished ();
 
 
@@ -149,12 +149,12 @@ public class PropagateDownloadEncrypted : GLib.Object {
                 this.encrypted_info = file;
 
                 GLib.debug ("Found matching encrypted metadata for file, starting download.");
-                /* emit */ file_metadata_found ();
+                signal_file_metadata_found ();
                 return;
             }
         }
 
-        /* emit */ failed ();
+        signal_failed ();
         GLib.critical ("Failed to find encrypted metadata information of remote file " + filename);
     }
 
@@ -169,8 +169,8 @@ public class PropagateDownloadEncrypted : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_folder_encrypted_metadata_error (string file_identifier, int http_return_code) {
-            GLib.critical ("Failed to find encrypted metadata information of remote file " + this.info.filename ());
-            /* emit */ failed ();
+        GLib.critical ("Failed to find encrypted metadata information of remote file " + this.info.filename ());
+        signal_failed ();
     }
 
 } // class PropagateDownloadEncrypted

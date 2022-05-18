@@ -77,7 +77,7 @@ public abstract class AbstractPropagateItemJob : AbstractPropagatorJob {
     /***********************************************************
     ***********************************************************/
     protected bool has_encrypted_ancestor () {
-        if (!this.propagator.account.capabilities.client_side_encryption_available ()) {
+        if (!this.propagator.account.capabilities.client_side_encryption_available) {
             return false;
         }
 
@@ -202,7 +202,7 @@ public abstract class AbstractPropagateItemJob : AbstractPropagatorJob {
             GLib.warning ("Could not complete propagation of " + this.item.destination ().to_string () + " by " + this.to_string () + " with status " + this.item.status.to_string () + " and error: " + this.item.error_string);
         else
             GLib.info ("Completed propagation of " + this.item.destination ().to_string () + " by " + this.to_string () + " with status " + this.item.status.to_string ());
-        /* emit */ this.propagator.signal_item_completed (this.item);
+        this.propagator.signal_item_completed (this.item);
         signal_finished (this.item.status);
 
         if (this.item.status == SyncFileItem.Status.FATAL_ERROR) {

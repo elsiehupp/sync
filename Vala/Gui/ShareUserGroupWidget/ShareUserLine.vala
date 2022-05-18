@@ -37,8 +37,8 @@ public class ShareUserLine : Gtk.Widget {
     private GLib.Action expiration_date_link_action;
     private GLib.Action password_protect_link_action;
 
-    internal signal void visual_deletion_done ();
-    internal signal void resize_requested ();
+    internal signal void signal_visual_deletion_done ();
+    internal signal void signal_resize_requested ();
 
     /***********************************************************
     ***********************************************************/
@@ -144,7 +144,7 @@ public class ShareUserLine : Gtk.Widget {
         menu.add_separator ();
 
         // Adds action to delete share widget
-        Gtk.Icon delete_icon = Gtk.Icon.from_theme ("user-trash", new Gtk.Icon (":/client/theme/delete.svg"));
+        Gtk.IconInfo delete_icon = Gtk.IconInfo.from_theme ("user-trash", new Gtk.IconInfo (":/client/theme/delete.svg"));
         this.delete_share_button= new GLib.Action (delete_icon,_("Unshare"), this);
 
         menu.add_action (this.delete_share_button);
@@ -209,7 +209,7 @@ public class ShareUserLine : Gtk.Widget {
         this.instance.error_label.hide ();
 
         this.instance.permission_tool_button.menu (menu);
-        this.instance.permission_tool_button.popup_mode (GLib.ToolButton.Instant_popup);
+        this.instance.permission_tool_button.popup_mode (Gtk.ToolButton.Instant_popup);
 
         this.instance.password_progress_indicator.visible (false);
 
@@ -357,10 +357,10 @@ public class ShareUserLine : Gtk.Widget {
     private void on_signal_password_checkbox_changed () {
         if (!this.password_protect_link_action.is_checked ()) {
             this.instance.error_label.hide ();
-            this.instance.error_label == "";
+            this.instance.error_label = "";
 
             if (!this.share.password_is_set) {
-                this.instance.line_edit_password == "";
+                this.instance.line_edit_password = "";
                 on_signal_refresh_password_options ();
             } else {
                 // do not call on_signal_refresh_password_options here, as it will be called after the network request is complete
@@ -380,8 +380,8 @@ public class ShareUserLine : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_delete_animation_finished () {
-        /* emit */ resize_requested ();
-        /* emit */ visual_deletion_done ();
+        signal_resize_requested ();
+        signal_visual_deletion_done ();
         delete_later ();
 
         // There is a painting bug where a small line of this widget isn't
@@ -403,7 +403,7 @@ public class ShareUserLine : Gtk.Widget {
         this.instance.line_edit_password.visible (is_password_enabled);
         this.instance.confirm_password.visible (is_password_enabled);
 
-        /* emit */ resize_requested ();
+        signal_resize_requested ();
     }
 
 
@@ -448,7 +448,7 @@ public class ShareUserLine : Gtk.Widget {
             this.on_signal_delete_animation_finished
         );
         animation.value_changed.connect (
-            this.resize_requested
+            this.signal_resize_requested
         );
 
         animation.on_signal_start ();
@@ -488,7 +488,7 @@ public class ShareUserLine : Gtk.Widget {
         this.instance.confirm_password.enabled (false);
 
         this.instance.error_label.hide ();
-        this.instance.error_label == "";
+        this.instance.error_label = "";
 
         toggle_password_progress_animation (true);
         this.share.password (this.instance.line_edit_password.text ());
@@ -537,7 +537,7 @@ public class ShareUserLine : Gtk.Widget {
         this.instance.error_label.show ();
         this.instance.error_label.on_signal_text (message);
 
-        /* emit */ resize_requested ();
+        signal_resize_requested ();
     }
 
 
@@ -600,7 +600,7 @@ public class ShareUserLine : Gtk.Widget {
                 avatar_size,
                 this
             );
-            avatar_line.avatar_pixmap.connect (
+            avatar_line.signal_avatar_pixmap.connect (
                 this.on_signal_avatar_loaded
             );
             avatar_line.on_signal_start ();
@@ -629,7 +629,7 @@ public class ShareUserLine : Gtk.Widget {
 
         var pixmap = pixmap_for_sharee_type (this.share.share_with.type, background_color);
 
-        if (!pixmap == null) {
+        if (pixmap != null) {
             this.instance.avatar.pixmap (pixmap);
         } else {
             GLib.debug ("pixmap is null for share type: " + this.share.share_with.type);
@@ -645,7 +645,7 @@ public class ShareUserLine : Gtk.Widget {
     private void customize_style () {
         this.instance.permission_tool_button.icon (Theme.create_color_aware_icon (":/client/theme/more.svg"));
 
-        Gtk.Icon delete_icon = Gtk.Icon.from_theme (
+        Gtk.IconInfo delete_icon = Gtk.IconInfo.from_theme (
             "user-trash",
             Theme.create_color_aware_icon (":/client/theme/delete.svg")
         );
@@ -692,7 +692,7 @@ public class ShareUserLine : Gtk.Widget {
             this.instance.note_text_edit.focus ();
         }
 
-        /* emit */ resize_requested ();
+        signal_resize_requested ();
     }
 
 
@@ -761,7 +761,7 @@ public class ShareUserLine : Gtk.Widget {
             }
         }
 
-        /* emit */ resize_requested ();
+        signal_resize_requested ();
     }
 
 

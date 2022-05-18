@@ -59,7 +59,7 @@ public class TestPlaceholderExists : AbstractTestSyncVirtualFiles {
 
         // Now disable vfs and check that all files are still there
         TestSyncVirtualFiles.clean_up_test_place_holder_exist ();
-        SyncEngine.wipe_virtual_files (fake_folder.local_path, fake_folder.sync_journal (), *vfs);
+        SyncEngine.wipe_virtual_files (fake_folder.local_path, fake_folder.sync_journal (), vfs);
         fake_folder.switch_to_vfs ((AbstractVfs)(new VfsOff ()));
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
@@ -73,7 +73,7 @@ public class TestPlaceholderExists : AbstractTestSyncVirtualFiles {
     /***********************************************************
     ***********************************************************/
     private static void clean_up_test_place_holder_exist (ItemCompletedSpy complete_spy) {
-        complete_spy == "";
+        complete_spy = "";
     }
 
 } // class TestPlaceholderExists

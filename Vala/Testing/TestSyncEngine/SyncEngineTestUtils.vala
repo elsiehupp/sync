@@ -28,7 +28,7 @@ public class SyncEngineTestUtils : GLib.Object {
             return path.mid (s_upload_url.path.length);
         if (path.has_prefix (s_root_url.path))
             return path.mid (s_root_url.path.length);
-        return {};
+        return "";
     }
 
     /***********************************************************

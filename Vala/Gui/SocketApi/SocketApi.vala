@@ -19,7 +19,6 @@
 //  #include <array>
 //  #include <GLib.BitArray>
 //  #include <GLib.Meta_method>
-//  #include <GLib.Object>
 //  #include <GLib.ScopedPointer>
 //  #include <GLib.Dir>
 //  #include <GLib.Application>
@@ -561,7 +560,7 @@ public class SocketApi : GLib.Object {
             if (this.folder_connection == null) {
                 return record;
             }
-            folder_connection.journal_database ().file_record (folder_relative_path, record);
+            folder_connection.journal_database.file_record (folder_relative_path, record);
             return record;
         }
 
@@ -791,7 +790,7 @@ public class SocketApi : GLib.Object {
             }
 
             // Update the pin state on all items
-            if (!data.folder_connection.vfs.pin_state (data.folder_relative_path, PinState.PinState.ALWAYS_LOCAL)) {
+            if (!data.folder_connection.vfs.pin_state (data.folder_relative_path, PinState.ALWAYS_LOCAL)) {
                 GLib.warning ("Could not set pin state of " + data.folder_relative_path + " to always local.");
             }
 
@@ -837,7 +836,7 @@ public class SocketApi : GLib.Object {
         }
 
         var conflicted_relative_path = file_data.folder_relative_path;
-        var base_relative_path = file_data.folder_connection.journal_database ().conflict_file_base_name (file_data.folder_relative_path.to_utf8 ());
+        var base_relative_path = file_data.folder_connection.journal_database.conflict_file_base_name (file_data.folder_relative_path.to_utf8 ());
 
         var directory = new GLib.Dir (file_data.folder_connection.path);
         var conflicted_path = directory.file_path (conflicted_relative_path);
@@ -881,7 +880,7 @@ public class SocketApi : GLib.Object {
 
         // If it's a conflict, we want to save it under the base name by default
         if (Utility.is_conflict_file (default_dir_and_name)) {
-            default_dir_and_name = file_data.folder_connection.journal_database ().conflict_file_base_name (file_data.folder_relative_path.to_utf8 ());
+            default_dir_and_name = file_data.folder_connection.journal_database.conflict_file_base_name (file_data.folder_relative_path.to_utf8 ());
         }
 
         // If the parent doesn't accept new files, go to the root of the sync folder_connection
@@ -1096,7 +1095,7 @@ public class SocketApi : GLib.Object {
             FileData file_data = FileData.file_data (argument);
             var record = file_data.journal_record ();
             bool is_on_signal_the_server = record.is_valid;
-            var is_e2e_encrypted_path = file_data.journal_record ().is_e2e_encrypted || !file_data.journal_record ().e2e_mangled_name == "";
+            var is_e2e_encrypted_path = file_data.journal_record ().is_e2e_encrypted || !file_data.journal_record ().e2e_mangled_name = "";
             var flag_string = is_on_signal_the_server && !is_e2e_encrypted_path ? "." : ":d:";
 
             GLib.FileInfo file_info = new GLib.FileInfo (file_data.local_path);
@@ -1175,12 +1174,12 @@ public class SocketApi : GLib.Object {
                 if (!combined) {
                     combined = *availability;
                 } else {
-                    combined = merge (*combined, *availability);
+                    combined = merge (combined, availability);
                 }
             }
 
             if (combined) {
-                switch (*combined) {
+                switch (combined) {
                 case Common.ItemAvailability.PinState.ALWAYS_LOCAL:
                     make_pin_context_menu (false, true);
                     break;
@@ -1330,14 +1329,14 @@ public class SocketApi : GLib.Object {
         var segments = property_name.split ('.');
 
         GLib.Object current_object = widget;
-        Gtk.Icon value;
+        Gtk.IconInfo value;
         for (int i = 0; i < segments.length; i++) {
             var segment = segments.at (i);
             var variable = current_object.property (segment.to_utf8 ().const_data ());
 
-            if (variable.can_convert<Gtk.Icon> ()) {
-                variable.convert (GLib.MetaType.Gtk.Icon);
-                value = variable.value<Gtk.Icon> ();
+            if (variable.can_convert<Gtk.IconInfo> ()) {
+                variable.convert (GLib.MetaType.Gtk.IconInfo);
+                value = variable.value<Gtk.IconInfo> ();
                 break;
             }
 

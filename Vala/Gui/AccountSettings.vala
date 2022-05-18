@@ -146,10 +146,10 @@ public class AccountSettings : Gtk.Widget {
         this.instance.selective_sync_notification.link_activated.connect (
             this.on_signal_link_activated
         );
-        this.model.suggest_expand.connect (
+        this.model.signal_suggest_expand.connect (
             AccountSettings.folder_list.expand
         );
-        this.model.dirty_changed.connect (
+        this.model.signal_dirty_changed.connect (
             this.on_signal_refresh_selective_sync_status
         );
         on_signal_refresh_selective_sync_status ();
@@ -173,7 +173,7 @@ public class AccountSettings : Gtk.Widget {
 
         on_signal_hide_selective_sync_widget ();
         this.instance.big_folder_ui.visible (false);
-        this.model.data_changed.connect (
+        this.model.signal_data_changed.connect (
             this.on_signal_selective_sync_changed
         );
         this.instance.selective_sync_apply.clicked.connect (
@@ -213,10 +213,10 @@ public class AccountSettings : Gtk.Widget {
         this.signal_request_mnemonic.connect (
             this.account_state.account.e2e.on_signal_request_mnemonic
         );
-        this.account_state.account.e2e.show_mnemonic.connect (
+        this.account_state.account.e2e.signal_show_mnemonic.connect (
             this.on_signal_show_mnemonic
         );
-        this.account_state.account.e2e.mnemonic_generated.connect (
+        this.account_state.account.e2e.signal_mnemonic_generated.connect (
             this.on_signal_new_mnemonic_generated
         );
 
@@ -240,7 +240,7 @@ public class AccountSettings : Gtk.Widget {
         );
         on_signal_account_state_changed ();
 
-        this.user_info.quota_updated.connect (
+        this.user_info.signal_quota_updated.connect (
             this.on_signal_quota_updated
         );
 
@@ -444,9 +444,9 @@ public class AccountSettings : Gtk.Widget {
             if it has, do not offer to create one.
              */
             GLib.info ("Account " + on_signal_accounts_state ().account.display_name
-                      + " Client Side Encryption " + on_signal_accounts_state ().account.capabilities.client_side_encryption_available ());
+                      + " Client Side Encryption " + on_signal_accounts_state ().account.capabilities.client_side_encryption_available);
 
-            if (this.account_state.account.capabilities.client_side_encryption_available ()) {
+            if (this.account_state.account.capabilities.client_side_encryption_available) {
                 this.instance.encryption_message.show ();
             }
         }
@@ -565,7 +565,7 @@ public class AccountSettings : Gtk.Widget {
     protected void on_signal_schedule_current_folder_force_remote_discovery () {
         try {
             FolderManager.instance.folder_by_alias (selected_folder_alias ()).on_signal_wipe_error_blocklist ();
-            FolderManager.instance.folder_by_alias (selected_folder_alias ()).journal_database ().force_remote_discovery_next_sync ();
+            FolderManager.instance.folder_by_alias (selected_folder_alias ()).journal_database.force_remote_discovery_next_sync ();
             FolderManager.instance.schedule_folder (
                 FolderManager.instance.folder_by_alias (selected_folder_alias ())
             );
@@ -787,8 +787,8 @@ public class AccountSettings : Gtk.Widget {
 
         // Wipe selective sync blocklist
         bool ok = false;
-        var old_blocklist = folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
-        folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, {});
+        var old_blocklist = folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
+        folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, {});
 
         // Change the folder_connection vfs mode and load the plugin
         folder_connection.virtual_files_enabled = true;
@@ -796,9 +796,9 @@ public class AccountSettings : Gtk.Widget {
 
         // Setting to PinState.UNSPECIFIED retains existing data.
         // Selective sync excluded folders become Common.ItemAvailability.ONLINE_ONLY.
-        folder_connection.root_pin_state (PinState.PinState.UNSPECIFIED);
+        folder_connection.root_pin_state (PinState.UNSPECIFIED);
         foreach (var entry in old_blocklist) {
-            folder_connection.journal_database ().schedule_path_for_remote_discovery (entry);
+            folder_connection.journal_database.schedule_path_for_remote_discovery (entry);
             if (!folder_connection.vfs ().pin_state (entry, Common.ItemAvailability.ONLINE_ONLY)) {
                 GLib.warning ("Could not set pin state of " + entry + " to online only.");
             }
@@ -887,8 +887,8 @@ public class AccountSettings : Gtk.Widget {
         folder_connection.vfs_on_signal_off_switch_pending (false);
 
         // Wipe pin states and selective sync database
-        folder_connection.root_pin_state (PinState.PinState.ALWAYS_LOCAL);
-        folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, {});
+        folder_connection.root_pin_state (PinState.ALWAYS_LOCAL);
+        folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, {});
 
         // Prevent issues with missing local files
         folder_connection.on_signal_next_sync_full_local_discovery ();
@@ -902,7 +902,7 @@ public class AccountSettings : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_current_folder_availability (PinState state) {
-        //  GLib.assert_true (state == Common.ItemAvailability.ONLINE_ONLY || state == PinState.PinState.ALWAYS_LOCAL);
+        //  GLib.assert_true (state == Common.ItemAvailability.ONLINE_ONLY || state == PinState.ALWAYS_LOCAL);
 
         try {
             FolderConnection folder_connection = FolderManager.instance.folder_by_alias (selected_folder_alias ());
@@ -988,10 +988,10 @@ public class AccountSettings : Gtk.Widget {
             if (definition.virtual_files_mode != AbstractVfs.Off && folder_wizard.property ("use_virtual_files").to_bool ()) {
                 folder_connection.root_pin_state (Common.ItemAvailability.ONLINE_ONLY);
             }
-            folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, selective_sync_block_list);
+            folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, selective_sync_block_list);
 
             // The user already accepted the selective sync dialog. everything is in the allow list
-            folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, "/");
+            folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, "/");
             FolderManager.instance.schedule_all_folders ();
             signal_folder_changed ();
         }
@@ -1066,7 +1066,7 @@ public class AccountSettings : Gtk.Widget {
             }
 
             bool ok = false;
-            var undecided_list = folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok);
+            var undecided_list = folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok);
             foreach (var item in undecided_list) {
                 // FIXME: add the folder_connection alias in a hoover hint.
                 // folder_connection.alias () + "/"
@@ -1136,7 +1136,7 @@ public class AccountSettings : Gtk.Widget {
             // But EncryptFolderJob expects directory path Foo/Bar convention
             var encrypt_folder_job = new EncryptFolderJob (
                 on_signal_accounts_state ().account,
-                folder_connection.journal_database (),
+                folder_connection.journal_database,
                 path.chopped (1),
                 file_id,
                 this
@@ -1173,7 +1173,7 @@ public class AccountSettings : Gtk.Widget {
         var info   = this.model.info_for_index (index);
         var acc = this.account_state.account;
 
-        if (acc.capabilities.client_side_encryption_available ()) {
+        if (acc.capabilities.client_side_encryption_available) {
             // Verify if the folder_connection is empty before attempting to encrypt.
 
             bool is_encrypted = info.is_encrypted;
@@ -1214,7 +1214,7 @@ public class AccountSettings : Gtk.Widget {
             var remote_path = info.path.chopped (1);
 
             // It might be an E2EE mangled path, so let's try to demangle it
-            var journal = info.folder_connection.journal_database ();
+            var journal = info.folder_connection.journal_database;
             SyncJournalFileRecord record;
             journal.file_record_by_e2e_mangled_name (remote_path, record);
 
@@ -1222,7 +1222,7 @@ public class AccountSettings : Gtk.Widget {
 
             vfs_pin_action = availability_menu.add_action (Utility.vfs_pin_action_text ());
             vfs_pin_action.triggered.connect (
-                this.on_signal_sub_folder_availability (info.folder_connection, path, PinState.PinState.ALWAYS_LOCAL)
+                this.on_signal_sub_folder_availability (info.folder_connection, path, PinState.ALWAYS_LOCAL)
             );
 
             vfs_free_space_action = availability_menu.add_action (Utility.vfs_free_space_action_text ());
@@ -1315,7 +1315,7 @@ public class AccountSettings : Gtk.Widget {
 
             vfs_pin_action = availability_menu.add_action (Utility.vfs_pin_action_text ());
             vfs_pin_action.triggered.connect (
-                this.on_signal_current_folder_availability (PinState.PinState.ALWAYS_LOCAL)
+                this.on_signal_current_folder_availability (PinState.ALWAYS_LOCAL)
             );
             vfs_pin_action.disabled (Theme.enforce_virtual_files_sync_folder);
 
@@ -1383,7 +1383,7 @@ public class AccountSettings : Gtk.Widget {
                 return;
             }
             if (FolderStatusDelegate.errors_list_rect (tv.visual_rect (index)).contains (position)) {
-                /* emit */ on_signal_show_issues_list (this.account_state);
+                signal_show_issues_list (this.account_state);
                 return;
             }
 
@@ -1606,7 +1606,7 @@ public class AccountSettings : Gtk.Widget {
         //  GLib.assert_true (GLib.FileInfo (abs_folder_path).is_absolute ());
 
         string ignore_file = abs_folder_path + ".sync-exclude.lst";
-        var layout = new GLib.VBoxLayout ();
+        var layout = new Gtk.Box (Gtk.Orientation.VERTICAL);
         var ignore_list_widget = new IgnoreListTableWidget (this);
         ignore_list_widget.read_ignore_file (ignore_file);
         layout.add_widget (ignore_list_widget);

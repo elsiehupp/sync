@@ -63,7 +63,7 @@ public class TestRenameVirtual2 : AbstractTestSyncXAttr {
     /***********************************************************
     ***********************************************************/
     private static void clean_up_test_rename_virtual2 (ItemCompletedSpy complete_spy) {
-        complete_spy == "";
+        complete_spy = "";
     }
 
 } // class TestRenameVirtual2

@@ -29,7 +29,7 @@ public class FakeHangingReply : FakeReply {
         // Follow more or less the implementation of GLib.NetworkReplyImpl.on_signal_abort
         close ();
         set_error (OperationCanceledError, _("Operation canceled"));
-        /* emit */ error_occurred (OperationCanceledError);
+        signal_error_occurred (OperationCanceledError);
         set_finished (true);
         signal_finished ();
         return false; // only run once

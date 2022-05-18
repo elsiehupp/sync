@@ -184,7 +184,7 @@ public class FolderWatcherPrivate : GLib.Object {
             //  GLib.List<string>.ConstIterator ConstIterator;
             //  for (ConstIterator = pathes.const_begin (); ConstIterator != pathes.const_end ();
             //       ++ConstIterator) {
-            //      const string full_path (directory.path + "/" + (*ConstIterator));
+            //      const string full_path (directory.path + "/" + (ConstIterator));
             //      full_list.append (full_path);
             //      ok = find_folders_below (GLib.Dir (full_path), full_list);
             //  }
@@ -210,7 +210,7 @@ public class FolderWatcherPrivate : GLib.Object {
             // unreliable.
             if (this.parent.is_reliable && (errno == ENOMEM || errno == ENOSPC)) {
                 this.parent.is_reliable = false;
-                /* emit */ this.parent.signal_became_unreliable (
+                this.parent.signal_became_unreliable (
                     _("This problem usually happens when the inotify watches are exhausted. "
                      + "Check the FAQ for details."));
             }

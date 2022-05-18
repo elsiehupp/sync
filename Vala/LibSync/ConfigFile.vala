@@ -584,7 +584,7 @@ public class ConfigFile : GLib.Object {
     string ConfigFile.proxy_password () {
         string pass_encoded = get_value (PROXY_PASS_C).to_byte_array ();
         var pass = string.from_utf8 (string.from_base64 (pass_encoded));
-        pass_encoded == "";
+        pass_encoded = "";
 
         var key = KEYCHAIN_PROXY_PASSWORD_KEY;
 
@@ -730,7 +730,7 @@ public class ConfigFile : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool show_main_dialog_as_normal_window () {
-        return get_value (SHOW_MAIN_DIALOG_AS_NORMAL_WINDOW_C, {}, false).to_bool ();
+        return get_value (SHOW_MAIN_DIALOG_AS_NORMAL_WINDOW_C, "", false).to_bool ();
     }
 
 
@@ -1125,7 +1125,7 @@ public class ConfigFile : GLib.Object {
             ConfigFile config;
             *g_config_filename () = config.ConfigFile.config_file;
         }
-        GLib.Settings settings = new GLib.Settings (*g_config_filename (), GLib.Settings.IniFormat, parent);
+        GLib.Settings settings = new GLib.Settings (g_config_filename (), GLib.Settings.IniFormat, parent);
         settings.begin_group (group);
         return settings;
     }

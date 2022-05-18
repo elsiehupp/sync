@@ -77,7 +77,7 @@ public class Flow2Auth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    internal signal void signal_status_changed (PollStatus status, int seconds_left);
+    internal signal void signal_status_changed (PollStatus status, int64 seconds_left);
 
 
     /***********************************************************
@@ -115,7 +115,7 @@ public class Flow2Auth : GLib.Object {
         this.is_busy = true;
         this.has_token = false;
 
-        signal_status_changed (PollStatus.PollStatus.FETCH_TOKEN, 0);
+        signal_status_changed (PollStatus.FETCH_TOKEN, 0);
 
         // Step 1 : Initiate a login, do an anonymous POST request
         GLib.Uri url = Utility.concat_url_path (this.account.url.to_string (), "/index.php/login/v2");
@@ -198,7 +198,7 @@ public class Flow2Auth : GLib.Object {
         GLib.info ("setting remote poll timer interval to " + polltime_in_microseconds.length + "msec.");
         this.seconds_interval = (polltime_in_microseconds.length / 1000);
         this.seconds_left = this.seconds_interval;
-        signal_status_changed (PollStatus.PollStatus.POLL_COUNTDOWN, this.seconds_left);
+        signal_status_changed (PollStatus.POLL_COUNTDOWN, this.seconds_left);
 
         if (!this.poll_timer_active) {
             this.poll_timer_active = true;
@@ -221,7 +221,7 @@ public class Flow2Auth : GLib.Object {
             break;
         case TokenAction.COPY_LINK_TO_CLIPBOARD:
             GLib.Application.clipboard ().on_signal_text (authorisation_link ().to_string (GLib.Uri.FullyEncoded));
-            signal_status_changed (PollStatus.PollStatus.COPY_LINK_TO_CLIPBOARD, 0);
+            signal_status_changed (PollStatus.COPY_LINK_TO_CLIPBOARD, 0);
             break;
         }
 
@@ -273,12 +273,12 @@ public class Flow2Auth : GLib.Object {
         this.is_busy = true;
         this.seconds_left--;
         if (this.seconds_left > 0) {
-            signal_status_changed (PollStatus.PollStatus.POLL_COUNTDOWN, this.seconds_left);
+            signal_status_changed (PollStatus.POLL_COUNTDOWN, this.seconds_left);
             this.is_busy = false;
             this.poll_timer_active = false;
             return this.poll_timer_repeat;
         }
-        signal_status_changed (PollStatus.PollStatus.POLL_NOW, 0);
+        signal_status_changed (PollStatus.POLL_NOW, 0);
 
         // Step 2 : Poll
         Soup.Request req;

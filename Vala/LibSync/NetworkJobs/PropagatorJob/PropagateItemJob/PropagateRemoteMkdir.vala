@@ -245,14 +245,14 @@ public class PropagateRemoteMkdir : AbstractPropagateItemJob {
         // Never save the etag on first mkdir.
         // Only fully propagated directories should have the etag set.
         var item_copy = this.item;
-        item_copy.etag == "";
+        item_copy.etag = "";
 
         // save the file identifier already so we can detect rename or remove
         var result = this.propagator.update_metadata (item_copy);
         if (!result) {
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error writing metadata to the database : %1").printf (result.error));
             return;
-        } else if (*result == AbstractVfs.ConvertToPlaceholderResult.Locked) {
+        } else if (result == AbstractVfs.ConvertToPlaceholderResult.Locked) {
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("The file %1 is currently in use").printf (this.item.file));
             return;
         }

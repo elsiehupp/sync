@@ -35,7 +35,7 @@ public abstract class AbstractTestPushNotifications : GLib.Object {
 
         account.push_notifications ().set_reconnect_timer_interval (0);
 
-        GLib.SignalSpy authentication_failed_spy = new GLib.SignalSpy (account.push_notifications (), &PushNotificationManager.signal_authentication_failed);
+        GLib.SignalSpy authentication_failed_spy = new GLib.SignalSpy (account.push_notifications (), PushNotificationManager.signal_authentication_failed);
 
         // Let three authentication attempts fail
         for (uint8 i = 0; i < 3; ++i) {

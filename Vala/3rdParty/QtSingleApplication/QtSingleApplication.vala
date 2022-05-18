@@ -57,7 +57,7 @@ public class SingleApplication : GLib.Application {
             // Find the first instance that it still running
             // The whole list needs to be iterated in order to append to it
             for (; *pids; ++pids) {
-                if (first_peer == -1 && is_running (*pids)) {
+                if (first_peer == -1 && is_running (pids)) {
                     first_peer = *pids;
                 }
             }
@@ -86,7 +86,7 @@ public class SingleApplication : GLib.Application {
         var pids = (int64) instances;
         int64 newpids = pids;
         for (; *pids; ++pids) {
-            if (*pids != app_pid && is_running (*pids)) {
+            if (pids != app_pid && is_running (pids)) {
                 *newpids++ = *pids;
             }
         }

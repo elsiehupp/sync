@@ -65,7 +65,7 @@ public class ProgressDispatcher : GLib.Object {
     @param[out] full error message
     @param[out] subject (optional)
     ***********************************************************/
-    internal signal void add_error_to_gui (string folder, SyncFileItem.Status status, string error_message, string subject);
+    internal signal void signal_add_error_to_gui (string folder, SyncFileItem.Status status, string error_message, string subject);
 
 
     /***********************************************************

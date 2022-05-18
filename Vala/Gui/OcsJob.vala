@@ -181,12 +181,12 @@ public class OcsJob : AbstractNetworkJob {
 
 
     /***********************************************************
-    @brief etag_response_header_received - signal to report the ETag response header value
+    @brief signal_etag_response_header_received - signal to report the ETag response header value
     from ocs api v2
     @param value - the ETag response header value
     @param status_code - the OCS status code : 100 (!) for on_signal_success
     ***********************************************************/
-    private void etag_response_header_received (string value, int status_code);
+    private void signal_etag_response_header_received (string value, int status_code);
 
 
     /***********************************************************
@@ -224,7 +224,7 @@ public class OcsJob : AbstractNetworkJob {
         } else {
             // save new ETag value
             if (this.reply.raw_header_list ().contains ("ETag")) {
-                /* emit */ etag_response_header_received (this.reply.raw_header ("ETag"), status_code);
+                signal_etag_response_header_received (this.reply.raw_header ("ETag"), status_code);
             }
 
             signal_job_finished (json, status_code);

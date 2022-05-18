@@ -17,7 +17,7 @@ public class TestOnWebSocketTextMessageReceivedNotifyFileMessageEmitFilesChanged
         var account = FakeWebSocketServer.create_account ();
         var socket = fake_server.authenticate_account (account);
         GLib.assert_true (socket);
-        GLib.SignalSpy files_changed_spy = new GLib.SignalSpy (account.push_notifications (), &PushNotificationManager.files_changed);
+        GLib.SignalSpy files_changed_spy = new GLib.SignalSpy (account.push_notifications (), PushNotificationManager.files_changed);
 
         socket.send_text_message ("notify_file");
 

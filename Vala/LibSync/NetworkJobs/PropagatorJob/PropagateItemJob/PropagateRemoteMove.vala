@@ -237,7 +237,7 @@ public class PropagateRemoteMove : AbstractPropagateItemJob {
 
         // Delete old database data.
         this.propagator.journal.delete_file_record (this.item.original_file);
-        if (!vfs.pin_state (this.item.original_file, PinState.PinState.INHERITED)) {
+        if (!vfs.pin_state (this.item.original_file, PinState.INHERITED)) {
             GLib.warning ("Could not set pin state of " + this.item.original_file + " to inherited.");
         }
 
@@ -256,12 +256,12 @@ public class PropagateRemoteMove : AbstractPropagateItemJob {
         if (!result) {
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error));
             return;
-        } else if (*result == AbstractVfs.ConvertToPlaceholderResult.Locked) {
+        } else if (result == AbstractVfs.ConvertToPlaceholderResult.Locked) {
             on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").printf (signal_new_item.file));
             return;
         }
-        if (pin_state && *pin_state != PinState.PinState.INHERITED
-            && !vfs.pin_state (signal_new_item.rename_target, *pin_state)) {
+        if (pin_state && *pin_state != PinState.INHERITED
+            && !vfs.pin_state (signal_new_item.rename_target, pin_state)) {
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Error setting pin state"));
             return;
         }

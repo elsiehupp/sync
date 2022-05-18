@@ -2,22 +2,14 @@
 namespace Occ {
 namespace Ui {
 
-public class UserAppsModel : GLib.AbstractListModel {
+public class UserAppsModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
     public enum UserAppsRoles {
-        NAME = GLib.USER_ROLE + 1,
+        NAME, // GLib.USER_ROLE + 1,
         URL,
-        ICON_URL;
-
-        internal GLib.HashTable<int, string> role_names () {
-            GLib.HashTable<int, string> roles;
-            roles[UserAppsRoles.NAME] = "app_name";
-            roles[UserAppsRoles.URL] = "app_url";
-            roles[UserAppsRoles.ICON_URL] = "app_icon_url";
-            return roles;
-        }
+        ICON_URL
     }
 
 

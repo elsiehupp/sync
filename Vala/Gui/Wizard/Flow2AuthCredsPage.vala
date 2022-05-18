@@ -5,7 +5,6 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <GLib.VBoxLayout>
 //  #include <GLib.NetworkCookie>
 //  #include <GLib.Pointer>
 
@@ -22,17 +21,17 @@ public class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
     /***********************************************************
     ***********************************************************/
     private Flow2AuthWidget flow_2_auth_widget = null;
-    private GLib.VBoxLayout layout = null;
+    private Gtk.Box layout = null;
 
-    internal signal void connect_to_oc_url (string value);
-    internal signal void poll_now ();
+    internal signal void signal_connect_to_ocs_url (string value);
+    internal signal void signal_poll_now ();
     internal signal void signal_style_changed ();
 
     /***********************************************************
     ***********************************************************/
     public Flow2AuthCredsPage () {
         base ();
-        this.layout = new GLib.VBoxLayout (this);
+        this.layout = new Gtk.Box (Gtk.Orientation.VERTICAL);
 
         this.flow_2_auth_widget = new Flow2AuthWidget ();
         this.layout.add_widget (this.flow_2_auth_widget);
@@ -96,8 +95,8 @@ public class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
             this.flow_2_auth_widget.reset_auth ();
 
         // Forget sensitive data
-        this.app_password == "";
-        this.user == "";
+        this.app_password = "";
+        this.user = "";
     }
 
 
@@ -156,7 +155,7 @@ public class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
                 var oc_wizard = (OwncloudWizard)wizard ();
                 //  GLib.assert_true (oc_wizard);
 
-                /* emit */ connect_to_oc_url (oc_wizard.account.url.to_string ());
+                signal_connect_to_ocs_url (oc_wizard.account.url.to_string ());
                 break;
             }
         }
@@ -166,7 +165,7 @@ public class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
     /***********************************************************
     ***********************************************************/
     public void on_signal_poll_now () {
-        /* emit */ poll_now ();
+        signal_poll_now ();
     }
 
 

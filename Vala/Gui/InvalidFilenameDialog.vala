@@ -39,6 +39,11 @@ public class InvalidFilenameDialog : Gtk.Dialog {
     private string new_filename;
 
     /***********************************************************
+    Widgets
+    ***********************************************************/
+    private Gtk.Label error_label;
+
+    /***********************************************************
     ***********************************************************/
     public InvalidFilenameDialog (unowned Account account, FolderConnection folder_connection, string file_path, Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);

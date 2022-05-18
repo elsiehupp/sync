@@ -23,7 +23,7 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
     public OwncloudeOAuthCredsPage instance;
 
 
-    internal signal void connect_to_oc_url (string value);
+    internal signal void signal_connect_to_ocs_url (string value);
 
 
     /***********************************************************
@@ -75,7 +75,7 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
         var oc_wizard = (OwncloudWizard)wizard ();
         //  GLib.assert_true (oc_wizard);
         oc_wizard.account.credentials (CredentialsFactory.create ("http"));
-        this.async_auth.on_signal_reset (new OAuth (oc_wizard.account, this));
+        this.async_auth.reset (new OAuth (oc_wizard.account, this));
         this.async_auth.signal_result.connect (
             this.on_signal_async_auth_result // GLib.QueuedConnection
         );
@@ -91,7 +91,7 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
     public void clean_up_page () {
         // The next or back button was activated, show the wizard again
         wizard ().show ();
-        this.async_auth.on_signal_reset ();
+        this.async_auth.reset ();
     }
 
 
@@ -144,7 +144,7 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
             this.refresh_token = refresh_token;
             var oc_wizard = (OwncloudWizard)wizard ();
             //  GLib.assert_true (oc_wizard);
-            /* emit */ connect_to_oc_url (oc_wizard.account.url.to_string ());
+            signal_connect_to_ocs_url (oc_wizard.account.url.to_string ());
             break;
         }
         }

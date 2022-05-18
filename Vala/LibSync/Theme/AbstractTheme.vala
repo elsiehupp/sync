@@ -44,6 +44,19 @@ public class Theme : GLib.Object {
         }
     }
 
+
+    private static Gtk.IconTheme icon_theme {
+        private get {
+            if (Theme.icon_theme == null) {
+                Theme.icon_theme = Gtk.IconTheme.get_default ();
+            }
+            return Theme.icon_theme;
+        }
+        private set {
+            Theme.icon_theme = value;
+        }
+    }
+
     private static bool mono = false;
     /***********************************************************
     Define if the systray icons should be using mono design
@@ -61,7 +74,7 @@ public class Theme : GLib.Object {
 
 //  #ifndef TOKEN_AUTH_ONLY
     // mutable
-    private GLib.HashTable<string, Gtk.Icon> icon_cache;
+    private GLib.HashTable<string, Gtk.IconInfo> icon_cache;
 //  #endif
 
 
@@ -312,7 +325,7 @@ public class Theme : GLib.Object {
     /***********************************************************
     Get an sync state icon
     ***********************************************************/
-    public static Gtk.Icon sync_state_icon (SyncResult.Status status, bool sys_tray = false) {
+    public static Gtk.IconInfo sync_state_icon (SyncResult.Status status, bool sys_tray = false) {
         // FIXME: Mind the size!
         string status_icon;
 
@@ -349,7 +362,7 @@ public class Theme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static Gtk.Icon folder_disabled_icon {
+    public static Gtk.IconInfo folder_disabled_icon {
         public get {
             return theme_icon ("state-pause");
         }
@@ -358,7 +371,7 @@ public class Theme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static Gtk.Icon folder_offline_icon {
+    public static Gtk.IconInfo folder_offline_icon {
         public get {
             return theme_icon ("state-offline", false);
         }
@@ -367,7 +380,7 @@ public class Theme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static Gtk.Icon folder_offline_icon_for_tray {
+    public static Gtk.IconInfo folder_offline_icon_for_tray {
         public get {
             return theme_icon ("state-offline", true);
         }
@@ -376,7 +389,7 @@ public class Theme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static Gtk.Icon application_icon {
+    public static Gtk.IconInfo application_icon {
         public get {
             return theme_icon (APPLICATION_ICON_NAME + "-icon");
         }
@@ -660,12 +673,11 @@ public class Theme : GLib.Object {
                 return new Gdk.Pixbuf (Theme.hidpi_filename (Theme.THEME_PREFIX + "colored/wizard-nextcloud.png"));
             }
         // #ifdef APPLICATION_WIZARD_USE_CUSTOM_LOGO
-            var use_svg = should_prefer_svg;
             string logo_base_path = Theme.THEME_PREFIX + "colored/wizard_logo";
-            if (use_svg) {
+            if (should_prefer_svg) {
                 var max_height = Theme.is_hidpi () ? 200 : 100;
                 var max_width = 2 * max_height;
-                var icon = new Gtk.Icon (logo_base_path + ".svg");
+                var icon = new Gtk.IconInfo (logo_base_path + ".svg");
                 var size = icon.actual_size (Gdk.Rectangle (max_width, max_height));
                 return icon.pixmap (size);
             } else {
@@ -685,12 +697,11 @@ public class Theme : GLib.Object {
     public static Gdk.Pixbuf wizard_header_logo {
         public get {
         // #ifdef APPLICATION_WIZARD_USE_CUSTOM_LOGO
-            var use_svg = should_prefer_svg;
             string logo_base_path = Theme.THEME_PREFIX + "colored/wizard_logo";
-            if (use_svg) {
+            if (should_prefer_svg) {
                 var max_height = 64;
                 var max_width = 2 * max_height;
-                var icon = new Gtk.Icon (logo_base_path + ".svg");
+                var icon = new Gtk.IconInfo (logo_base_path + ".svg");
                 var size = icon.actual_size (Gdk.Rectangle (max_width, max_height));
                 return icon.pixmap (size);
             } else {
@@ -1061,17 +1072,17 @@ public class Theme : GLib.Object {
     }
 	
 	/***********************************************************
-    @brief Request suitable Gtk.Icon resource depending on the
+    @brief Request suitable Gtk.IconInfo resource depending on the
     background colour of the parent widget.
 
     This should be replaced (TODO) by a real theming
     implementation for the client UI
     (actually 2019/09/13 only systray theming).
     ***********************************************************/
-	public static Gtk.Icon ui_theme_icon (string icon_name, bool ui_has_dark_background) {
+	public static Gtk.IconInfo ui_theme_icon (string icon_name, bool ui_has_dark_background) {
         string icon_path = Theme.THEME_PREFIX + (ui_has_dark_background ? "white/": "black/") + icon_name;
         string icn_path = icon_path.to_utf8 ().const_data ();
-        return new Gtk.Icon (Gdk.Pixbuf (icon_path));
+        return new Gtk.IconInfo (Gdk.Pixbuf (icon_path));
     }
 
 
@@ -1148,34 +1159,34 @@ public class Theme : GLib.Object {
     @brief Creates a colour-aware icon based on the specified
     palette's base colour (Dark-/Light-Mode switching).
 
-    @return Gtk.Icon, colour-aware (inverted on dark backgrounds).
+    @return Gtk.IconInfo, colour-aware (inverted on dark backgrounds).
 
     2019/12/09: Moved here from SettingsDialog.
     ***********************************************************/
-    public static Gtk.Icon create_color_aware_icon (string name, Gtk.Palette palette = GLib.Application.palette ()) {
+    public static Gtk.IconInfo create_color_aware_icon (string name, Gtk.Palette palette = GLib.Application.palette ()) {
         GLib.SvgRenderer renderer = new GLib.SvgRenderer (name);
         Gtk.Image img = new Gtk.Image (64, 64, Gtk.Image.FormatARGB32);
         img.fill (GLib.GlobalColor.transparent);
-        GLib.Painter img_painter = new GLib.Painter  (&img);
+        GLib.Painter img_painter = new GLib.Painter  (img);
         Gtk.Image inverted = new Gtk.Image (64, 64, Gtk.Image.FormatARGB32);
         inverted.fill (GLib.GlobalColor.transparent);
         GLib.Painter inv_painter = new GLib.Painter (inverted);
 
-        renderer.render (&img_painter);
-        renderer.render (&inv_painter);
+        renderer.render (img_painter);
+        renderer.render (inv_painter);
 
         inverted.invert_pixels (Gtk.Image.InvertRgb);
 
-        Gtk.Icon icon;
+        Gtk.IconInfo icon;
         if (Theme.is_dark_color (palette.color (Gtk.Palette.Base))) {
             icon.add_pixmap (Gdk.Pixbuf.from_image (inverted));
         } else {
             icon.add_pixmap (Gdk.Pixbuf.from_image (img));
         }
         if (Theme.is_dark_color (palette.color (Gtk.Palette.HighlightedText))) {
-            icon.add_pixmap (Gdk.Pixbuf.from_image (img), Gtk.Icon.Normal, Gtk.Icon.On);
+            icon.add_pixmap (Gdk.Pixbuf.from_image (img), Gtk.IconInfo.Normal, Gtk.IconInfo.On);
         } else {
-            icon.add_pixmap (Gdk.Pixbuf.from_image (inverted), Gtk.Icon.Normal, Gtk.Icon.On);
+            icon.add_pixmap (Gdk.Pixbuf.from_image (inverted), Gtk.IconInfo.Normal, Gtk.IconInfo.On);
         }
         return icon;
     }
@@ -1267,7 +1278,7 @@ public class Theme : GLib.Object {
     provides or from the apps Qt resources.
     ***********************************************************/
 //  #ifndef TOKEN_AUTH_ONLY
-    protected Gtk.Icon theme_icon (string name, bool sys_tray = false) {
+    protected Gtk.IconInfo theme_icon (string name, bool sys_tray = false) {
         string flavor;
         if (sys_tray) {
             flavor = systray_icon_flavor (this.mono);
@@ -1276,21 +1287,33 @@ public class Theme : GLib.Object {
         }
 
         string key = name + "," + flavor;
-        Gtk.Icon cached = this.icon_cache[key];
+        Gtk.IconInfo cached = this.icon_cache[key];
         if (cached == null) {
-            if (Gtk.Icon.has_theme_icon (name)) {
+            if (Theme.icon_theme.has_icon (name)) {
                 // use from theme
-                return cached = Gtk.Icon.from_theme (name);
+                return cached = Theme.icon_theme.choose_icon (name);
             }
 
             GLib.SvgRenderer renderer = new GLib.SvgRenderer (Theme.THEME_PREFIX + "%1/%2.svg".printf (flavor).printf (name));
 
-            var use_svg = should_prefer_svg;
-            GLib.List<int> sizes = use_svg
-                ? { 16, 32, 64, 128, 256 }
-                : { 16, 22, 32, 48, 64, 128, 256, 512, 1024 };
+            GLib.List<int> sizes = new GLib.List<int> ();
+            sizes.append (16);
+            if (!should_prefer_svg) {
+                sizes.append (22);
+            }
+            sizes.append (32);
+            if (!should_prefer_svg) {
+                sizes.append (48);
+            }
+            sizes.append (64);
+            sizes.append (128);
+            sizes.append (256);
+            if (!should_prefer_svg) {
+                sizes.append (512);
+                sizes.append (1024);
+            }
             foreach (int size in sizes) {
-                var px = use_svg ? create_pixmap_from_svg (size) : load_pixmap (size);
+                var px = should_prefer_svg ? create_pixmap_from_svg (size) : load_pixmap (size);
                 if (px == null) {
                     continue;
                 }
@@ -1332,17 +1355,20 @@ public class Theme : GLib.Object {
         or not
     @return string image path in the resources
     ***********************************************************/
-    protected static string theme_image_path (string name, int size = -1, bool sys_tray = false) {
+    protected static string theme_image_path (
+        string name,
+        int size = -1,
+        bool sys_tray = false
+    ) {
         var flavor = (!is_branded && sys_tray) ? systray_icon_flavor (Theme.mono): "colored";
-        var use_svg = should_prefer_svg;
 
         // branded client may have several sizes of the same icon
-        string file_path = (use_svg || size <= 0)
+        string file_path = (should_prefer_svg || size <= 0)
                 ? Theme.THEME_PREFIX + "%1/%2".printf (flavor).printf (name)
                 : Theme.THEME_PREFIX + "%1/%2-%3".printf (flavor).printf (name).printf (size);
 
         // Use the SVG as fallback if a PNG is missing so that we get a chance to display something
-        if (use_svg) {
+        if (should_prefer_svg) {
             return file_path + ".svg";
         } else if (GLib.File.exists (png_path)) {
             return file_path + ".png";

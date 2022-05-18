@@ -424,7 +424,7 @@ public class ProcessDirectoryJob : GLib.Object {
                 item.instruction = CSync.SyncInstructions.ERROR;
                 item.status = SyncFileItem.Status.NORMAL_ERROR;
                 item.error_string = error_message;
-                /* emit */ this.discovery_data.signal_item_discovered (item);
+                this.discovery_data.signal_item_discovered (item);
                 return false;
             }
         }
@@ -615,7 +615,7 @@ public class ProcessDirectoryJob : GLib.Object {
         if (excluded == CSync.ExcludedFiles.Type.NOT_EXCLUDED && !is_symlink) {
             return false;
         } else if (excluded == CSync.ExcludedFiles.Type.EXCLUDE_SILENT || excluded == CSync.ExcludedFiles.Type.EXCLUDE_AND_REMOVE) {
-            /* emit */ this.discovery_data.signal_silently_excluded (path);
+            this.discovery_data.signal_silently_excluded (path);
             return true;
         }
 
@@ -685,7 +685,7 @@ public class ProcessDirectoryJob : GLib.Object {
         }
 
         this.child_ignored = true;
-        /* emit */ this.discovery_data.signal_item_discovered (item);
+        this.discovery_data.signal_item_discovered (item);
         return true;
     }
 
@@ -766,7 +766,7 @@ public class ProcessDirectoryJob : GLib.Object {
                 item.instruction = CSync.SyncInstructions.IGNORE;
                 item.error_string = _("File has extension reserved for virtual files.");
                 this.child_ignored = true;
-                /* emit */ this.discovery_data.signal_item_discovered (item);
+                this.discovery_data.signal_item_discovered (item);
                 return;
             }
         }
@@ -840,13 +840,13 @@ public class ProcessDirectoryJob : GLib.Object {
             item.instruction = CSync.SyncInstructions.ERROR;
             this.child_ignored = true;
             item.error_string = _("Server reported no %1").printf (missing_data.join (", "));
-            /* emit */ this.discovery_data.signal_item_discovered (item);
+            this.discovery_data.signal_item_discovered (item);
             return;
         }
 
         // The file is known in the database already
         if (database_entry.is_valid) {
-            bool is_database_entry_an_e2Ee_placeholder = database_entry.is_virtual_file () && !database_entry.e2e_mangled_name () == "";
+            bool is_database_entry_an_e2Ee_placeholder = database_entry.is_virtual_file () && !database_entry.e2e_mangled_name () = "";
             GLib.assert (!is_database_entry_an_e2Ee_placeholder || server_entry.size >= Constants.E2EE_TAG_SIZE);
             bool is_virtual_e2Ee_placeholder = is_database_entry_an_e2Ee_placeholder && server_entry.size >= Constants.E2EE_TAG_SIZE;
             int64 size_on_signal_server = is_virtual_e2Ee_placeholder ? server_entry.size - Constants.E2EE_TAG_SIZE : server_entry.size;
@@ -990,7 +990,7 @@ public class ProcessDirectoryJob : GLib.Object {
         if (!local_entry.is_valid
             && item.type == ItemType.FILE
             && opts.vfs.mode () != AbstractVfs.Off
-            && this.pin_state != PinState.PinState.ALWAYS_LOCAL
+            && this.pin_state != PinState.ALWAYS_LOCAL
             && !FileSystem.is_exclude_file (item.file)) {
             item.type = ItemType.VIRTUAL_FILE;
             if (is_vfs_with_suffix ()) {
@@ -1125,7 +1125,7 @@ public class ProcessDirectoryJob : GLib.Object {
 
         if (!base_record.is_directory ()) {
             CSync.FileStat buf;
-            if (csync_vio_local_stat (this.discovery_data.local_dir + original_path_adjusted, buf)) {
+            if (csync_vio_local_stat (this.discovery_data.local_directory + original_path_adjusted, buf)) {
                 GLib.info ("Local file does not exist anymore. " + original_path_adjusted);
                 return;
             }
@@ -1136,7 +1136,7 @@ public class ProcessDirectoryJob : GLib.Object {
                 return;
             }
         } else {
-            if (!GLib.File.new_for_path (this.discovery_data.local_dir + original_path_adjusted).query_info ().get_file_type () == FileType.DIRECTORY) {
+            if (!GLib.File.new_for_path (this.discovery_data.local_directory + original_path_adjusted).query_info ().get_file_type () == FileType.DIRECTORY) {
                 GLib.info ("Local directory does not exist anymore. " + original_path_adjusted);
                 return;
             }
@@ -1278,7 +1278,7 @@ public class ProcessDirectoryJob : GLib.Object {
                     item.type = ItemType.VIRTUAL_FILE_DEHYDRATION;
                 } else if (!server_modified
                     && (database_entry.inode != local_entry.inode
-                        || this.discovery_data.sync_options.vfs.needs_metadata_update (*item))) {
+                        || this.discovery_data.sync_options.vfs.needs_metadata_update (item))) {
                     item.instruction = CSync.SyncInstructions.UPDATE_METADATA;
                     item.direction = SyncFileItem.Direction.DOWN;
                 }
@@ -1309,7 +1309,7 @@ public class ProcessDirectoryJob : GLib.Object {
             } else if (type_change) {
                 item.instruction = CSync.SyncInstructions.TYPE_CHANGE;
                 item.direction = SyncFileItem.Direction.UP;
-                item.checksum_header == "";
+                item.checksum_header = "";
                 item.size = local_entry.size;
                 item.modtime = local_entry.modtime;
                 item.type = local_entry.is_directory ? ItemType.DIRECTORY : ItemType.FILE;
@@ -1330,7 +1330,7 @@ public class ProcessDirectoryJob : GLib.Object {
                     item.instruction = CSync.SyncInstructions.NEW;
                 }
                 item.direction = SyncFileItem.Direction.UP;
-                item.checksum_header == "";
+                item.checksum_header = "";
                 item.size = local_entry.size;
                 item.modtime = local_entry.modtime;
                 this.child_modified = true;
@@ -1339,7 +1339,7 @@ public class ProcessDirectoryJob : GLib.Object {
                 // check #4754 #4755
                 bool is_eml_file = path.original.has_suffix (".eml", GLib.CaseInsensitive);
                 if (is_eml_file && database_entry.file_size == local_entry.size && !database_entry.checksum_header == "") {
-                    if (compute_local_checksum (database_entry.checksum_header, this.discovery_data.local_dir + path.local, item)
+                    if (compute_local_checksum (database_entry.checksum_header, this.discovery_data.local_directory + path.local, item)
                             && item.checksum_header == database_entry.checksum_header) {
                         GLib.info ("Note: Checksums are identical, file did not actually change: " + path.local);
                         item.instruction = CSync.SyncInstructions.UPDATE_METADATA;
@@ -1369,7 +1369,7 @@ public class ProcessDirectoryJob : GLib.Object {
         // New local file or rename
         item.instruction = CSync.SyncInstructions.NEW;
         item.direction = SyncFileItem.Direction.UP;
-        item.checksum_header == "";
+        item.checksum_header = "";
         item.size = local_entry.size;
         item.modtime = local_entry.modtime;
         item.type = local_entry.is_directory ? ItemType.DIRECTORY : local_entry.is_virtual_file ? ItemType.VIRTUAL_FILE : ItemType.FILE;
@@ -1514,12 +1514,12 @@ public class ProcessDirectoryJob : GLib.Object {
         }
 
         // must be a dehydrated placeholder
-        bool is_file_place_holder = !local_entry.is_directory && this.discovery_data.sync_options.vfs.is_dehydrated_placeholder (this.discovery_data.local_dir + path.local);
+        bool is_file_place_holder = !local_entry.is_directory && this.discovery_data.sync_options.vfs.is_dehydrated_placeholder (this.discovery_data.local_directory + path.local);
 
         // either correct availability, or a result with error if the folder is new or otherwise has no availability set yet
         var folder_place_holder_availability = local_entry.is_directory ? this.discovery_data.sync_options.vfs.availability (path.local) : AbstractVfs.AvailabilityResult (AbstractVfs.AvailabilityError.NO_SUCH_ITEM);
 
-        var folder_pin_state = local_entry.is_directory ? this.discovery_data.sync_options.vfs.pin_state (path.local) : Optional<AbstractVfs.PinState> (PinState.PinState.UNSPECIFIED);
+        var folder_pin_state = local_entry.is_directory ? this.discovery_data.sync_options.vfs.pin_state (path.local) : Optional<AbstractVfs.PinState> (PinState.UNSPECIFIED);
 
         if (!is_file_place_holder && !folder_place_holder_availability.is_valid && !folder_pin_state.is_valid) {
             // not a file placeholder and not a synced folder placeholder (new local folder)
@@ -1537,7 +1537,7 @@ public class ProcessDirectoryJob : GLib.Object {
             if (local_entry.is_directory && folder_place_holder_availability.is_valid && !is_online_only_folder) {
                 // a VFS folder but is not online0only (has some files hydrated)
                 GLib.info ("Virtual directory without database entry for " + path.local + " but it contains hydrated file (s), so let's keep it and reupload.");
-                /* emit */ this.discovery_data.add_error_to_gui (SyncFileItem.Status.SOFT_ERROR, _("Conflict when uploading some files to a folder. Those, conflicted, are going to get cleared!"), path.local);
+                this.discovery_data.signal_add_error_to_gui (SyncFileItem.Status.SOFT_ERROR, _("Conflict when uploading some files to a folder. Those, conflicted, are going to get cleared!"), path.local);
                 return;
             }
             GLib.warning (
@@ -1558,10 +1558,10 @@ public class ProcessDirectoryJob : GLib.Object {
             if (is_folder_pin_state_online_only && folder_pin_state.is_valid) {
                 GLib.info ("folder_pin_state: " + folder_pin_state);
             }
-            /* emit */ this.discovery_data.add_error_to_gui (SyncFileItem.Status.SOFT_ERROR, _("Conflict when uploading a folder. It's going to get cleared!"), path.local);
+            this.discovery_data.signal_add_error_to_gui (SyncFileItem.Status.SOFT_ERROR, _("Conflict when uploading a folder. It's going to get cleared!"), path.local);
         } else {
             GLib.info ("Wiping virtual file without database entry for " + path.local);
-            /* emit */ this.discovery_data.add_error_to_gui (SyncFileItem.Status.SOFT_ERROR, _("Conflict when uploading a file. It's going to get removed!"), path.local);
+            this.discovery_data.signal_add_error_to_gui (SyncFileItem.Status.SOFT_ERROR, _("Conflict when uploading a file. It's going to get removed!"), path.local);
         }
         item.instruction = CSync.SyncInstructions.REMOVE;
         item.direction = SyncFileItem.Direction.DOWN;
@@ -1633,7 +1633,7 @@ public class ProcessDirectoryJob : GLib.Object {
         }
 
         // The old file must have been deleted.
-        if (GLib.File.exists (this.discovery_data.local_dir + original_path)
+        if (GLib.File.exists (this.discovery_data.local_directory + original_path)
             // Exception : If the rename changes case only (like "foo" . "Foo") the
             // old filename might still point to the same file.
             && ! (Utility.fs_case_preserving ()
@@ -1645,7 +1645,7 @@ public class ProcessDirectoryJob : GLib.Object {
 
         // Verify the checksum where possible
         if (!base_record.checksum_header == "" && item.type == ItemType.FILE && base_record.type == ItemType.FILE) {
-            if (compute_local_checksum (base_record.checksum_header, this.discovery_data.local_dir + path.original, item)) {
+            if (compute_local_checksum (base_record.checksum_header, this.discovery_data.local_directory + path.original, item)) {
                 GLib.info ("checking checksum of potential rename " + path.original + item.checksum_header + base_record.checksum_header);
                 if (item.checksum_header != base_record.checksum_header) {
                     GLib.info ("Not a move, checksums differ.");
@@ -1801,7 +1801,7 @@ public class ProcessDirectoryJob : GLib.Object {
                 || (item.type == ItemType.VIRTUAL_FILE && item.instruction == CSync.SyncInstructions.NEW)) {
                 this.discovery_data.deleted_item[path.original] = item;
             }
-            /* emit */ this.discovery_data.signal_item_discovered (item);
+            this.discovery_data.signal_item_discovered (item);
         }
     }
 
@@ -1974,7 +1974,7 @@ public class ProcessDirectoryJob : GLib.Object {
             );
             this.queued_jobs.push_back (process_directory_job);
         } else {
-            /* emit */ this.discovery_data.signal_item_discovered (item);
+            this.discovery_data.signal_item_discovered (item);
         }
     }
 
@@ -1989,7 +1989,7 @@ public class ProcessDirectoryJob : GLib.Object {
         this.child_modified |= process_directory_job.child_modified;
 
         if (process_directory_job.dir_item)
-            /* emit */ this.discovery_data.signal_item_discovered (process_directory_job.dir_item);
+            this.discovery_data.signal_item_discovered (process_directory_job.dir_item);
 
         int count = this.running_jobs.remove_all (process_directory_job);
         //  GLib.assert_true (count == 1);
@@ -2096,10 +2096,10 @@ public class ProcessDirectoryJob : GLib.Object {
                 // Similarly, the server might also return 404 or 50x in case of bugs. #7199 #7586
                 this.dir_item.instruction = CSync.SyncInstructions.IGNORE;
                 this.dir_item.error_string = results.error.message;
-                /* emit */ this.on_signal_finished ();
+                this.signal_finished ();
             } else {
                 // Fatal for the root job since it has no SyncFileItem, or for the network errors
-                /* emit */ this.discovery_data.signal_fatal_error (_("Server replied with an error while reading directory \"%1\" : %2")
+                this.discovery_data.signal_fatal_error (_("Server replied with an error while reading directory \"%1\" : %2")
                     .printf (this.current_folder.server, results.error.message));
             }
         }
@@ -2117,7 +2117,7 @@ public class ProcessDirectoryJob : GLib.Object {
     Fills this.local_normal_query_entries.
     ***********************************************************/
     private void start_async_local_query () {
-        string local_path = this.discovery_data.local_dir + this.current_folder.local;
+        string local_path = this.discovery_data.local_directory + this.current_folder.local;
         var local_job = new DiscoverySingleLocalDirectoryJob (this.discovery_data.account, local_path, this.discovery_data.sync_options.vfs);
 
         this.discovery_data.currently_active_jobs++;
@@ -2135,7 +2135,7 @@ public class ProcessDirectoryJob : GLib.Object {
             this.on_signal_discovery_single_local_directory_job_finished_fatal_error
         );
 
-        local_job.finished_non_fatal_error.connect (
+        local_job.signal_finished_non_fatal_error.connect (
             this.on_signal_discovery_single_local_directory_job_finished_non_fatal_error
         );
 
@@ -2160,7 +2160,7 @@ public class ProcessDirectoryJob : GLib.Object {
             this.discovery_single_directory_job.abort ();
         }
 
-        /* emit */ this.discovery_data.signal_fatal_error (message);
+        this.discovery_data.signal_fatal_error (message);
     }
 
 
@@ -2171,10 +2171,10 @@ public class ProcessDirectoryJob : GLib.Object {
         if (this.dir_item != null) {
             this.dir_item.instruction = CSync.SyncInstructions.IGNORE;
             this.dir_item.error_string = message;
-            /* emit */ this.on_signal_finished ();
+            this.signal_finished ();
         } else {
             // Fatal for the root job since it has no SyncFileItem
-            /* emit */ this.discovery_data.signal_fatal_error (message);
+            this.discovery_data.signal_fatal_error (message);
         }
     }
 

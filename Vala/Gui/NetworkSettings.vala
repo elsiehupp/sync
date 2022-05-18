@@ -141,7 +141,7 @@ public class NetworkSettings : Gtk.Widget {
     private void load_bandwidth_limit_settings () {
         ConfigFile config_file;
 
-        int use_download_limit = config_file.use_download_limit ();
+        int use_download_limit = ConfigFile.use_download_limit ();
         if (use_download_limit >= 1) {
             this.instance.download_limit_radio_button.checked (true);
         } else if (use_download_limit == 0) {
@@ -149,9 +149,9 @@ public class NetworkSettings : Gtk.Widget {
         } else {
             this.instance.auto_download_limit_radio_button.checked (true);
         }
-        this.instance.download_spin_box.value (config_file.download_limit ());
+        this.instance.download_spin_box.value (ConfigFile.download_limit ());
 
-        int use_upload_limit = config_file.use_upload_limit ();
+        int use_upload_limit = ConfigFile.use_upload_limit ();
         if (use_upload_limit >= 1) {
             this.instance.upload_limit_radio_button.checked (true);
         } else if (use_upload_limit == 0) {
@@ -159,7 +159,7 @@ public class NetworkSettings : Gtk.Widget {
         } else {
             this.instance.auto_upload_limit_radio_button.checked (true);
         }
-        this.instance.upload_spin_box.value (config_file.upload_limit ());
+        this.instance.upload_spin_box.value (ConfigFile.upload_limit ());
     }
 
 
@@ -170,9 +170,9 @@ public class NetworkSettings : Gtk.Widget {
 
         on_signal_check_empty_proxy_host ();
         if (this.instance.no_proxy_radio_button.is_checked ()) {
-            config_file.proxy_type (Soup.NetworkProxy.NoProxy);
+            ConfigFile.proxy_type (Soup.NetworkProxy.NoProxy);
         } else if (this.instance.system_proxy_radio_button.is_checked ()) {
-            config_file.proxy_type (Soup.NetworkProxy.DefaultProxy);
+            ConfigFile.proxy_type (Soup.NetworkProxy.DefaultProxy);
         } else if (this.instance.manual_proxy_radio_button.is_checked ()) {
             int type = this.instance.type_combo_box.item_data (this.instance.type_combo_box.current_index ()).to_int ();
             string host = this.instance.host_line_edit.text ();
@@ -182,7 +182,7 @@ public class NetworkSettings : Gtk.Widget {
             bool needs_auth = this.instance.auth_requiredcheck_box.is_checked ();
             string user = this.instance.user_line_edit.text ();
             string pass = this.instance.password_line_edit.text ();
-            config_file.proxy_type (type, this.instance.host_line_edit.text (),
+            ConfigFile.proxy_type (type, this.instance.host_line_edit.text (),
                 this.instance.port_spin_box.value (), needs_auth, user, pass);
         }
 
@@ -206,22 +206,22 @@ public class NetworkSettings : Gtk.Widget {
     private void on_signal_save_bandwidth_limit_settings () {
         ConfigFile config_file;
         if (this.instance.download_limit_radio_button.is_checked ()) {
-            config_file.use_download_limit (1);
+            ConfigFile.use_download_limit (1);
         } else if (this.instance.no_download_limit_radio_button.is_checked ()) {
-            config_file.use_download_limit (0);
+            ConfigFile.use_download_limit (0);
         } else if (this.instance.auto_download_limit_radio_button.is_checked ()) {
-            config_file.use_download_limit (-1);
+            ConfigFile.use_download_limit (-1);
         }
-        config_file.download_limit (this.instance.download_spin_box.value ());
+        ConfigFile.download_limit (this.instance.download_spin_box.value ());
 
         if (this.instance.upload_limit_radio_button.is_checked ()) {
-            config_file.use_upload_limit (1);
+            ConfigFile.use_upload_limit (1);
         } else if (this.instance.no_upload_limit_radio_button.is_checked ()) {
-            config_file.use_upload_limit (0);
+            ConfigFile.use_upload_limit (0);
         } else if (this.instance.auto_upload_limit_radio_button.is_checked ()) {
-            config_file.use_upload_limit (-1);
+            ConfigFile.use_upload_limit (-1);
         }
-        config_file.upload_limit (this.instance.upload_spin_box.value ());
+        ConfigFile.upload_limit (this.instance.upload_spin_box.value ());
 
         FolderManager.instance.dirty_network_limits ();
     }
@@ -284,7 +284,7 @@ public class NetworkSettings : Gtk.Widget {
         }
         // load current proxy settings
         ConfigFile config_file;
-        int type = config_file.proxy_type ();
+        int type = ConfigFile.proxy_type ();
         switch (type) {
         case Soup.NetworkProxy.NoProxy:
             this.instance.no_proxy_radio_button.checked (true);
@@ -301,15 +301,15 @@ public class NetworkSettings : Gtk.Widget {
             break;
         }
 
-        this.instance.host_line_edit.on_signal_text (config_file.proxy_host_name ());
-        int port = config_file.proxy_port ();
+        this.instance.host_line_edit.on_signal_text (ConfigFile.proxy_host_name ());
+        int port = ConfigFile.proxy_port ();
         if (port == 0) {
             port = 8080;
         }
         this.instance.port_spin_box.value (port);
-        this.instance.auth_requiredcheck_box.checked (config_file.proxy_needs_auth ());
-        this.instance.user_line_edit.on_signal_text (config_file.proxy_user ());
-        this.instance.password_line_edit.on_signal_text (config_file.proxy_password ());
+        this.instance.auth_requiredcheck_box.checked (ConfigFile.proxy_needs_auth ());
+        this.instance.user_line_edit.on_signal_text (ConfigFile.proxy_user ());
+        this.instance.password_line_edit.on_signal_text (ConfigFile.proxy_password ());
     }
 
 } // class NetworkSettings

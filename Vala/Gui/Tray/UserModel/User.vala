@@ -5,6 +5,18 @@ namespace Ui {
 public class User : GLib.Object {
 
     /***********************************************************
+    Time span in milliseconds which must elapse between
+    sequential refreshes of the notifications
+    ***********************************************************/
+    const int NOTIFICATION_REQUEST_FREE_PERIOD = 15000;
+
+    /***********************************************************
+    Time span in milliseconds after which activities will
+    expired by default
+    ***********************************************************/
+    const int64 ACTIVITY_DEFAULT_EXPIRATION_TIME_MSECS = 1000 * 60 * 10;
+
+    /***********************************************************
     ***********************************************************/
     unowned Account account {
         public get {
@@ -95,14 +107,14 @@ public class User : GLib.Object {
         this.account_state.account.account_changed_avatar.connect (
             this.signal_avatar_changed
         );
-        this.account_state.account.user_status_changed.connect (
+        this.account_state.account.signal_user_status_changed.connect (
             this.signal_status_changed
         );
         this.account_state.signal_desktop_notifications_allowed_changed.connect (
             this.on_signal_desktop_notifications_allowed_changed
         );
 
-        this.activity_model.send_notification_request.connect (
+        this.activity_model.signal_send_notification_request.connect (
             this.on_signal_send_notification_request
         );
     }
@@ -119,7 +131,16 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public string server (bool shortened) {
+    public string server {
+        public get {
+            return server_string (false);
+        }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private string server_string (bool shortened) {
         string server_url = this.account_state.account.url.to_string ();
         if (shortened) {
             server_url.replace ("https://", "");
@@ -171,12 +192,14 @@ public class User : GLib.Object {
     If dav_display_name is empty (which can be several reasons,
     the simplest is missing login at startup), fall back to username
     ***********************************************************/
-    public string name () {
-        string name = this.account_state.account.dav_display_name ();
-        if (name == "") {
-            name = this.account_state.account.credentials ().user ();
+    public string name {
+        public get {
+            string name = this.account_state.account.dav_display_name ();
+            if (name == "") {
+                name = this.account_state.account.credentials ().user ();
+            }
+            return name;
         }
-        return name;
     }
 
 
@@ -272,7 +295,7 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public string avatar_url () {
+    public string avatar_url {
         if (avatar () == null) {
             return "";
         }
@@ -292,7 +315,7 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public LibSync.UserStatus.OnlineStatus status () {
+    public LibSync.UserStatus.OnlineStatus status {
         public get {
             return this.account_state.account.user_status_connector ().user_status ().state;
         }
@@ -310,7 +333,7 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.Uri status_icon {
+    public string status_icon {
         public get {
             return this.account_state.account.user_status_connector ().user_status ().state_icon ();
         }
@@ -574,7 +597,7 @@ public class User : GLib.Object {
 
                     var path = GLib.FileInfo (activity.file).directory ().path.to_utf8 ();
                     if (path == ".")
-                        path == "";
+                        path = "";
 
                     if (engine.should_discover_locally (path))
                         this.activity_model.remove_activity_from_activity_list (activity);
@@ -595,7 +618,7 @@ public class User : GLib.Object {
                 }
             }
 
-            /* emit */ ProgressDispatcher.instance.signal_folder_conflicts (folder_connection_alias, conflicts);
+            ProgressDispatcher.instance.signal_folder_conflicts (folder_connection_alias, conflicts);
         }
     }
 
@@ -605,17 +628,16 @@ public class User : GLib.Object {
     public void on_signal_send_notification_request (string account_name, string link, string verb, int row) {
         GLib.info ("Server Notification Request " + verb + link + " on account " + account_name);
 
-        GLib.List<string> valid_verbs = {
-            "GET",
-            "PUT",
-            "POST",
-            "DELETE"
-        };
+        GLib.List<string> valid_verbs = new GLib.List<string> ();
+        valid_verbs.append ("GET");
+        valid_verbs.append ("PUT");
+        valid_verbs.append ("POST");
+        valid_verbs.append ("DELETE");
 
-        if (valid_verbs.contains (verb)) {
+        if (valid_verbs.find (verb).length () > 0) {
             unowned AccountState acc = AccountManager.instance.account (account_name);
             if (acc != null) {
-                vNotificationConfirmJobar notification_confirm_job = new NotificationConfirmJob (acc.account);
+                NotificationConfirmJob notification_confirm_job = new NotificationConfirmJob (acc.account);
                 GLib.Uri l_uri = new GLib.Uri (link);
                 notification_confirm_job.link_and_verb (l_uri, verb);
                 notification_confirm_job.property ("activity_row", GLib.Variant.from_value (row));
@@ -656,11 +678,11 @@ public class User : GLib.Object {
         this.activity_model.clear_notifications ();
 
         foreach (var activity in list) {
-            if (this.blocklisted_notifications.contains (activity)) {
+            if (this.blocklisted_notifications.find (activity).length () > 0) {
                 GLib.info ("Activity in blocklist; skipping.");
                 continue;
             }
-            var message = AccountManager.instance.accounts.length == 1 ? "" : activity.acc_name;
+            var message = AccountManager.instance.accounts.length () == 1 ? "" : activity.acc_name;
             show_desktop_notification (activity.subject, message);
             this.activity_model.add_notification_to_activity_list (activity);
         }
@@ -703,15 +725,15 @@ public class User : GLib.Object {
 
         if (check_push_notifications_are_ready ()) {
             // we are relying on Web_socket push notifications - ignore refresh attempts from UI
-            this.time_since_last_check[this.account_state].invalidate ();
+            this.time_since_last_check.get (this.account_state).invalidate ();
             return true; // run repeatedly
         }
 
         // GLib.Timer isn't actually constructed as invalid.
         if (!this.time_since_last_check.contains (this.account_state)) {
-            this.time_since_last_check[this.account_state].invalidate ();
+            this.time_since_last_check.get (this.account_state).invalidate ();
         }
-        GLib.Timer timer = this.time_since_last_check[this.account_state];
+        GLib.Timer timer = this.time_since_last_check.get (this.account_state);
 
         // Fetch Activities only if visible and if last check is longer than 15 secs ago
         if (timer.is_valid && timer.elapsed () < NOTIFICATION_REQUEST_FREE_PERIOD) {

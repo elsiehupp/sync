@@ -22,7 +22,7 @@ public class TestSetUserStatusMessagePredefinedStatusWasSetUserStatusSetCorrect 
         );
 
         string user_status_message = "Some status";
-        LibSync.UserStatus.OnlineStatus user_status_state = LibSync.UserStatus.OnlineStatus.Online;
+        LibSync.UserStatus.OnlineStatus user_status_state = LibSync.UserStatus.OnlineStatus.ONLINE;
 
         model.set_online_status (user_status_state);
         model.set_user_status_message (user_status_message);

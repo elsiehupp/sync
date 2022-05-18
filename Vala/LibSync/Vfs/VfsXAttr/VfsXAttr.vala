@@ -110,8 +110,8 @@ public class VfsXAttr : Common.AbstractVfs {
 
         // Ensure the pin state isn't contradictory
         var pin = pin_state (item.file);
-        if (pin && *pin == PinState.PinState.ALWAYS_LOCAL) {
-            pin_state (item.rename_target, PinState.PinState.UNSPECIFIED);
+        if (pin && *pin == PinState.ALWAYS_LOCAL) {
+            pin_state (item.rename_target, PinState.UNSPECIFIED);
         }
         return new Result<void, string> ();
     }
@@ -161,11 +161,11 @@ public class VfsXAttr : Common.AbstractVfs {
         };
 
         if (xattr.has_nextcloud_placeholder_attributes (path)) {
-            var should_download = pin && (*pin == PinState.PinState.ALWAYS_LOCAL);
+            var should_download = pin && (pin == PinState.ALWAYS_LOCAL);
             stat.type = should_download ? ItemType.VIRTUAL_FILE_DOWNLOAD : ItemType.VIRTUAL_FILE;
             return true;
         } else {
-            var should_dehydrate = pin && (*pin == Common.ItemAvailability.ONLINE_ONLY);
+            var should_dehydrate = pin && (pin == Common.ItemAvailability.ONLINE_ONLY);
             if (should_dehydrate) {
                 stat.type = ItemType.VIRTUAL_FILE_DEHYDRATION;
                 return true;

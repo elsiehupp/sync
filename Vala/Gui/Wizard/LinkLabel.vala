@@ -13,7 +13,7 @@ public class LinkLabel : Gtk.Label {
     ***********************************************************/
     GLib.Uri url { private get; public set; }
 
-    internal signal void clicked ();
+    internal signal void signal_clicked ();
 
     /***********************************************************
     ***********************************************************/
@@ -45,7 +45,7 @@ public class LinkLabel : Gtk.Label {
             OpenExternal.open_browser (url);
         }
 
-        /* emit */ clicked ();
+        signal_clicked ();
     }
 
 

@@ -25,7 +25,7 @@ public class RemotePermissions : GLib.Object {
     /***********************************************************
     ***********************************************************/
     //  private template <typename Char> // can be 'char' or 'ushort' if conversion from string
-    private void from_array (char[] remote_permissions) {
+    private RemotePermissions.from_array (char[] remote_permissions) {
         this.value = (uint16)not_null_mask;
         if (remote_permissions == null) {
             return;
@@ -100,23 +100,19 @@ public class RemotePermissions : GLib.Object {
     /***********************************************************
     read value that was written with to_database_value ()
     ***********************************************************/
-    public static RemotePermissions from_database_value (string value) {
+    public RemotePermissions.from_database_value (string value) {
         if (value == "") {
-            return {};
+            this = new RemotePermissions ();
         }
-        RemotePermissions perm;
-        perm.from_array (value.const_data ());
-        return perm;
+        this = new RemotePermissions.from_array (value.const_data ());
     }
 
 
     /***********************************************************
     Read a permissions string received from the server, never null
     ***********************************************************/
-    public static RemotePermissions from_server_string (string value) {
-        RemotePermissions perm;
-        perm.from_array (value.utf16 ());
-        return perm;
+    public RemotePermissions.from_server_string (string value) {
+        this = new RemotePermissions.from_array (value.utf16 ());
     }
 
 

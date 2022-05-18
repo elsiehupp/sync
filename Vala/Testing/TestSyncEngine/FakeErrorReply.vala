@@ -28,7 +28,7 @@ public class FakeErrorReply : FakeReply {
         open (GLib.IODevice.ReadOnly);
         set_attribute (Soup.Request.HttpStatusCodeAttribute, http_error_code);
         set_error (InternalServerError, "Internal Server Fake Error");
-        GLib.Object.invoke_method (this, &FakeErrorReply.respond, GLib.QueuedConnection);
+        GLib.Object.invoke_method (this, FakeErrorReply.respond, GLib.QueuedConnection);
     }
 
     /***********************************************************

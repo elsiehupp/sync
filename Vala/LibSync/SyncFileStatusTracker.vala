@@ -131,10 +131,10 @@ public class SyncFileStatusTracker : GLib.Object {
             GLib.debug ("Investigating " + item.destination () + item.status + item.instruction);
             this.dirty_paths.remove (item.destination ());
 
-            if (has_error_status (*item)) {
+            if (has_error_status (item)) {
                 this.sync_problems[item.destination ()] = Common.SyncFileStatus.SyncFileStatusTag.STATUS_ERROR;
                 invalidate_parent_paths (item.destination ());
-            } else if (has_excluded_status (*item)) {
+            } else if (has_excluded_status (item)) {
                 this.sync_problems[item.destination ()] = Common.SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED;
             }
 
@@ -202,16 +202,17 @@ public class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_sync_finished () {
-        // Clear the sync counts to reduce the impact of unsymetrical inc/dec calls (e.g. when directory job abort)
-        GLib.HashTable<string, int> old_sync_count;
-        std.swap (this.sync_count, old_sync_count);
-        for (var it = old_sync_count.begin (); it != old_sync_count.end (); ++it) {
+        foreach (string key in this.sync_count.get_keys ()) {
             // Don't announce folders, file_status expect only paths without "/", otherwise it asserts
-            if (it.key ().has_suffix ("/")) {
+            if (key.has_suffix ("/")) {
                 continue;
             }
-
-            signal_file_status_changed (get_system_destination (it.key ()), file_status (it.key ()));
+            // Clear the sync counts to reduce the impact of unsymetrical inc/dec calls (e.g. when directory job abort)
+            this.sync_count = null;
+            signal_file_status_changed (
+                get_system_destination (key),
+                file_status (key)
+            );
         }
     }
 

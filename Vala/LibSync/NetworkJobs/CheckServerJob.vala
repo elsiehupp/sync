@@ -43,7 +43,7 @@ public class CheckServerJob : AbstractNetworkJob {
     \a url see this.server_status_url (does not include "/status.php")
     \a info The status.php input_stream information
     ***********************************************************/
-    internal signal void instance_found (GLib.Uri url, Json.Object info);
+    internal signal void signal_instance_found (GLib.Uri url, Json.Object info);
 
 
     /***********************************************************
@@ -51,7 +51,7 @@ public class CheckServerJob : AbstractNetworkJob {
 
     \a input_stream is never null
     ***********************************************************/
-    internal signal void instance_not_found (GLib.InputStream input_stream);
+    internal signal void signal_instance_not_found (GLib.InputStream input_stream);
 
 
     /***********************************************************
@@ -59,7 +59,7 @@ public class CheckServerJob : AbstractNetworkJob {
 
     \a url The specific url where the timeout happened.
     ***********************************************************/
-    internal signal void timeout (GLib.Uri url);
+    internal signal void signal_timeout (GLib.Uri url);
 
 
 
@@ -96,7 +96,7 @@ public class CheckServerJob : AbstractNetworkJob {
     public new void on_signal_timed_out () {
         GLib.warning ("TIMEOUT");
         if (this.input_stream != null && this.input_stream.is_running ()) {
-            /* emit */ timeout (this.input_stream.url);
+            signal_timeout (this.input_stream.url);
         } else if (this.input_stream == null) {
             GLib.warning ("Timeout even there was no input_stream?");
         }
@@ -150,7 +150,7 @@ public class CheckServerJob : AbstractNetworkJob {
         int http_status = this.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (body == "" || http_status != 200) {
             GLib.warning ("Error: status.php replied " + http_status + body);
-            /* emit */ instance_not_found (this.input_stream);
+            signal_instance_not_found (this.input_stream);
         } else {
             Json.ParserError error;
             var status = GLib.JsonDocument.from_json (body, error);
@@ -161,10 +161,10 @@ public class CheckServerJob : AbstractNetworkJob {
 
             GLib.info ("status.php returns: " + status + " " + this.input_stream.error + " Reply: " + this.input_stream);
             if (status.object ().contains ("installed")) {
-                /* emit */ instance_found (this.server_url, status.object ());
+                signal_instance_found (this.server_url, status.object ());
             } else {
                 GLib.warning ("No proper answer on " + this.input_stream.url);
-                /* emit */ instance_not_found (this.input_stream);
+                signal_instance_not_found (this.input_stream);
             }
         }
         return true;

@@ -106,7 +106,7 @@ public class OwncloudPropagator : GLib.Object {
     /***********************************************************
     Absolute path to the local directory. ends with "/"
     ***********************************************************/
-    private string local_dir { private set; }
+    private string local_directory { private set; }
 
     /***********************************************************
     ***********************************************************/
@@ -146,7 +146,7 @@ public class OwncloudPropagator : GLib.Object {
     ***********************************************************/
     public OwncloudPropagator.for_account (
         Account account,
-        string local_dir,
+        string local_directory,
         string remote_folder,
         SyncJournalDb progress_database,
         GLib.List<string> bulk_upload_block_list) {
@@ -156,7 +156,7 @@ public class OwncloudPropagator : GLib.Object {
         this.another_sync_needed = false;
         this.chunk_size = 10 * 1000 * 1000; // 10 MB, overridden in sync_options
         this.account = account;
-        this.local_dir = local_dir.has_suffix ("/") ? local_dir : local_dir + "/";
+        this.local_directory = local_directory.has_suffix ("/") ? local_directory : local_directory + "/";
         this.remote_folder = remote_folder.has_suffix ("/") ? remote_folder : remote_folder + "/";
         this.bulk_upload_block_list = bulk_upload_block_list;
         this.schedule_delayed_tasks = false;
@@ -247,7 +247,7 @@ public class OwncloudPropagator : GLib.Object {
                     item.instruction = CSync.SyncInstructions.NONE;
                     continue;
                 } else {
-                    maybe_conflict_directory == "";
+                    maybe_conflict_directory = "";
                 }
             }
 
@@ -412,7 +412,7 @@ public class OwncloudPropagator : GLib.Object {
     in filesystems that are only case-preserving.
     ***********************************************************/
     public bool local_filename_clash (string relfile) {
-        string file = this.local_dir + rel_file;
+        string file = this.local_directory + rel_file;
         GLib.assert (!file == "");
 
         if (!file == "" && Utility.fs_case_preserving ()) {
@@ -420,11 +420,11 @@ public class OwncloudPropagator : GLib.Object {
             // On Linux, the file system is case sensitive, but this code is useful for testing.
             // Just check that there is no other file with the same name and different casing.
             GLib.FileInfo file_info = GLib.File.new_for_path (file);
-            string fn = file_info.filename ();
+            string filename = file_info.filename ();
             GLib.List<string> list = file_info.directory ().entry_list ({
-                fn
+                filename
             });
-            if (list.length > 1 || (list.length == 1 && list[0] != fn)) {
+            if (list.length > 1 || (list.length == 1 && list[0] != filename)) {
                 return true;
             }
         }
@@ -452,14 +452,14 @@ public class OwncloudPropagator : GLib.Object {
     Q_REQUIRED_RESULT
     ***********************************************************/
     public string full_local_path (string temporary_filename) {
-        return this.local_dir + temporary_filename;
+        return this.local_directory + temporary_filename;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public string local_path {
-        return this.local_dir;
+        return this.local_directory;
     }
 
 
@@ -553,7 +553,7 @@ public class OwncloudPropagator : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void report_progress (SyncFileItem item, int64 bytes) {
-        /* emit */ progress (item, bytes);
+        signal_progress (item, bytes);
     }
 
 
@@ -598,7 +598,7 @@ public class OwncloudPropagator : GLib.Object {
     all jobs that are currently running.
     ***********************************************************/
     public DiskSpaceResult disk_space_check () {
-        int64 free_bytes = Utility.free_disk_space (this.local_dir);
+        int64 free_bytes = Utility.free_disk_space (this.local_directory);
         if (free_bytes < 0) {
             return DiskSpaceResult.OK;
         }
@@ -629,12 +629,12 @@ public class OwncloudPropagator : GLib.Object {
         SyncFileItem item,
         PropagatorCompositeJob composite,
         string *error) {
-        string fn = full_local_path (item.file);
+        string filename = full_local_path (item.file);
 
         string rename_error;
-        var conflict_mod_time = FileSystem.get_mod_time (fn);
+        var conflict_mod_time = FileSystem.get_mod_time (filename);
         if (conflict_mod_time <= 0) {
-            error = _("Impossible to get modification time for file in conflict %1").printf (fn);
+            error = _("Impossible to get modification time for file in conflict %1").printf (filename);
             return false;
         }
         string conflict_user_name;
@@ -645,17 +645,17 @@ public class OwncloudPropagator : GLib.Object {
             item.file, Utility.q_date_time_from_time_t (conflict_mod_time), conflict_user_name);
         string conflict_file_path = full_local_path (conflict_filename);
 
-        signal_touched_file (fn);
+        signal_touched_file (filename);
         signal_touched_file (conflict_file_path);
 
-        if (!FileSystem.rename (fn, conflict_file_path, rename_error)) {
+        if (!FileSystem.rename (filename, conflict_file_path, rename_error)) {
             // If the rename fails, don't replace it.
             if (error != null) {
                 *error = rename_error;
             }
             return false;
         }
-        GLib.info ("Created conflict file " + fn + " -> " + conflict_filename);
+        GLib.info ("Created conflict file " + filename + " -> " + conflict_filename);
 
         // Create a new conflict record. To get the base etag, we need to read it from the database.
         ConflictRecord conflict_record;
@@ -714,7 +714,7 @@ public class OwncloudPropagator : GLib.Object {
     ***********************************************************/
     public Result<AbstractVfs.ConvertToPlaceholderResult, string> update_metadata (SyncFileItem item);
     Result<AbstractVfs.ConvertToPlaceholderResult, string> OwncloudPropagator.update_metadata (SyncFileItem item) {
-        return OwncloudPropagator.static_update_metadata (item, this.local_dir, sync_options.vfs, this.journal);
+        return OwncloudPropagator.static_update_metadata (item, this.local_directory, sync_options.vfs, this.journal);
     }
 
 
@@ -727,14 +727,14 @@ public class OwncloudPropagator : GLib.Object {
     Will also trigger a AbstractVfs.convert_to_placeholder.
     ***********************************************************/
     public static Result<AbstractVfs.ConvertToPlaceholderResult, string> static_update_metadata (
-        SyncFileItem item, string local_dir,
+        SyncFileItem item, string local_directory,
         AbstractVfs vfs, SyncJournalDb journal
     ) {
-        string fs_path = local_dir + item.destination ();
+        string fs_path = local_directory + item.destination ();
         var result = vfs.convert_to_placeholder (fs_path, item);
         if (!result) {
             return result.error;
-        } else if (*result == AbstractVfs.ConvertToPlaceholderResult.Locked) {
+        } else if (result == AbstractVfs.ConvertToPlaceholderResult.Locked) {
             return AbstractVfs.ConvertToPlaceholderResult.Locked;
         }
         var record = item.to_sync_journal_file_record_with_inode (fs_path);
@@ -765,7 +765,7 @@ public class OwncloudPropagator : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void clear_delayed_tasks () {
-        this.delayed_tasks == "";
+        this.delayed_tasks = "";
     }
 
 
@@ -880,7 +880,7 @@ public class OwncloudPropagator : GLib.Object {
     ***********************************************************/
     private void reset_delayed_upload_tasks () {
         this.schedule_delayed_tasks = false;
-        this.delayed_tasks == "";
+        this.delayed_tasks = "";
     }
 
 
@@ -892,7 +892,7 @@ public class OwncloudPropagator : GLib.Object {
         int64 value = 50 * 1000 * 1000LL;
 
         OwncloudPropagator.has_env = false;
-        OwncloudPropagator.env = qgetenv ("OWNCLOUD_CRITICAL_FREE_SPACE_BYTES").to_long_long (&has_env);
+        OwncloudPropagator.env = qgetenv ("OWNCLOUD_CRITICAL_FREE_SPACE_BYTES").to_long_long (has_env);
         if (has_env) {
             value = env;
         }
@@ -912,7 +912,7 @@ public class OwncloudPropagator : GLib.Object {
         int64 value = 250 * 1000 * 1000LL;
 
         OwncloudPropagator.has_env = false;
-        OwncloudPropagator.env = qgetenv ("OWNCLOUD_FREE_SPACE_BYTES").to_long_long (&has_env);
+        OwncloudPropagator.env = qgetenv ("OWNCLOUD_FREE_SPACE_BYTES").to_long_long (has_env);
         if (has_env) {
             value = env;
         }

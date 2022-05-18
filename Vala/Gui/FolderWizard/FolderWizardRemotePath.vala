@@ -268,10 +268,10 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_refresh_folders () {
-        this.encrypted_paths == "";
+        this.encrypted_paths = "";
         run_lscol_job ("/");
-        this.instance.folder_tree_widget == "";
-        this.instance.folder_entry == "";
+        this.instance.folder_tree_widget = "";
+        this.instance.folder_entry = "";
     }
 
 
@@ -299,7 +299,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
             this.instance.folder_entry.on_signal_text (directory);
         }
 
-        /* emit */ complete_changed ();
+        signal_complete_changed ();
     }
 
 
@@ -359,7 +359,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     private LscolJob run_lscol_job (string path) {
         var lscol_job = new LscolJob (this.account, path, this);
         var props = new GLib.List<string> ({ "resourcetype" });
-        if (this.account.capabilities.client_side_encryption_available ()) {
+        if (this.account.capabilities.client_side_encryption_available) {
             props += "http://nextcloud.org/ns:is-encrypted";
         }
         lscol_job.properties (props);
@@ -396,7 +396,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         if (!item) {
             item = new GLib.TreeWidgetItem (parent);
             GLib.FileIconProvider prov;
-            Gtk.Icon folder_icon = prov.icon (GLib.FileIconProvider.FolderConnection);
+            Gtk.IconInfo folder_icon = prov.icon (GLib.FileIconProvider.FolderConnection);
             item.icon (0, folder_icon);
             item.on_signal_text (0, folder_name);
             item.data (0, GLib.USER_ROLE, folder_path);

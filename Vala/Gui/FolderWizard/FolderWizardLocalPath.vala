@@ -56,7 +56,7 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
         string error_str = FolderManager.instance.check_path_validity_for_new_folder (
             GLib.Dir.from_native_separators (this.instance.local_folder_line_edit.text ()), server_url);
 
-        bool is_ok = error_str == "";
+        bool is_ok = error_str = "";
         GLib.List<string> warn_strings;
         if (!is_ok) {
             warn_strings += error_str;
@@ -65,7 +65,7 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
         this.instance.warn_label.word_wrap (true);
         if (is_ok) {
             this.instance.warn_label.hide ();
-            this.instance.warn_label == "";
+            this.instance.warn_label = "";
         } else {
             this.instance.warn_label.show ();
             string warnings = format_warnings (warn_strings);
@@ -110,7 +110,7 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
             // set the last directory component name as alias
             this.instance.local_folder_line_edit.on_signal_text (GLib.Dir.to_native_separators (directory));
         }
-        /* emit */ complete_changed ();
+        signal_complete_changed ();
     }
 
 } // class FolderWizardLocalPath

@@ -16,7 +16,7 @@ public class TestClearAtStages : GLib.Object {
         UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
 
         GLib.assert_true (model.clear_at () == _("Don't clear"));
-        var clear_at_values = model.clear_at_values ();
+        var clear_at_values = model.clear_at_values;
         GLib.assert_true (clear_at_values.length == 6);
 
         GLib.assert_true (clear_at_values[0] == _("Don't clear"));

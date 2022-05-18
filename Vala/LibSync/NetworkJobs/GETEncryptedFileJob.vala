@@ -16,7 +16,7 @@ public class GETEncryptedFileJob : GETFileJob {
     /***********************************************************
     ***********************************************************/
     private unowned EncryptionHelper.StreamingDecryptor decryptor;
-    private EncryptedFile encrypted_file_info = {};
+    private EncryptedFile encrypted_file_info = null;
     private string pending_bytes;
     private int64 processed_so_far = 0;
 

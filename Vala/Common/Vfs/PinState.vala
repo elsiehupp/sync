@@ -68,7 +68,13 @@ public enum PinState {
     New remote files in unspecified directories on_signal_start unspecified, and
     dehydrated (which is an arbitrary decision).
     ***********************************************************/
-    UNSPECIFIED = 3;
+    UNSPECIFIED = 3,
+
+    /***********************************************************
+    This is an error state that should be replaced with an error
+    domain.
+    ***********************************************************/
+    UNKOWN = 4;
 
     /***********************************************************
     Translated text for "making items always available locally"

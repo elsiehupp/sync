@@ -1,11 +1,10 @@
 
-//  #include <GLib.AbstractListModel>
 //  #include <Gtk.Image>
 //  #include <GLib.QuickImageProvider>
 //  #include <chrono>
 //  #include <pushnotifications
 //  #include <GLib.DesktopServ
-//  #include <Gtk.Icon>
+//  #include <Gtk.IconInfo>
 //  #include <GLib.MessageB
 //  #include <GLib.SvgRenderer>
 //  #include <GLib.Painter>
@@ -14,10 +13,10 @@
 namespace Occ {
 namespace Ui {
 
-public class UserModel : GLib.AbstractListModel {
+public class UserModel : GLib.Object {
 
     public enum UserRoles {
-        NAME = GLib.USER_ROLE + 1,
+        NAME, // GLib.USER_ROLE + 1,
         SERVER,
         SERVER_HAS_USER_STATUS,
         STATUS_ICON,
@@ -27,50 +26,21 @@ public class UserModel : GLib.AbstractListModel {
         AVATAR,
         IS_CURRENT_USER,
         IS_CONNECTED,
-        IDENTIFIER;
-
-        public static GLib.HashTable<int, string> role_names () {
-            GLib.HashTable<int, string> roles;
-            roles[UserRoles.NAME] = "name";
-            roles[UserRoles.SERVER] = "server";
-            roles[UserRoles.SERVER_HAS_USER_STATUS] = "server_has_user_status";
-            roles[UserRoles.STATUS_ICON] = "status_icon";
-            roles[UserRoles.STATUS_EMOJI] = "status_emoji";
-            roles[UserRoles.STATUS_MESSAGE] = "status_message";
-            roles[UserRoles.DESKTOP_NOTIFICATION] = "are_desktop_notifications_allowed";
-            roles[UserRoles.AVATAR] = "avatar";
-            roles[UserRoles.IS_CURRENT_USER] = "is_current_user";
-            roles[UserRoles.IS_CONNECTED] = "is_connected";
-            roles[UserRoles.IDENTIFIER] = "identifier";
-            return roles;
-        }
+        IDENTIFIER
     }
-
-
-    /***********************************************************
-    Time span in milliseconds which must elapse between
-    sequential refreshes of the notifications
-    ***********************************************************/
-    const int NOTIFICATION_REQUEST_FREE_PERIOD = 15000;
-
-    /***********************************************************
-    Time span in milliseconds after which activities will
-    expired by default
-    ***********************************************************/
-    const int64 ACTIVITY_DEFAULT_EXPIRATION_TIME_MSECS = 1000 * 60 * 10;
 
 
     /***********************************************************
     ***********************************************************/
     public static UserModel instance {
         public get {
-            if (!this.instance) {
-                this.instance = new UserModel ();
+            if (UserModel.instance == null) {
+                UserModel.instance = new UserModel ();
             }
-            return this.instance;
+            return UserModel.instance;
         }
         private set {
-            this.instance = value;
+            UserModel.instance = value;
         }
     }
 
@@ -169,35 +139,35 @@ public class UserModel : GLib.AbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.Variant data (GLib.ModelIndex index, int role) {
-        if (index.row () < 0 || index.row () >= this.users.length) {
-            return GLib.Variant ();
+    public GLib.Variant data (int index, int role) {
+        if (index < 0 || index >= this.users.length) {
+            return null;
         }
 
         if (role == UserRoles.NAME) {
-            return this.users[index.row ()].name ();
+            return new GLib.Variant.string (this.users.nth_data (index).name);
         } else if (role == UserRoles.SERVER) {
-            return this.users[index.row ()].server ();
+            return new GLib.Variant.string (this.users.nth_data (index).server);
         } else if (role == UserRoles.SERVER_HAS_USER_STATUS) {
-            return this.users[index.row ()].server_has_user_status ();
+            return new GLib.Variant.boolean (this.users.nth_data (index).server_has_user_status);
         } else if (role == UserRoles.STATUS_ICON) {
-            return this.users[index.row ()].status_icon ();
+            return new GLib.Variant.string (this.users.nth_data (index).status_icon);
         } else if (role == UserRoles.STATUS_EMOJI) {
-            return this.users[index.row ()].status_emoji ();
+            return new GLib.Variant.string (this.users.nth_data (index).status_emoji);
         } else if (role == UserRoles.STATUS_MESSAGE) {
-            return this.users[index.row ()].status_message ();
+            return new GLib.Variant.string (this.users.nth_data (index).status_message);
         } else if (role == UserRoles.DESKTOP_NOTIFICATION) {
-            return this.users[index.row ()].are_desktop_notifications_allowed;
+            return new GLib.Variant.boolean (this.users.nth_data (index).are_desktop_notifications_allowed);
         } else if (role == UserRoles.AVATAR) {
-            return this.users[index.row ()].avatar_url ();
+            return new GLib.Variant.string (this.users.nth_data (index).avatar_url);
         } else if (role == UserRoles.IS_CURRENT_USER) {
-            return this.users[index.row ()].is_current_user ();
+            return new GLib.Variant.boolean (this.users.nth_data (index).is_current_user);
         } else if (role == UserRoles.IS_CONNECTED) {
-            return this.users[index.row ()].is_connected;
+            return new GLib.Variant.boolean (this.users.nth_data (index).is_connected);
         } else if (role == UserRoles.IDENTIFIER) {
-            return index.row ();
+            return index;
         }
-        return GLib.Variant ();
+        return new GLib.Variant ();
     }
 
 
@@ -205,7 +175,7 @@ public class UserModel : GLib.AbstractListModel {
     ***********************************************************/
     public Gtk.Image avatar_by_identifier (int identifier) {
         if (identifier < 0 || identifier >= this.users.size ())
-            return {};
+            return null;
 
         return this.users[identifier].avatar ();
     }
@@ -290,7 +260,7 @@ public class UserModel : GLib.AbstractListModel {
     /***********************************************************
     ***********************************************************/
     private void on_signal_avatar_changed (int row) {
-        /* emit */ data_changed (
+        signal_data_changed (
             index (row, 0),
             index (row, 0),
             {
@@ -303,7 +273,7 @@ public class UserModel : GLib.AbstractListModel {
     /***********************************************************
     ***********************************************************/
     private void on_signal_status_changed (int row) {
-        /* emit */ data_changed (
+        signal_data_changed (
             index (row, 0),
             index (row, 0),
             {
@@ -318,7 +288,7 @@ public class UserModel : GLib.AbstractListModel {
     /***********************************************************
     ***********************************************************/
     private void on_signal_desktop_notifications_allowed_changed (int row) {
-        /* emit */ data_changed (
+        signal_data_changed (
             index (row, 0),
             index (row, 0),
             {
@@ -331,7 +301,7 @@ public class UserModel : GLib.AbstractListModel {
     /***********************************************************
     ***********************************************************/
     private void on_signal_account_state_changed (int row) {
-        /* emit */ data_changed (
+        signal_data_changed (
             index (row, 0),
             index (row, 0),
             {
@@ -355,11 +325,11 @@ public class UserModel : GLib.AbstractListModel {
     /***********************************************************
     ***********************************************************/
     public void open_current_account_talk () {
-        if (!this.current_user) {
+        if (UserModel.current_user == null) {
             return;
         }
 
-        var talk_app = this.current_user.talk_app ();
+        var talk_app = UserModel.current_user.talk_app ();
         if (talk_app) {
             OpenExternal.open_browser (talk_app.url);
         } else {
@@ -487,11 +457,11 @@ public class UserModel : GLib.AbstractListModel {
     ***********************************************************/
     public GLib.List<AccountApp> app_list {
         public get {
-            if (this.current_user_id < 0 || this.current_user_id >= this.users.size ()) {
-                return {};
+            if (this.current_user_id < 0 || this.current_user_id >= this.users.length ()) {
+                return null;
             }
 
-            return this.users[this.current_user_id].app_list;
+            return new GLib.Variant (this.users.nth_data (this.current_user_id).app_list;
         }
     }
 

@@ -23,7 +23,7 @@ public class TestDestructor : AbstractTestOwnSql {
         query_2.prepare ("SELECT * FROM addresses");
         SqlQuery query_3 = new SqlQuery ("SELECT * FROM addresses", this.database);
         SqlQuery query_4;
-        database.on_signal_reset ();
+        database.reset ();
     }
 
 } // class TestDestructor

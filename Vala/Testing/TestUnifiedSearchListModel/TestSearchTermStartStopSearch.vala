@@ -24,7 +24,7 @@ public class TestSearchTermStartStopSearch : AbstractTestUnifiedSearchListmodel 
         GLib.assert_true (model.search_term () == "dis");
 
         // #2 test set_search_term actually sets the search term and the signal is emitted
-        search_term_changed == "";
+        search_term_changed = "";
         model.set_search_term (model.search_term () + "cuss");
         GLib.assert_true (model.search_term () == "discuss");
         GLib.assert_true (search_term_changed.length == 1);
@@ -33,7 +33,7 @@ public class TestSearchTermStartStopSearch : AbstractTestUnifiedSearchListmodel 
         GLib.assert_true (!model.is_search_in_progress ());
 
         // #4 test that model has started the search after specific delay
-        GLib.SignalSpy search_in_progress_changed = new GLib.SignalSpy (model, &UnifiedSearchResultsListModel.is_search_in_progress_changed);
+        GLib.SignalSpy search_in_progress_changed = new GLib.SignalSpy (model, UnifiedSearchResultsListModel.is_search_in_progress_changed);
         // allow search jobs to get created within the model
         GLib.assert_true (search_in_progress_changed.wait ());
         GLib.assert_true (search_in_progress_changed.length == 1);

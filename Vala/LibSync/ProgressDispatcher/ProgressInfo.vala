@@ -313,8 +313,8 @@ public class ProgressInfo : GLib.Object {
         this.status = Status.STARTING;
 
         this.current_items = new GLib.HashTable<string, ProgressItem?> ();
-        this.current_discovered_remote_folder == "";
-        this.current_discovered_local_folder == "";
+        this.current_discovered_remote_folder = "";
+        this.current_discovered_local_folder = "";
         this.size_progress = new Progress ();
         this.file_progress = new Progress ();
         this.total_size_of_completed_jobs = 0;
