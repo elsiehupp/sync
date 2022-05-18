@@ -59,9 +59,14 @@ deps = [
     dependency('zlib'),
 ]
 
+libraries = [
+    subproject('gpseq').get_variable ('gpseq_lib')
+]
+
 common = library(
     'Common',
     srcs,
     dependencies: deps,
-    install: false
+    install: false,
+    link_with: libraries
 )

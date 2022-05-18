@@ -4,9 +4,14 @@ srcs = files([
     'Test/TestQTokenizer.vala',
 ])
 
+libraries = [
+    subproject('gpseq').get_variable ('gpseq_lib')
+]
+
 library(
     'QTokenizer',
     srcs,
 #     dependencies: deps,
-    install: false
+    install: false,
+    link_with: libraries
 )

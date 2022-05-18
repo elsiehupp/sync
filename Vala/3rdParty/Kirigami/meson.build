@@ -19,9 +19,14 @@ deps = [
     # dependency('libsoup-2.4'),
 ]
 
+libraries = [
+    subproject('gpseq').get_variable ('gpseq_lib')
+]
+
 library(
     'Kirigami',
     srcs,
 #     dependencies: deps,
-    install: false
+    install: false,
+    link_with: libraries
 )

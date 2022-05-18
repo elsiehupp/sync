@@ -21,9 +21,14 @@ deps = [
     # dependency('libsoup-2.4'),
 ]
 
+libraries = [
+    subproject('gpseq').get_variable ('gpseq_lib')
+]
+
 crash_reporter = library(
     'CrashReporter',
     srcs,
     dependencies: deps,
-    install: false
+    install: false,
+    link_with: libraries
 )

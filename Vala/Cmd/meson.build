@@ -20,9 +20,14 @@ deps = [
     meson.get_compiler('vala').find_library('readline'),
 ]
 
+libraries = [
+    subproject('gpseq').get_variable ('gpseq_lib')
+]
+
 cmd = library(
     'Cmd',
     srcs,
     dependencies: deps,
-    install: false
+    install: false,
+    link_with: libraries
 )
