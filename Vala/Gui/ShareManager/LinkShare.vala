@@ -191,7 +191,7 @@ public class LinkShare : Share {
     ***********************************************************/
     private void on_signal_link_share_note_set (GLib.JsonDocument reply, GLib.Variant value) {
         this.note = note.to_string ();
-        /* emit */ signal_note_set ();
+        signal_note_set ();
     }
 
 
@@ -209,7 +209,7 @@ public class LinkShare : Share {
         } else {
             this.expire_date = value.to_date ();
         }
-        /* emit */ signal_expire_date_set ();
+        signal_expire_date_set ();
     }
 
 
@@ -217,7 +217,7 @@ public class LinkShare : Share {
     ***********************************************************/
     private void on_signal_name_set (GLib.JsonDocument reply, GLib.Variant value) {
         this.name = value.to_string ();
-        /* emit */ signal_name_set ();
+        signal_name_set ();
     }
 
 
@@ -226,7 +226,7 @@ public class LinkShare : Share {
     private void on_signal_link_share_label_set (GLib.JsonDocument reply, GLib.Variant value) {
         if (this.label != label.to_string ()) {
             this.label = label.to_string ();
-            /* emit */ signal_label_set ();
+            signal_label_set ();
         }
     }
 

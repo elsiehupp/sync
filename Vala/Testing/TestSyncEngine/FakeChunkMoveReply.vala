@@ -88,8 +88,8 @@ public class FakeChunkMoveReply : FakeReply {
         set_raw_header ("OC-ETag", file_info.etag);
         set_raw_header ("ETag", file_info.etag);
         set_raw_header ("OC-FileId", file_info.file_identifier);
-        /* emit */ signal_meta_data_changed ();
-        /* emit */ signal_finished ();
+        signal_meta_data_changed ();
+        signal_finished ();
         return false; // only run once
     }
 
@@ -99,8 +99,8 @@ public class FakeChunkMoveReply : FakeReply {
     public bool respond_precondition_failed () {
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 412);
         set_error (InternalServerError, "Precondition Failed");
-        /* emit */ signal_meta_data_changed ();
-        /* emit */ signal_finished ();
+        signal_meta_data_changed ();
+        signal_finished ();
         return false; // only run once
     }
 
@@ -109,7 +109,7 @@ public class FakeChunkMoveReply : FakeReply {
     ***********************************************************/
     public override bool on_signal_abort () {
         set_error (OperationCanceledError, "on_signal_abort");
-        /* emit */ signal_finished ();
+        signal_finished ();
         return false; // only run once
     }
 

@@ -48,13 +48,13 @@ public class DeleteApiJob : AbstractNetworkJob {
 
         if (this.reply.error != GLib.InputStream.NoError) {
             GLib.warning ("Network error: " + this.path + this.error_string + http_status);
-            /* emit */ signal_result (http_status);
+            signal_result (http_status);
             return true;
         }
 
         var reply_data = string.from_utf8 (this.reply.read_all ());
         GLib.info ("TMX Delete Job " + reply_data);
-        /* emit */ signal_result (http_status);
+        signal_result (http_status);
         return true;
     }
 

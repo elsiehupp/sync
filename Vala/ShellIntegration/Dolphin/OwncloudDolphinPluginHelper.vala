@@ -155,7 +155,7 @@ public class OwncloudDolphinPluginHelper : GLib.Object {
                     return;
                 }
             }
-            /* emit */ signal_command_received (line);
+            signal_command_received (line);
         }
     }
 

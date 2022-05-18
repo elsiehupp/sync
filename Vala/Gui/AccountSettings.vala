@@ -459,7 +459,7 @@ public class AccountSettings : Gtk.Widget {
         customize_style ();
 
         // Notify the other widgets (Dark-/Light-Mode switching)
-        /* emit */ signal_style_changed ();
+        signal_style_changed ();
     }
 
 
@@ -636,7 +636,7 @@ public class AccountSettings : Gtk.Widget {
             this.model.remove_row (row);
 
             // single folder_connection fix to show add-button and hide remove-button
-            /* emit */ signal_folder_changed ();
+            signal_folder_changed ();
         }
     }
 
@@ -646,7 +646,7 @@ public class AccountSettings : Gtk.Widget {
     ***********************************************************/
     protected void on_signal_open_current_folder () {
         if (selected_folder_alias () != "") {
-            /* emit */ signal_open_folder_alias (alias);
+            signal_open_folder_alias (alias);
         }
     }
 
@@ -993,7 +993,7 @@ public class AccountSettings : Gtk.Widget {
             // The user already accepted the selective sync dialog. everything is in the allow list
             folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, "/");
             FolderManager.instance.schedule_all_folders ();
-            /* emit */ signal_folder_changed ();
+            signal_folder_changed ();
         }
     }
 

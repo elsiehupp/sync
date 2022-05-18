@@ -40,10 +40,10 @@ public class FakePayloadReply : FakeReply {
     public bool respond () {
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 200);
         set_header (Soup.Request.ContentLengthHeader, this.body.size ());
-        /* emit */ signal_meta_data_changed ();
-        /* emit */ signal_ready_read ();
+        signal_meta_data_changed ();
+        signal_ready_read ();
         set_finished (true);
-        /* emit */ signal_finished ();
+        signal_finished ();
         return false; // only run once
     }
 

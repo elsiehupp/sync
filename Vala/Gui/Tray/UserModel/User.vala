@@ -20,9 +20,15 @@ public class User : GLib.Object {
     private GLib.List<Activity> blocklisted_notifications;
 
     /***********************************************************
+    Time span in milliseconds which must elapse between
+    sequential checks for expired activities
     ***********************************************************/
-    private GLib.Timeout expired_activities_check_timer;
-    private GLib.Timeout notification_check_timer;
+    const int64 EXPIRED_ACTIVITIES_CHECK_INTERVAL_MSEC = 1000 * 60;
+
+    /***********************************************************
+    ***********************************************************/
+    private bool expired_activities_check_timer_active = false;
+    private bool notification_check_timer_active = false;
     private GLib.HashTable<AccountState, GLib.Timer> time_since_last_check;
 
     /***********************************************************
@@ -67,12 +73,6 @@ public class User : GLib.Object {
         );
         ProgressDispatcher.instance.signal_add_error_to_gui.connect (
             this.on_signal_add_error_to_gui
-        );
-        this.notification_check_timer.timeout.connect (
-            this.on_signal_refresh
-        );
-        this.expired_activities_check_timer.timeout.connect (
-            this.on_signal_check_expired_activities
         );
         this.account_state.signal_state_changed.connect (
             this.on_signal_account_state_changed
@@ -474,8 +474,12 @@ public class User : GLib.Object {
 
                 show_desktop_notification (activity.subject, activity.message);
 
-                if (!this.expired_activities_check_timer.is_active ()) {
-                    this.expired_activities_check_timer.on_signal_start (EXPIRED_ACTIVITIES_CHECK_INTERVAL_MSEC);
+                if (!this.expired_activities_check_timer_active) {
+                    this.expired_activities_check_timer_active = true;
+                    GLib.Timeout.add (
+                        (uint)EXPIRED_ACTIVITIES_CHECK_INTERVAL_MSEC,
+                        this.on_signal_check_expired_activities
+                    );
                 }
             }
         } catch (FolderManagerError error) {
@@ -689,14 +693,18 @@ public class User : GLib.Object {
 
 
     /***********************************************************
+    I'm not sure if this should be repeating.
     ***********************************************************/
-    public void on_signal_refresh () {
+    public bool on_signal_refresh () {
+        if (!this.notification_check_timer_active) {
+            return true; // run repeatedly
+        }
         on_signal_refresh_user_status ();
 
         if (check_push_notifications_are_ready ()) {
             // we are relying on Web_socket push notifications - ignore refresh attempts from UI
             this.time_since_last_check[this.account_state].invalidate ();
-            return;
+            return true; // run repeatedly
         }
 
         // GLib.Timer isn't actually constructed as invalid.
@@ -708,7 +716,7 @@ public class User : GLib.Object {
         // Fetch Activities only if visible and if last check is longer than 15 secs ago
         if (timer.is_valid && timer.elapsed () < NOTIFICATION_REQUEST_FREE_PERIOD) {
             GLib.debug ("Do not check as last check is only secs ago: " + (timer.elapsed () / 1000).to_string ());
-            return;
+            return true; // run repeatedly
         }
         if (this.account_state != null && this.account_state.is_connected) {
             if (!timer.is_valid) {
@@ -717,6 +725,7 @@ public class User : GLib.Object {
             on_signal_refresh_notifications ();
             timer.on_signal_start ();
         }
+        return true; // run repeatedly
     }
 
 
@@ -744,8 +753,13 @@ public class User : GLib.Object {
     ***********************************************************/
     public void on_signal_notification_refresh_interval (GLib.TimeSpan interval_in_microseconds) {
         if (!check_push_notifications_are_ready ()) {
-            GLib.debug ("Starting Notification refresh timer with " + interval_in_microseconds.length / 1000 + " sec interval_in_microseconds");
-            this.notification_check_timer.on_signal_start (interval_in_microseconds.length);
+            GLib.debug ("Starting Notification refresh timer with " + interval_in_microseconds.to_string () / 1000 + " sec interval_in_microseconds");
+
+            this.notification_check_timer_active = true;
+            GLib.Timeout.add (
+                (uint)interval_in_microseconds,
+                this.on_signal_refresh
+            );
         }
     }
 
@@ -753,7 +767,7 @@ public class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_rebuild_navigation_app_list () {
-        /* emit */ signal_server_has_talk_changed ();
+        signal_server_has_talk_changed ();
         // Rebuild App list
         UserAppsModel.instance.build_app_list ();
     }
@@ -764,9 +778,12 @@ public class User : GLib.Object {
     private void on_signal_push_notifications_ready () {
         GLib.info ("Push notifications are ready.");
 
-        if (this.notification_check_timer.is_active ()) {
-            // as we are now able to use push notifications - let's stop the polling timer
-            this.notification_check_timer.stop ();
+        if (this.notification_check_timer_active) {
+            /***********************************************************
+            As we are now able to use push notifications, let's stop the
+            polling timer.
+            ***********************************************************/
+            this.notification_check_timer_active = false;
         }
 
         connect_push_notifications ();
@@ -806,7 +823,10 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_check_expired_activities () {
+    private bool on_signal_check_expired_activities () {
+        if (!this.expired_activities_check_timer_active) {
+            return true; // run repeatedly
+        }
         foreach (Activity activity in this.activity_model.errors_list ()) {
             if (activity.expire_at_msecs > 0 && GLib.DateTime.current_date_time ().to_m_secs_since_epoch () >= activity.expire_at_msecs) {
                 this.activity_model.remove_activity_from_activity_list (activity);
@@ -814,8 +834,9 @@ public class User : GLib.Object {
         }
 
         if (this.activity_model.errors_list ().length () == 0) {
-            this.expired_activities_check_timer.stop ();
+            this.expired_activities_check_timer_active = false;
         }
+        return true; // run repeatedly
     }
 
 
@@ -874,7 +895,7 @@ public class User : GLib.Object {
         }
 
         this.notification_cache.insert (notification);
-        /* emit */ signal_gui_log (notification.title, notification.message);
+        signal_gui_log (notification.title, notification.message);
         // restart the gui log timer now that we show a new notification
         this.gui_log_timer.on_signal_start ();
     }

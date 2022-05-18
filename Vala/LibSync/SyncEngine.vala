@@ -420,13 +420,13 @@ public class SyncEngine : GLib.Object {
 
         this.stop_watch.start ();
         this.progress_info.status = ProgressInfo.Status.STARTING;
-        /* emit */ signal_transmission_progress (*this.progress_info);
+        signal_transmission_progress (*this.progress_info);
 
         GLib.info ("#### Discovery start ####################################################");
         GLib.info ("Server" + account.server_version
                          + (account.is_http2Supported () ? "Using HTTP/2": ""));
         this.progress_info.status = ProgressInfo.Status.DISCOVERY;
-        /* emit */ signal_transmission_progress (*this.progress_info);
+        signal_transmission_progress (*this.progress_info);
 
         this.discovery_phase.reset (new DiscoveryPhase ());
         this.discovery_phase.account = this.account;
@@ -758,7 +758,7 @@ public class SyncEngine : GLib.Object {
             this.progress_info.current_discovered_remote_folder = folder;
             this.progress_info.current_discovered_local_folder == "";
         }
-        /* emit */ signal_transmission_progress (*this.progress_info);
+        signal_transmission_progress (*this.progress_info);
     }
 
 
@@ -768,7 +768,7 @@ public class SyncEngine : GLib.Object {
         if (this.remote_root_etag == "") {
             GLib.debug ("Root etag: " + e);
             this.remote_root_etag = e;
-            /* emit */ signal_etag_retrieved_from_sync_engine (this.remote_root_etag, time);
+            signal_etag_retrieved_from_sync_engine (this.remote_root_etag, time);
         }
     }
 
@@ -836,7 +836,7 @@ public class SyncEngine : GLib.Object {
                 this.journal.file_record (record);
 
                 // This might have changed the shared flag, so we must notify SyncFileStatusTracker for example
-                /* emit */ signal_item_completed (item);
+                signal_item_completed (item);
             } else {
                 // Update only outdated data from the disk.
                 this.journal.update_local_metadata (item.file, item.modtime, item.size, item.inode);
@@ -901,8 +901,8 @@ public class SyncEngine : GLib.Object {
     private void on_signal_item_completed (SyncFileItem item) {
         this.progress_info.progress_complete (item);
 
-        /* emit */ signal_transmission_progress (this.progress_info);
-        /* emit */ signal_item_completed (item);
+        signal_transmission_progress (this.progress_info);
+        signal_item_completed (item);
     }
 
 
@@ -930,7 +930,7 @@ public class SyncEngine : GLib.Object {
         this.progress_info.current_discovered_remote_folder == "";
         this.progress_info.current_discovered_local_folder == "";
         this.progress_info.status = ProgressInfo.Status.RECONCILE;
-        /* emit */ signal_transmission_progress (*this.progress_info);
+        signal_transmission_progress (*this.progress_info);
 
         //    GLib.info ("Permissions of the root folder: " + this.csync_ctx.remote.root_perms.to_string ();
 
@@ -945,7 +945,7 @@ public class SyncEngine : GLib.Object {
 
             GLib.Object guard = new GLib.Object ();
             GLib.Object self = this;
-            /* emit */ signal_about_to_remove_all_files (side >= 0 ? SyncFileItem.Direction.DOWN : SyncFileItem.Direction.UP, callback);
+            signal_about_to_remove_all_files (side >= 0 ? SyncFileItem.Direction.DOWN : SyncFileItem.Direction.UP, callback);
             return;
         }
         finish_delegate ();
@@ -975,13 +975,13 @@ public class SyncEngine : GLib.Object {
         this.local_discovery_paths = new GLib.List<string> ();
 
         // To announce the beginning of the sync
-        /* emit */ signal_about_to_propagate (this.sync_items);
+        signal_about_to_propagate (this.sync_items);
 
         GLib.info ("#### Reconcile (signal_about_to_propagate OK) #################################################### "<< this.stop_watch.add_lap_time ("Reconcile (signal_about_to_propagate OK)") + "ms");
 
         // it's important to do this before ProgressInfo.start (), to announce start of new sync
         this.progress_info.status = ProgressInfo.Status.PROPAGATION;
-        /* emit */ signal_transmission_progress (*this.progress_info);
+        signal_transmission_progress (*this.progress_info);
         this.progress_info.start_estimate_updates ();
 
         // post update phase script : allow to tweak stuff by a custom script in debug mode.
@@ -1094,7 +1094,7 @@ public class SyncEngine : GLib.Object {
         // so we don't count this twice (like Recent Files)
         this.progress_info.last_completed_item = SyncFileItem ();
         this.progress_info.status = ProgressInfo.Status.DONE;
-        /* emit */ signal_transmission_progress (*this.progress_info);
+        signal_transmission_progress (*this.progress_info);
 
         on_signal_finalize (on_signal_success);
     }
@@ -1104,7 +1104,7 @@ public class SyncEngine : GLib.Object {
     ***********************************************************/
     private void on_signal_progress (SyncFileItem item, int64 current) {
         this.progress_info.progress_item (item, current);
-        /* emit */ signal_transmission_progress (*this.progress_info);
+        signal_transmission_progress (*this.progress_info);
     }
 
 
@@ -1165,7 +1165,7 @@ public class SyncEngine : GLib.Object {
         }
 
         this.unique_errors.insert (message);
-        /* emit */ signal_sync_error (message, ErrorCategory.NORMAL);
+        signal_sync_error (message, ErrorCategory.NORMAL);
     }
 
 
@@ -1187,7 +1187,7 @@ public class SyncEngine : GLib.Object {
             return;
 
         this.unique_errors.insert (message);
-        /* emit */ signal_sync_error (message, ErrorCategory.INSUFFICIENT_REMOTE_STORAGE);
+        signal_sync_error (message, ErrorCategory.INSUFFICIENT_REMOTE_STORAGE);
     }
 
 
@@ -1398,7 +1398,7 @@ public class SyncEngine : GLib.Object {
         }
         is_any_sync_running = false;
         this.sync_running = false;
-        /* emit */ signal_finished (on_signal_success);
+        signal_finished (on_signal_success);
 
         // Delete the propagator only after emitting the signal.
         this.propagator = null;

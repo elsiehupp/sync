@@ -164,7 +164,7 @@ public class RemoteWipe : GLib.Object {
             manager.save ();
 
             // delete data
-            /* emit */ signal_authorized (account_state);
+            signal_authorized (account_state);
 
         } else {
             // ask user for his credentials again

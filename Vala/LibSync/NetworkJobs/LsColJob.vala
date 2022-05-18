@@ -122,11 +122,11 @@ public class LscolJob : AbstractNetworkJob {
             string expected_path = this.input_stream.request ().url.path; // something like "/owncloud/remote.php/dav/folder"
             if (!lscol_xml_parser.parse (this.input_stream.read_all (), this.folder_infos, expected_path)) {
                 // XML parse error
-                /* emit */ signal_finished_with_error (this.input_stream);
+                signal_finished_with_error (this.input_stream);
             }
         } else {
             // wrong content type, wrong HTTP code or any other network error
-            /* emit */ signal_finished_with_error (this.input_stream);
+            signal_finished_with_error (this.input_stream);
         }
 
         return true;

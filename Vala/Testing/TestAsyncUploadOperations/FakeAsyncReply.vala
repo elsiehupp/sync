@@ -30,8 +30,8 @@ public class FakeAsyncReply : FakeReply {
     public void respond () {
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 202);
         set_raw_header ("OC-JobStatus-Location", this.poll_location);
-        /* emit */ signal_meta_data_changed ();
-        /* emit */ signal_finished ();
+        signal_meta_data_changed ();
+        signal_finished ();
     }
 
 

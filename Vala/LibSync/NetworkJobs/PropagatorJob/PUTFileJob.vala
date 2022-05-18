@@ -109,7 +109,7 @@ public class PUTFileJob : AbstractNetworkJob {
             + this.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute)
             + this.input_stream.attribute (Soup.Request.HttpReasonPhraseAttribute));
 
-        /* emit */ signal_finished ();
+        signal_finished ();
         return true;
     }
 

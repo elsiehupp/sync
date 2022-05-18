@@ -127,7 +127,7 @@ public class AbstractPropagatorJob : AbstractNetworkJob {
     ***********************************************************/
     public new void abort (AbstractPropagatorJob.AbortType abort_type) {
         if (abort_type == AbstractPropagatorJob.AbortType.ASYNCHRONOUS)
-            /* emit */ signal_abort_finished ();
+            signal_abort_finished ();
     }
 
 

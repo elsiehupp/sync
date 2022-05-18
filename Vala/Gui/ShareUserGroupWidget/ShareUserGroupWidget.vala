@@ -58,7 +58,8 @@ public class ShareUserGroupWidget : Gtk.Widget {
     ***********************************************************/
     private GLib.Completer completer;
     private ShareeModel completer_model;
-    private GLib.Timeout completion_timer;
+    private bool completion_timer_active = false;
+    private bool completion_timer_repeat = false;
 
     /***********************************************************
     ***********************************************************/
@@ -171,11 +172,12 @@ public class ShareUserGroupWidget : Gtk.Widget {
             this.on_signal_sharee_line_edit_text_edited // GLib.QueuedConnection
         );
         this.instance.sharee_line_edit.install_event_filter (this);
-        this.completion_timer.timeout.connect (
+
+        this.completion_timer_active = true;
+        GLib.Timeout.add (
+            600,
             this.on_completion_timer_timeout
         );
-        this.completion_timer.single_shot (true);
-        this.completion_timer.interval (600);
 
         this.instance.error_label.hide ();
 
@@ -195,7 +197,12 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
 
     private void on_completion_timer_timeout () {
+        if (!this.completion_timer_active) {
+            return this.completion_timer_repeat;
+        }
         on_signal_search_for_sharees (ShareeModel.LookupMode.LOCAL_SEARCH);
+        this.completion_timer_active = false;
+        return this.completion_timer_repeat;
     }
 
 
@@ -228,7 +235,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         customize_style ();
 
         // Notify the other widgets (ShareUserLine in this case, Dark-/Light-Mode switching)
-        /* emit */ signal_style_changed ();
+        signal_style_changed ();
     }
 
 
@@ -327,8 +334,8 @@ public class ShareUserGroupWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_sharee_line_edit_text_changed (string text) {
-        this.completion_timer.stop ();
-        /* emit */ signal_toggle_public_link_share (false);
+        this.completion_timer_active = false;
+        signal_toggle_public_link_share (false);
     }
 
 
@@ -340,7 +347,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         }
 
         this.instance.sharee_line_edit.enabled (false);
-        this.completion_timer.stop ();
+        this.completion_timer_active = false;
         this.pi_sharee.on_signal_start_animation ();
         ShareeModel.ShareeSet blocklist;
 
@@ -363,8 +370,12 @@ public class ShareUserGroupWidget : Gtk.Widget {
         // First text_changed is called first and we stopped the timer when the text is changed, programatically or not
         // Then we restart the timer here if the user touched a key
         if (text != "") {
-            this.completion_timer.on_signal_start ();
-            /* emit */ signal_toggle_public_link_share (true);
+            this.completion_timer_active = true;
+            GLib.Timeout.add (
+                600,
+                this.on_completion_timer_timeout
+            );
+            signal_toggle_public_link_share (true);
         }
     }
 
@@ -389,7 +400,11 @@ public class ShareUserGroupWidget : Gtk.Widget {
         }
 
         // nothing found? try to refresh completion
-        this.completion_timer.on_signal_start ();
+        this.completion_timer_active = true;
+        GLib.Timeout.add (
+            600,
+            this.on_completion_timer_timeout
+        );
     }
 
 

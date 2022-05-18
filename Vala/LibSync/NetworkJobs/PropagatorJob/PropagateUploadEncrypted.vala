@@ -163,7 +163,7 @@ public class PropagateUploadEncrypted : GLib.Object {
         this.folder_identifier = "";
         this.is_folder_locked = false;
 
-        /* emit */ signal_folder_unlocked (folder_identifier, 200);
+        signal_folder_unlocked (folder_identifier, 200);
         this.is_unlock_running = false;
     }
 
@@ -171,7 +171,7 @@ public class PropagateUploadEncrypted : GLib.Object {
     private void on_signal_unlock_encrypt_folder_api_job_error (string folder_identifier, int http_status) {
         GLib.debug ("Unlock Error");
 
-        /* emit */ signal_folder_unlocked (folder_identifier, http_status);
+        signal_folder_unlocked (folder_identifier, http_status);
         this.is_unlock_running = false;
     }
 

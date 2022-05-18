@@ -83,7 +83,7 @@ public class WheelHandler : GLib.Object {
 
         GlobalWheelFilter.instance.set_item_handler_association (target, this);
 
-        /* emit */ signal_target_changed ();
+        signal_target_changed ();
     }
 
 }

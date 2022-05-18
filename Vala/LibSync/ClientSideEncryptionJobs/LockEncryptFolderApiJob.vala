@@ -43,7 +43,7 @@ public class LockEncryptFolderApiJob : AbstractNetworkJob {
         int return_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (return_code != 200) {
             GLib.info ("Error locking file " + this.path + this.error_string + return_code);
-            /* emit */ signal_error (this.file_identifier, return_code);
+            signal_error (this.file_identifier, return_code);
             return true;
         }
 
@@ -54,7 +54,7 @@ public class LockEncryptFolderApiJob : AbstractNetworkJob {
         GLib.info ("Got json: " + token);
 
         // TODO: Parse the token and submit.
-        /* emit */ signal_success (this.file_identifier, token);
+        signal_success (this.file_identifier, token);
         return true;
     }
 

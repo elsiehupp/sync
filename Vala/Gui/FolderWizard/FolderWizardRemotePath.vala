@@ -20,7 +20,8 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     private Ui_Folder_wizard_target_page instance;
     private bool warn_was_visible;
     private unowned Account account;
-    private GLib.Timeout lscol_timer;
+    private bool lscol_timer_active = false;
+    private bool lscol_timer_repeat = false;
     private GLib.List<string> encrypted_paths;
 
     /***********************************************************
@@ -51,9 +52,8 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
             this.on_signal_folder_entry_edited
         );
 
-        this.lscol_timer.interval (500);
-        this.lscol_timer.single_shot (true);
-        this.lscol_timer.timeout.connect (
+        GLib.Timeout.add (
+            500,
             this.on_signal_lscol_folder_entry
         );
 
@@ -307,18 +307,27 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     ***********************************************************/
     protected void on_signal_folder_entry_edited (string text) {
         if (select_by_path (text)) {
-            this.lscol_timer.stop ();
+            this.lscol_timer_active = false;
             return;
         }
 
         this.instance.folder_tree_widget.current_item (null);
-        this.lscol_timer.on_signal_start (); // avoid sending a request on each keystroke
+
+        // avoid sending a request on each keystroke
+        this.lscol_timer_active = true;
+        GLib.Timeout.add (
+            500,
+            this.on_signal_lscol_folder_entry
+        );
     }
 
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_lscol_folder_entry () {
+    protected bool on_signal_lscol_folder_entry () {
+        if (!lscol_timer_active) {
+            return this.lscol_timer_repeat;
+        }
         string path = this.instance.folder_entry.text ();
         if (path.has_prefix ("/"))
             path = path.mid (1);
@@ -333,6 +342,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         lscol_job.signal_directory_listing_subfolders.connect (
             this.on_signal_typed_path_found
         );
+        return this.lscol_timer_repeat;
     }
 
 

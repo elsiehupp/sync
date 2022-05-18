@@ -15,7 +15,7 @@ public class TestOnWebSocketErrorConnectionLostEmitConnectionLost : AbstractTest
     private TestOnWebSocketErrorConnectionLostEmitConnectionLost () {
         FakeWebSocketServer fake_server;
         var account = FakeWebSocketServer.create_account ();
-        GLib.SignalSpy connection_lost_spy = new GLib.SignalSpy (account.push_notifications (), &PushNotificationManager.connection_lost);
+        GLib.SignalSpy connection_lost_spy = new GLib.SignalSpy (account.push_notifications (), &PushNotificationManager.signal_connection_lost);
         GLib.SignalSpy push_notifications_disabled_spy = new GLib.SignalSpy (account, &Account.push_notifications_disabled);
         GLib.assert_true (connection_lost_spy.is_valid);
 
@@ -26,7 +26,7 @@ public class TestOnWebSocketErrorConnectionLostEmitConnectionLost : AbstractTest
         socket.on_signal_abort ();
 
         GLib.assert_true (connection_lost_spy.wait ());
-        // Account handled connection_lost signal and disabled push notifications
+        // Account handled signal_connection_lost signal and disabled push notifications
         GLib.assert_true (push_notifications_disabled_spy.length == 1);
     }
 

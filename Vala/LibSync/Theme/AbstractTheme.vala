@@ -55,7 +55,7 @@ public class Theme : GLib.Object {
         }
         public set {
             Theme.mono = value;
-            /* emit */ signal_systray_use_mono_icons_changed (mono);
+            signal_systray_use_mono_icons_changed (mono);
         }
     }
 

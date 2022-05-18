@@ -45,7 +45,7 @@ public class CleanupPollsJob : GLib.Object {
     ***********************************************************/
     public new void start () {
         if (this.poll_infos.empty ()) {
-            /* emit */ signal_finished ();
+            signal_finished ();
             delete_later ();
             return;
         }

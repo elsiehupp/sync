@@ -24,7 +24,7 @@ public class TestOnWebSocketSslErrorSslErrorDisablePushNotifications : AbstractT
         GLib.assert_true (push_notifications_web_socket_children.size () == 1);
         /* emit */ push_notifications_web_socket_children[0].ssl_errors (GLib.List<GLib.SslError> ());
 
-        // Account handled connection_lost signal and the authentication_failed Signal should be emitted
+        // Account handled signal_connection_lost signal and the signal_authentication_failed Signal should be emitted
         GLib.assert_true (push_notifications_disabled_spy.length == 1);
     }
 

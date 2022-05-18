@@ -52,8 +52,8 @@ public class FakePutReply : FakeReply {
         set_raw_header ("OC-FileID", file_info.file_identifier);
         set_raw_header ("X-OC-MTime", "accepted"); // Prevents GLib.assert_true (!this.running_now) since we'll call AbstractPropagateItemJob.done twice in that case.
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 200);
-        /* emit */ signal_meta_data_changed ();
-        /* emit */ signal_finished ();
+        signal_meta_data_changed ();
+        signal_finished ();
     }
 
 
@@ -61,7 +61,7 @@ public class FakePutReply : FakeReply {
     ***********************************************************/
     public override bool on_signal_abort () {
         set_error (OperationCanceledError, "on_signal_abort");
-        /* emit */ signal_finished ();
+        signal_finished ();
         return false; // only run once
     }
 

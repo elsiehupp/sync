@@ -169,7 +169,7 @@ public class Logger : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void post_gui_log (string title, string message) {
-        /* emit */ signal_gui_log (title, message);
+        signal_gui_log (title, message);
     }
 
 

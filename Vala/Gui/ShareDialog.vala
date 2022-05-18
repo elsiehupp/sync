@@ -253,7 +253,7 @@ public class ShareDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void on_signal_shares_fetched (GLib.List<unowned Share> shares) {
-        /* emit */ signal_toggle_share_link_animation (true);
+        signal_toggle_share_link_animation (true);
 
         string version_string = this.account_state.account.server_version ();
         GLib.info (version_string + "Fetched" + shares.length + "shares");
@@ -267,20 +267,20 @@ public class ShareDialog : Gtk.Dialog {
         }
 
         init_link_share_widget ();
-        /* emit */ signal_toggle_share_link_animation (false);
+        signal_toggle_share_link_animation (false);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_add_link_share_widget (LinkShare link_share) {
-        /* emit */ signal_toggle_share_link_animation (true);
+        signal_toggle_share_link_animation (true);
         ShareLinkWidget added_link_share_widget = add_link_share_widget (link_share);
         init_link_share_widget ();
         if (link_share.password_is_set) {
             added_link_share_widget.on_signal_focus_password_line_edit ();
         }
-        /* emit */ signal_toggle_share_link_animation (false);
+        signal_toggle_share_link_animation (false);
     }
 
 
@@ -356,7 +356,7 @@ public class ShareDialog : Gtk.Dialog {
 
         if (!ok) {
             // The dialog was canceled so no need to do anything
-            /* emit */ signal_toggle_share_link_animation (false);
+            signal_toggle_share_link_animation (false);
             return;
         }
 
@@ -387,7 +387,7 @@ public class ShareDialog : Gtk.Dialog {
         case Gdk.Event.PaletteChange:
         case Gdk.Event.ThemeChange:
             // Notify the other widgets (Dark-/Light-Mode switching)
-            /* emit */ signal_style_changed ();
+            signal_style_changed ();
             break;
         default:
             break;

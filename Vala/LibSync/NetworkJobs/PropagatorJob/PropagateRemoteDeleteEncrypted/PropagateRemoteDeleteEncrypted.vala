@@ -30,7 +30,7 @@ public class PropagateRemoteDeleteEncrypted : AbstractPropagateRemoteDeleteEncry
     ***********************************************************/
     private new void on_signal_folder_unlocked_successfully (string folder_identifier) {
         AbstractPropagateRemoteDeleteEncrypted.on_signal_folder_unlocked_successfully (folder_identifier);
-        /* emit */ signal_finished (!this.is_task_failed);
+        signal_finished (!this.is_task_failed);
     }
 
 

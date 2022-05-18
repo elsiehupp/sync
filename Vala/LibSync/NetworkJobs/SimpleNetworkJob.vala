@@ -44,7 +44,7 @@ public class SimpleNetworkJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private bool on_signal_finished () {
-        /* emit */ signal_finished (this.reply);
+        signal_finished (this.reply);
         return true;
     }
 

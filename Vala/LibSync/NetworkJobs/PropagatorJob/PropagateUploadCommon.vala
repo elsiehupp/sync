@@ -606,7 +606,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
         }
 
         if (*running_count == 0 && abort_type == AbstractPropagatorJob.AbortType.ASYNCHRONOUS)
-            /* emit */ signal_abort_finished ();
+            signal_abort_finished ();
     }
 
 

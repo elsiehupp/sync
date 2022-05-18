@@ -45,7 +45,7 @@ public class SyncStatusSummary : GLib.Object {
             }
 
             this.sync_icon = value;
-            /* emit */ signal_sync_icon_changed ();
+            signal_sync_icon_changed ();
         }
     }
 
@@ -59,7 +59,7 @@ public class SyncStatusSummary : GLib.Object {
             }
 
             this.syncing = value;
-            /* emit */ signal_syncing_changed ();
+            signal_syncing_changed ();
         }
     }
 
@@ -73,7 +73,7 @@ public class SyncStatusSummary : GLib.Object {
             }
 
             this.sync_status_string = value;
-            /* emit */ signal_sync_status_string_changed ();
+            signal_sync_status_string_changed ();
         }
     }
 
@@ -87,7 +87,7 @@ public class SyncStatusSummary : GLib.Object {
             }
 
             this.sync_status_detail_string = value;
-            /* emit */ signal_sync_status_detail_string_changed ();
+            signal_sync_status_detail_string_changed ();
         }
     }
 
@@ -101,7 +101,7 @@ public class SyncStatusSummary : GLib.Object {
             }
 
             this.progress = value;
-            /* emit */ signal_sync_progress_changed ();
+            signal_sync_progress_changed ();
         }
     }
 

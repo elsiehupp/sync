@@ -404,7 +404,7 @@ public class ConnectionValidator : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void report_result (Status status) {
-        /* emit */ signal_connection_result (status, this.errors);
+        signal_connection_result (status, this.errors);
         delete_later ();
     }
 

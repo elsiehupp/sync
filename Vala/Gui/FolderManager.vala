@@ -316,7 +316,7 @@ public class FolderManager : GLib.Object {
             settings.end_group (); // <account>
         }
 
-        /* emit */ signal_folder_list_changed (this.folder_map);
+        signal_folder_list_changed (this.folder_map);
 
         foreach (var folder_connection in this.folder_map) {
             folder_connection.process_switched_to_virtual_files ();
@@ -362,11 +362,11 @@ public class FolderManager : GLib.Object {
             FolderConnection folder_connection = set_up_folder_from_old_config_file (alias, account_state);
             if (folder_connection) {
                 schedule_folder (folder_connection);
-                /* emit */ signal_folder_sync_state_change (folder_connection);
+                signal_folder_sync_state_change (folder_connection);
             }
         }
 
-        /* emit */ signal_folder_list_changed (this.folder_map);
+        signal_folder_list_changed (this.folder_map);
 
         // return the number of valid folders.
         return this.folder_map.size ();
@@ -456,8 +456,8 @@ public class FolderManager : GLib.Object {
         if (folder_connection) {
             folder_connection.save_backwards_compatible (one_account_only);
             folder_connection.save_to_settings ();
-            /* emit */ signal_folder_sync_state_change (folder_connection);
-            /* emit */ signal_folder_list_changed (this.folder_map);
+            signal_folder_sync_state_change (folder_connection);
+            signal_folder_list_changed (this.folder_map);
         }
 
         this.navigation_pane_helper.schedule_update_cloud_storage_registry ();
@@ -477,7 +477,7 @@ public class FolderManager : GLib.Object {
         }
 
         if (this.scheduled_folders.remove_all (folder_connection) > 0) {
-            /* emit */ signal_schedule_queue_changed ();
+            signal_schedule_queue_changed ();
         }
 
         folder_connection.sync_paused = true;
@@ -502,7 +502,7 @@ public class FolderManager : GLib.Object {
 
         this.navigation_pane_helper.schedule_update_cloud_storage_registry ();
 
-        /* emit */ signal_folder_list_changed (this.folder_map);
+        signal_folder_list_changed (this.folder_map);
     }
 
 
@@ -1085,8 +1085,8 @@ public class FolderManager : GLib.Object {
         this.last_sync_folder = null;
         this.current_sync_folder = null;
         this.scheduled_folders = new GLib.Queue<FolderConnection> ();
-        /* emit */ signal_folder_list_changed (this.folder_map);
-        /* emit */ signal_schedule_queue_changed ();
+        signal_folder_list_changed (this.folder_map);
+        signal_schedule_queue_changed ();
 
         return count;
     }
@@ -1112,9 +1112,9 @@ public class FolderManager : GLib.Object {
                 return;
             }
             folder_connection.prepare_to_sync ();
-            /* emit */ signal_folder_sync_state_change (folder_connection);
+            signal_folder_sync_state_change (folder_connection);
             this.scheduled_folders.enqueue (folder_connection);
-            /* emit */ signal_schedule_queue_changed ();
+            signal_schedule_queue_changed ();
         } else {
             GLib.info ("Sync for folder_connection " + alias + " already scheduled, do not enqueue!");
         }
@@ -1138,9 +1138,9 @@ public class FolderManager : GLib.Object {
         this.scheduled_folders.remove_all (folder_connection);
 
         folder_connection.prepare_to_sync ();
-        /* emit */ signal_folder_sync_state_change (folder_connection);
+        signal_folder_sync_state_change (folder_connection);
         this.scheduled_folders.prepend (folder_connection);
-        /* emit */ signal_schedule_queue_changed ();
+        signal_schedule_queue_changed ();
 
         start_scheduled_sync_soon ();
     }
@@ -1224,7 +1224,7 @@ public class FolderManager : GLib.Object {
                     this.scheduled_folders.remove (folder_connection);
                 }
             }
-            /* emit */ signal_schedule_queue_changed ();
+            signal_schedule_queue_changed ();
         }
     }
 
@@ -1278,7 +1278,7 @@ public class FolderManager : GLib.Object {
             }
 
             if (this.scheduled_folders.remove_all (folder_connection) > 0) {
-                /* emit */ signal_schedule_queue_changed ();
+                signal_schedule_queue_changed ();
             }
 
             // wipe database
@@ -1312,8 +1312,8 @@ public class FolderManager : GLib.Object {
             this.navigation_pane_helper.schedule_update_cloud_storage_registry ();
         }
 
-        /* emit */ signal_folder_list_changed (this.folder_map);
-        /* emit */ signal_wipe_done (account_state, on_signal_success);
+        signal_folder_list_changed (this.folder_map);
+        signal_wipe_done (account_state, on_signal_success);
     }
 
 
@@ -1459,7 +1459,7 @@ public class FolderManager : GLib.Object {
             }
         }
 
-        /* emit */ signal_schedule_queue_changed ();
+        signal_schedule_queue_changed ();
 
         // Start syncing this folder_connection!
         if (folder_connection != null) {
@@ -1520,7 +1520,7 @@ public class FolderManager : GLib.Object {
         foreach (FolderConnection folder_connection in folders_to_remove) {
             remove_folder (folder_connection);
         }
-        /* emit */ signal_folder_list_changed (this.folder_map);
+        signal_folder_list_changed (this.folder_map);
     }
 
 
@@ -1531,7 +1531,7 @@ public class FolderManager : GLib.Object {
     private void on_signal_forward_folder_sync_state_change () {
         var folder_connection = (FolderConnection) sender ();
         if (folder_connection) {
-            /* emit */ signal_folder_sync_state_change (folder_connection);
+            signal_folder_sync_state_change (folder_connection);
         }
     }
 
@@ -1965,7 +1965,7 @@ public class FolderManager : GLib.Object {
                     }
 
                     schedule_folder (folder_connection);
-                    /* emit */ signal_folder_sync_state_change (folder_connection);
+                    signal_folder_sync_state_change (folder_connection);
                 }
             }
             settings.end_group ();

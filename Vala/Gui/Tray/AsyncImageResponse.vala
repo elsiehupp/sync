@@ -41,7 +41,7 @@ public class AsyncImageResponse : GLib.QuickImageResponse {
     ***********************************************************/
     public void image_and_emit_finished (Gtk.Image image = {}) {
         this.image = image;
-        /* emit */ signal_finished ();
+        signal_finished ();
     }
 
 

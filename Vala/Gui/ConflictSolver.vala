@@ -78,7 +78,7 @@ public class ConflictSolver : GLib.Object {
         }
 
         this.local_version_filename = local_version_filename;
-        /* emit */ signal_local_version_filename_changed ();
+        signal_local_version_filename_changed ();
     }
 
 
@@ -90,7 +90,7 @@ public class ConflictSolver : GLib.Object {
         }
 
         this.remote_version_filename = remote_version_filename;
-        /* emit */ signal_remote_version_filename_changed ();
+        signal_remote_version_filename_changed ();
     }
 
 

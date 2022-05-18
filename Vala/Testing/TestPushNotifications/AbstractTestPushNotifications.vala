@@ -35,7 +35,7 @@ public abstract class AbstractTestPushNotifications : GLib.Object {
 
         account.push_notifications ().set_reconnect_timer_interval (0);
 
-        GLib.SignalSpy authentication_failed_spy = new GLib.SignalSpy (account.push_notifications (), &PushNotificationManager.authentication_failed);
+        GLib.SignalSpy authentication_failed_spy = new GLib.SignalSpy (account.push_notifications (), &PushNotificationManager.signal_authentication_failed);
 
         // Let three authentication attempts fail
         for (uint8 i = 0; i < 3; ++i) {
@@ -46,7 +46,7 @@ public abstract class AbstractTestPushNotifications : GLib.Object {
             socket.send_text_message ("err : Invalid credentials");
         }
 
-        // Now the authentication_failed Signal should be emitted
+        // Now the signal_authentication_failed Signal should be emitted
         return_false_on_fail (authentication_failed_spy.wait ());
         return_false_on_fail (authentication_failed_spy.length == 1);
 

@@ -23,8 +23,8 @@ public class FakeDeleteReply : FakeReply {
     ***********************************************************/
     public void respond () {
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 204);
-        /* emit */ signal_meta_data_changed ();
-        /* emit */ signal_finished ();
+        signal_meta_data_changed ();
+        signal_finished ();
     }
 
 

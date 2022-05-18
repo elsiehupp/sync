@@ -159,8 +159,8 @@ public class AccountManager : GLib.Object {
         var accounts_copy = this.accounts;
         this.accounts == new GLib.List<unowned AccountState> ();
         foreach (var acc in accounts_copy) {
-            /* emit */ signal_account_removed (acc);
-            /* emit */ signal_remove_account_folders (acc);
+            signal_account_removed (acc);
+            signal_remove_account_folders (acc);
         }
     }
 
@@ -202,7 +202,7 @@ public class AccountManager : GLib.Object {
 
         account.account.delete_app_token ();
 
-        /* emit */ signal_account_sync_connection_removed (account);
+        signal_account_sync_connection_removed (account);
         /* emit */ account_removed (account);
     }
 
@@ -476,7 +476,7 @@ public class AccountManager : GLib.Object {
 
         AccountState ptr = new AccountState (account_state);
         this.accounts += ptr;
-        /* emit */ signal_account_added (account_state);
+        signal_account_added (account_state);
     }
 
 

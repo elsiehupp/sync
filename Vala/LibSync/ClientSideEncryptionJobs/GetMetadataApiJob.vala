@@ -51,12 +51,12 @@ public class GetMetadataApiJob : AbstractNetworkJob {
         int return_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (return_code != 200) {
             GLib.info ("Error requesting the metadata " + this.path + this.error_string + return_code);
-            /* emit */ signal_error (this.file_identifier, return_code);
+            signal_error (this.file_identifier, return_code);
             return true;
         }
         Json.ParserError error;
         var json = GLib.JsonDocument.from_json (this.reply.read_all (), error);
-        /* emit */ signal_json_received (this, json, this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ());
+        signal_json_received (this, json, this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ());
         return true;
     }
 

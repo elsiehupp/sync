@@ -105,7 +105,7 @@ public class PutMultiFileJob : AbstractNetworkJob {
                 + this.reply.attribute (Soup.Request.HttpStatusCodeAttribute)
                 + this.reply.attribute (Soup.Request.HttpReasonPhraseAttribute));
 
-        /* emit */ signal_finished ();
+        signal_finished ();
         return true;
     }
 

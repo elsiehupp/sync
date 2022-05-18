@@ -196,7 +196,7 @@ public class HttpCredentialsGui : HttpCredentials {
                 this.signal_authorisation_link_changed
             );
             this.async_auth.on_signal_start ();
-            /* emit */ signal_authorisation_link_changed ();
+            signal_authorisation_link_changed ();
         } else if (type == LibSync.DetermineAuthTypeJob.AuthType.BASIC) {
             on_signal_show_dialog ();
         } else {

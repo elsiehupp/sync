@@ -618,7 +618,7 @@ public class OwncloudGui : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_settings_dialog_activated () {
-        /* emit */ signal_is_showing_settings_dialog ();
+        signal_is_showing_settings_dialog ();
     }
 
 

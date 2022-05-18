@@ -205,7 +205,7 @@ public class DetermineAuthTypeJob : AbstractNetworkJob {
         }
 
         GLib.info ("Auth type for " + this.account.dav_url ().to_string () + " is " + result.to_string ());
-        /* emit */ signal_auth_type (result);
+        signal_auth_type (result);
         delete_later ();
     }
 

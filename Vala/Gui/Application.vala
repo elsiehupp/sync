@@ -858,7 +858,7 @@ public class Application : GLib.Application {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_gui_is_showing_settings () {
-        /* emit */ signal_is_showing_settings_dialog ();
+        signal_is_showing_settings_dialog ();
     }
 
 

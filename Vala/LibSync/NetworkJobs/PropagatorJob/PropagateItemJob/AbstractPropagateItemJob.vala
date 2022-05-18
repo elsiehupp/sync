@@ -203,7 +203,7 @@ public abstract class AbstractPropagateItemJob : AbstractPropagatorJob {
         else
             GLib.info ("Completed propagation of " + this.item.destination ().to_string () + " by " + this.to_string () + " with status " + this.item.status.to_string ());
         /* emit */ this.propagator.signal_item_completed (this.item);
-        /* emit */ signal_finished (this.item.status);
+        signal_finished (this.item.status);
 
         if (this.item.status == SyncFileItem.Status.FATAL_ERROR) {
             // Abort all remaining jobs.

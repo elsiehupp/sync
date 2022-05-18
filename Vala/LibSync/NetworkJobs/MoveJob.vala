@@ -68,7 +68,7 @@ public class MoveJob : AbstractNetworkJob {
         GLib.info ("MOVE of " + this.reply.request ().url
             + " finished with status " + reply_status_string ());
 
-        /* emit */ signal_finished ();
+        signal_finished ();
         return true;
     }
 

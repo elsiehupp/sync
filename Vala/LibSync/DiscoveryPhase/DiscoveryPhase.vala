@@ -267,7 +267,7 @@ public class DiscoveryPhase : GLib.Object {
                 return callback (false);
             }
 
-            /* emit */ signal_new_big_folder (path, true);
+            signal_new_big_folder (path, true);
             return callback (true);
         }
 
@@ -308,7 +308,7 @@ public class DiscoveryPhase : GLib.Object {
         var result = values.value ("size").to_long_long ();
         if (result >= limit) {
             // we tell the UI there is a new folder
-            /* emit */ signal_new_big_folder (path, false);
+            signal_new_big_folder (path, false);
             return callback (true);
         } else {
             // it is not too big, put it in the allow list (so we will not do more query for the children)
@@ -395,7 +395,7 @@ public class DiscoveryPhase : GLib.Object {
                     GLib.warning (" (*it).is_restoration " + (*it).is_restoration);
                     GLib.assert (false);
                     add_error_to_gui (SyncFileItem.Status.FatalError, _("Error while canceling delete of a file"), original_path);
-                    /* emit */ signal_fatal_error (_("Error while canceling delete of %1").printf (original_path));
+                    signal_fatal_error (_("Error while canceling delete of %1").printf (original_path));
                 }
                 (*it).instruction = CSync.SyncInstructions.NONE;
                 result = true;
@@ -431,7 +431,7 @@ public class DiscoveryPhase : GLib.Object {
         //  ENFORCE (this.current_root_job == sender ());
         this.current_root_job = null;
         if (process_directory_job.dir_item != null) {
-            /* emit */ signal_item_discovered (process_directory_job.dir_item);
+            signal_item_discovered (process_directory_job.dir_item);
         }
         process_directory_job.delete_later ();
 
@@ -441,7 +441,7 @@ public class DiscoveryPhase : GLib.Object {
             var next_job = this.queued_deleted_directories.take (this.queued_deleted_directories.first_key ());
             start_job (next_job);
         } else {
-            /* emit */ signal_finished ();
+            signal_finished ();
         }
     }
 

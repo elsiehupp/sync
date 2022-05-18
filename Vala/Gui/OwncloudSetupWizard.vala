@@ -568,7 +568,7 @@ public class OwncloudSetupWizard : GLib.Object {
 
         // notify others.
         this.oc_wizard.on_signal_done (GLib.Wizard.Accepted);
-        /* emit */ signal_own_cloud_wizard_done (result);
+        signal_own_cloud_wizard_done (result);
     }
 
 
@@ -580,7 +580,7 @@ public class OwncloudSetupWizard : GLib.Object {
         disconnect (this.oc_wizard, OwncloudWizard.basic_setup_finished,
             this, OwncloudSetupWizard.on_signal_assistant_finished);
         this.oc_wizard.close ();
-        /* emit */ signal_own_cloud_wizard_done (Gtk.Dialog.Accepted);
+        signal_own_cloud_wizard_done (Gtk.Dialog.Accepted);
     }
 
 

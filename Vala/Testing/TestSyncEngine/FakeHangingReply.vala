@@ -31,7 +31,7 @@ public class FakeHangingReply : FakeReply {
         set_error (OperationCanceledError, _("Operation canceled"));
         /* emit */ error_occurred (OperationCanceledError);
         set_finished (true);
-        /* emit */ signal_finished ();
+        signal_finished ();
         return false; // only run once
     }
 

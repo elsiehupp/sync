@@ -33,16 +33,16 @@ public class FakePostReply : GLib.InputStream {
     public virtual void respond () {
         if (aborted) {
             set_error (OperationCanceledError, "Operation Canceled");
-            /* emit */ signal_meta_data_changed ();
-            /* emit */ signal_finished ();
+            signal_meta_data_changed ();
+            signal_finished ();
             return false; // only run once
         } else if (redirect_to_policy) {
             set_header (Soup.Request.LocationHeader, "/my.policy");
             set_attribute (Soup.Request.RedirectionTargetAttribute, "/my.policy");
             set_attribute (Soup.Request.HttpStatusCodeAttribute, 302); // 302 might or might not lose POST data in rfc
             set_header (Soup.Request.ContentLengthHeader, 0);
-            /* emit */ signal_meta_data_changed ();
-            /* emit */ signal_finished ();
+            signal_meta_data_changed ();
+            signal_finished ();
             return false; // only run once
         } else if (redirect_to_token) {
             // Redirect to self
@@ -51,17 +51,17 @@ public class FakePostReply : GLib.InputStream {
             set_attribute (Soup.Request.RedirectionTargetAttribute, destination);
             set_attribute (Soup.Request.HttpStatusCodeAttribute, 307); // 307 explicitly in rfc says to not lose POST data
             set_header (Soup.Request.ContentLengthHeader, 0);
-            /* emit */ signal_meta_data_changed ();
-            /* emit */ signal_finished ();
+            signal_meta_data_changed ();
+            signal_finished ();
             return false; // only run once
         }
         set_header (Soup.Request.ContentLengthHeader, payload.size ());
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 200);
-        /* emit */ signal_meta_data_changed ();
+        signal_meta_data_changed ();
         if (bytes_available () > 0) {
-            /* emit */ signal_ready_read ();
+            signal_ready_read ();
         }
-        /* emit */ signal_finished ();
+        signal_finished ();
         return false; // only run once
     }
 

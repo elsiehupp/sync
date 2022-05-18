@@ -238,9 +238,9 @@ public class FolderConnection : GLib.Object {
             } else {
                 sync_state (LibSync.SyncResult.Status.PAUSED);
             }
-            /* emit */ signal_sync_paused_changed (this, value);
-            /* emit */ signal_sync_state_change ();
-            /* emit */ signal_can_sync_changed ();
+            signal_sync_paused_changed (this, value);
+            signal_sync_state_change ();
+            signal_can_sync_changed ();
         }
         public get {
             return this.definition.paused;
@@ -967,7 +967,7 @@ public class FolderConnection : GLib.Object {
 
         this.time_since_last_sync_start.on_signal_start ();
         this.sync_result.status (LibSync.SyncResult.Status.SYNC_PREPARE);
-        /* emit */ signal_sync_state_change ();
+        signal_sync_state_change ();
 
         GLib.info (
             "*** Start syncing " + remote_url ().to_string ()
@@ -1010,7 +1010,7 @@ public class FolderConnection : GLib.Object {
 
         GLib.Object.invoke_method (this.engine, "on_signal_start_sync", GLib.QueuedConnection);
 
-        /* emit */ signal_sync_started ();
+        signal_sync_started ();
     }
 
 
@@ -1141,7 +1141,7 @@ public class FolderConnection : GLib.Object {
         }
         on_signal_warn_on_signal_new_excluded_item (record, relative_path);
 
-        /* emit */ signal_watched_file_changed_externally (path);
+        signal_watched_file_changed_externally (path);
 
         // Also schedule this folder_connection for a sync, but only after some delay:
         // The sync will not upload files that were changed too recently.
@@ -1224,7 +1224,7 @@ public class FolderConnection : GLib.Object {
     private void on_signal_sync_started () {
         GLib.info ("#### Propagation on_signal_start ####################################################");
         this.sync_result.status (LibSync.SyncResult.Status.SYNC_RUNNING);
-        /* emit */ signal_sync_state_change ();
+        signal_sync_state_change ();
     }
 
 
@@ -1281,7 +1281,7 @@ public class FolderConnection : GLib.Object {
             }
         }
 
-        /* emit */ signal_sync_state_change ();
+        signal_sync_state_change ();
 
         // The signal_sync_finished result that is to be triggered here makes the folderman
         // clear the current running sync folder_connection marker.
@@ -1334,7 +1334,7 @@ public class FolderConnection : GLib.Object {
     // and hand the result over to the progress dispatcher.
     ***********************************************************/
     private void on_signal_transmission_progress (ProgressInfo progress_info) {
-        /* emit */ signal_progress_info (progress_info);
+        signal_progress_info (progress_info);
         ProgressDispatcher.instance.signal_progress_info (alias (), progress_info);
     }
 
@@ -1415,7 +1415,7 @@ public class FolderConnection : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private bool on_signal_emit_finished_delayed () {
-        /* emit */ signal_sync_finished (this.sync_result);
+        signal_sync_finished (this.sync_result);
 
         // Immediately check the etag again if there was some sync activity.
         if ((this.sync_result.status () == LibSync.SyncResult.Status.SUCCESS
@@ -1456,7 +1456,7 @@ public class FolderConnection : GLib.Object {
             if (!undecided_list.contains (new_folder)) {
                 undecided_list.append (new_folder);
                 journal.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, undecided_list);
-                /* emit */ signal_new_big_folder_discovered (new_folder);
+                signal_new_big_folder_discovered (new_folder);
             }
             string message = !is_external ? (_("A new folder_connection larger than %1 MB has been added : %2.\n")
                                                     .printf (ConfigFile ().new_big_folder_size_limit.second)
@@ -1580,8 +1580,8 @@ public class FolderConnection : GLib.Object {
         // Let everyone know we're syncing
         this.sync_result.on_signal_reset ();
         this.sync_result.status (LibSync.SyncResult.Status.SYNC_RUNNING);
-        /* emit */ signal_sync_started ();
-        /* emit */ signal_sync_state_change ();
+        signal_sync_started ();
+        signal_sync_state_change ();
     }
 
 
@@ -1591,8 +1591,8 @@ public class FolderConnection : GLib.Object {
     private void on_signal_hydration_done () {
         // emit signal to update instance and reschedule normal syncs if necessary
         this.sync_result.status (LibSync.SyncResult.Status.SUCCESS);
-        /* emit */ signal_sync_finished (this.sync_result);
-        /* emit */ signal_sync_state_change ();
+        signal_sync_finished (this.sync_result);
+        signal_sync_state_change ();
     }
 
 

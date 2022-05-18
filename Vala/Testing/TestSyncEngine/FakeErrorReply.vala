@@ -34,8 +34,8 @@ public class FakeErrorReply : FakeReply {
     /***********************************************************
     ***********************************************************/
     public virtual void respond () {
-        /* emit */ signal_meta_data_changed ();
-        /* emit */ signal_ready_read ();
+        signal_meta_data_changed ();
+        signal_ready_read ();
         // finishing can come strictly after signal_ready_read was called
         GLib.Timeout.add (5, this.on_signal_finished);
     }
@@ -44,7 +44,7 @@ public class FakeErrorReply : FakeReply {
     ***********************************************************/
     public bool on_signal_finished () {
         set_finished (true);
-        /* emit */ signal_finished ();
+        signal_finished ();
         return false; // only run once
     }
 

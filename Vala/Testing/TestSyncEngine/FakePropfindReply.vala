@@ -96,11 +96,11 @@ public class FakePropfindReply : FakeReply {
         set_header (Soup.Request.ContentTypeHeader, "application/xml; charset=utf-8");
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 207);
         set_finished (true);
-        /* emit */ signal_meta_data_changed ();
+        signal_meta_data_changed ();
         if (bytes_available ()) {
-            /* emit */ signal_ready_read ();
+            signal_ready_read ();
         }
-        /* emit */ signal_finished ();
+        signal_finished ();
     }
 
 
@@ -109,8 +109,8 @@ public class FakePropfindReply : FakeReply {
     public void respond_404 () {
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 404);
         set_error (InternalServerError, "Not Found");
-        /* emit */ signal_meta_data_changed ();
-        /* emit */ signal_finished ();
+        signal_meta_data_changed ();
+        signal_finished ();
     }
 
 

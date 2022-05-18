@@ -219,7 +219,7 @@ public class OcsJob : AbstractNetworkJob {
                         + Utility.concat_url_path (account.url, this.path)
                         + this.params
                         + " has unexpected status code: " + status_code + reply_data);
-            /* emit */ signal_error (status_code, message);
+            signal_error (status_code, message);
 
         } else {
             // save new ETag value
@@ -227,7 +227,7 @@ public class OcsJob : AbstractNetworkJob {
                 /* emit */ etag_response_header_received (this.reply.raw_header ("ETag"), status_code);
             }
 
-            /* emit */ signal_job_finished (json, status_code);
+            signal_job_finished (json, status_code);
         }
         return true;
     }

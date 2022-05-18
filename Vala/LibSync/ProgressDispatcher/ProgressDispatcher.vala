@@ -92,7 +92,7 @@ public class ProgressDispatcher : GLib.Object {
         //             && progress.total_file_count == 0) ) {
             return;
         }
-        /* emit */ signal_progress_info (folder, progress);
+        signal_progress_info (folder, progress);
     }
 
 

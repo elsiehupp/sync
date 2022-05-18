@@ -645,8 +645,8 @@ public class OwncloudPropagator : GLib.Object {
             item.file, Utility.q_date_time_from_time_t (conflict_mod_time), conflict_user_name);
         string conflict_file_path = full_local_path (conflict_filename);
 
-        /* emit */ signal_touched_file (fn);
-        /* emit */ signal_touched_file (conflict_file_path);
+        signal_touched_file (fn);
+        signal_touched_file (conflict_file_path);
 
         if (!FileSystem.rename (fn, conflict_file_path, rename_error)) {
             // If the rename fails, don't replace it.
@@ -683,7 +683,7 @@ public class OwncloudPropagator : GLib.Object {
                 conflict_item.instruction = CSync.SyncInstructions.NEW;
                 conflict_item.modtime = conflict_mod_time;
                 conflict_item.size = item.previous_size;
-                /* emit */ signal_new_item (conflict_item);
+                signal_new_item (conflict_item);
                 composite.append_task (conflict_item);
             }
         }
@@ -807,7 +807,7 @@ public class OwncloudPropagator : GLib.Object {
     ***********************************************************/
     private void on_signal_propagate_root_directory_job_finished (SyncFileItem.Status status) {
         if (!this.finished_emited) {
-            /* emit */ signal_finished (status == SyncFileItem.Status.SUCCESS);
+            signal_finished (status == SyncFileItem.Status.SUCCESS);
         }
         this.finished_emited = true;
     }

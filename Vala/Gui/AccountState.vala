@@ -86,12 +86,12 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
                     on_signal_check_connectivity ();
                 }
                 if (old_state == State.CONNECTED || this.state == State.CONNECTED) {
-                    /* emit */ signal_is_connected_changed ();
+                    signal_is_connected_changed ();
                 }
             }
 
             // might not have changed but the underlying this.connection_errors might have
-            /* emit */ signal_state_changed (this.state);
+            signal_state_changed (this.state);
         }
     }
 
@@ -171,7 +171,7 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
             }
 
             this.are_desktop_notifications_allowed = value;
-            /* emit */ signal_desktop_notifications_allowed_changed ();
+            signal_desktop_notifications_allowed_changed ();
         }
     }
 
@@ -638,7 +638,7 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
                     }
                 }
 
-                /* emit */ signal_has_fetched_navigation_apps ();
+                signal_has_fetched_navigation_apps ();
             }
         }
     }

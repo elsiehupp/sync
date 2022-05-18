@@ -107,7 +107,7 @@ public class LscolXMLParser : GLib.Object {
                         if (current_href.has_suffix ("/")) {
                             current_href.chop (1);
                         }
-                        /* emit */ signal_directory_listing_iterated (current_href, current_http200Properties);
+                        signal_directory_listing_iterated (current_href, current_http200Properties);
                         current_href == "";
                         current_http200Properties == "";
                     } else if (reader.name () == "propstat") {
@@ -132,8 +132,8 @@ public class LscolXMLParser : GLib.Object {
             GLib.warning ("ERROR no WebDAV response? " + xml.to_string ());
             return false;
         } else {
-            /* emit */ signal_directory_listing_subfolders (folders);
-            /* emit */ signal_finished_without_error ();
+            signal_directory_listing_subfolders (folders);
+            signal_finished_without_error ();
         }
         return true;
     }

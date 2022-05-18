@@ -173,7 +173,7 @@ public class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
     /***********************************************************
     ***********************************************************/
     public void on_signal_style_changed () {
-        /* emit */ signal_style_changed ();
+        signal_style_changed ();
     }
 
 } // class Flow2AuthCredsPage

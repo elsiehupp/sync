@@ -54,12 +54,6 @@ public class UserModel : GLib.AbstractListModel {
     const int NOTIFICATION_REQUEST_FREE_PERIOD = 15000;
 
     /***********************************************************
-    Time span in milliseconds which must elapse between
-    sequential checks for expired activities
-    ***********************************************************/
-    const int64 EXPIRED_ACTIVITIES_CHECK_INTERVAL_MSEC = 1000 * 60;
-
-    /***********************************************************
     Time span in milliseconds after which activities will
     expired by default
     ***********************************************************/
@@ -287,7 +281,7 @@ public class UserModel : GLib.AbstractListModel {
             end_insert_rows ();
             ConfigFile config;
             this.users.last ().on_signal_notification_refresh_interval (config.notification_refresh_interval ());
-            /* emit */ signal_new_user_selected ();
+            signal_new_user_selected ();
         }
     }
 
@@ -400,7 +394,7 @@ public class UserModel : GLib.AbstractListModel {
         this.users[this.current_user_id].is_current_user (false);
         this.users[identifier].is_current_user (true);
         this.current_user_id = identifier;
-        /* emit */ signal_new_user_selected ();
+        signal_new_user_selected ();
     }
 
 

@@ -77,7 +77,7 @@ public class SignPublicKeyApiJob : AbstractNetworkJob {
 
         Json.ParserError error;
         var json = GLib.JsonDocument.from_json (this.reply.read_all (), error);
-        /* emit */ signal_json_received (this, json, this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ());
+        signal_json_received (this, json, this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ());
         return true;
     }
 

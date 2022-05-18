@@ -99,7 +99,7 @@ public class SingleApplication : GLib.Application {
     public bool event (Gdk.Event event) {
         if (event.type () == Gdk.Event.File_open) {
             var foe = (GLib.File_open_event)event;
-            /* emit */ signal_file_open_request (foe.file ());
+            signal_file_open_request (foe.file ());
             return true;
         }
         return GLib.Application.event (event);

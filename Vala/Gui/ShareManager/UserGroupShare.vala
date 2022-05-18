@@ -32,7 +32,7 @@ public class UserGroupShare : Share {
         }
         public set {
             if (this.expire_date == value) {
-                /* emit */ signal_expire_date_set ();
+                signal_expire_date_set ();
                 return;
             }
 
@@ -79,7 +79,7 @@ public class UserGroupShare : Share {
     ***********************************************************/
     public void on_signal_link_share_note_set (GLib.JsonDocument reply, GLib.Variant note) {
         this.note = note.to_string ();
-        /* emit */ signal_note_set ();
+        signal_note_set ();
     }
 
 
@@ -97,7 +97,7 @@ public class UserGroupShare : Share {
         } else {
             this.expire_date = value.to_date ();
         }
-        /* emit */ signal_expire_date_set ();
+        signal_expire_date_set ();
     }
 
 } // class UserGroupShare

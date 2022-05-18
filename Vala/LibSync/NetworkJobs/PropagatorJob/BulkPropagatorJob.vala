@@ -401,7 +401,7 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
                 }
 
                 abort_with_error (single_file.item, SyncFileItem.Status.NORMAL_ERROR, device.error_string);
-                /* emit */ signal_finished (SyncFileItem.Status.NORMAL_ERROR);
+                signal_finished (SyncFileItem.Status.NORMAL_ERROR);
 
                 return;
             }
@@ -443,7 +443,7 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
             }
 
             GLib.info ("final status" + this.final_status.to_string ());
-            /* emit */ signal_finished (this.final_status);
+            signal_finished (this.final_status);
             this.propagator.schedule_next_job ();
         } else {
             on_signal_schedule_self_or_child ();

@@ -636,7 +636,7 @@ public class SocketApi : GLib.Object {
             string message = "SHARE:OK:" + GLib.Dir.to_native_separators (local_file);
             listener.on_signal_send_message (message);
 
-            /* emit */ signal_share_command_received (remote_path, file_data.local_path, start_page);
+            signal_share_command_received (remote_path, file_data.local_path, start_page);
         }
     }
 
@@ -646,7 +646,7 @@ public class SocketApi : GLib.Object {
     ***********************************************************/
     private void process_file_activity_request (string local_file) {
         var file_data = FileData.file_data (local_file);
-        /* emit */ signal_file_activity_command_received (file_data.server_relative_path, file_data.local_path);
+        signal_file_activity_command_received (file_data.server_relative_path, file_data.local_path);
     }
 
 
@@ -750,7 +750,7 @@ public class SocketApi : GLib.Object {
 
 
     private void on_signal_get_or_create_public_link_share_error () {
-        /* emit */ signal_share_command_received (file_data.server_relative_path, file_data.local_path, ShareDialogStartPage.PUBLIC_LINKS);
+        signal_share_command_received (file_data.server_relative_path, file_data.local_path, ShareDialogStartPage.PUBLIC_LINKS);
     }
 
 

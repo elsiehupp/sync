@@ -84,7 +84,7 @@ public class NotificationConfirmJob : AbstractNetworkJob {
                 reply_code = rex_match.captured (1).to_int ();
             }
         }
-        /* emit */ signal_job_finished (reply_str, reply_code);
+        signal_job_finished (reply_str, reply_code);
 
         return true;
     }

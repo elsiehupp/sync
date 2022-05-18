@@ -4332,7 +4332,7 @@ public class EmojiModel : GLib.Object {
             return;
         }
         this.category = category;
-        /* emit */ signal_model_changed ();
+        signal_model_changed ();
     }
 
 
@@ -4353,7 +4353,7 @@ public class EmojiModel : GLib.Object {
         history_emojis.push_front (model_data);
         this.settings.get_value ("Editor/emojis", history_emojis);
 
-        /* emit */ signal_history_changed ();
+        signal_history_changed ();
     }
 
 

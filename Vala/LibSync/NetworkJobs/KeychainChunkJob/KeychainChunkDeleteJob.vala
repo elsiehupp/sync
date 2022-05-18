@@ -109,7 +109,7 @@ public class KeychainChunkDeleteJob : AbstractKeychainChunkJob {
 
         delete_job.delete_later ();
 
-        /* emit */ signal_finished (this);
+        signal_finished (this);
 
         if (this.auto_delete) {
             delete_later ();

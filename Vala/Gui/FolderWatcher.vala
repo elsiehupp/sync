@@ -191,7 +191,7 @@ public class FolderWatcher : GLib.Object {
 
         GLib.info ("Detected changes in paths: " + changed_paths.to_string ());
         foreach (string path in changed_paths) {
-            /* emit */ signal_path_changed (path);
+            signal_path_changed (path);
         }
     }
 
@@ -222,7 +222,7 @@ public class FolderWatcher : GLib.Object {
     ***********************************************************/
     private bool on_timer () {
         if (this.test_notification_path != "") {
-            /* emit */ signal_became_unreliable (_("The watcher did not receive a test notification."));
+            signal_became_unreliable (_("The watcher did not receive a test notification."));
         }
         this.test_notification_path == "";
         return false; // only run once

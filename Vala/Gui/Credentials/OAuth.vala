@@ -72,7 +72,7 @@ public class OAuth : GLib.Object {
     public void on_signal_start () {
         // Listen on the socket to get a port which will be used in the redirect_uri
         if (!this.server.listen (GLib.HostAddress.LocalLost)) {
-            /* emit */ signal_result (Result.NOT_SUPPORTED, "");
+            signal_result (Result.NOT_SUPPORTED, "");
             return;
         }
 
@@ -180,7 +180,7 @@ public class OAuth : GLib.Object {
             GLib.warning ("Error when getting the access_token " + json + error_reason);
             http_reply_and_close (socket, "500 Internal Server Error",
                 _("<h1>Login Error</h1><p>%1</p>").printf (error_reason).to_utf8 ().const_data ());
-            /* emit */ signal_result (Error);
+            signal_result (Error);
             return;
         }
         if (this.expected_user != null && user != this.expected_user) {
@@ -202,7 +202,7 @@ public class OAuth : GLib.Object {
         } else {
             http_reply_and_close (socket, "200 OK", login_successfull_html);
         }
-        /* emit */ signal_result (Result.LOGGED_IN, user, access_token, refresh_token);
+        signal_result (Result.LOGGED_IN, user, access_token, refresh_token);
     }
 
 
@@ -213,7 +213,7 @@ public class OAuth : GLib.Object {
             OpenExternal.open_browser (authorisation_link ());
         } catch {
             // We cannot open the browser, then we claim we don't support OAuth.
-            /* emit */ signal_result (Result.NOT_SUPPORTED, "");
+            signal_result (Result.NOT_SUPPORTED, "");
             return false;
         }
         return true;

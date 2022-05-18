@@ -147,7 +147,7 @@ public class PropagatorCompositeJob : AbstractPropagatorJob {
                 propagator_job.abort (abort_type);
             }
         } else if (abort_type == AbstractPropagatorJob.AbortType.ASYNCHRONOUS) {
-            /* emit */ signal_abort_finished ();
+            signal_abort_finished ();
         }
     }
 
@@ -171,7 +171,7 @@ public class PropagatorCompositeJob : AbstractPropagatorJob {
 
         // Emit abort if last job has been aborted
         if (this.aborts_count == 0) {
-            /* emit */ signal_abort_finished ();
+            signal_abort_finished ();
         }
     }
 
@@ -227,7 +227,7 @@ public class PropagatorCompositeJob : AbstractPropagatorJob {
             return;
 
         this.state = Finished;
-        /* emit */ signal_finished (this.has_error == SyncFileItem.Status.NO_STATUS ? SyncFileItem.Status.SUCCESS : this.has_error);
+        signal_finished (this.has_error == SyncFileItem.Status.NO_STATUS ? SyncFileItem.Status.SUCCESS : this.has_error);
     }
 
 } // class PropagatorCompositeJob

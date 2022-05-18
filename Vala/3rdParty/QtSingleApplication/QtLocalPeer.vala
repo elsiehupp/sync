@@ -147,7 +147,7 @@ public class QtLocalPeer : GLib.Object {
         string message = string.from_utf8 (u_msg.const_data (), u_msg.length);
         socket.write (ACK, ACK.length);
         socket.wait_for_bytes_written (1000);
-        /* emit */ signal_message_received (message, socket); // ## (might take a long time to return)
+        signal_message_received (message, socket); // ## (might take a long time to return)
     }
 
 }

@@ -111,14 +111,14 @@ public class PropfindJob : AbstractNetworkJob {
             }
             if (reader.has_error ()) {
                 GLib.warning ("XML parser error: " + reader.error_string);
-                /* emit */ signal_finished_with_error (this.reply);
+                signal_finished_with_error (this.reply);
             } else {
-                /* emit */ signal_result (items);
+                signal_result (items);
             }
         } else {
             GLib.warning ("*not* successful, http result code is" + http_result_code
                 + (http_result_code == 302 ? this.reply.header (Soup.Request.LocationHeader).to_string (): ""));
-            /* emit */ signal_finished_with_error (this.reply);
+            signal_finished_with_error (this.reply);
         }
         return true;
     }

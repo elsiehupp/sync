@@ -226,7 +226,7 @@ public class ShareManager : GLib.Object {
         var data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
         unowned Share share = new Share (parse_share (data));
 
-        /* emit */ signal_share_created (share);
+        signal_share_created (share);
 
         update_folder (this.account, share.path);
     }

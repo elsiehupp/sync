@@ -391,14 +391,14 @@ public class UserStatusSelectorModel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_user_status_set () {
-        /* emit */ signal_finished ();
+        signal_finished ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_message_cleared () {
-        /* emit */ signal_finished ();
+        signal_finished ();
     }
 
 

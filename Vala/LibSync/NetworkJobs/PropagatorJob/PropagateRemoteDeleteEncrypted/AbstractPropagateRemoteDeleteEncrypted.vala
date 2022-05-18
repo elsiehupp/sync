@@ -226,7 +226,7 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : AbstractNetworkJo
     ***********************************************************/
     protected void unlock_folder () {
         if (!this.folder_locked) {
-            /* emit */ signal_finished (true);
+            signal_finished (true);
             return;
         }
 
@@ -260,7 +260,7 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : AbstractNetworkJo
         if (this.folder_locked) {
             unlock_folder ();
         } else {
-            /* emit */ signal_finished (false);
+            signal_finished (false);
         }
     }
 

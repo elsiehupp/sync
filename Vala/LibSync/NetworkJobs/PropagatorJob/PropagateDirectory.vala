@@ -141,7 +141,7 @@ public class PropagateDirectory : AbstractPropagatorJob {
                 abort (AbstractPropagatorJob.AbortType.SYNCHRONOUS);
                 this.state = Finished;
                 GLib.info ("PropagateDirectory.on_signal_first_job_finished " + " emit finished " + status.to_string ());
-                /* emit */ signal_finished (status);
+                signal_finished (status);
             }
             return;
         }
@@ -193,7 +193,7 @@ public class PropagateDirectory : AbstractPropagatorJob {
         }
         this.state = Finished;
         GLib.info ("PropagateDirectory.on_signal_sub_jobs_finished " + " emit finished " + status.to_string ());
-        /* emit */ signal_finished (status);
+        signal_finished (status);
     }
 
 } // class PropagateDirectory

@@ -48,7 +48,7 @@ public class OcsNavigationAppsJob : OcsJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_job_finished (GLib.JsonDocument reply, int status_code) {
-        /* emit */ signal_apps_job_finished (reply, status_code);
+        signal_apps_job_finished (reply, status_code);
     }
 
 } // class OcsNavigationAppsJob

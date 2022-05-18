@@ -368,7 +368,7 @@ public class ProcessDirectoryJob : GLib.Object {
                     this.dir_item.instruction = CSync.SyncInstructions.NONE;
                 }
             }
-            /* emit */ signal_finished ();
+            signal_finished ();
         }
 
         int started = 0;

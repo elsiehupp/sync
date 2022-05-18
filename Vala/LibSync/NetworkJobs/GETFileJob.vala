@@ -188,7 +188,7 @@ public class GETFileJob : AbstractNetworkJob {
                 this.bandwidth_manager.on_signal_unregister_download_job (this);
             }
             if (!this.has_emitted_finished_signal) {
-                /* emit */ signal_finished ();
+                signal_finished ();
             }
             this.has_emitted_finished_signal = true;
             return true; // discard
@@ -346,7 +346,7 @@ public class GETFileJob : AbstractNetworkJob {
                           + " finished with status " + reply_status_string ()
                           + this.input_stream.raw_header ("Content-Range") + this.input_stream.raw_header ("Content-Length"));
 
-                /* emit */ signal_finished ();
+                signal_finished ();
             }
             this.has_emitted_finished_signal = true;
             delete_later ();

@@ -185,7 +185,7 @@ public class WebFlowCredentialsDialog : Gtk.Dialog {
             customize_style ();
 
             // Notify the other widgets (Dark-/Light-Mode switching)
-            /* emit */ signal_style_changed ();
+            signal_style_changed ();
             break;
         case Gdk.Event.ActivationChange:
             if (is_active_window ())

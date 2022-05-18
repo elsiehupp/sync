@@ -52,10 +52,10 @@ public class DeleteMetadataApiJob : AbstractNetworkJob {
         if (return_code != 200) {
             GLib.info ("Error removing metadata for " + this.path + this.error_string + return_code);
             GLib.info ("Full Error Log " + this.reply.read_all ());
-            /* emit */ signal_error (this.file_identifier, return_code);
+            signal_error (this.file_identifier, return_code);
             return true;
         }
-        /* emit */ signal_success (this.file_identifier);
+        signal_success (this.file_identifier);
         return true;
     }
 

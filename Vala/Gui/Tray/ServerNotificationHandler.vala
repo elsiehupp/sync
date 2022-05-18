@@ -138,7 +138,7 @@ public class ServerNotificationHandler : GLib.Object {
 
             list.append (a);
         }
-        /* emit */ signal_new_notification_list (list);
+        signal_new_notification_list (list);
 
         delete_later ();
     }

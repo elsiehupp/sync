@@ -92,13 +92,13 @@ public class OCUpdater : AbstractUpdater {
         public set {
             var old_state = this.state;
             this.state = value;
-            /* emit */ signal_download_state_changed ();
+            signal_download_state_changed ();
 
             // show the notification if the download is complete (on every check)
             // or once for system based updates.
             if (this.state == OCUpdater.DownloadState.DOWNLOAD_COMPLETE || (old_state != OCUpdater.DownloadState.UIPLOAD_ONLY_AVAILABLE_THROUGH_SYSTEM
                                                              && this.state == OCUpdater.DownloadState.UIPLOAD_ONLY_AVAILABLE_THROUGH_SYSTEM)) {
-                /* emit */ signal_new_update_available (_("Update Check"), status_string);
+                signal_new_update_available (_("Update Check"), status_string);
             }
         }
     }
@@ -114,7 +114,7 @@ public class OCUpdater : AbstractUpdater {
     /***********************************************************
     Timer to guard the timeout of an individual network request
     ***********************************************************/
-    private GLib.Timeout timeout_watchdog;
+    private bool timeout_watchdog_active = false;
 
     UpdateInfo update_info { protected get; private set; }
 
@@ -130,8 +130,7 @@ public class OCUpdater : AbstractUpdater {
         base ();
         this.update_url = url;
         this.state = Unknown;
-        this.soup_context = new Soup.ClientContext (this);
-        this.timeout_watchdog = new GLib.Timeout (this);
+        this.soup_context = new Soup.ClientContext ();
     }
 
 
@@ -166,10 +165,11 @@ public class OCUpdater : AbstractUpdater {
     ***********************************************************/
     public override void check_for_update () {
         GLib.InputStream reply = this.soup_context.get (Soup.Request (this.update_url));
-        this.timeout_watchdog.timeout.connect (
+        this.timeout_watchdog_active = true;
+        GLib.Timeout.add (
+            30 * 1000,
             this.on_signal_timed_out
         );
-        this.timeout_watchdog.on_signal_start (30 * 1000);
         reply.signal_finished.connect (
             this.on_signal_version_info_arrived
         );
@@ -295,7 +295,7 @@ public class OCUpdater : AbstractUpdater {
     /***********************************************************
     ***********************************************************/
     private void on_signal_version_info_arrived () {
-        this.timeout_watchdog.stop ();
+        this.timeout_watchdog_active = false;
         var reply = (GLib.InputStream) sender ();
         reply.delete_later ();
         if (reply.error != GLib.InputStream.NoError) {
@@ -319,8 +319,12 @@ public class OCUpdater : AbstractUpdater {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_timed_out () {
+    private bool on_signal_timed_out () {
+        if (!this.timeout_watchdog_active) {
+            return false; // only run once
+        }
         this.download_state = DownloadState.DOWNLOAD_TIMED_OUT;
+        return false; // only run once
     }
 
 

@@ -67,8 +67,6 @@ public class UserInfo : GLib.Object {
     public int64 last_quota_total_bytes { public get; private set; }
     public int64 last_quota_used_bytes { public get; private set; }
 
-    private GLib.Timeout job_restart_timer;
-
     /***********************************************************
     The time at which the user info and quota was received last
     ***********************************************************/
@@ -115,18 +113,15 @@ public class UserInfo : GLib.Object {
         account_state.signal_state_changed.connect (
             this.on_signal_account_state_changed
         );
-        this.job_restart_timer.timeout.connect (
-            this.on_signal_fetch_info
-        );
-        this.job_restart_timer.single_shot (true);
     }
 
 
+    private bool job_restart_timer_repeat;
     /***********************************************************
     ***********************************************************/
-    public void on_signal_fetch_info () {
+    public bool on_signal_fetch_info () {
         if (!can_get_info ()) {
-            return;
+            return job_restart_timer_repeat;
         }
 
         if (this.json_api_job != null) {
@@ -144,6 +139,8 @@ public class UserInfo : GLib.Object {
             this.on_signal_request_failed
         );
         this.json_api_job.on_signal_start ();
+
+        return job_restart_timer_repeat;
     }
 
 
@@ -175,7 +172,10 @@ public class UserInfo : GLib.Object {
             /* emit */ quota_updated (this.last_quota_total_bytes, this.last_quota_used_bytes);
         }
 
-        this.job_restart_timer.on_signal_start (DEFAULT_INTERVAL_T);
+        GLib.Timeout.add (
+            DEFAULT_INTERVAL_T,
+            this.on_signal_fetch_info
+        );
         this.last_info_received = GLib.DateTime.current_date_time ();
 
         // Avatar Image
@@ -202,10 +202,14 @@ public class UserInfo : GLib.Object {
             if (this.last_info_received == null || elapsed >= DEFAULT_INTERVAL_T) {
                 on_signal_fetch_info ();
             } else {
-                this.job_restart_timer.on_signal_start (DEFAULT_INTERVAL_T - elapsed);
+                this.job_restart_timer_repeat = true;
+                GLib.Timeout.add (
+                    DEFAULT_INTERVAL_T - elapsed,
+                    this.on_signal_fetch_info
+                );
             }
         } else {
-            this.job_restart_timer.stop ();
+            this.job_restart_timer_repeat = false;
         }
     }
 
@@ -215,7 +219,11 @@ public class UserInfo : GLib.Object {
     private void on_signal_request_failed () {
         this.last_quota_total_bytes = 0;
         this.last_quota_used_bytes = 0;
-        this.job_restart_timer.on_signal_start (FAIL_INTERVAL_T);
+        this.job_restart_timer_repeat = true;
+        GLib.Timeout.add (
+            FAIL_INTERVAL_T,
+            this.on_signal_fetch_info
+        );
     }
 
 

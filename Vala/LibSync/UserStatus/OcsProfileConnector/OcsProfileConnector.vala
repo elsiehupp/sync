@@ -27,7 +27,7 @@ public class OcsProfileConnector : GLib.Object {
         if (this.account.server_version_int < Account.make_server_version (23, 0, 0)) {
             GLib.info ("Server version " + this.account.server_version
                 + " does not support profile page.");
-            /* emit */ signal_error ();
+            signal_error ();
             return;
         }
         JsonApiJob json_api_job = new JsonApiJob (this.account, "/ocs/v2.php/hovercard/v1/%1".printf (user_id), this);

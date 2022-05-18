@@ -531,7 +531,7 @@ public class AbstractNetworkJob : GLib.Object {
                     GLib.warning (this.input_stream.raw_header ("Proxy-Authenticate"));
                 }
             }
-            /* emit */ signal_network_error (this.input_stream);
+            signal_network_error (this.input_stream);
         }
 
         // get the Date timestamp from input_stream

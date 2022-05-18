@@ -70,7 +70,7 @@ public class PollJob : AbstractNetworkJob {
                     this.journal.poll_info (info);
                     this.journal.commit ("remove poll info");
                 }
-                /* emit */ signal_finished ();
+                signal_finished ();
                 return true;
             }
             GLib.Timeout.add (8 * 1000, this.start);
@@ -84,7 +84,7 @@ public class PollJob : AbstractNetworkJob {
         if (json_parse_error.error != Json.ParserError.NoError) {
             this.item.error_string = _("Invalid JSON input_stream from the poll URL");
             this.item.status = SyncFileItem.Status.NORMAL_ERROR;
-            /* emit */ signal_finished ();
+            signal_finished ();
             return true;
         }
 
@@ -112,7 +112,7 @@ public class PollJob : AbstractNetworkJob {
         this.journal.poll_info (info);
         this.journal.commit ("remove poll info");
 
-        /* emit */ signal_finished ();
+        signal_finished ();
         return true;
     }
 

@@ -71,7 +71,7 @@ public class SlideShow : Gtk.Widget {
             this.current_slide = value;
             maybe_restart_timer ();
             update ();
-            /* emit */ signal_current_slide_changed (value);
+            signal_current_slide_changed (value);
         }
     }
 
@@ -197,7 +197,7 @@ public class SlideShow : Gtk.Widget {
     ***********************************************************/
     protected void mouse_release_event (GLib.MouseEvent event) {
         if (this.animation == null && GLib.Line_f (this.press_point, event.position ()).length < GLib.Application.style_hints ().start_drag_distance ()) {
-            /* emit */ signal_clicked ();
+            signal_clicked ();
         }
     }
 

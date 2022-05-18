@@ -153,14 +153,14 @@ public class Share : GLib.Object {
     ***********************************************************/
     protected void on_signal_password_set (GLib.JsonDocument reply, GLib.Variant value) {
         this.password_is_set = !value.to_string () == "";
-        /* emit */ signal_password_set ();
+        signal_password_set ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     protected void on_signal_password_error (int status_code, string message) {
-        /* emit */ signal_password_error (status_code, message);
+        signal_password_error (status_code, message);
     }
 
 
@@ -168,7 +168,7 @@ public class Share : GLib.Object {
     ***********************************************************/
     private void on_signal_deleted () {
         update_folder (this.account, this.path);
-        /* emit */ signal_share_deleted ();
+        signal_share_deleted ();
     }
 
 
@@ -176,7 +176,7 @@ public class Share : GLib.Object {
     ***********************************************************/
     private void on_signal_permissions_set (GLib.JsonDocument reply, GLib.Variant value) {
         this.permissions = (Permissions)value.to_int ();
-        /* emit */ signal_permissions_set ();
+        signal_permissions_set ();
     }
 
 } // class Share

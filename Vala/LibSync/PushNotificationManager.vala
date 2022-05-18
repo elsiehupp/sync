@@ -18,7 +18,9 @@ public class PushNotificationManager : GLib.Object {
     private Account account = null;
     private GLib.WebSocket web_socket;
     private uint8 failed_authentication_attempts_count = 0;
-    private GLib.Timeout reconnect_timer = null;
+
+
+    private bool reconnect_timer_active = false;
 
     /***********************************************************
     Set the interval for reconnection attempts
@@ -36,10 +38,21 @@ public class PushNotificationManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Timeout ping_timer;
-    private GLib.Timeout ping_timed_out_timer;
-    private bool pong_received_from_web_socket_server = false;
+    private bool ping_timer_active = false;
+    private bool ping_timed_out_timer_active = false;
 
+    /***********************************************************
+    Set the interval in which the websocket will ping the server if it is still alive.
+
+    If the websocket does not respond in timeout_interval, the connection will be terminated.
+
+    Used by both ping timer and pinged-out timer.
+
+    @param interval Interval in milliseconds.
+    ***********************************************************/
+    public uint ping_interval { private get; public set; }
+
+    private bool pong_received_from_web_socket_server = false;
 
     /***********************************************************
     Eitted after a successful connection and authentication
@@ -99,17 +112,7 @@ public class PushNotificationManager : GLib.Object {
         this.web_socket.pong.connect (
             this.on_signal_web_socket_pong_received
         );
-        this.ping_timer.timeout.connect (
-            this.on_signal_ping_timer_timeout
-        );
-        this.ping_timer.single_shot (true);
-        this.ping_timer.interval (PING_INTERVAL);
-
-        this.ping_timed_out_timer.timeout.connect (
-            this.on_signal_ping_timed_out_timer_timed_out
-        );
-        this.ping_timed_out_timer.single_shot (true);
-        this.ping_timed_out_timer.interval (PING_INTERVAL);
+        this.start_ping_timer ();
     }
 
 
@@ -127,21 +130,6 @@ public class PushNotificationManager : GLib.Object {
         GLib.info ("Setting up push notifications.");
         this.failed_authentication_attempts_count = 0;
         reconnect_to_web_socket ();
-    }
-
-
-
-
-    /***********************************************************
-    Set the interval in which the websocket will ping the server if it is still alive.
-
-    If the websocket does not respond in timeout_interval, the connection will be terminated.
-
-    @param interval Interval in milliseconds.
-    ***********************************************************/
-    public void ping_interval (int timeout_interval) {
-        this.ping_timer.interval (timeout_interval);
-        this.ping_timed_out_timer.interval (timeout_interval);
     }
 
 
@@ -187,16 +175,19 @@ public class PushNotificationManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_web_socket_error (GLib.AbstractSocket.SocketError error) {
-        // This error gets thrown in test_setup_max_connection_attempts_reached_delete_push_notifications after
-        // the second connection attempt. I have no idea why this happens. Maybe the socket gets not closed correctly?
-        // I think it's fine to ignore this error.
+        /***********************************************************
+        This error gets thrown in test_setup_max_connection_attempts_reached_delete_push_notifications
+        after the second connection attempt. I have no idea why this
+        happens. Maybe the socket gets not closed correctly? I think
+        it's fine to ignore this error.
+        ***********************************************************/
         if (error == GLib.AbstractSocket.UnfinishedSocketOperationError) {
             return;
         }
 
         GLib.warning ("Websocket error on with account " + this.account.url.to_string () + error.to_string ());
         close_web_socket ();
-        /* emit */ connection_lost ();
+        signal_connection_lost ();
     }
 
 
@@ -205,7 +196,7 @@ public class PushNotificationManager : GLib.Object {
     private void on_signal_web_socket_ssl_errors (GLib.List<GnuTLS.ErrorCode> errors) {
         GLib.warning ("Websocket ssl errors with account " + this.account.url.to_string () + errors.to_string ());
         close_web_socket ();
-        /* emit */ authentication_failed ();
+        signal_authentication_failed ();
     }
 
 
@@ -222,15 +213,16 @@ public class PushNotificationManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_ping_timed_out_timer_timed_out () {
+    private bool on_signal_ping_timed_out_timer_timed_out () {
         if (this.pong_received_from_web_socket_server) {
             GLib.debug ("Websocket respond with a pong in time.");
-            return;
+            return false; // only run once
         }
 
         GLib.info ("Websocket did not respond with a pong in time. Try to reconnect.");
         // Try again to connect
         up ();
+        return false; // only run once
     }
 
 
@@ -239,7 +231,7 @@ public class PushNotificationManager : GLib.Object {
     private void open_web_socket () {
         // Open websocket
         var capabilities = this.account.capabilities;
-        var web_socket_url = capabilities.push_notifications_web_socket_url ();
+        string web_socket_url = capabilities.push_notifications_web_socket_url ();
 
         GLib.info ("Open connection to websocket on " + web_socket_url + " for account " + this.account.url);
         this.web_socket.error.connect (
@@ -265,13 +257,13 @@ public class PushNotificationManager : GLib.Object {
     private void close_web_socket () {
         GLib.info ("Closing websocket for account " + this.account.url.to_string ());
 
-        this.ping_timer.stop ();
-        this.ping_timed_out_timer.stop ();
+        this.ping_timer_active = false;
+        this.ping_timed_out_timer_active = false;
         this.is_ready = false;
 
         // Maybe there run some reconnection attempts
-        if (this.reconnect_timer != null) {
-            this.reconnect_timer.stop ();
+        if (this.reconnect_timer_active) {
+            this.reconnect_timer_active = false;
         }
 
         disconnect (this.web_socket, GLib.Overload<GLib.AbstractSocket.SocketError>.of (&GLib.WebSocket.error), this, PushNotificationManager.on_signal_web_socket_error);
@@ -297,61 +289,58 @@ public class PushNotificationManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private bool try_reconnect_to_web_socket () {
-        ++this.failed_authentication_attempts_count;
+        this.failed_authentication_attempts_count++;
         if (this.failed_authentication_attempts_count >= MAX_ALLOWED_FAILED_AUTHENTICATION_ATTEMPTS) {
             GLib.info ("Max authentication attempts reached.");
             return false;
         }
-
-        if (this.reconnect_timer == null) {
-            this.reconnect_timer = new GLib.Timeout (this);
-        }
-
-        this.reconnect_timer.interval (this.reconnect_timer_interval);
-        this.reconnect_timer.single_shot (true);
-        this.reconnect_timer.timeout.connect (
+        this.reconnect_timer_active = true;
+        GLib.Timeout.add (
+            this.reconnect_timer_interval,
             this.on_reconnnect_timer_finished
         );
-        this.reconnect_timer.start ();
-
         return true;
     }
 
 
-    private void on_reconnnect_timer_finished () {
-        reconnect_to_web_socket ();
+    private bool on_reconnnect_timer_finished () {
+        if (this.reconnect_timer_active) {
+            this.reconnect_to_web_socket ();
+        }
+        return false; // only run once
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void init_reconnect_timer ();
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_signal_ping_timer_timeout () {
-        GLib.debug ();
-
+    private bool on_signal_ping_timer_timeout () {
         this.pong_received_from_web_socket_server = false;
-
         this.web_socket.ping ({});
         start_ping_timed_out_timer ();
+        return false; // only run once
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void start_ping_timer () {
-        this.ping_timed_out_timer.stop ();
-        this.ping_timer.start ();
+        this.ping_timed_out_timer_active = false;
+        this.ping_timer_active = true;
+        GLib.Timeout.add (
+            PING_INTERVAL,
+            this.on_signal_ping_timer_timeout
+        );
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void start_ping_timed_out_timer () {
-        this.ping_timed_out_timer.start ();
+        this.ping_timed_out_timer_active = true;
+        GLib.Timeout.add (
+            PING_INTERVAL,
+            this.on_signal_ping_timed_out_timer_timed_out
+        );
     }
 
 
@@ -362,14 +351,14 @@ public class PushNotificationManager : GLib.Object {
         this.failed_authentication_attempts_count = 0;
         this.is_ready = true;
         start_ping_timer ();
-        /* emit */ ready ();
+        signal_ready ();
 
         // We maybe reconnected to websocket while being offline for a
         // while. To not miss any notifications that may have happend,
         // emit all the signals once.
-        emit_files_changed ();
-        emit_notifications_changed ();
-        emit_activities_changed ();
+        signal_files_changed (this.account);
+        signal_notifications_changed (this.account);
+        signal_activities_changed (this.account);
     }
 
 
@@ -377,7 +366,7 @@ public class PushNotificationManager : GLib.Object {
     ***********************************************************/
     private void handle_notify_file () {
         GLib.info ("Files push notification arrived.");
-        emit_files_changed ();
+        signal_files_changed (this.account);
     }
 
 
@@ -387,7 +376,7 @@ public class PushNotificationManager : GLib.Object {
         GLib.info ("Invalid credentials submitted to websocket.");
         if (!try_reconnect_to_web_socket ()) {
             close_web_socket ();
-            /* emit */ authentication_failed ();
+            signal_authentication_failed ();
         }
     }
 
@@ -396,7 +385,7 @@ public class PushNotificationManager : GLib.Object {
     ***********************************************************/
     private void handle_notify_notification () {
         GLib.info ("Push notification arrived.");
-        emit_notifications_changed ();
+        signal_notifications_changed (this.account);
     }
 
 
@@ -404,28 +393,7 @@ public class PushNotificationManager : GLib.Object {
     ***********************************************************/
     private void handle_notify_activity () {
         GLib.info ("Push activity arrived.");
-        emit_activities_changed ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void emit_files_changed () {
-        /* emit */ signal_files_changed (this.account);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void emit_notifications_changed () {
-        /* emit */ signal_notifications_changed (this.account);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void emit_activities_changed () {
-        /* emit */ signal_activities_changed (this.account);
+        signal_activities_changed (this.account);
     }
 
 } // class PushNotificationManager

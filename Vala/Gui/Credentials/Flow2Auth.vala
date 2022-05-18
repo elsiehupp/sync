@@ -57,7 +57,8 @@ public class Flow2Auth : GLib.Object {
     private GLib.Uri login_url;
     private string poll_token;
     private string poll_endpoint;
-    private GLib.Timeout poll_timer;
+    private bool poll_timer_active;
+    private bool poll_timer_repeat;
     private int64 seconds_left;
     private int64 seconds_interval;
     private bool is_busy;
@@ -86,8 +87,10 @@ public class Flow2Auth : GLib.Object {
         this.account = account;
         this.is_busy = false;
         this.has_token = false;
-        this.poll_timer.interval (1000);
-        this.poll_timer.timeout.connect (
+        this.poll_timer_active = true;
+        this.poll_timer_repeat = false;
+        GLib.Timeout.add (
+            1000,
             this.on_signal_poll_timer_timeout
         );
     }
@@ -112,7 +115,7 @@ public class Flow2Auth : GLib.Object {
         this.is_busy = true;
         this.has_token = false;
 
-        /* emit */ signal_status_changed (PollStatus.PollStatus.FETCH_TOKEN, 0);
+        signal_status_changed (PollStatus.PollStatus.FETCH_TOKEN, 0);
 
         // Step 1 : Initiate a login, do an anonymous POST request
         GLib.Uri url = Utility.concat_url_path (this.account.url.to_string (), "/index.php/login/v2");
@@ -146,7 +149,7 @@ public class Flow2Auth : GLib.Object {
             poll_endpoint = json.value ("poll").to_object ().value ("endpoint").to_string ();
             if (this.enforce_https && new GLib.Uri (poll_endpoint).scheme () != "https") {
                 GLib.warning ("Can not poll endpoint because the returned url " + poll_endpoint + " does not on_signal_start with https.");
-                /* emit */ signal_result (Result.ERROR, _("The polling URL does not on_signal_start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
+                signal_result (Result.ERROR, _("The polling URL does not on_signal_start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
                 return;
             }
             login_url = json["login"].to_string ();
@@ -169,8 +172,8 @@ public class Flow2Auth : GLib.Object {
                 error_reason = _("The reply from the server did not contain all expected fields");
             }
             GLib.warning ("Error when getting the login_url " + json + error_reason);
-            /* emit */ signal_result (Result.ERROR, error_reason);
-            this.poll_timer.stop ();
+            signal_result (Result.ERROR, error_reason);
+            this.poll_timer_repeat = false; // actually we should cancel, not just prevent repeat
             this.is_busy = false;
             return;
         }
@@ -195,10 +198,14 @@ public class Flow2Auth : GLib.Object {
         GLib.info ("setting remote poll timer interval to " + polltime_in_microseconds.length + "msec.");
         this.seconds_interval = (polltime_in_microseconds.length / 1000);
         this.seconds_left = this.seconds_interval;
-        /* emit */ signal_status_changed (PollStatus.PollStatus.POLL_COUNTDOWN, this.seconds_left);
+        signal_status_changed (PollStatus.PollStatus.POLL_COUNTDOWN, this.seconds_left);
 
-        if (!this.poll_timer.is_active ()) {
-            this.poll_timer.on_signal_start ();
+        if (!this.poll_timer_active) {
+            this.poll_timer_active = true;
+            GLib.Timeout.add (
+                1000,
+                this.on_signal_poll_timer_timeout
+            );
         }
 
         switch (action) {
@@ -209,12 +216,12 @@ public class Flow2Auth : GLib.Object {
             } catch {
                 // We cannot open the browser, then we claim we don't support Flow2Auth.
                 // Our UI callee will ask the user to copy and open the link.
-                /* emit */ signal_result (Result.NOT_SUPPORTED);
+                signal_result (Result.NOT_SUPPORTED);
             }
             break;
         case TokenAction.COPY_LINK_TO_CLIPBOARD:
             GLib.Application.clipboard ().on_signal_text (authorisation_link ().to_string (GLib.Uri.FullyEncoded));
-            /* emit */ signal_status_changed (PollStatus.PollStatus.COPY_LINK_TO_CLIPBOARD, 0);
+            signal_status_changed (PollStatus.PollStatus.COPY_LINK_TO_CLIPBOARD, 0);
             break;
         }
 
@@ -259,18 +266,19 @@ public class Flow2Auth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_poll_timer_timeout () {
-        if (this.is_busy || !this.has_token) {
-            return;
+    private bool on_signal_poll_timer_timeout () {
+        if (this.is_busy || !this.has_token || !this.poll_timer_active) {
+            return this.poll_timer_repeat;
         }
         this.is_busy = true;
         this.seconds_left--;
         if (this.seconds_left > 0) {
-            /* emit */ signal_status_changed (PollStatus.PollStatus.POLL_COUNTDOWN, this.seconds_left);
+            signal_status_changed (PollStatus.PollStatus.POLL_COUNTDOWN, this.seconds_left);
             this.is_busy = false;
-            return;
+            this.poll_timer_active = false;
+            return this.poll_timer_repeat;
         }
-        /* emit */ signal_status_changed (PollStatus.PollStatus.POLL_NOW, 0);
+        signal_status_changed (PollStatus.PollStatus.POLL_NOW, 0);
 
         // Step 2 : Poll
         Soup.Request req;
@@ -286,6 +294,8 @@ public class Flow2Auth : GLib.Object {
         simple_network_job.signal_finished.connect (
             this.on_signal_simple_network_job_finished
         );
+        this.poll_timer_active = false;
+        return this.poll_timer_repeat;
     }
 
 
@@ -303,7 +313,7 @@ public class Flow2Auth : GLib.Object {
             server_url = json["server"].to_string ();
             if (this.enforce_https && server_url.scheme () != "https") {
                 GLib.warning ("Returned server url " + server_url.to_string () + " does not start with https.");
-                /* emit */ signal_result (Result.ERROR, _("The returned server URL does not on_signal_start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
+                signal_result (Result.ERROR, _("The returned server URL does not on_signal_start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
                 return;
             }
             login_name = json["login_name"].to_string ();
@@ -330,7 +340,7 @@ public class Flow2Auth : GLib.Object {
 
             // We get a 404 until authentication is done, so don't show this error in the GUI.
             if (reply.error != GLib.InputStream.ContentNotFoundError) {
-                /* emit */ signal_result (Result.ERROR, error_reason);
+                signal_result (Result.ERROR, error_reason);
             }
 
             // Forget sensitive data
@@ -343,14 +353,14 @@ public class Flow2Auth : GLib.Object {
             return;
         }
 
-        this.poll_timer.stop ();
+        this.poll_timer_repeat = false;
 
         // Success
         GLib.info ("Success getting the app_password for user: " + login_name + ", server: " + server_url.to_string ());
 
         this.account.url (server_url);
 
-        /* emit */ signal_result (Result.LOGGED_IN, "", login_name, app_password);
+        signal_result (Result.LOGGED_IN, "", login_name, app_password);
 
         // Forget sensitive data
         app_password = "";

@@ -100,7 +100,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Timeout unified_search_text_editing_finished_timer;
+    private bool unified_search_text_editing_finished_timer_active = false;
 
     /***********************************************************
     ***********************************************************/
@@ -215,7 +215,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
         if (!provider_info.id == "" && provider_info.id == provider_id && provider_info.is_paginated) {
             // Load more items
             this.current_fetch_more_in_progress_provider_id = provider_id;
-            /* emit */ signal_current_fetch_more_in_progress_provider_id_changed ();
+            signal_current_fetch_more_in_progress_provider_id_changed ();
             start_search_for_provider (provider_id, provider_info.cursor);
         }
     }
@@ -273,7 +273,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
             )
         );
         if (is_search_in_progress () && !was_search_in_progress) {
-            /* emit */ signal_is_search_in_progress_changed ();
+            signal_is_search_in_progress_changed ();
         }
         json_api_job.on_signal_start ();
     }
@@ -493,7 +493,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
 
         if (!this.search_job_connections == "") {
             this.search_job_connections == "";
-            /* emit */ signal_is_search_in_progress_changed ();
+            signal_is_search_in_progress_changed ();
         }
     }
 
@@ -503,7 +503,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
     private void clear_current_fetch_more_in_progress_provider_id () {
         if (!this.current_fetch_more_in_progress_provider_id == "") {
             this.current_fetch_more_in_progress_provider_id == "";
-            /* emit */ signal_current_fetch_more_in_progress_provider_id_changed ();
+            signal_current_fetch_more_in_progress_provider_id_changed ();
         }
     }
 
@@ -516,30 +516,24 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
         }
 
         this.search_term = term;
-        /* emit */ signal_search_term_changed ();
+        signal_search_term_changed ();
 
         if (!this.error_string == "") {
             this.error_string == "";
-            /* emit */ signal_error_string_changed ();
+            signal_error_string_changed ();
         }
 
         disconnect_and_clear_search_jobs ();
 
         clear_current_fetch_more_in_progress_provider_id ();
 
-        disconnect (this.unified_search_text_editing_finished_timer, GLib.Timeout.timeout, this,
-            &UnifiedSearchResultsListModel.on_signal_search_term_editing_finished);
-
-        if (this.unified_search_text_editing_finished_timer.is_active ()) {
-            this.unified_search_text_editing_finished_timer.stop ();
-        }
-
+        this.unified_search_text_editing_finished_timer_active = false;
         if (!this.search_term == "") {
-            this.unified_search_text_editing_finished_timer.interval (SEARCH_TERM_EDITING_FINISHED_SEARCH_START_DELAY);
-            this.unified_search_text_editing_finished_timer.timeout.connect (
+            this.unified_search_text_editing_finished_timer_active = true;
+            GLib.Timeout.add (
+                SEARCH_TERM_EDITING_FINISHED_SEARCH_START_DELAY,
                 this.on_signal_search_term_editing_finished
             );
-            this.unified_search_text_editing_finished_timer.on_signal_start ();
         }
 
         if (!this.results == "") {
@@ -552,10 +546,11 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_search_term_editing_finished () {
-        disconnect (
-            this.unified_search_text_editing_finished_timer, GLib.Timeout.timeout,
-            this, UnifiedSearchResultsListModel.on_signal_search_term_editing_finished);
+    private bool on_signal_search_term_editing_finished () {
+        if (!this.unified_search_text_editing_finished_timer_active) {
+            return false; // only run once
+        }
+        this.unified_search_text_editing_finished_timer_active = false;
 
         if (!this.account_state || !this.account_state.account) {
             GLib.critical ("Account state is invalid. Could not on_signal_start search!");
@@ -571,6 +566,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
         } else {
             start_search ();
         }
+        return false; // only run once
     }
 
 
@@ -582,7 +578,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
         if (!json_api_job) {
             GLib.critical ("Failed to fetch providers.".printf (this.search_term));
             this.error_string += _("Failed to fetch providers.") + "\n";
-            /* emit */ signal_error_string_changed ();
+            signal_error_string_changed ();
             return;
         }
 
@@ -596,7 +592,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
             this.error_string +=
                 _("Failed to fetch search providers for '%1'. Error: %2").printf (this.search_term).printf (json_api_job.error_string)
                 + "\n";
-            /* emit */ signal_error_string_changed ();
+            signal_error_string_changed ();
             return;
         }
 
@@ -629,7 +625,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
         if (!json_api_job) {
             GLib.critical ("Search has failed for '%2'.".printf (this.search_term));
             this.error_string += _("Search has failed for '%2'.").printf (this.search_term) + "\n";
-            /* emit */ signal_error_string_changed ();
+            signal_error_string_changed ();
             return;
         }
 
@@ -643,7 +639,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
             this.search_job_connections.remove (provider_id);
 
             if (this.search_job_connections == "") {
-                /* emit */ signal_is_search_in_progress_changed ();
+                signal_is_search_in_progress_changed ();
             }
         }
 
@@ -659,7 +655,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
             );
             this.error_string +=
                 _("Search has failed for '%1'. Error : %2").printf (this.search_term).printf (json_api_job.error_string) + "\n";
-            /* emit */ signal_error_string_changed ();
+            signal_error_string_changed ();
             return;
         }
 

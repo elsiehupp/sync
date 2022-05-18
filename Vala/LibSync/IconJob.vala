@@ -40,11 +40,11 @@ public class IconJob : GLib.Object {
 
         var network_error = reply.error;
         if (network_error != GLib.InputStream.NoError) {
-            /* emit */ signal_error (signal_network_error);
+            signal_error (signal_network_error);
             return;
         }
 
-        /* emit */ signal_job_finished (reply.read_all ());
+        signal_job_finished (reply.read_all ());
     }
 
 } // class IconJob

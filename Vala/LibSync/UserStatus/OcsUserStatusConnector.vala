@@ -37,7 +37,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
         }
         public set {
             if (!this.user_status_supported) {
-                /* emit */ signal_error (Error.USER_STATUS_NOT_SUPPORTED);
+                signal_error (Error.USER_STATUS_NOT_SUPPORTED);
                 return;
             }
 
@@ -70,7 +70,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
 
         if (!this.user_status_supported) {
             GLib.debug ("User status not supported.");
-            /* emit */ signal_error (Error.USER_STATUS_NOT_SUPPORTED);
+            signal_error (Error.USER_STATUS_NOT_SUPPORTED);
             return;
         }
 
@@ -82,7 +82,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
     ***********************************************************/
     public void fetch_predefined_statuses () {
         if (!this.user_status_supported) {
-            /* emit */ signal_error (Error.USER_STATUS_NOT_SUPPORTED);
+            signal_error (Error.USER_STATUS_NOT_SUPPORTED);
             return;
         }
         start_fetch_predefined_statuses ();
@@ -110,12 +110,12 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
 
         if (status_code != 200) {
             GLib.info ("Slot fetch UserStatus finished with status code " + status_code.to_string ());
-            /* emit */ signal_error (Error.COULD_NOT_FETCH_USER_STATUS);
+            signal_error (Error.COULD_NOT_FETCH_USER_STATUS);
             return;
         }
 
         this.user_status = json_to_user_status (json);
-        /* emit */ signal_user_status_fetched (this.user_status);
+        signal_user_status_fetched (this.user_status);
     }
 
 
@@ -126,7 +126,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
 
         if (status_code != 200) {
             GLib.info ("Slot predefined user statuses finished with status code " + status_code.to_string ());
-            /* emit */ signal_error (Error.COULD_NOT_FETCH_PREDEFINED_USER_STATUSES);
+            signal_error (Error.COULD_NOT_FETCH_PREDEFINED_USER_STATUSES);
             return;
         }
         var json_data = json.object ().value ("ocs").to_object ().value ("data");
@@ -135,7 +135,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
             return;
         }
         var statuses = json_to_predefined_statuses (json_data.to_array ());
-        /* emit */ signal_predefined_statuses_fetched (statuses);
+        signal_predefined_statuses_fetched (statuses);
     }
 
 
@@ -145,7 +145,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
         log_response ("Online status set", json, status_code);
 
         if (status_code != 200) {
-            /* emit */ signal_error (Error.COULD_NOT_SET_USER_STATUS);
+            signal_error (Error.COULD_NOT_SET_USER_STATUS);
             return;
         }
     }
@@ -157,7 +157,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
         log_response ("Message set", json, status_code);
 
         if (status_code != 200) {
-            /* emit */ signal_error (Error.COULD_NOT_SET_USER_STATUS);
+            signal_error (Error.COULD_NOT_SET_USER_STATUS);
             return;
         }
 
@@ -166,7 +166,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
         // message
         fetch_user_status ();
 
-        /* emit */ signal_user_status_set ();
+        signal_user_status_set ();
     }
 
 
@@ -176,12 +176,12 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
         log_response ("Message cleared", json, status_code);
 
         if (status_code != 200) {
-            /* emit */ signal_error (Error.COULD_NOT_CLEAR_MESSAGE);
+            signal_error (Error.COULD_NOT_CLEAR_MESSAGE);
             return;
         }
 
         this.user_status = new JsonApiJob ();
-        /* emit */ signal_message_cleared ();
+        signal_message_cleared ();
     }
 
 
@@ -298,7 +298,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
         }
 
         if (!this.user_status_emojis_supported) {
-            /* emit */ signal_error (Error.EMOJIS_NOT_SUPPORTED);
+            signal_error (Error.EMOJIS_NOT_SUPPORTED);
             return;
         }
         this.message_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL + "/message/custom", this);

@@ -266,7 +266,7 @@ public class OcsShareJob : OcsJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_job_finished (GLib.JsonDocument reply) {
-        /* emit */ signal_finished (reply, this.value);
+        signal_finished (reply, this.value);
     }
 
 } // class OcsShareJob

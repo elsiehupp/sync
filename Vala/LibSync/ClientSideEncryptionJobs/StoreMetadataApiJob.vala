@@ -61,11 +61,11 @@ public class StoreMetadataApiJob : AbstractNetworkJob {
         int return_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             if (return_code != 200) {
                 GLib.info ("Error sending the metadata " + this.path + this.error_string + return_code);
-                /* emit */ signal_error (this.file_identifier, return_code);
+                signal_error (this.file_identifier, return_code);
             }
 
             GLib.info ("Metadata submited to the server successfully");
-            /* emit */ signal_success (this.file_identifier);
+            signal_success (this.file_identifier);
         return true;
     }
 

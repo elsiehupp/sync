@@ -102,11 +102,11 @@ public class FakePutMultiFileReply : FakeReply {
 
         set_finished (true);
         if (bytes_available ()) {
-            /* emit */ signal_ready_read ();
+            signal_ready_read ();
         }
 
-        /* emit */ signal_meta_data_changed ();
-        /* emit */ signal_finished ();
+        signal_meta_data_changed ();
+        signal_finished ();
     }
 
 
@@ -114,7 +114,7 @@ public class FakePutMultiFileReply : FakeReply {
     ***********************************************************/
     public override bool on_signal_abort () {
         set_error (OperationCanceledError, "on_signal_abort");
-        /* emit */ signal_finished ();
+        signal_finished ();
         return false; // only run once
     }
 

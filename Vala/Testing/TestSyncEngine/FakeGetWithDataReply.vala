@@ -47,8 +47,8 @@ public class FakeGetWithDataReply : FakeReply {
     public void respond () {
         if (aborted) {
             set_error (OperationCanceledError, "Operation Canceled");
-            /* emit */ signal_meta_data_changed ();
-            /* emit */ signal_finished ();
+            signal_meta_data_changed ();
+            signal_finished ();
             return;
         }
         set_header (Soup.Request.ContentLengthHeader, payload.size ());
@@ -56,10 +56,10 @@ public class FakeGetWithDataReply : FakeReply {
         set_raw_header ("OC-ETag", file_info.etag);
         set_raw_header ("ETag", file_info.etag);
         set_raw_header ("OC-FileId", file_info.file_identifier);
-        /* emit */ signal_meta_data_changed ();
+        signal_meta_data_changed ();
         if (bytes_available ())
-            /* emit */ signal_ready_read ();
-        /* emit */ signal_finished ();
+            signal_ready_read ();
+        signal_finished ();
     }
 
 

@@ -142,7 +142,7 @@ public class JsonApiJob : AbstractNetworkJob {
         if (this.reply.error != GLib.InputStream.NoError) {
             GLib.warning ("Network error: " + this.path + this.error_string + this.reply.attribute (Soup.Request.HttpStatusCodeAttribute));
             status_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-            /* emit */ signal_json_received (GLib.JsonDocument (), status_code);
+            signal_json_received (GLib.JsonDocument (), status_code);
             return true;
         }
 
@@ -180,11 +180,11 @@ public class JsonApiJob : AbstractNetworkJob {
         // empty or invalid response and status code is != 304 because json_str is expected to be empty
         if ( (error.error != Json.ParserError.NoError || json == null) && http_status_code != NOT_MODIFIED_STATUS_CODE) {
             GLib.warning ("Invalid JSON! " + json_str + error.error_string);
-            /* emit */ signal_json_received (this, json, status_code);
+            signal_json_received (this, json, status_code);
             return true;
         }
 
-        /* emit */ signal_json_received (this, json, status_code);
+        signal_json_received (this, json, status_code);
         return true;
     }
 

@@ -106,7 +106,7 @@ public class KeychainChunkWriteJob : AbstractKeychainChunkJob {
 
                 this.chunk_buffer == "";
 
-                /* emit */ signal_finished (this);
+                signal_finished (this);
 
                 if (this.auto_delete) {
                     delete_later ();
@@ -136,7 +136,7 @@ public class KeychainChunkWriteJob : AbstractKeychainChunkJob {
 
             chunk == "";
         } else {
-            /* emit */ signal_finished (this);
+            signal_finished (this);
 
             if (this.auto_delete) {
                 delete_later ();

@@ -37,8 +37,8 @@ public class FakeMkcolReply : FakeReply {
     public void respond () {
         set_raw_header ("OC-FileId", file_info.file_identifier);
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 201);
-        /* emit */ signal_meta_data_changed ();
-        /* emit */ signal_finished ();
+        signal_meta_data_changed ();
+        signal_finished ();
     }
 
 

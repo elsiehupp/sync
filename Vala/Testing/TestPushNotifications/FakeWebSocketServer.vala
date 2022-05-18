@@ -175,7 +175,7 @@ public class FakeWebSocketServer : GLib.Object {
     ***********************************************************/
     private void on_signal_process_next_message_internal (string message) {
         var client = (GLib.WebSocket) sender ();
-        /* emit */ signal_process_text_message (client, message);
+        signal_process_text_message (client, message);
     }
 
 

@@ -105,7 +105,7 @@ public class PropagateRootDirectory : PropagateDirectory {
     private void on_signal_sub_jobs_abort_finished (AbortsFinished abort_status) {
         abort_status.sub_jobs_finished = true;
         if (abort_status.sub_jobs_finished && abort_status.dir_deletion_finished) {
-            /* emit */ signal_abort_finished ();
+            signal_abort_finished ();
         }
     }
 
@@ -115,7 +115,7 @@ public class PropagateRootDirectory : PropagateDirectory {
     private void on_signal_ir_deletion_jobs_abort_finished (AbortsFinished abort_status) {
         abort_status.dir_deletion_finished = true;
         if (abort_status.sub_jobs_finished && abort_status.dir_deletion_finished) {
-            /* emit */ signal_abort_finished ();
+            signal_abort_finished ();
         }
     }
 
@@ -132,7 +132,7 @@ public class PropagateRootDirectory : PropagateDirectory {
     private void on_signal_dir_deletion_jobs_finished (SyncFileItem.Status status) {
         this.state = Finished;
         GLib.info ("PropagateRootDirectory.on_signal_dir_deletion_jobs_finished " + " emit finished " + status.to_string ());
-        /* emit */ signal_finished (status);
+        signal_finished (status);
     }
 
 
@@ -154,7 +154,7 @@ public class PropagateRootDirectory : PropagateDirectory {
                 abort (AbstractPropagatorJob.AbortType.SYNCHRONOUS);
                 this.state = Finished;
                 GLib.info ("PropagateRootDirectory.on_signal_sub_jobs_finished " + " emit finished " + status.to_string ());
-                /* emit */ signal_finished (status);
+                signal_finished (status);
             }
             return;
         }

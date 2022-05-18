@@ -44,7 +44,7 @@ public class PassiveUpdateNotifier : OCUpdater {
             // as the one that is running. If not, restart if possible.
             string fs_version = Utility.version_of_installed_binary ();
             if (! (fs_version == "" || this.running_app_version == "") && fs_version != this.running_app_version) {
-                /* emit */ signal_request_restart ();
+                signal_request_restart ();
             }
         }
 

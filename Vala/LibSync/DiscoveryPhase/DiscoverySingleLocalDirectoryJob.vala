@@ -87,7 +87,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, GLib.Runnable*/ 
                 item.instruction = CSync.SyncInstructions.IGNORE;
                 item.status = SyncFileItem.Status.NORMAL_ERROR;
                 item.error_string = _("Filename encoding is not valid");
-                /* emit */ signal_item_discovered (item);
+                signal_item_discovered (item);
                 continue;
             }
             i.modtime = dirent.modtime;
@@ -115,7 +115,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, GLib.Runnable*/ 
             GLib.warning ("closedir failed for file in " + local_path + " - errno: " + errno.to_string ());
         }
 
-        /* emit */ signal_finished (results);
+        signal_finished (results);
     }
 
 } // class DiscoverySingleLocalDirectoryJob

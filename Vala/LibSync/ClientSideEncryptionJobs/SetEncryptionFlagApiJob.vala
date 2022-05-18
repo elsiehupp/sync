@@ -68,10 +68,10 @@ public class SetEncryptionFlagApiJob : AbstractNetworkJob {
         int return_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         GLib.info ("Encryption Flag Return " + this.reply.read_all ());
         if (return_code == 200) {
-            /* emit */ signal_success (this.file_identifier);
+            signal_success (this.file_identifier);
         } else {
             GLib.info ("Setting the encrypted flag failed with " + this.path + this.error_string + return_code);
-            /* emit */ signal_error (this.file_identifier, return_code);
+            signal_error (this.file_identifier, return_code);
         }
         return true;
     }

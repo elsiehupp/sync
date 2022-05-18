@@ -68,14 +68,14 @@ public class ValidateChecksumHeader : AbstractComputeChecksum {
     ***********************************************************/
     private void on_signal_checksum_calculated (string checksum_type, string checksum) {
         if (checksum_type != this.expected_checksum_type) {
-            /* emit */ signal_validation_failed (_("The checksum header contained an unknown checksum type \"%1\"").printf (this.expected_checksum_type));
+            signal_validation_failed (_("The checksum header contained an unknown checksum type \"%1\"").printf (this.expected_checksum_type));
             return;
         }
         if (checksum != this.expected_checksum) {
-            /* emit */ signal_validation_failed (_(" (The downloaded file does not match the checksum, it will be resumed. \"%1\" != \"%2\")").printf (this.expected_checksum, checksum));
+            signal_validation_failed (_(" (The downloaded file does not match the checksum, it will be resumed. \"%1\" != \"%2\")").printf (this.expected_checksum, checksum));
             return;
         }
-        /* emit */ signal_validated (checksum_type, checksum);
+        signal_validated (checksum_type, checksum);
     }
 
 
@@ -84,13 +84,13 @@ public class ValidateChecksumHeader : AbstractComputeChecksum {
     private ComputeChecksum prepare_start (string checksum_header) {
         // If the incoming header is empty no validation can happen. Just continue.
         if (checksum_header == "") {
-            /* emit */ signal_validated ("", "");
+            signal_validated ("", "");
             return null;
         }
 
         if (!parse_checksum_header (checksum_header, this.expected_checksum_type, this.expected_checksum)) {
             GLib.warning ("Checksum header malformed: " + checksum_header);
-            /* emit */ signal_validation_failed (_("The checksum header is malformed."));
+            signal_validation_failed (_("The checksum header is malformed."));
             return null;
         }
 

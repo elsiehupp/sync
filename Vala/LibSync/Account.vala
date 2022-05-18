@@ -77,7 +77,7 @@ public class Account : GLib.Object {
                 return;
             }
             this.dav_user = value;
-            /* emit */ signal_wants_account_saved (this);
+            signal_wants_account_saved (this);
         }
     }
 
@@ -96,13 +96,15 @@ public class Account : GLib.Object {
         }
         public set {
             this.display_name = value;
-            /* emit */ signal_account_changed_display_name ();
+            signal_account_changed_display_name ();
         }
     }
 
     /***********************************************************
+    Maybe replace this with a mutex lock?
     ***********************************************************/
-    private GLib.Timeout push_notifications_reconnect_timer;
+    private bool push_notifications_reconnect_timer_active;
+    private uint push_notifications_reconnect_timer_interval;
 
     /***********************************************************
     ***********************************************************/
@@ -113,7 +115,7 @@ public class Account : GLib.Object {
         }
         public set {
             this.avatar = value;
-            /* emit */ signal_account_changed_avatar ();
+            signal_account_changed_avatar ();
         }
     }
 //  #endif
@@ -173,6 +175,7 @@ public class Account : GLib.Object {
             this.capabilities = value;
 
             set_up_user_status_connector ();
+            this.push_notifications_reconnect_timer_active = true;
             try_setup_push_notifications ();
         }
     }
@@ -194,7 +197,7 @@ public class Account : GLib.Object {
 
             var old_server_version = this.server_version;
             this.server_version = value;
-            /* emit */ signal_server_version_changed (this, old_server_version, value);
+            signal_server_version_changed (this, old_server_version, value);
         }
     }
 
@@ -263,6 +266,7 @@ public class Account : GLib.Object {
                 this.on_signal_credentials_asked
             );
 
+            this.push_notifications_reconnect_timer_active = true;
             try_setup_push_notifications ();
         }
     }
@@ -397,9 +401,11 @@ public class Account : GLib.Object {
         //  q_register_meta_type<unowned Account> ("unowned Account");
         //  q_register_meta_type<Account> ("Account*");
 
-        this.push_notifications_reconnect_timer.interval (PUSH_NOTIFICATIONS_RECONNECT_INTERVAL);
-        this.push_notifications_reconnect_timer.timeout.connect (
-            this.try_setup_push_notifications);
+        this.push_notifications_reconnect_timer_active = true;
+        GLib.Timeout.add (
+            PUSH_NOTIFICATIONS_RECONNECT_INTERVAL,
+            this.try_setup_push_notifications
+        );
     }
 
 
@@ -696,7 +702,7 @@ public class Account : GLib.Object {
         CookieJar jar = (CookieJar)this.soup_session.get_feature (typeof (CookieJar));
         //  GLib.assert_true (jar);
         jar.all_cookies ();
-        /* emit */ signal_wants_account_saved (this);
+        signal_wants_account_saved (this);
     }
 
 
@@ -716,10 +722,11 @@ public class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void try_setup_push_notifications () {
-        // Stop the timer to prevent parallel setup attempts
-        this.push_notifications_reconnect_timer.stop ();
-
+    public bool try_setup_push_notifications () {
+        if (!this.push_notifications_reconnect_timer_active) {
+            return false;
+        }
+        this.push_notifications_reconnect_timer_active = false;
         if (this.capabilities.available_push_notifications () != PushNotificationType.NONE) {
             GLib.info ("Try to setup push notifications");
 
@@ -739,14 +746,16 @@ public class Account : GLib.Object {
             // If push notifications already running it is no problem to call setup again
             this.push_notifications.up ();
         }
+        // Stop the timer to prevent parallel setup attempts
+        return false;
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_push_notifications_signal_ready () {
-        this.push_notifications_reconnect_timer.stop ();
-        /* emit */ signal_push_notifications_ready (this);
+        this.push_notifications_reconnect_timer_active = false;
+        signal_push_notifications_ready (this);
     }
 
 
@@ -758,10 +767,10 @@ public class Account : GLib.Object {
             return;
         }
         if (!this.push_notifications.is_ready) {
-            /* emit */ signal_push_notifications_disabled (this);
+            signal_push_notifications_disabled (this);
         }
-        if (!this.push_notifications_reconnect_timer.is_active) {
-            this.push_notifications_reconnect_timer.start ();
+        if (!this.push_notifications_reconnect_timer_active) {
+            this.push_notifications_reconnect_timer_active = true;
         }
     }
 
@@ -865,7 +874,7 @@ public class Account : GLib.Object {
         // Retrieving password will trigger remote wipe check job
         retrieve_app_password ();
 
-        /* emit */ signal_invalid_credentials ();
+        signal_invalid_credentials ();
     }
 
 
@@ -901,7 +910,7 @@ public class Account : GLib.Object {
             password = read_job.binary_data ();
         }
 
-        /* emit */ signal_app_password_retrieved (password);
+        signal_app_password_retrieved (password);
     }
 
 
@@ -1013,19 +1022,19 @@ public class Account : GLib.Object {
 
 
     private void on_signal_user_status_connector_user_status_fetched (UserStatus status) {
-        /* emit */ signal_user_status_changed ();
+        signal_user_status_changed ();
     }
 
 
     private void on_signal_user_status_connector_message_cleared () {
-        /* emit */ signal_user_status_changed ();
+        signal_user_status_changed ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void push_notifications_reconnect_interval (int interval) {
-        this.push_notifications_reconnect_timer.interval (interval);
+        this.push_notifications_reconnect_timer_interval = interval;
     }
 
 
@@ -1089,7 +1098,7 @@ public class Account : GLib.Object {
             if (approved_certificates.length > 0) {
                 GLib.SslConfiguration.default_configuration ().add_ca_certificates (approved_certificates);
                 add_approved_certificates (approved_certificates);
-                /* emit */ signal_wants_account_saved (this);
+                signal_wants_account_saved (this);
 
                 // all ssl certificates are known and accepted. We can ignore the problems right away.
                 GLib.info (output + " Certs are known and trusted! This is not an actual error.");
@@ -1129,7 +1138,7 @@ public class Account : GLib.Object {
             fetch_user_name_job.start ();
         } else {
             GLib.debug ("User identifier already fetched.");
-            /* emit */ signal_credentials_fetched (this.credentials);
+            signal_credentials_fetched (this.credentials);
         }
     }
 
@@ -1138,21 +1147,21 @@ public class Account : GLib.Object {
         fetch_user_name_job.delete_later ();
         if (status_code != 100) {
             GLib.warning ("Could not fetch user identifier. Login will probably not work.");
-            /* emit */ signal_credentials_fetched (this.credentials);
+            signal_credentials_fetched (this.credentials);
             return;
         }
 
         var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
         var user_id = obj_data.value ("identifier").to_string ();
         this.dav_user = user_id;
-        /* emit */ signal_credentials_fetched (this.credentials);
+        signal_credentials_fetched (this.credentials);
     }
 
 
     /***********************************************************
     ***********************************************************/
     protected void on_signal_credentials_asked () {
-        /* emit */ signal_credentials_asked (this.credentials);
+        signal_credentials_asked (this.credentials);
     }
 
 
