@@ -8,16 +8,16 @@ srcs = files([
 subdir('Vala')
 
 libraries = [
-    # '3rdParty',
-    cmd,
-    common,
+    # subproject('3rdParty').get_variable ('3rd_party'),
+    subproject('Cmd').get_variable ('cmd'),
+    subproject('Common').get_variable ('common'),
     # 'CrashReporter',
-    csync,
+    subproject('CSync').get_variable ('csync'),
     # 'Gui',
-    lib_sync,
+    subproject('LibSync').get_variable ('lib_sync'),
     # 'ShellIntegration',
     # 'Testing',
-    subproject('gpseq').get_variable ('gpseq_lib')
+    subproject('Gpseq').get_variable ('gpseq_lib')
 ]
 
 executable(

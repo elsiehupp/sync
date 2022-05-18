@@ -1,8 +1,4 @@
-# project(
-#	'com.elsiehupp.NextcloudVala',
-#	'c',
-#	'vala',
-#	version: '1.0.0')
+project('com.elsiehupp.NextcloudVala.CSync', 'c', 'vala', version: '1.0.0')
 
 srcs = files([
 #    'Config.vala.cmake',
@@ -32,7 +28,7 @@ deps = [
 ]
 
 libraries = [
-    subproject('gpseq').get_variable ('gpseq_lib')
+    subproject('Gpseq').get_variable ('gpseq_lib')
 ]
 
 csync = library(

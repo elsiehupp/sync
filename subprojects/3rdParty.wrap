@@ -1,0 +1,5 @@
+[wrap-file]
+directory = 3rdParty
+
+[provide]
+dependency_names = 3rd_party

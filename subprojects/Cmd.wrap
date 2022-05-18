@@ -1,0 +1,5 @@
+[wrap-file]
+directory = Cmd
+
+[provide]
+dependency_names = cmd

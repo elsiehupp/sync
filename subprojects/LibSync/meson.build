@@ -1,4 +1,4 @@
-# project('com.elsiehupp.NextcloudVala', 'c', 'vala', version: '1.0.0')
+project('com.elsiehupp.NextcloudVala.LibSync', 'c', 'vala', version: '1.0.0')
 
 srcs = files([
     'Account.vala',
@@ -171,7 +171,16 @@ deps = [
 ]
 
 libraries = [
-    subproject('gpseq').get_variable ('gpseq_lib')
+    # subproject('3rdParty').get_variable ('3rd_party'),
+    # subproject('Cmd').get_variable ('cmd'),
+    subproject('Common').get_variable ('common'),
+    # 'CrashReporter',
+    subproject('CSync').get_variable ('csync'),
+    # 'Gui',
+    # subproject('LibSync').get_variable ('lib_sync'),
+    # 'ShellIntegration',
+    # 'Testing',
+    subproject('Gpseq').get_variable ('gpseq_lib')
 ]
 
 lib_sync = library(

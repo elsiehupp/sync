@@ -3,7 +3,7 @@ srcs = files([
 ])
 
 libraries = [
-    subproject('gpseq').get_variable ('gpseq_lib')
+    subproject('Gpseq').get_variable ('gpseq_lib')
 ]
 
 library(
