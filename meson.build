@@ -17,12 +17,13 @@ libraries = [
     lib_sync,
     # 'ShellIntegration',
     # 'Testing',
+    subproject('gpseq').get_variable ('gpseq_lib')
 ]
 
 executable(
     meson.project_name(),
     srcs,
-#     dependencies: deps,
+    # dependencies: deps,
     install: false,
     link_with: libraries
 )

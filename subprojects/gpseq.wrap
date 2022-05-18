@@ -1,0 +1,6 @@
+[wrap-git]
+url = git@gitlab.com:kosmospredanie/gpseq.git
+revision = 0.3.3
+
+[provide]
+dependency_names = gpseq_lib
