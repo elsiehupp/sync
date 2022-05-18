@@ -474,7 +474,7 @@ public class UserStatusSelectorModel : GLib.Object {
     /***********************************************************
     Q_REQUIRED_RESULT
     ***********************************************************/
-    private string clear_at_readable (Optional<ClearAt> clear_at) {
+    private string clear_at_readable (Gpseq.Optional<ClearAt> clear_at) {
         if (clear_at != null) {
             switch (clear_at.type) {
             case ClearAtType.PERIOD: {
@@ -537,7 +537,7 @@ public class UserStatusSelectorModel : GLib.Object {
     /***********************************************************
     Q_REQUIRED_RESULT
     ***********************************************************/
-    private static Optional<ClearAt> clear_stage_type_to_date_time (ClearStageType type) {
+    private static Gpseq.Optional<ClearAt> clear_stage_type_to_date_time (ClearStageType type) {
         switch (type) {
         case ClearStageType.DO_NOT_CLEAR:
             return {};

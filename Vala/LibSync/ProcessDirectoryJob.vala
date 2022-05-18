@@ -1519,7 +1519,7 @@ public class ProcessDirectoryJob : GLib.Object {
         // either correct availability, or a result with error if the folder is new or otherwise has no availability set yet
         var folder_place_holder_availability = local_entry.is_directory ? this.discovery_data.sync_options.vfs.availability (path.local) : AbstractVfs.AvailabilityResult (AbstractVfs.AvailabilityError.NO_SUCH_ITEM);
 
-        var folder_pin_state = local_entry.is_directory ? this.discovery_data.sync_options.vfs.pin_state (path.local) : Optional<AbstractVfs.PinState> (PinState.UNSPECIFIED);
+        var folder_pin_state = local_entry.is_directory ? this.discovery_data.sync_options.vfs.pin_state (path.local) : Gpseq.Optional<AbstractVfs.PinState> (PinState.UNSPECIFIED);
 
         if (!is_file_place_holder && !folder_place_holder_availability.is_valid && !folder_pin_state.is_valid) {
             // not a file placeholder and not a synced folder placeholder (new local folder)

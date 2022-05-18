@@ -46,15 +46,15 @@ public class UserStatus : GLib.Object {
     public bool message_predefined { public get; public set; }
 
     /***********************************************************
-    Optional<ClearAt> date_time
+    Gpseq.Optional<ClearAt> date_time
     Q_REQUIRED_RESULT
     ***********************************************************/
-    public Optional<ClearAt> clear_at { public get; public set; }
+    public Gpseq.Optional<ClearAt> clear_at { public get; public set; }
 
     /***********************************************************
     ***********************************************************/
     public UserStatus (string identifier, string message, string icon,
-        OnlineStatus state = OnlineStatus.ONLINE, bool message_predefined, Optional<ClearAt> clear_at = new Optional<ClearAt> ()) {
+        OnlineStatus state = OnlineStatus.ONLINE, bool message_predefined, Gpseq.Optional<ClearAt> clear_at = new Gpseq.Optional<ClearAt> ()) {
         this.identifier = identifier;
         this.message = message;
         this.icon = icon;

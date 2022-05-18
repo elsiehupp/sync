@@ -1,28 +1,28 @@
-namespace Occ {
-namespace Common {
+//  namespace Occ {
+//  namespace Common {
 
-/***********************************************************
-@class Optional
+//  /***********************************************************
+//  @class Gpseq.Optional
 
-@author Olivier Goffart <ogoffart@woboq.com>
+//  @author Olivier Goffart <ogoffart@woboq.com>
 
-@copyright GPLv3 or Later
-***********************************************************/
-public class Optional : Result<T, OptionalNoErrorData> {
+//  @copyright GPLv3 or Later
+//  ***********************************************************/
+//  public class Gpseq.Optional : Result<T, OptionalNoErrorData> {
 
-    //  template <typename T>
+//      //  template <typename T>
 
-    /***********************************************************
-    ***********************************************************/
-    //  public using Result<T, OptionalNoErrorData>.Result;
+//      /***********************************************************
+//      ***********************************************************/
+//      //  public using Result<T, OptionalNoErrorData>.Result;
 
-    /***********************************************************
-    ***********************************************************/
-    public Optional () {
-        base (new OptionalNoErrorData ());
-    }
+//      /***********************************************************
+//      ***********************************************************/
+//      public Gpseq.Optional () {
+//          base (new OptionalNoErrorData ());
+//      }
 
-} // class Optional
+//  } // class Gpseq.Optional
 
-} // namespace Common
-} // namespace Occ
+//  } // namespace Common
+//  } // namespace Occ

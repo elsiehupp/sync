@@ -19,7 +19,7 @@ public class TestCtorFetchStatusAndPredefinedStatuses : GLib.Object {
         string user_status_icon = "❤";
         LibSync.UserStatus.OnlineStatus user_status_state = LibSync.UserStatus.OnlineStatus.DO_NOT_DISTURB;
         bool user_status_message_predefined = false;
-        Optional<ClearAt> user_status_clear_at; {
+        Gpseq.Optional<ClearAt> user_status_clear_at; {
             ClearAt clear_at;
             clear_at.type = ClearAtType.TIMESTAMP;
             clear_at.timestamp = current_date_time.add_days (1).to_time_t ();

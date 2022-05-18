@@ -369,8 +369,8 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
     }
 
 
-    private static Optional<ClearAt> json_extract_clear_at (Json.Object json_object) {
-        Optional<ClearAt> clear_at = new JsonApiJob ();
+    private static Gpseq.Optional<ClearAt> json_extract_clear_at (Json.Object json_object) {
+        Gpseq.Optional<ClearAt> clear_at = new JsonApiJob ();
         if (json_object.contains ("clear_at") && !json_object.value ("clear_at") == null) {
             ClearAt clear_at_value;
             clear_at_value.type = ClearAtType.TIMESTAMP;
@@ -459,7 +459,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
     }
 
 
-    private static uint64 clear_at_to_timestamp_optional (Optional<ClearAt> clear_at) {
+    private static uint64 clear_at_to_timestamp_optional (Gpseq.Optional<ClearAt> clear_at) {
         if (clear_at) {
             return clear_at_to_timestamp (clear_at);
         }
@@ -467,8 +467,8 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
     }
 
 
-    private static Optional<ClearAt> json_to_clear_at (Json.Object json_object) {
-        Optional<ClearAt> clear_at;
+    private static Gpseq.Optional<ClearAt> json_to_clear_at (Json.Object json_object) {
+        Gpseq.Optional<ClearAt> clear_at;
 
         if (json_object.value ("clear_at").is_object () && !json_object.value ("clear_at") == null) {
             ClearAt clear_at_value;

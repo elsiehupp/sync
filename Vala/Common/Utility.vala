@@ -113,7 +113,7 @@ public class Utility : GLib.Object {
             ***********************************************************/
             outfile = rand_string;
             /***********************************************************
-            Optional, as GLib.File destructor will already do it:
+            Gpseq.Optional, as GLib.File destructor will already do it:
             ***********************************************************/
             file.close ();
             return true;

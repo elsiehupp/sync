@@ -174,8 +174,8 @@ public class VfsSuffix : Common.AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
-    public Optional<PinState> pin_state (string folder_path) {
-        return new Optional<PinState> (null);
+    public Gpseq.Optional<PinState> pin_state (string folder_path) {
+        return new Gpseq.Optional<PinState> (null);
     }
 
 

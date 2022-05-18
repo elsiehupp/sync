@@ -237,7 +237,7 @@ public abstract class AbstractVfs : GLib.Object {
     Returns none on retrieval error.
     Q_REQUIRED_RESULT
     ***********************************************************/
-    public abstract Optional<PinState> pin_state_of_path (string folder_path);
+    public abstract Gpseq.Optional<PinState> pin_state_of_path (string folder_path);
 
 
     /***********************************************************
@@ -302,7 +302,7 @@ public abstract class AbstractVfs : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected Optional<PinState> find_pin_state_in_database (string folder_path) {
+    protected Gpseq.Optional<PinState> find_pin_state_in_database (string folder_path) {
         var pin = this.setup_params.journal.internal_pin_states.effective_for_path (folder_path.to_utf8 ());
         return pin;
     }

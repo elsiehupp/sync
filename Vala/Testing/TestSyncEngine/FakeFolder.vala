@@ -36,7 +36,7 @@ public class FakeFolder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public FakeFolder (FileInfo template_file_info, Optional<FileInfo> local_file_info = new Optional<FileInfo> (), string remote_path = "") {
+    public FakeFolder (FileInfo template_file_info, Gpseq.Optional<FileInfo> local_file_info = new Gpseq.Optional<FileInfo> (), string remote_path = "") {
         this.local_modifier = this.temporary_directory.path;
         // Needs to be done once
         SyncEngine.minimum_file_age_for_upload = std.chrono.milliseconds (0);

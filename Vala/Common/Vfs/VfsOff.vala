@@ -112,8 +112,8 @@ public class VfsOff : AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
-    public override Optional<PinState> pin_state_of_path (string folder_path) {
-        return new Optional<PinState> ();
+    public override Gpseq.Optional<PinState> pin_state_of_path (string folder_path) {
+        return new Gpseq.Optional<PinState> ();
     }
 
 

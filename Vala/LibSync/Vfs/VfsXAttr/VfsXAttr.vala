@@ -184,7 +184,7 @@ public class VfsXAttr : Common.AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
-    public Optional<PinState> pin_state (string folder_path) {
+    public Gpseq.Optional<PinState> pin_state (string folder_path) {
         return pin_state_in_database (folder_path);
     }
 

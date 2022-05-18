@@ -1159,7 +1159,7 @@ public class SocketApi : GLib.Object {
             //  ENFORCE (!files == "");
 
             // Determine the combined availability status of the files
-            var combined = new Optional<Common.ItemAvailability> ();
+            var combined = new Gpseq.Optional<Common.ItemAvailability> ();
             foreach (var file in files) {
                 var file_data = FileData.file_data (file);
                 var availability = sync_folder.vfs.availability (file_data.folder_relative_path);

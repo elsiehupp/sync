@@ -134,10 +134,10 @@ public class SyncJournalDb : GLib.Object {
 
         Returns none on database error.
         ***********************************************************/
-        Optional<PinState> raw_for_path (string path) {
+        Gpseq.Optional<PinState> raw_for_path (string path) {
             GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.database.mutex);
             if (!this.database.check_connect ()) {
-                return new Optional<PinState> ();
+                return new Gpseq.Optional<PinState> ();
             }
             PreparedSqlQuery query = this.database.query_manager.get_for_key_sql_and_database (
                 PreparedSqlQueryManager.Key.GET_RAW_PIN_STATE_QUERY,
@@ -177,7 +177,7 @@ public class SyncJournalDb : GLib.Object {
 
         Returns none on database error.
         ***********************************************************/
-        public Optional<PinState> effective_for_path (string path) {
+        public Gpseq.Optional<PinState> effective_for_path (string path) {
             GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.database.mutex);
             if (!this.database.check_connect ()) {
                 return PinState.UNKOWN;
@@ -226,7 +226,7 @@ public class SyncJournalDb : GLib.Object {
         It's valid to use the root path "".
         Returns none on database error.
         ***********************************************************/
-        public Optional<PinState> effective_for_path_recursive (string path) {
+        public Gpseq.Optional<PinState> effective_for_path_recursive (string path) {
             /***********************************************************
             Get the item's effective pin state. We'll compare subitem's
             pin states against this.
@@ -338,7 +338,7 @@ public class SyncJournalDb : GLib.Object {
         Returns nothing on database error.
         Note that this will have an entry for "".
         ***********************************************************/
-        Optional<GLib.List<GLib.Pair<string, PinState>>> raw_list () {
+        Gpseq.Optional<GLib.List<GLib.Pair<string, PinState>>> raw_list () {
             GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.database.mutex);
             if (!this.database.check_connect ()) {
                 return PinState.UNKOWN;
@@ -359,7 +359,7 @@ public class SyncJournalDb : GLib.Object {
                     query.byte_array_value (0), (PinState)query.int_value (1)
                 });
             }
-            return new Optional<GLib.List<string>> (result);
+            return new Gpseq.Optional<GLib.List<string>> (result);
         }
     }
 
@@ -1186,7 +1186,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     Returns whether the item or any subitems are dehydrated
     ***********************************************************/
-    public Optional<HasHydratedDehydrated> has_hydrated_or_dehydrated_files (string filename) {
+    public Gpseq.Optional<HasHydratedDehydrated> has_hydrated_or_dehydrated_files (string filename) {
         GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
         if (!check_connect ()) {
             return null;

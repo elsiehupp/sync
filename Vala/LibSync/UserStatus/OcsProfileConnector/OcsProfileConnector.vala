@@ -143,7 +143,7 @@ public class OcsProfileConnector : GLib.Object {
     }
 
 
-    private static Optional<Gdk.Pixbuf> create_pixmap_from_svg_data (string icon_data) {
+    private static Gpseq.Optional<Gdk.Pixbuf> create_pixmap_from_svg_data (string icon_data) {
         GLib.SvgRenderer svg_renderer;
         if (!svg_renderer.on_signal_load (icon_data)) {
             return {};
@@ -160,7 +160,7 @@ public class OcsProfileConnector : GLib.Object {
     }
 
 
-    private static Optional<Gdk.Pixbuf> icon_data_to_pixmap (string icon_data) {
+    private static Gpseq.Optional<Gdk.Pixbuf> icon_data_to_pixmap (string icon_data) {
         if (!icon_data.has_prefix ("<svg")) {
             return {};
         }
