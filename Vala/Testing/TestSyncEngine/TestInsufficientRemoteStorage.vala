@@ -17,7 +17,7 @@ public class TestInsufficientRemoteStorage : AbstractTestSyncEngine {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         // Disable parallel uploads
-        SyncOptions sync_options;
+        LibSync.SyncOptions sync_options;
         sync_options.parallel_network_jobs = 0;
         fake_folder.sync_engine.set_sync_options (sync_options);
 

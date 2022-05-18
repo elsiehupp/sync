@@ -32,7 +32,7 @@ public class TestLateAbortHard : AbstractTestChunkingNg {
 
         var connection = connect (
             fake_folder.sync_engine,
-            SyncEngine.signal_about_to_propagate,
+            LibSync.SyncEngine.signal_about_to_propagate,
             check_etag_updated
         );
         GLib.assert_true (fake_folder.sync_once ());
@@ -46,7 +46,7 @@ public class TestLateAbortHard : AbstractTestChunkingNg {
 
         // An EVAL/EVAL conflict is also UPDATE_METADATA when there's no checksums
         connection = connect (
-            fake_folder.sync_engine, SyncEngine.signal_about_to_propagate,
+            fake_folder.sync_engine, LibSync.SyncEngine.signal_about_to_propagate,
             check_etag_updated
         );
         GLib.assert_true (fake_folder.sync_once ());
@@ -84,7 +84,7 @@ public class TestLateAbortHard : AbstractTestChunkingNg {
     Now the next sync gets a NEW/NEW conflict and since there's
     no checksum it just becomes a UPDATE_METADATA.
     ***********************************************************/
-    private static void check_etag_updated (GLib.List<unowned SyncFileItem> items) {
+    private static void check_etag_updated (GLib.List<unowned LibSync.SyncFileItem> items) {
         GLib.assert_true (items.size () == 1);
         GLib.assert_true (items[0].file == "A");
         SyncJournalFileRecord record;

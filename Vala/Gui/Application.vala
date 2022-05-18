@@ -60,7 +60,7 @@ public class Application : GLib.Application {
 
     /***********************************************************
     ***********************************************************/
-    private Theme theme;
+    private LibSync.Theme theme;
 
     /***********************************************************
     ***********************************************************/
@@ -88,7 +88,7 @@ public class Application : GLib.Application {
     /***********************************************************
     Option from command line
     ***********************************************************/
-    private string log_dir;
+    private string log_directory;
 
     /***********************************************************
     Option from command line
@@ -159,9 +159,9 @@ public class Application : GLib.Application {
     /***********************************************************
     ***********************************************************/
     public Application (int argc, char **argv) {
-        base (Theme.app_name, argc, argv);
+        base (LibSync.Theme.app_name, argc, argv);
         this.gui = null;
-        this.theme = Theme.instance;
+        this.theme = LibSync.Theme.instance;
         this.help_only = false;
         this.version_only = false;
         this.show_log_window = false;
@@ -187,7 +187,7 @@ public class Application : GLib.Application {
         application_name (this.theme.app_name);
         window_icon (this.theme.application_icon);
 
-        if (!ConfigFile ().exists ()) {
+        if (!LibSync.ConfigFile ().exists ()) {
             // Migrate from version <= 2.4
             application_name (this.theme.app_name_gui);
             // We need to use the deprecated GLib.DesktopServices.storage_location because of its Qt4
@@ -200,7 +200,7 @@ public class Application : GLib.Application {
             //  GLib.T_WARNING_POP
             application_name (this.theme.app_name);
             if (new GLib.FileInfo (old_dir).is_dir ()) {
-                var configuration_directory = ConfigFile ().config_path;
+                var configuration_directory = LibSync.ConfigFile ().config_path;
                 if (configuration_directory.has_suffix ("/")) {
                     // macOS 10.11.x does not like trailing slash for rename/move.
                     configuration_directory.chop (1);
@@ -237,7 +237,7 @@ public class Application : GLib.Application {
             return;
         }
     //  #if defined (WITH_CRASHREPORTER)
-        if (ConfigFile ().crash_reporter ()) {
+        if (LibSync.ConfigFile ().crash_reporter ()) {
             var reporter = CRASHREPORTER_EXECUTABLE;
             this.crash_handler.reset (new CrashReporter.Handler (GLib.Dir.temp_path, true, reporter));
         }
@@ -250,19 +250,19 @@ public class Application : GLib.Application {
             return;
         }
 
-        ConfigFile config;
+        LibSync.ConfigFile config;
         // The timeout is initialized with an environment variable, if not, override with the value from the config
         if (!AbstractNetworkJob.http_timeout) {
             AbstractNetworkJob.http_timeout = config.timeout ();
         }
         // Check vfs plugins
-        if (Theme.show_virtual_files_option && this.best_available_vfs_mode == AbstractVfs.Off) {
+        if (LibSync.Theme.show_virtual_files_option && this.best_available_vfs_mode == Common.AbstractVfs.Off) {
             GLib.warning ("Theme wants to show vfs mode, but no vfs plugins are available.");
         }
-        if (is_vfs_plugin_available (AbstractVfs.WindowsCfApi)) {
+        if (is_vfs_plugin_available (Common.AbstractVfs.WindowsCfApi)) {
             GLib.info ("VFS windows plugin is available");
         }
-        if (is_vfs_plugin_available (AbstractVfs.WithSuffix)) {
+        if (is_vfs_plugin_available (Common.AbstractVfs.WithSuffix)) {
             GLib.info ("VFS suffix plugin is available");
         }
 
@@ -284,8 +284,8 @@ public class Application : GLib.Application {
                     _("Error accessing the configuration file"),
                     _("There was an error while accessing the configuration "
                     "file at %1. Please make sure the file can be accessed by your user.")
-                        .printf (ConfigFile ().config_file ()),
-                    _("Quit %1").printf (Theme.app_name_gui));
+                        .printf (LibSync.ConfigFile ().config_file ()),
+                    _("Quit %1").printf (LibSync.Theme.app_name_gui));
                 GLib.Timeout.add (0, this.on_timeout_quit);
                 return;
             }
@@ -451,7 +451,7 @@ public class Application : GLib.Application {
     console on Windows.
     ***********************************************************/
     public void show_version () {
-        display_help_text (Theme.version_switch_output);
+        display_help_text (LibSync.Theme.version_switch_output);
     }
 
 
@@ -576,7 +576,7 @@ public class Application : GLib.Application {
                 }
             } else if (option == "--logdir") {
                 if (iterator.has_next () && !iterator.peek_next ().has_prefix ("--")) {
-                    this.log_dir = iterator.next ();
+                    this.log_directory = iterator.next ();
                 } else {
                     show_hint ("Log directory not specified");
                 }
@@ -593,7 +593,7 @@ public class Application : GLib.Application {
             } else if (option == "--confdir") {
                 if (iterator.has_next () && !iterator.peek_next ().has_prefix ("--")) {
                     string configuration_directory = iterator.next ();
-                    if (!ConfigFile.configuration_directory (configuration_directory)) {
+                    if (!LibSync.ConfigFile.configuration_directory (configuration_directory)) {
                         show_hint ("Invalid path passed to --confdir");
                     }
                 } else {
@@ -624,7 +624,7 @@ public class Application : GLib.Application {
     protected void setup_translations () {
         GLib.List<string> ui_languages;
         ui_languages = GLib.Locale.system ().ui_languages ();
-        string enforced_locale = Theme.enforced_locale;
+        string enforced_locale = LibSync.Theme.enforced_locale;
         if (!enforced_locale == "") {
             ui_languages.prepend (enforced_locale);
         }
@@ -681,19 +681,18 @@ public class Application : GLib.Application {
     ***********************************************************/
     protected void setup_logging () {
         // might be called from second instance
-        var logger = LibSync.Logger.instance;
-        logger.log_file (this.log_file);
+        LibSync.Logger.log_file = this.log_file;
         if (this.log_file == "") {
-            logger.log_dir (this.log_dir == "" ? ConfigFile ().log_dir () : this.log_dir);
+            LibSync.Logger.log_directory = this.log_directory == "" ? LibSync.ConfigFile ().log_directory () : this.log_directory;
         }
-        logger.log_expire (this.log_expire > 0 ? this.log_expire : ConfigFile ().log_expire ());
-        logger.log_flush (this.log_flush || ConfigFile ().log_flush ());
-        logger.log_debug (this.log_debug || ConfigFile ().log_debug ());
-        if (!logger.is_logging_to_file () && ConfigFile ().automatic_log_dir ()) {
-            logger.setup_temporary_folder_log_dir ();
+        LibSync.Logger.log_expire = this.log_expire > 0 ? this.log_expire : LibSync.ConfigFile ().log_expire ();
+        LibSync.Logger.log_flush = this.log_flush || LibSync.ConfigFile ().log_flush ();
+        LibSync.Logger.log_debug = this.log_debug || LibSync.ConfigFile ().log_debug ();
+        if (!LibSync.Logger.is_logging_to_file && LibSync.ConfigFile ().automatic_log_dir ()) {
+            LibSync.Logger.setup_temporary_folder_log_dir ();
         }
 
-        logger.on_signal_enter_next_log_file ();
+        LibSync.Logger.on_signal_enter_next_log_file ();
 
         GLib.info ("##################"
             this.theme.app_name
@@ -881,11 +880,11 @@ public class Application : GLib.Application {
         AccountManager.backward_migration_settings_keys (delete_keys, ignore_keys);
         FolderManager.backward_migration_settings_keys (delete_keys, ignore_keys);
 
-        ConfigFile config_file;
+        LibSync.ConfigFile config_file;
 
         // Did the client version change?
         // (The client version is adjusted further down)
-        bool version_changed = ConfigFile.client_version_string != Common.NextcloudVersion.MIRALL_VERSION_STRING;
+        bool version_changed = LibSync.ConfigFile.client_version_string != Common.NextcloudVersion.MIRALL_VERSION_STRING;
 
         // We want to message the user either for destructive changes,
         // or if we're ignoring something and the client version changed.
@@ -894,7 +893,7 @@ public class Application : GLib.Application {
         if (!version_changed && !warning_message) {
             return true;
         }
-        var backup_file = ConfigFile.create_backup ();
+        var backup_file = LibSync.ConfigFile.create_backup ();
 
         if (warning_message) {
             string bold_message;
@@ -923,7 +922,7 @@ public class Application : GLib.Application {
                 return false;
             }
 
-            var settings = ConfigFile.settings_with_group ("foo");
+            var settings = LibSync.ConfigFile.settings_with_group ("foo");
             settings.end_group ();
 
             // Wipe confusing keys from the future, ignore the others
@@ -931,7 +930,7 @@ public class Application : GLib.Application {
                 settings.remove (bad_key);
         }
 
-        ConfigFile.client_version_string (MIRALL_VERSION_STRING);
+        LibSync.ConfigFile.client_version_string (MIRALL_VERSION_STRING);
         return true;
     }
 

@@ -69,7 +69,7 @@ public class TestSelectiveSyncBug : AbstractTestSyncEngine {
         var expected_server_state = fake_folder.current_remote_state ();
 
         // Remove sub_folder_a with selective_sync:
-        fake_folder.sync_engine.journal.set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, {"parent_folder/sub_folder_a/"});
+        fake_folder.sync_engine.journal.set_selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, {"parent_folder/sub_folder_a/"});
         fake_folder.sync_engine.journal.schedule_path_for_remote_discovery ("parent_folder/sub_folder_a/");
         GLib.assert_true (get_etag ("parent_folder") == "this.invalid_");
         GLib.assert_true (get_etag ("parent_folder/sub_folder_a") == "this.invalid_");

@@ -115,7 +115,7 @@ public class ShareDialog : Gtk.Dialog {
             this.instance.label_share_path.on_signal_text (_("FolderConnection : %2").printf (oc_dir));
         }
 
-        this.window_title (_("%1 Sharing").printf (Theme.app_name_gui));
+        this.window_title (_("%1 Sharing").printf (LibSync.Theme.app_name_gui));
 
         if (!account_state.account.capabilities.share_api ()) {
             return;
@@ -177,7 +177,7 @@ public class ShareDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private override void on_signal_done (int r) {
-        ConfigFile config;
+        LibSync.ConfigFile config;
         config.save_geometry (this);
         Gtk.Dialog.on_signal_done (r);
     }
@@ -236,7 +236,7 @@ public class ShareDialog : Gtk.Dialog {
     ***********************************************************/
     private void on_signal_account_state_changed (AccountState account_state, AccountState.State state) {
         bool enabled = (state == AccountState.State.CONNECTED);
-        GLib.debug ("Account connected? " + enabled.to_string ());
+        GLib.debug ("LibSync.Account connected? " + enabled.to_string ());
 
         if (this.user_group_widget != null) {
             this.user_group_widget.enabled (enabled);
@@ -400,7 +400,7 @@ public class ShareDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void show_sharing_ui () {
-        var theme = Theme.instance;
+        var theme = LibSync.Theme.instance;
 
         // There's no difference between being unable to reshare and
         // being unable to reshare with reshare permission.
@@ -417,7 +417,7 @@ public class ShareDialog : Gtk.Dialog {
         // We only do user/group sharing from 8.2.0
         bool user_group_sharing =
             theme.user_group_sharing
-            && this.account_state.account.server_version_int >= Account.make_server_version (8, 2, 0);
+            && this.account_state.account.server_version_int >= LibSync.Account.make_server_version (8, 2, 0);
 
         if (user_group_sharing) {
             this.user_group_widget = new ShareUserGroupWidget (this.account_state.account, this.share_path, this.local_path, this.max_sharing_permissions, this.private_link_url, this);

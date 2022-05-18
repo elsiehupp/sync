@@ -13,7 +13,7 @@ public class TestCreateSvgPixmapWithCustomColor : AbstractTestIconUtils {
     /***********************************************************
     ***********************************************************/
     private TestCreateSvgPixmapWithCustomColor () {
-        GLib.Dir black_svg_dir = new GLib.Dir (Theme.THEME_PREFIX + "black");
+        GLib.Dir black_svg_dir = new GLib.Dir (LibSync.Theme.THEME_PREFIX + "black");
         GLib.List<string> black_images = black_svg_dir.entry_list ("*.svg");
 
         GLib.assert_true (!black_images == "");
@@ -22,7 +22,7 @@ public class TestCreateSvgPixmapWithCustomColor : AbstractTestIconUtils {
 
         GLib.assert_true (!IconUtils.create_svg_image_with_custom_color (black_images.at (0), GLib.ColorConstants.Svg.green) == null);
 
-        GLib.Dir white_svg_dir = new GLib.Dir (Theme.THEME_PREFIX + "white");
+        GLib.Dir white_svg_dir = new GLib.Dir (LibSync.Theme.THEME_PREFIX + "white");
         GLib.List<string> white_images = white_svg_dir.entry_list ("*.svg");
 
         GLib.assert_true (!white_images == "");

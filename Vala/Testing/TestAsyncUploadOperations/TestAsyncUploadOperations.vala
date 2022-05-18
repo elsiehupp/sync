@@ -32,7 +32,7 @@ public class AbstractTestAsyncOp : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.VariantMap ( { "chunking", "1.0" } ) } });
         // Reduce max chunk size a bit so we get more chunks
-        SyncOptions options;
+        LibSync.SyncOptions options;
         options.max_chunk_size = 20 * 1000;
         fake_folder.sync_engine.set_sync_options (options);
         int n_get = 0;

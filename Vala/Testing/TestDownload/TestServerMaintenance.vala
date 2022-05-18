@@ -21,11 +21,11 @@ public class TestServerMaintenance : GLib.Object {
 
         GLib.SignalSpy complete_spy = new GLib.SignalSpy (
             fake_folder.sync_engine,
-            SyncEngine.signal_item_completed
+            LibSync.SyncEngine.signal_item_completed
         );
         GLib.assert_true (!fake_folder.sync_once ()); // Fail because A/broken
         // FatalError means the sync was aborted, which is what we want
-        GLib.assert_true (get_item (complete_spy, "A/broken").status == SyncFileItem.Status.FATAL_ERROR);
+        GLib.assert_true (get_item (complete_spy, "A/broken").status == LibSync.SyncFileItem.Status.FATAL_ERROR);
         GLib.assert_true (get_item (complete_spy, "A/broken").error_string.contains ("System in maintenance mode"));
     }
 

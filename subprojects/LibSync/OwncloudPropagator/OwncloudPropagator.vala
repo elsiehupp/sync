@@ -22,7 +22,7 @@ public class OwncloudPropagator : GLib.Object {
     /***********************************************************
     const?
     ***********************************************************/
-    public SyncJournalDb journal { public get; construct; }
+    public Common.SyncJournalDb journal { public get; construct; }
 
     /***********************************************************
     Used to ensure that on_signal_finished is only emitted once
@@ -148,7 +148,7 @@ public class OwncloudPropagator : GLib.Object {
         Account account,
         string local_directory,
         string remote_folder,
-        SyncJournalDb progress_database,
+        Common.SyncJournalDb progress_database,
         GLib.List<string> bulk_upload_block_list) {
         this.journal = progress_database;
         this.finished_emited = false;
@@ -710,10 +710,10 @@ public class OwncloudPropagator : GLib.Object {
     Typically after a sync operation succeeded. Updates the inode from
     the filesystem.
 
-    Will also trigger a AbstractVfs.convert_to_placeholder.
+    Will also trigger a Common.AbstractVfs.convert_to_placeholder.
     ***********************************************************/
-    public Result<AbstractVfs.ConvertToPlaceholderResult, string> update_metadata (SyncFileItem item);
-    Result<AbstractVfs.ConvertToPlaceholderResult, string> OwncloudPropagator.update_metadata (SyncFileItem item) {
+    public Result<Common.AbstractVfs.ConvertToPlaceholderResult, string> update_metadata (SyncFileItem item);
+    Result<Common.AbstractVfs.ConvertToPlaceholderResult, string> OwncloudPropagator.update_metadata (SyncFileItem item) {
         return OwncloudPropagator.static_update_metadata (item, this.local_directory, sync_options.vfs, this.journal);
     }
 
@@ -724,25 +724,25 @@ public class OwncloudPropagator : GLib.Object {
     Typically after a sync operation succeeded. Updates the inode from
     the filesystem.
 
-    Will also trigger a AbstractVfs.convert_to_placeholder.
+    Will also trigger a Common.AbstractVfs.convert_to_placeholder.
     ***********************************************************/
-    public static Result<AbstractVfs.ConvertToPlaceholderResult, string> static_update_metadata (
+    public static Result<Common.AbstractVfs.ConvertToPlaceholderResult, string> static_update_metadata (
         SyncFileItem item, string local_directory,
-        AbstractVfs vfs, SyncJournalDb journal
+        Common.AbstractVfs vfs, Common.SyncJournalDb journal
     ) {
         string fs_path = local_directory + item.destination ();
         var result = vfs.convert_to_placeholder (fs_path, item);
         if (!result) {
             return result.error;
-        } else if (result == AbstractVfs.ConvertToPlaceholderResult.Locked) {
-            return AbstractVfs.ConvertToPlaceholderResult.Locked;
+        } else if (result == Common.AbstractVfs.ConvertToPlaceholderResult.Locked) {
+            return Common.AbstractVfs.ConvertToPlaceholderResult.Locked;
         }
         var record = item.to_sync_journal_file_record_with_inode (fs_path);
         var d_bresult = journal.file_record (record);
         if (!d_bresult) {
             return d_bresult.error;
         }
-        return AbstractVfs.ConvertToPlaceholderResult.Ok;
+        return Common.AbstractVfs.ConvertToPlaceholderResult.Ok;
     }
 
 
@@ -993,7 +993,7 @@ public class OwncloudPropagator : GLib.Object {
 
     May adjust the status or item.error_string.
     ***********************************************************/
-    private static void blocklist_update (SyncJournalDb journal, SyncFileItem item) {
+    private static void blocklist_update (Common.SyncJournalDb journal, SyncFileItem item) {
         SyncJournalErrorBlocklistRecord old_entry = journal.error_blocklist_entry (item.file);
 
         bool may_blocklist =

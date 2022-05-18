@@ -87,7 +87,7 @@ public class SocketApi : GLib.Object {
             // TODO: once the windows extension supports multiple
             // client connections, switch back to the theme name
             // See issue #2388
-            // + Theme.app_name;
+            // + LibSync.Theme.app_name;
         } else if (Utility.is_mac ()) {
             // This must match the code signing Team setting of the extension
             // Example for developer builds (with ad-hoc signing identity): "" "com.owncloud.desktopclient" ".socket_api"
@@ -96,7 +96,7 @@ public class SocketApi : GLib.Object {
         } else if (Utility.is_linux () || Utility.is_bsd ()) {
             string runtime_dir;
             runtime_dir = GLib.StandardPaths.writable_location (GLib.StandardPaths.Runtime_location);
-            socket_path = runtime_dir + "/" + Theme.app_name + "/socket";
+            socket_path = runtime_dir + "/" + LibSync.Theme.app_name + "/socket";
         } else {
             GLib.warning ("An unexpected system detected, so this probably won't work.");
         }
@@ -442,7 +442,7 @@ public class SocketApi : GLib.Object {
     through the event loop and never directly.
     ***********************************************************/
     private static void fetch_private_link_url (
-        unowned Account account,
+        LibSync.Account account,
         string remote_path,
         string numeric_file_id,
         GLib.Object target,
@@ -600,7 +600,7 @@ public class SocketApi : GLib.Object {
     Opens share dialog, sends reply
     ***********************************************************/
     private void process_share_request (string local_file, SocketListener listener, ShareDialogStartPage start_page) {
-        var theme = Theme.instance;
+        var theme = LibSync.Theme.instance;
 
         var file_data = FileData.file_data (local_file);
         var share_folder = file_data.folder_connection;
@@ -612,7 +612,7 @@ public class SocketApi : GLib.Object {
             string message = "SHARE:NOTCONNECTED:" + GLib.Dir.to_native_separators (local_file);
             // if the folder_connection isn't connected, don't open the share dialog
             listener.on_signal_send_message (message);
-        } else if (!theme.link_sharing && (!theme.user_group_sharing || share_folder.account_state.account.server_version_int < Account.make_server_version (8, 2, 0))) {
+        } else if (!theme.link_sharing && (!theme.user_group_sharing || share_folder.account_state.account.server_version_int < LibSync.Account.make_server_version (8, 2, 0))) {
             string message = "SHARE:NOP:" + GLib.Dir.to_native_separators (local_file);
             listener.on_signal_send_message (message);
         } else {
@@ -691,8 +691,8 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void command_SHARE_MENU_TITLE (string argument, SocketListener listener) {
-        //  listener.on_signal_send_message ("SHARE_MENU_TITLE: " + _("Share with %1", "parameter is Nextcloud").printf (Theme.app_name_gui));
-        listener.on_signal_send_message ("SHARE_MENU_TITLE:"  + Theme.app_name_gui);
+        //  listener.on_signal_send_message ("SHARE_MENU_TITLE: " + _("Share with %1", "parameter is Nextcloud").printf (LibSync.Theme.app_name_gui));
+        listener.on_signal_send_message ("SHARE_MENU_TITLE:"  + LibSync.Theme.app_name_gui);
     }
 
 
@@ -731,7 +731,7 @@ public class SocketApi : GLib.Object {
             return;
         }
 
-        unowned Account account = file_data.folder_connection.account_state.account;
+        LibSync.Account account = file_data.folder_connection.account_state.account;
         var get_or_create_public_link_share_job = new GetOrCreatePublicLinkShare (account, file_data.server_relative_path, this);
         get_or_create_public_link_share_job.signal_finished.connect (
             this.on_signal_get_or_create_public_link_share_finished
@@ -886,8 +886,8 @@ public class SocketApi : GLib.Object {
         // If the parent doesn't accept new files, go to the root of the sync folder_connection
         GLib.FileInfo file_info = new GLib.FileInfo (local_file);
         var parent_record = parent_dir.journal_record ();
-        if ((file_info.is_file () && !parent_record.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_ADD_FILE))
-            || (file_info.is_dir () && !parent_record.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_ADD_SUB_DIRECTORIES))) {
+        if ((file_info.is_file () && !parent_record.remote_permissions.has_permission (Common.RemotePermissions.Permissions.CAN_ADD_FILE))
+            || (file_info.is_dir () && !parent_record.remote_permissions.has_permission (Common.RemotePermissions.Permissions.CAN_ADD_SUB_DIRECTORIES))) {
             default_dir_and_name = new GLib.FileInfo (default_dir_and_name).filename ();
         }
 
@@ -991,7 +991,7 @@ public class SocketApi : GLib.Object {
                 "FILE_ACTIVITY_MENU_TITLE", _("Activity")
             },
             {
-                "CONTEXT_MENU_TITLE", Theme.app_name_gui
+                "CONTEXT_MENU_TITLE", LibSync.Theme.app_name_gui
             },
             {
                 "COPY_PRIVATE_LINK_MENU_TITLE", _("Copy private link to clipboard")
@@ -1022,13 +1022,13 @@ public class SocketApi : GLib.Object {
         var flag_string = is_on_signal_the_server && enabled ? "." : ":d:";
 
         var capabilities = file_data.folder_connection.account_state.account.capabilities;
-        var theme = Theme.instance;
+        var theme = LibSync.Theme.instance;
         if (!capabilities.share_api () || ! (theme.user_group_sharing || (theme.link_sharing && capabilities.share_public_link ())))
             return;
 
         // If sharing is globally disabled, do not show any sharing entries.
         // If there is no permission to share for this file, add a disabled entry saying so
-        if (is_on_signal_the_server && !record.remote_permissions == null && !record.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_RESHARE)) {
+        if (is_on_signal_the_server && !record.remote_permissions == null && !record.remote_permissions.has_permission (Common.RemotePermissions.Permissions.CAN_RESHARE)) {
             listener.on_signal_send_message ("MENU_ITEM:DISABLED:d:" + (!record.is_directory () ? _("Resharing this file is not allowed") : _("Resharing this folder_connection is not allowed")));
         } else {
             listener.on_signal_send_message ("MENU_ITEM:SHARE" + flag_string + _("Share options"));
@@ -1121,13 +1121,13 @@ public class SocketApi : GLib.Object {
                 var parent_record = parent_dir.journal_record ();
                 bool can_add_to_dir =
                     !parent_record.is_valid // We're likely at the root of the sync folder_connection, got to assume we can add there
-                    || (file_info.is_file () && parent_record.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_ADD_FILE))
-                    || (file_info.is_dir () && parent_record.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_ADD_SUB_DIRECTORIES));
+                    || (file_info.is_file () && parent_record.remote_permissions.has_permission (Common.RemotePermissions.Permissions.CAN_ADD_FILE))
+                    || (file_info.is_dir () && parent_record.remote_permissions.has_permission (Common.RemotePermissions.Permissions.CAN_ADD_SUB_DIRECTORIES));
                 bool can_change_file =
                     !is_on_signal_the_server
-                    || (record.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_DELETE)
-                        && record.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_MOVE)
-                        && record.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_RENAME));
+                    || (record.remote_permissions.has_permission (Common.RemotePermissions.Permissions.CAN_DELETE)
+                        && record.remote_permissions.has_permission (Common.RemotePermissions.Permissions.CAN_MOVE)
+                        && record.remote_permissions.has_permission (Common.RemotePermissions.Permissions.CAN_RENAME));
 
                 if (is_conflict && can_change_file) {
                     if (can_add_to_dir) {
@@ -1164,10 +1164,10 @@ public class SocketApi : GLib.Object {
                 var file_data = FileData.file_data (file);
                 var availability = sync_folder.vfs.availability (file_data.folder_relative_path);
                 if (!availability) {
-                    if (availability.error == AbstractVfs.AvailabilityError.DATABASE_ERROR) {
+                    if (availability.error == Common.AbstractVfs.AvailabilityError.DATABASE_ERROR) {
                         availability = Common.ItemAvailability.MIXED;
                     }
-                    if (availability.error == AbstractVfs.AvailabilityError.NO_SUCH_ITEM) {
+                    if (availability.error == Common.AbstractVfs.AvailabilityError.NO_SUCH_ITEM) {
                         continue;
                     }
                 }
@@ -1228,7 +1228,7 @@ public class SocketApi : GLib.Object {
         listener.on_signal_send_message (
             "MENU_ITEM:CURRENT_PIN:d:"
             + Common.ItemAvailability.to_string (combined));
-        if (!Theme.enforce_virtual_files_sync_folder) {
+        if (!LibSync.Theme.enforce_virtual_files_sync_folder) {
             listener.on_signal_send_message (
                 "MENU_ITEM:MAKE_AVAILABLE_LOCALLY:"
                 + (make_available_locally ? ":" : "d:")

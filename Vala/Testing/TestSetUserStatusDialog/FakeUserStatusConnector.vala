@@ -11,8 +11,8 @@ public class FakeUserStatusConnector : AbstractUserStatusConnector {
 
     /***********************************************************
     ***********************************************************/
-    private UserStatus user_status_set_by_caller_of_set_user_status;
-    public UserStatus user_status {
+    private LibSync.UserStatus user_status_set_by_caller_of_set_user_status;
+    public LibSync.UserStatus user_status {
         // get Not implemented
         public set {
             signal_error (Error.COULD_NOT_SET_USER_STATUS);
@@ -22,7 +22,7 @@ public class FakeUserStatusConnector : AbstractUserStatusConnector {
         this.user_status_set_by_caller_of_set_user_status = value;
         signal_user_status_set ();}
     }
-    private GLib.List<UserStatus> predefined_statuses;
+    private GLib.List<LibSync.UserStatus> predefined_statuses;
     private bool is_message_cleared = false;
     private bool could_not_fetch_predefined_user_statuses = false;
     private bool could_not_fetch_user_status = false;

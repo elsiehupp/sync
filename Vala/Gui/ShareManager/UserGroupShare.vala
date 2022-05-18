@@ -56,7 +56,7 @@ public class UserGroupShare : Share {
     /***********************************************************
     ***********************************************************/
     public UserGroupShare (
-        Account account,
+        LibSync.Account account,
         string identifier,
         string owner,
         string owner_display_name,

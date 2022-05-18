@@ -120,7 +120,7 @@ public class LinkShare : Share {
     /***********************************************************
     ***********************************************************/
     public LinkShare (
-        Account account,
+        LibSync.Account account,
         string identifier,
         string owner_uid,
         string owner_display_name,

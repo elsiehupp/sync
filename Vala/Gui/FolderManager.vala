@@ -233,7 +233,7 @@ public class FolderManager : GLib.Object {
 
         this.socket_api = new SocketApi ();
 
-        ConfigFile config;
+        LibSync.ConfigFile config;
         // std.chrono.milliseconds polltime_in_microseconds
         GLib.TimeSpan polltime_in_microseconds = config.remote_poll_interval ();
         GLib.info ("setting remote poll timer interval to " + polltime_in_microseconds.length + "msec");
@@ -288,7 +288,7 @@ public class FolderManager : GLib.Object {
         GLib.List<string> skip_settings_keys;
         backward_migration_settings_keys (skip_settings_keys, skip_settings_keys);
 
-        var settings = ConfigFile.settings_with_group ("Accounts");
+        var settings = LibSync.ConfigFile.settings_with_group ("Accounts");
         var accounts_with_settings = settings.child_groups ();
         if (accounts_with_settings == "") {
             int r = setup_folders_migration ();
@@ -345,7 +345,7 @@ public class FolderManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public int setup_folders_migration () {
-        ConfigFile config;
+        LibSync.ConfigFile config;
         GLib.Dir storage_dir = new GLib.Dir (config.config_path);
         this.folder_config_path = config.config_path + "folders";
 
@@ -378,7 +378,7 @@ public class FolderManager : GLib.Object {
     from future versions.
     ***********************************************************/
     public static void backward_migration_settings_keys (GLib.List<string> delete_keys, GLib.List<string> ignore_keys) {
-        var settings = ConfigFile.settings_with_group ("Accounts");
+        var settings = LibSync.ConfigFile.settings_with_group ("Accounts");
 
         foreach (var account_id in settings.child_groups ()) {
             settings.begin_group (account_id);
@@ -524,7 +524,7 @@ public class FolderManager : GLib.Object {
     incoming relative server path. The method checks with all existing sync
     folders.
     ***********************************************************/
-    public GLib.List<string> find_file_in_local_folders (string rel_path, unowned Account acc) {
+    public GLib.List<string> find_file_in_local_folders (string rel_path, LibSync.Account acc) {
         GLib.List<string> re;
 
         // We'll be comparing against FolderConnection.remote_path which always starts with /
@@ -585,13 +585,13 @@ public class FolderManager : GLib.Object {
         // file and try again.
         GLib.FileInfo config_file = new GLib.FileInfo (this.folder_config_path, file);
 
-        if (!ConfigFile.exists) {
+        if (!LibSync.ConfigFile.exists) {
             // try the escaped variant.
             escaped_alias = escape_alias (file);
-            ConfigFile.file (this.folder_config_path, escaped_alias);
+            LibSync.ConfigFile.file (this.folder_config_path, escaped_alias);
         }
-        if (!ConfigFile.is_readable ()) {
-            GLib.warning ("Cannot read folder_connection definition for alias " + ConfigFile.file_path);
+        if (!LibSync.ConfigFile.is_readable ()) {
+            GLib.warning ("Cannot read folder_connection definition for alias " + LibSync.ConfigFile.file_path);
             return folder_connection;
         }
 
@@ -642,7 +642,7 @@ public class FolderManager : GLib.Object {
             GLib.List<string> block_list = settings.get_value ("block_list").to_string_list ();
             if (!block_list.empty ()) {
                 // migrate settings
-                folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
+                folder_connection.journal_database.selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
                 settings.remove ("block_list");
                 // FIXME: If you remove this codepath, you need to provide another way to do
                 // this via theme.h or the normal FolderManager.set_up_folders
@@ -920,7 +920,7 @@ public class FolderManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private bool push_notifications_files_ready (Account account) {
+    private bool push_notifications_files_ready (LibSync.Account account) {
         var push_notifications = account.push_notifications ();
         var push_files_available = account.capabilities.available_push_notifications () & PushNotificationType.FILES;
 
@@ -1198,7 +1198,7 @@ public class FolderManager : GLib.Object {
         string account_name = account_state.account.display_name;
 
         if (account_state.is_connected) {
-            GLib.info ("Account " + account_name + " connected, scheduling its folders.");
+            GLib.info ("LibSync.Account " + account_name + " connected, scheduling its folders.");
 
             foreach (FolderConnection folder_connection in this.folder_map.values ()) {
                 if (folder_connection
@@ -1208,7 +1208,7 @@ public class FolderManager : GLib.Object {
                 }
             }
         } else {
-            GLib.info ("Account " + account_name
+            GLib.info ("LibSync.Account " + account_name
                 + " disconnected or paused, terminating or descheduling sync folders.");
 
             foreach (FolderConnection folder_connection in this.folder_map.values ()) {
@@ -1538,7 +1538,7 @@ public class FolderManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_server_version_changed (Account account) {
+    private void on_signal_server_version_changed (LibSync.Account account) {
         // Pause folders if the server version is unsupported
         if (account.server_version_unsupported) {
             GLib.warning (
@@ -1587,7 +1587,7 @@ public class FolderManager : GLib.Object {
             var msecs_since_sync = folder_connection.microseconds_since_last_sync ();
 
             // Possibly it's just time for a new sync run
-            bool force_sync_interval_expired = msecs_since_sync > ConfigFile ().force_sync_interval ();
+            bool force_sync_interval_expired = msecs_since_sync > LibSync.ConfigFile ().force_sync_interval ();
             if (force_sync_interval_expired) {
                 GLib.info (
                     "Scheduling folder_connection " + folder_connection.alias ()
@@ -1628,7 +1628,7 @@ public class FolderManager : GLib.Object {
     ***********************************************************/
     private void on_signal_setup_push_notifications (FolderConnection.Map folder_map) {
         foreach (FolderConnection folder_connection in folder_map) {
-            Account account = folder_connection.account_state.account;
+            LibSync.Account account = folder_connection.account_state.account;
 
             // See if the account already provides the PushNotificationManager object and if yes connect to it.
             // If we can't connect at this point, the signals will be connected in on_signal_push_notifications_ready ()
@@ -1643,7 +1643,7 @@ public class FolderManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_process_files_push_notification (Account account) {
+    private void on_signal_process_files_push_notification (LibSync.Account account) {
         GLib.info ("Got files push notification for account " + account.to_string ());
 
         foreach (FolderConnection folder_connection in this.folder_map) {
@@ -1660,7 +1660,7 @@ public class FolderManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_connect_to_push_notifications (Account account) {
+    private void on_signal_connect_to_push_notifications (LibSync.Account account) {
         PushNotificationManager push_notifications = account.push_notifications ();
 
         if (push_notifications_files_ready (account)) {
@@ -1677,7 +1677,7 @@ public class FolderManager : GLib.Object {
     does not set an account on the new folder_connection.
     ***********************************************************/
     private FolderConnection add_folder_internal (FolderDefinition folder_definition,
-        AccountState account_state, AbstractVfs vfs) {
+        AccountState account_state, Common.AbstractVfs vfs) {
         var alias = folder_definition.alias;
         int count = 0;
         while (folder_definition.alias == ""
@@ -1908,7 +1908,7 @@ public class FolderManager : GLib.Object {
                     }
 
                     var vfs = create_vfs_from_plugin (folder_definition.virtual_files_mode);
-                    if (!vfs && folder_definition.virtual_files_mode != AbstractVfs.Off) {
+                    if (!vfs && folder_definition.virtual_files_mode != Common.AbstractVfs.Off) {
                         GLib.warning ("Could not load plugin for mode " + folder_definition.virtual_files_mode);
                     }
 
@@ -1930,7 +1930,7 @@ public class FolderManager : GLib.Object {
 
                 // Migration : If an old database is found, move it to the new name.
                 if (backwards_compatible) {
-                    SyncJournalDb.maybe_migrate_database (folder_definition.local_path, folder_definition.absolute_journal_path);
+                    Common.SyncJournalDb.maybe_migrate_database (folder_definition.local_path, folder_definition.absolute_journal_path);
                 }
 
                 var switch_to_vfs = is_switch_to_vfs_needed (folder_definition);
@@ -1979,8 +1979,8 @@ public class FolderManager : GLib.Object {
         var result = false;
         if (ENFORCE_VIRTUAL_FILES_SYNC_FOLDER &&
             folder_definition.virtual_files_mode != this.best_available_vfs_mode &&
-            folder_definition.virtual_files_mode == AbstractVfs.Off &&
-            Theme.show_virtual_files_option
+            folder_definition.virtual_files_mode == Common.AbstractVfs.Off &&
+            LibSync.Theme.show_virtual_files_option
         ) {
             result = true;
         }
@@ -2001,7 +2001,7 @@ public class FolderManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void run_etag_job_if_possible (FolderConnection folder_connection) {
-        ConfigFile config = new ConfigFile ();
+        LibSync.ConfigFile config = new LibSync.ConfigFile ();
         var polltime_in_microseconds = config.remote_poll_interval ();
 
         GLib.info ("Run etag job on folder_connection " + folder_connection.to_string ());

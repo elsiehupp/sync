@@ -17,7 +17,7 @@ public class TestRemoteWipe : GLib.Object {
     // TODO
     private TestRemoteWipe () {
 //        GLib.TemporaryDir directory;
-//        ConfigFile.set_configuration_directory (directory.path); // we don't want to pollute the user's config file
+//        LibSync.ConfigFile.set_configuration_directory (directory.path); // we don't want to pollute the user's config file
 //        GLib.assert_true (directory.is_valid);
 
 //        GLib.Dir dir_to_remove = new GLib.Dir (directory.path);
@@ -25,7 +25,7 @@ public class TestRemoteWipe : GLib.Object {
 
 //        string directory_path = dir_to_remove.canonical_path;
 
-//        unowned Account account = Account.create ();
+//        LibSync.Account account = LibSync.Account.create ();
 //        GLib.assert_true (account);
 
 //        var manager = AccountManager.instance;

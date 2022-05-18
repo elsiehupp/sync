@@ -43,14 +43,14 @@ public class TestWipeVirtualSuffixFiles : AbstractTestSyncVirtualFiles {
 
         // Now wipe the virtuals
 
-        SyncEngine.wipe_virtual_files (fake_folder.local_path, fake_folder.sync_journal (), fake_folder.sync_engine.sync_options ().vfs);
+        LibSync.SyncEngine.wipe_virtual_files (fake_folder.local_path, fake_folder.sync_journal (), fake_folder.sync_engine.sync_options ().vfs);
 
         GLib.assert_true (!fake_folder.current_local_state ().find ("f1" + DVSUFFIX));
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/a1" + DVSUFFIX));
         GLib.assert_true (fake_folder.current_local_state ().find ("A/a3" + DVSUFFIX));
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/B/b1" + DVSUFFIX));
 
-        fake_folder.switch_to_vfs ((AbstractVfs)(new VfsOff ()));
+        fake_folder.switch_to_vfs ((Common.AbstractVfs)(new VfsOff ()));
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a3" + DVSUFFIX)); // regular upload
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());

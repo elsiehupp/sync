@@ -52,7 +52,7 @@ public class SslButton : Gtk.ToolButton {
         }
         this.account_state = account_state;
 
-        unowned Account account = this.account_state.account;
+        LibSync.Account account = this.account_state.account;
         if (account.url.scheme () == "https") {
             icon (Gtk.IconInfo (":/client/theme/lock-https.svg"));
             GLib.SslCipher cipher = account.session_cipher;
@@ -73,7 +73,7 @@ public class SslButton : Gtk.ToolButton {
             return;
         }
 
-        unowned Account account = this.account_state.account;
+        LibSync.Account account = this.account_state.account;
 
         this.menu.add_action (_("Server version : %1").printf (account.server_version ())).enabled (false);
 

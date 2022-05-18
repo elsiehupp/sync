@@ -63,14 +63,14 @@ public class WizardCommon : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static string title_template () {
-        return " (<font color=\"%1\" size=\"5\">)".printf (Theme.wizard_header_title_color.name ()) + "%1</font>";
+        return " (<font color=\"%1\" size=\"5\">)".printf (LibSync.Theme.wizard_header_title_color.name ()) + "%1</font>";
     }
 
 
     /***********************************************************
     ***********************************************************/
     public static string sub_title_template () {
-        return "<font color=\"%1\">".printf (Theme.wizard_header_title_color.name ()) + "%1</font>";
+        return "<font color=\"%1\">".printf (LibSync.Theme.wizard_header_title_color.name ()) + "%1</font>";
     }
 
 

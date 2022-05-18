@@ -63,28 +63,28 @@ public class VfsOff : AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
-    public override Result<void, string> create_placeholder (SyncFileItem sync_file_item) {
+    public override Result<void, string> create_placeholder (LibSync.SyncFileItem sync_file_item) {
         return null;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public override Result<void, string> dehydrate_placeholder (SyncFileItem sync_file_item) {
+    public override Result<void, string> dehydrate_placeholder (LibSync.SyncFileItem sync_file_item) {
         return null;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public override Result<ConvertToPlaceholderResult, string> convert_to_placeholder (string string_value_1, SyncFileItem sync_file_item, string string_value_2) {
+    public override Result<ConvertToPlaceholderResult, string> convert_to_placeholder (string string_value_1, LibSync.SyncFileItem sync_file_item, string string_value_2) {
         return ConvertToPlaceholderResult.Ok;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public override bool needs_metadata_update (SyncFileItem sync_file_item) {
+    public override bool needs_metadata_update (LibSync.SyncFileItem sync_file_item) {
         return false;
     }
 

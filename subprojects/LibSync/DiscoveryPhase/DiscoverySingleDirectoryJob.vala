@@ -59,13 +59,13 @@ public class DiscoverySingleDirectoryJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private public string data_fingerprint;
+    private string data_fingerprint;
 
 
     /***********************************************************
     This is not actually a network job, it is just a job
     ***********************************************************/
-    internal signal void first_directory_permissions (RemotePermissions);
+    internal signal void first_directory_permissions (Common.RemotePermissions);
     internal signal void etag (string , GLib.DateTime time);
     internal signal void signal_finished (Result<T, HttpError><GLib.List<RemoteInfo>> result);
 

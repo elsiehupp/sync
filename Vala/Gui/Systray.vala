@@ -162,7 +162,7 @@ public class Systray : GLib.SystemTrayIcon {
         var pause_action = context_menu.add_action (_("Pause sync"), this, Systray.on_signal_pause_all_folders);
         var resume_action = context_menu.add_action (_("Resume sync"), this, Systray.on_signal_unpause_all_folders);
         context_menu.add_action (_("Settings"), this, Systray.signal_open_settings);
-        context_menu.add_action (_("Exit %1").printf (Theme.app_name_gui), this, Systray.signal_shutdown);
+        context_menu.add_action (_("Exit %1").printf (LibSync.Theme.app_name_gui), this, Systray.signal_shutdown);
         context_menu (context_menu);
 
         context_menu.about_to_show.connect (
@@ -191,8 +191,8 @@ public class Systray : GLib.SystemTrayIcon {
     }
 
 
-    private Theme on_signal_theme_instance_for_engineon_signal_instance_for_engine (GLib.QmlEngine qml_engine, GLib.JSEngine qjs_engine) {
-        return Theme.instance;
+    private LibSync.Theme on_signal_theme_instance_for_engineon_signal_instance_for_engine (GLib.QmlEngine qml_engine, GLib.JSEngine qjs_engine) {
+        return LibSync.Theme.instance;
     }
 
 
@@ -280,7 +280,7 @@ public class Systray : GLib.SystemTrayIcon {
     /***********************************************************
     ***********************************************************/
     public string window_title () {
-        return Theme.app_name_gui;
+        return LibSync.Theme.app_name_gui;
     }
 
 
@@ -291,7 +291,7 @@ public class Systray : GLib.SystemTrayIcon {
             return true;
         }
 
-        ConfigFile config;
+        LibSync.ConfigFile config;
         return config.show_main_dialog_as_normal_window ();
     }
 
@@ -312,7 +312,7 @@ public class Systray : GLib.SystemTrayIcon {
     /***********************************************************
     ***********************************************************/
     public void tool_tip (string tip) {
-        GLib.SystemTrayIcon.tool_tip (_("%1 : %2").printf (Theme.app_name_gui, tip));
+        GLib.SystemTrayIcon.tool_tip (_("%1 : %2").printf (LibSync.Theme.app_name_gui, tip));
     }
 
 

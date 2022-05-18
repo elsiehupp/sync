@@ -42,7 +42,7 @@ public class TestWipeVirtualSuffixFiles : AbstractTestSyncXAttr {
         fake_folder.local_modifier.insert ("A/a3", 100);
 
         // Now wipe the virtuals
-        SyncEngine.wipe_virtual_files (fake_folder.local_path, fake_folder.sync_journal (), fake_folder.sync_engine.sync_options ().vfs);
+        LibSync.SyncEngine.wipe_virtual_files (fake_folder.local_path, fake_folder.sync_journal (), fake_folder.sync_engine.sync_options ().vfs);
 
         cfverify_gone (fake_folder, "f1");
         cfverify_gone (fake_folder, "A/a1");

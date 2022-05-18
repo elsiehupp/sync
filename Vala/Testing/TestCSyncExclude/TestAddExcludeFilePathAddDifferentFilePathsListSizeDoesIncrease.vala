@@ -13,7 +13,7 @@ public class TestAddExcludeFilePathAddDifferentFilePathsListSizeDoesIncrease : A
     /***********************************************************
     ***********************************************************/
     private TestAddExcludeFilePathAddDifferentFilePathsListSizeDoesIncrease () {
-        excluded_files.reset (new ExcludedFiles ());
+        excluded_files.reset (new CSync.ExcludedFiles ());
 
         var file_path1 = "exclude1/.sync-exclude.lst";
         var file_path2 = "exclude2/.sync-exclude.lst";

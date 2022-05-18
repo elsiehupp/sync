@@ -16,7 +16,7 @@ public class TestIsHidpiHidpiReturnTrue : AbstractTestTheme {
         FakePaintDevice paint_device;
         paint_device.set_hidpi (true);
 
-        GLib.assert_true (Theme.is_hidpi (paint_device) == true);
+        GLib.assert_true (LibSync.Theme.is_hidpi (paint_device) == true);
     }
 
 } // class TestIsHidpiHidpiReturnTrue

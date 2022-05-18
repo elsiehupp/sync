@@ -127,7 +127,7 @@ public class OwncloudSetupWizard : GLib.Object {
         if (!fixed_url.has_prefix ("http://") && !fixed_url.has_prefix ("https://")) {
             url.scheme ("https");
         }
-        unowned Account account = this.oc_wizard.account;
+        LibSync.Account account = this.oc_wizard.account;
         account.url (url);
 
         // Reset the proxy which might had been determined previously in ConnectionValidator.on_signal_check_server_and_auth ()
@@ -135,9 +135,9 @@ public class OwncloudSetupWizard : GLib.Object {
         account.network_access_manager.proxy (Soup.NetworkProxy (Soup.NetworkProxy.NoProxy));
 
         // And also reset the GLib.SslConfiguration, for the same reason (#6832)
-        // Here the client certificate is added, if any. Later it'll be in HttpCredentials
+        // Here the client certificate is added, if any. Later it'll be in LibSync.HttpCredentials
         account.ssl_configuration (GLib.SslConfiguration ());
-        var ssl_configuration = account.or_create_ssl_config (); // let Account set defaults
+        var ssl_configuration = account.or_create_ssl_config (); // let LibSync.Account set defaults
         if (this.oc_wizard.client_ssl_certificate != null) {
             ssl_configuration.local_certificate (this.oc_wizard.client_ssl_certificate);
             ssl_configuration.private_key (this.oc_wizard.client_ssl_key);
@@ -168,7 +168,7 @@ public class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_find_server () {
-        unowned Account account = this.oc_wizard.account;
+        LibSync.Account account = this.oc_wizard.account;
 
         // Set fake credentials before we check what credential it actually is.
         account.credentials (CredentialsFactory.create ("dummy"));
@@ -202,7 +202,7 @@ public class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_find_server_behind_redirect () {
-        unowned Account account = this.oc_wizard.account;
+        LibSync.Account account = this.oc_wizard.account;
 
         // Step 2: Resolve any permanent redirect chains on the base url
         var redirect_check_job = account.send_request ("GET", account.url);
@@ -225,7 +225,7 @@ public class OwncloudSetupWizard : GLib.Object {
     }
 
 
-    private void on_redirect_check_job (int permanent_redirects, unowned Account account, GLib.InputStream reply, GLib.Uri target_url, int count) {
+    private void on_redirect_check_job (int permanent_redirects, LibSync.Account account, GLib.InputStream reply, GLib.Uri target_url, int count) {
         int http_code = reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (count == *permanent_redirects && (http_code == 301 || http_code == 308)) {
             GLib.info (account.url + " was redirected to " + target_url);
@@ -235,7 +235,7 @@ public class OwncloudSetupWizard : GLib.Object {
     }
 
 
-    private void on_redirect_check_job_finished (unowned Account account) {
+    private void on_redirect_check_job_finished (LibSync.Account account) {
         var check_server_job = new CheckServerJob (account, this);
         check_server_job.ignore_credential_failure (true);
         check_server_job.signal_instance_found.connect (
@@ -259,7 +259,7 @@ public class OwncloudSetupWizard : GLib.Object {
 
         this.oc_wizard.on_signal_append_to_configuration_log (_("<font color=\"green\">Successfully connected to %1 : %2 version %3 (%4)</font><br/><br/>")
                                                 .printf (Utility.escape (url.to_string ()),
-                                                    Utility.escape (Theme.app_name_gui),
+                                                    Utility.escape (LibSync.Theme.app_name_gui),
                                                     Utility.escape (CheckServerJob.version_string (info)),
                                                     Utility.escape (server_version)),
                                                 OwncloudWizard.LogType.LOG_HTML);
@@ -289,7 +289,7 @@ public class OwncloudSetupWizard : GLib.Object {
             message = _("Invalid URL");
         } else {
             message = _("Failed to connect to %1 at %2:<br/>%3")
-                      .printf (Utility.escape (Theme.app_name_gui),
+                      .printf (Utility.escape (LibSync.Theme.app_name_gui),
                           Utility.escape (this.oc_wizard.account.url.to_string ()),
                           Utility.escape (check_server_job.error_string));
         }
@@ -309,7 +309,7 @@ public class OwncloudSetupWizard : GLib.Object {
     private void on_signal_no_server_found_timeout (GLib.Uri url) {
         this.oc_wizard.on_signal_display_error (
             _("Timeout while trying to connect to %1 at %2.")
-                .printf (Utility.escape (Theme.app_name_gui), Utility.escape (url.to_string ())),
+                .printf (Utility.escape (LibSync.Theme.app_name_gui), Utility.escape (url.to_string ())),
                     false);
     }
 
@@ -357,7 +357,7 @@ public class OwncloudSetupWizard : GLib.Object {
         this.oc_wizard.field ("OcsUrl", url);
         this.oc_wizard.on_signal_append_to_configuration_log (
             _("Trying to connect to %1 at %2 …")
-                .printf (Theme.app_name_gui)
+                .printf (LibSync.Theme.app_name_gui)
                 .printf (url),
                 OwncloudWizard.LogType.LOG_PLAIN
         );
@@ -548,14 +548,14 @@ public class OwncloudSetupWizard : GLib.Object {
                 }
                 var f = folder_man.add_folder (account, folder_definition);
                 if (f) {
-                    if (folder_definition.virtual_files_mode != AbstractVfs.Off && this.oc_wizard.use_virtual_file_sync ()) {
+                    if (folder_definition.virtual_files_mode != Common.AbstractVfs.Off && this.oc_wizard.use_virtual_file_sync ()) {
                         f.root_pin_state (Common.ItemAvailability.ONLINE_ONLY);
                     }
-                    f.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
+                    f.journal_database.selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
                         this.oc_wizard.selective_sync_blocklist ());
                     if (!this.oc_wizard.is_confirm_big_folder_checked ()) {
                         // The user already accepted the selective sync dialog. everything is in the allow list
-                        f.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
+                        f.journal_database.selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
                             { } + "/");
                     }
                 }
@@ -592,7 +592,7 @@ public class OwncloudSetupWizard : GLib.Object {
         } else {
             GLib.info ("No system proxy set by OS.");
         }
-        unowned Account account = this.oc_wizard.account;
+        LibSync.Account account = this.oc_wizard.account;
         account.network_access_manager.proxy (proxy);
 
         on_signal_find_server ();
@@ -666,15 +666,15 @@ public class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void start_wizard () {
-        unowned Account account = AccountManager.create_account ();
+        LibSync.Account account = AccountManager.create_account ();
         account.credentials (CredentialsFactory.create ("dummy"));
-        account.url (Theme.override_server_url);
+        account.url (LibSync.Theme.override_server_url);
         this.oc_wizard.account = account;
         this.oc_wizard.oc_url = account.url.to_string ();
 
-        this.remote_folder = Theme.default_server_folder;
+        this.remote_folder = LibSync.Theme.default_server_folder;
         // remote_folder may be empty, which means /
-        string local_folder = Theme.default_client_folder;
+        string local_folder = LibSync.Theme.default_client_folder;
 
         // if its a relative path, prepend with users home directory, otherwise use as absolute path
 
@@ -711,7 +711,7 @@ public class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private test_owncloud_connect () {
-        unowned Account account = this.oc_wizard.account;
+        LibSync.Account account = this.oc_wizard.account;
 
         var propfind_job = new PropfindJob (account, "/", this);
         propfind_job.ignore_credential_failure (true);
@@ -776,7 +776,7 @@ public class OwncloudSetupWizard : GLib.Object {
             this.oc_wizard.on_signal_append_to_configuration_log (
                 "<p><font color=\"green\"><b>"
                 + _("Successfully connected to %1!")
-                    .printf (Theme.app_name_gui)
+                    .printf (LibSync.Theme.app_name_gui)
                 + "</b></font></p>",
                 OwncloudWizard.LogType.LOG_HTML);
             this.oc_wizard.on_signal_successful_step ();
@@ -785,7 +785,7 @@ public class OwncloudSetupWizard : GLib.Object {
             this.oc_wizard.on_signal_append_to_configuration_log (
                 "<p><font color=\"red\">"
                 + _("Connection to %1 could not be established. Please check again.")
-                    .printf (Theme.app_name_gui)
+                    .printf (LibSync.Theme.app_name_gui)
                 + "</font></p>",
                 OwncloudWizard.LogType.LOG_HTML);
         }
@@ -818,7 +818,7 @@ public class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private AccountState apply_account_changes () {
-        unowned Account new_account = this.oc_wizard.account;
+        LibSync.Account new_account = this.oc_wizard.account;
 
         // Detach the account that is going to be saved from the
         // wizard to ensure it doesn't accidentally get modified

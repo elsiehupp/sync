@@ -606,7 +606,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
         }
 
         // Apply the remote permissions
-        FileSystem.file_read_only_weak (this.temporary_file.filename (), !this.item.remote_permissions == null && !this.item.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_WRITE));
+        FileSystem.file_read_only_weak (this.temporary_file.filename (), !this.item.remote_permissions == null && !this.item.remote_permissions.has_permission (Common.RemotePermissions.Permissions.CAN_WRITE));
 
         bool is_conflict = this.item.instruction == CSync.SyncInstructions.CONFLICT
             && (GLib.File.new_for_path (filename).query_info ().get_file_type () == FileType.DIRECTORY || !FileSystem.file_equals (filename, this.temporary_file.filename ()));
@@ -624,7 +624,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
         // In the case of an hydration, this size is likely to change for placeholders
         // (except with the cfapi backend)
         var is_virtual_download = this.item.type == ItemType.VIRTUAL_FILE_DOWNLOAD;
-        var is_cf_api_vfs = vfs && vfs.mode () == AbstractVfs.WindowsCfApi;
+        var is_cf_api_vfs = vfs && vfs.mode () == Common.AbstractVfs.WindowsCfApi;
         if (previous_file_exists && (is_cf_api_vfs || !is_virtual_download)) {
             // Check whether the existing file has changed since the discovery
             // phase by comparing size and mtime to the previous values. This
@@ -663,7 +663,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
         if (this.conflict_record.is_valid)
             this.propagator.journal.conflict_record (this.conflict_record);
 
-        if (vfs && vfs.mode () == AbstractVfs.WithSuffix) {
+        if (vfs && vfs.mode () == Common.AbstractVfs.WithSuffix) {
             // If the virtual file used to have a different name and database
             // entry, remove it transfer its old pin state.
             if (this.item.type == ItemType.VIRTUAL_FILE_DOWNLOAD) {
@@ -706,7 +706,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
         if (!result) {
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error));
             return;
-        } else if (result == AbstractVfs.ConvertToPlaceholderResult.Locked) {
+        } else if (result == Common.AbstractVfs.ConvertToPlaceholderResult.Locked) {
             on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").printf (this.item.file));
             return;
         }
@@ -722,7 +722,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
         on_signal_done (is_conflict ? SyncFileItem.Status.CONFLICT : SyncFileItem.Status.SUCCESS);
 
         // handle the special recall file
-        if (!this.item.remote_permissions.has_permission (RemotePermissions.Permissions.IS_SHARED)
+        if (!this.item.remote_permissions.has_permission (Common.RemotePermissions.Permissions.IS_SHARED)
             && (this.item.file == ".sys.admin#recall#"
                 || this.item.file.has_suffix ("/.sys.admin#recall#"))) {
             handle_recall_file (filename, this.propagator.local_path, this.propagator.journal);
@@ -794,14 +794,14 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             this.propagator.journal.delete_file_record (this.item.original_file);
             update_metadata (false);
 
-            if (this.item.remote_permissions != null && !this.item.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_WRITE)) {
+            if (this.item.remote_permissions != null && !this.item.remote_permissions.has_permission (Common.RemotePermissions.Permissions.CAN_WRITE)) {
                 // make sure ReadOnly flag is preserved for placeholder, similarly to regular files
                 FileSystem.file_read_only (this.propagator.full_local_path (this.item.file), true);
             }
 
             return;
         }
-        if (vfs.mode () == AbstractVfs.Off && this.item.type == ItemType.VIRTUAL_FILE) {
+        if (vfs.mode () == Common.AbstractVfs.Off && this.item.type == ItemType.VIRTUAL_FILE) {
             GLib.warning ("Ignored virtual file type of " + this.item.file);
             this.item.type = ItemType.FILE;
         }
@@ -824,7 +824,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             }
             update_metadata (false);
 
-            if (this.item.remote_permissions != null && !this.item.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_WRITE)) {
+            if (this.item.remote_permissions != null && !this.item.remote_permissions.has_permission (Common.RemotePermissions.Permissions.CAN_WRITE)) {
                 // make sure ReadOnly flag is preserved for placeholder, similarly to regular files
                 FileSystem.file_read_only (this.propagator.full_local_path (this.item.file), true);
             }

@@ -37,7 +37,7 @@ public class CommandLine : GLib.Application {
     const string BINARY_NAME = Common.Config.APPLICATION_EXECUTABLE + "cmd";
 
     /***********************************************************
-    We can't use csync_userdata because the SyncEngine sets it
+    We can't use csync_userdata because the LibSync.SyncEngine sets it
     already, so we have to use a global variable.
     ***********************************************************/
     CmdOptions opts;
@@ -118,7 +118,7 @@ public class CommandLine : GLib.Application {
     private void parse_options (GLib.List<string> app_args, CmdOptions options) {
         GLib.List<string> args = app_args;
 
-        int arg_count = args.length;
+        int arg_count = (int)args.length ();
 
         if (arg_count < 3) {
             if (arg_count >= 2) {
@@ -184,8 +184,8 @@ public class CommandLine : GLib.Application {
             } else if (option == "--downlimit" && !args.nth_data (index + 1).has_prefix ("-")) {
                 options.downlimit = int.parse (args.nth_data (index + 1)) * 1000;
             } else if (option == "--logdebug") {
-                LibSync.Logger.instance.log_file ("-");
-                LibSync.Logger.instance.log_debug (true);
+                LibSync.Logger.log_file = "-";
+                LibSync.Logger.log_debug = true;
             } else if (option == "--path" && !args.nth_data (index + 1).has_prefix ("-")) {
                 options.remote_path = args.nth_data (index + 1);
             }
@@ -205,7 +205,7 @@ public class CommandLine : GLib.Application {
     to disable the read from database. (The normal client does
     it in SelectiveSyncDialog.accept).
     ***********************************************************/
-    private void selective_sync_fixup (SyncJournalDb journal, GLib.List<string> new_list) {
+    private void selective_sync_fixup (Common.SyncJournalDb journal, GLib.List<string> new_list) {
         Sqlite.Database database;
         if (!database.open_or_create_read_write (journal.database_file_path)) {
             return;
@@ -213,7 +213,7 @@ public class CommandLine : GLib.Application {
 
         bool ok = false;
 
-        GLib.List<string> selective_sync_list = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
+        GLib.List<string> selective_sync_list = journal.get_selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
         GLib.List<string> old_block_list_set = new GLib.List<string> ();
         if (ok) {
             GLib.List<string> block_list_set = new GLib.List<string> (new_list.begin (), new_list.end ());
@@ -222,7 +222,7 @@ public class CommandLine : GLib.Application {
                 journal.schedule_path_for_remote_discovery (change);
             }
 
-            journal.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, new_list);
+            journal.selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, new_list);
         }
     }
 
@@ -253,7 +253,7 @@ public class CommandLine : GLib.Application {
             q_message_pattern ("%{time MM-dd hh:mm:ss:zzz} [ %{type} %{category} ]%{if-debug}\t[ %{function} ]%{endif}:\t%{message}");
         }
 
-        unowned Account account = Account.create ();
+        LibSync.Account account = LibSync.Account.create ();
 
         if (!account) {
             GLib.fatal ("Could not initialize account!");
@@ -388,7 +388,7 @@ public class CommandLine : GLib.Application {
         Much lower age than the default since this utility is
         usually made to be run right after a change in the tests.
         ***********************************************************/
-        SyncEngine.minimum_file_age_for_upload = std.chrono.milliseconds (0);
+        LibSync.SyncEngine.minimum_file_age_for_upload = std.chrono.milliseconds (0);
 
         int restart_count = 0;
     }
@@ -417,17 +417,17 @@ public class CommandLine : GLib.Application {
         }
 
         CommandLine cmd;
-        string db_path = options.source_dir + SyncJournalDb.make_database_name (options.source_dir, credential_free_url, options.remote_path, user);
-        SyncJournalDb database = new SyncJournalDb (db_path);
+        string db_path = options.source_dir + Common.SyncJournalDb.make_database_name (options.source_dir, credential_free_url, options.remote_path, user);
+        Common.SyncJournalDb database = new Common.SyncJournalDb (db_path);
 
         if (!selective_sync_list.empty ()) {
             selective_sync_fixup (database, selective_sync_list);
         }
 
-        SyncOptions opt;
+        LibSync.SyncOptions opt;
         opt.fill_from_environment_variables ();
         opt.verify_chunk_sizes ();
-        SyncEngine sync_engine = new SyncEngine (account, options.source_dir, options.remote_path, database);
+        LibSync.SyncEngine sync_engine = new LibSync.SyncEngine (account, options.source_dir, options.remote_path, database);
         sync_engine.ignore_hidden_files (options.ignore_hidden_files);
         sync_engine.network_limits (options.uplimit, options.downlimit);
         sync_engine.signal_finished.connect (
@@ -444,7 +444,7 @@ public class CommandLine : GLib.Application {
         Exclude lists
         ***********************************************************/
         bool has_user_exclude_file = options.exclude != "";
-        string system_exclude_file = ConfigFile.exclude_file_from_system ();
+        string system_exclude_file = LibSync.ConfigFile.exclude_file_from_system ();
 
         /***********************************************************
         Always try to load the user-provided exclude list if one is

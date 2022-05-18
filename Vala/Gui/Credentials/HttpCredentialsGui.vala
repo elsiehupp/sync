@@ -9,7 +9,7 @@ namespace Ui {
 
 @copyright GPLv3 or Later
 ***********************************************************/
-public class HttpCredentialsGui : HttpCredentials {
+public class HttpCredentialsGui : LibSync.HttpCredentials {
 
     /***********************************************************
     GLib.ScopedPointerObjectDeleteLater
@@ -44,7 +44,7 @@ public class HttpCredentialsGui : HttpCredentials {
     ***********************************************************/
     public override void ask_from_user () {
         // This function can be called from AccountState.on_signal_invalid_credentials,
-        // which (indirectly, through HttpCredentials.invalidate_token) schedules
+        // which (indirectly, through LibSync.HttpCredentials.invalidate_token) schedules
         // a cache wipe of the soup_context. We can only execute a network job again once
         // the cache has been cleared, otherwise we'd interfere with the job.
         GLib.Timeout.add (100, this.on_signal_ask_from_user_async);
@@ -62,17 +62,17 @@ public class HttpCredentialsGui : HttpCredentials {
 
     /***********************************************************
     ***********************************************************/
-    static string request_app_password_text (Account account) {
+    static string request_app_password_text (LibSync.Account account) {
         int version = account.server_version_int;
         var url = account.url.to_string ();
         if (url.has_suffix ("/")) {
             url.chop (1);
         }
-        if (version >= Account.make_server_version (13, 0, 0)) {
+        if (version >= LibSync.Account.make_server_version (13, 0, 0)) {
             url += "/index.php/settings/user/security";
-        } else if (version >= Account.make_server_version (12, 0, 0)) {
+        } else if (version >= LibSync.Account.make_server_version (12, 0, 0)) {
             url += "/index.php/settings/personal#security";
-        } else if (version >= Account.make_server_version (11, 0, 0)) {
+        } else if (version >= LibSync.Account.make_server_version (11, 0, 0)) {
             url += "/index.php/settings/user/security#security";
         } else {
             return "";
@@ -118,8 +118,8 @@ public class HttpCredentialsGui : HttpCredentials {
         string message = _("Please enter %1 password:<br>"
                          + "<br>"
                          + "User: %2<br>"
-                         + "Account: %3<br>")
-                        .printf (Utility.escape (Theme.app_name_gui),
+                         + "LibSync.Account: %3<br>")
+                        .printf (Utility.escape (LibSync.Theme.app_name_gui),
                             Utility.escape (this.user),
                             Utility.escape (this.account.display_name));
 

@@ -10,13 +10,13 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public class AbstractTestFolderMan : GLib.Object {
 
-    Account account
+    LibSync.Account account
     AccountState account_state;
     FolderManager folder_manager;
     GLib.Uri url
 
     protected AbstractTestFolderMan () {
-        this.account = Account.create ();
+        this.account = LibSync.Account.create ();
         this.url = new GLib.Uri ("http://example.de");
         this.var credentials = new HttpCredentialsTest ("testuser", "secret");
         this.account.set_credentials (this.credentials);

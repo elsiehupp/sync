@@ -51,7 +51,7 @@ public class LogBrowser : Gtk.Dialog {
             + "run and compress older ones. It will also delete log files after a couple "
             + "of hours to avoid consuming too much disk space.\n"
             + "If enabled, logs will be written to %1")
-            .printf (LibSync.Logger.instance.temporary_folder_log_dir_path));
+            .printf (LibSync.Logger.temporary_folder_log_dir_path));
         label.word_wrap (true);
         label.text_interaction_flags (GLib.Text_selectable_by_mouse);
         label.size_policy (GLib.SizePolicy.Expanding, GLib.SizePolicy.Minimum_expanding);
@@ -60,7 +60,7 @@ public class LogBrowser : Gtk.Dialog {
         // button to permanently save logs
         var enable_logging_button = new GLib.CheckBox ();
         enable_logging_button.on_signal_text (_("Enable logging to temporary folder"));
-        enable_logging_button.checked (ConfigFile ().automatic_log_dir ());
+        enable_logging_button.checked (LibSync.ConfigFile ().automatic_log_dir ());
         enable_logging_button.toggled.connect (
             this.toggle_permanent_logging
         );
@@ -100,7 +100,7 @@ public class LogBrowser : Gtk.Dialog {
         );
         add_action (show_log_window_action);
 
-        ConfigFile config;
+        LibSync.ConfigFile config;
         config.restore_geometry (this);
     }
 
@@ -108,7 +108,7 @@ public class LogBrowser : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void on_open_folder_button_clicked () {
-        string path = LibSync.Logger.instance.temporary_folder_log_dir_path;
+        string path = LibSync.Logger.temporary_folder_log_dir_path;
         new GLib.Dir ().mkpath (path);
         GLib.DesktopServices.open_url (GLib.Uri.from_local_file (path));
     }
@@ -117,7 +117,7 @@ public class LogBrowser : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     protected override void close_event (GLib.CloseEvent event) {
-        ConfigFile config;
+        LibSync.ConfigFile config;
         config.save_geometry (this);
     }
 
@@ -125,7 +125,7 @@ public class LogBrowser : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     protected void toggle_permanent_logging (bool enabled) {
-        ConfigFile ().automatic_log_dir (enabled);
+        LibSync.ConfigFile ().automatic_log_dir (enabled);
 
         var logger = LibSync.Logger.instance;
         if (enabled) {

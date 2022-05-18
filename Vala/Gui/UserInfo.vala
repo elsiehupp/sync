@@ -129,7 +129,7 @@ public class UserInfo : GLib.Object {
             this.json_api_job.delete_later ();
         }
 
-        unowned Account account = this.account_state.account;
+        LibSync.Account account = this.account_state.account;
         this.json_api_job = new LibSync.JsonApiJob (account, "ocs/v1.php/cloud/user", this);
         this.json_api_job.on_signal_timeout (20 * 1000);
         this.json_api_job.signal_json_received.connect (
@@ -149,7 +149,7 @@ public class UserInfo : GLib.Object {
     private void on_signal_update_last_info (GLib.JsonDocument json) {
         var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
 
-        unowned Account account = this.account_state.account;
+        LibSync.Account account = this.account_state.account;
 
         // User Info
         string user = obj_data.value ("identifier").to_string ();
@@ -242,7 +242,7 @@ public class UserInfo : GLib.Object {
         if (this.account_state != null || !this.active) {
             return false;
         }
-        unowned Account account = this.account_state.account;
+        LibSync.Account account = this.account_state.account;
         return (this.account_state.is_connected || this.allow_disconnected_account_state)
             && account.credentials ()
             && account.credentials ().ready ();

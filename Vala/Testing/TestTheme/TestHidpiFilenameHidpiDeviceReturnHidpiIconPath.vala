@@ -18,7 +18,7 @@ public class TestHidpiFilenameHidpiDeviceReturnHidpiIconPath : AbstractTestTheme
         Gdk.RGBA background_color = Gdk.RGBA ("#000000");
         string icon_name = "wizard-files";
 
-        var icon_path = Theme.hidpi_filename (icon_name + ".png", background_color, paint_device);
+        var icon_path = LibSync.Theme.hidpi_filename (icon_name + ".png", background_color, paint_device);
 
         GLib.assert_true (icon_path == ":/client/theme/white/" + icon_name + "@2x.png");
     }

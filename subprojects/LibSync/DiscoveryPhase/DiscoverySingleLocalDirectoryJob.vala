@@ -17,7 +17,9 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, GLib.Runnable*/ 
     ***********************************************************/
     private string local_path;
     private unowned Account account;
-    private AbstractVfs vfs;
+    private Common.AbstractVfs vfs;
+
+    private static GMime.Encoding codec
 
 
     internal signal void signal_finished (GLib.List<LocalInfo> result);
@@ -29,7 +31,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, GLib.Runnable*/ 
 
     /***********************************************************
     ***********************************************************/
-    public DiscoverySingleLocalDirectoryJob.for_account (unowned Account account, string local_path, AbstractVfs vfs, GLib.Object parent = new GLib.Object ()) {
+    public DiscoverySingleLocalDirectoryJob.for_account (unowned Account account, string local_path, Common.AbstractVfs vfs, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.local_path = local_path;
         this.account = account;
@@ -71,10 +73,10 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, GLib.Runnable*/ 
             var dirent = CSync.VioHandle.read_directory (dh, this.vfs);
             if (!dirent)
                 break;
-            if (dirent.type == ItemType.SKIP)
+            if (dirent.type == CSync.ItemType.SKIP)
                 continue;
             LocalInfo i;
-            static GMime.Encoding codec = GMime.Encoding.codec_for_name ("UTF-8");
+            DiscoveryPhase.codec = GMime.Encoding.codec_for_name ("UTF-8");
             //  GLib.assert_true (codec);
             GMime.Encoding.ConverterState state;
             i.name = codec.to_unicode (dirent.path, dirent.path.size (), state);

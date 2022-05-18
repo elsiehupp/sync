@@ -42,7 +42,7 @@ public class NavigationPaneHelper : GLib.Object {
     ***********************************************************/
     public NavigationPaneHelper (FolderManager folder_man) {
         this.folder_man = folder_man;
-        ConfigFile config;
+        LibSync.ConfigFile config;
         this.show_in_explorer_navigation_pane = config.show_in_explorer_navigation_pane ();
 
         update_cloud_storage_registry ();

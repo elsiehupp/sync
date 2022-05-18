@@ -267,7 +267,7 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
         if (!result) {
             on_signal_done (one_file.item, SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error));
             return;
-        } else if (result == AbstractVfs.ConvertToPlaceholderResult.Locked) {
+        } else if (result == Common.AbstractVfs.ConvertToPlaceholderResult.Locked) {
             on_signal_done (one_file.item, SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").printf (one_file.item.file));
             return;
         }

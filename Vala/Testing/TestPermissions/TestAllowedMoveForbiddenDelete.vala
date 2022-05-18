@@ -35,7 +35,7 @@ public class TestAllowedMoveForbiddenDelete : AbstractTestPermissions {
        rm.insert ("changeonly/sub2/filetorname2a");
        rm.insert ("changeonly/sub2/filetorname2z");
 
-       on_set_all_perm (rm.find ("changeonly"), RemotePermissions.from_server_string ("NSV"));
+       on_set_all_perm (rm.find ("changeonly"), Common.RemotePermissions.from_server_string ("NSV"));
 
        GLib.assert_true (fake_folder.sync_once ());
 

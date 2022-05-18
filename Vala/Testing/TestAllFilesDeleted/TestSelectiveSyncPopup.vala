@@ -25,7 +25,7 @@ public class TestSelectiveSyncPopup : AbstractTestAllFilesDeleted {
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         fake_folder.sync_engine.journal.set_selective_sync_list (
-            SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
+            Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
             {
                 "A/", "B/", "C/", "S/"
             }
@@ -39,7 +39,7 @@ public class TestSelectiveSyncPopup : AbstractTestAllFilesDeleted {
 
 
     protected void on_signal_about_to_remove_all_files_selective_sync_o_popup (
-        LibSync.SyncFileItem.Direction direction,
+        LibSync.LibSync.SyncFileItem.Direction direction,
         Callback callback
     ) {
         about_to_remove_all_files_called++;

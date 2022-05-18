@@ -13,7 +13,7 @@ public class TestClearAtClearAtAfterPeriod : GLib.Object {
     ***********************************************************/
     private TestClearAtClearAtAfterPeriod () {
         {
-            UserStatus user_status;
+            LibSync.UserStatus user_status;
             ClearAt clear_at;
             clear_at.type = ClearAtType.PERIOD;
             clear_at.period = 60 * 30;
@@ -24,7 +24,7 @@ public class TestClearAtClearAtAfterPeriod : GLib.Object {
             GLib.assert_true (model.clear_at () == _("30 minutes"));
         }
         {
-            UserStatus user_status;
+            LibSync.UserStatus user_status;
             ClearAt clear_at;
             clear_at.type = ClearAtType.PERIOD;
             clear_at.period = 60 * 60;

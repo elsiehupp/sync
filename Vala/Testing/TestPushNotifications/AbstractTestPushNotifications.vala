@@ -20,16 +20,16 @@ public abstract class AbstractTestPushNotifications : GLib.Object {
     }
 
 
-    protected static bool verify_called_once_with_account (GLib.SignalSpy spy, unowned Account account) {
+    protected static bool verify_called_once_with_account (GLib.SignalSpy spy, LibSync.Account account) {
         return_false_on_fail (spy.length == 1);
-        var account_from_spy = spy.at (0).at (0).value<Account> ();
+        var account_from_spy = spy.at (0).at (0).value<LibSync.Account> ();
         return_false_on_fail (account_from_spy == account);
 
         return true;
     }
 
 
-    protected static bool fail_three_authentication_attempts (FakeWebSocketServer fake_server, unowned Account account) {
+    protected static bool fail_three_authentication_attempts (FakeWebSocketServer fake_server, LibSync.Account account) {
         return_false_on_fail (account);
         return_false_on_fail (account.push_notifications ());
 

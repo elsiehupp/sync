@@ -13,7 +13,7 @@ public class Flow2AuthWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private Account account = null;
+    private LibSync.Account account = null;
     private Flow2Auth async_auth;
     private static Flow2AuthWidget instance;
 
@@ -61,7 +61,7 @@ public class Flow2AuthWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public void start_auth (Account account) {
+    public void start_auth (LibSync.Account account) {
         Flow2Auth old_auth = this.async_auth.take ();
         if (old_auth) {
             old_auth.deleteLater ();
@@ -87,7 +87,7 @@ public class Flow2AuthWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public void reauth (Account account) {
+    public void reauth (LibSync.Account account) {
         start_auth (account);
     }
 
@@ -233,7 +233,7 @@ public class Flow2AuthWidget : Gtk.Widget {
         logo ();
 
         if (this.progress_indicator != null) {
-            bool is_dark_background = Theme.is_dark_color (palette ().window ().color ());
+            bool is_dark_background = LibSync.Theme.is_dark_color (palette ().window ().color ());
             if (this.is_dark_background) {
                 this.progress_indicator.color (GLib.white);
             } else {
@@ -255,9 +255,9 @@ public class Flow2AuthWidget : Gtk.Widget {
     ***********************************************************/
     private void logo () {
         var background_color = palette ().window ().color ();
-        var logo_icon_filename = Theme.is_branded
-            ? Theme.hidpi_filename ("external.png", background_color)
-            : Theme.hidpi_filename (":/client/theme/colored/external.png");
+        var logo_icon_filename = LibSync.Theme.is_branded
+            ? LibSync.Theme.hidpi_filename ("external.png", background_color)
+            : LibSync.Theme.hidpi_filename (":/client/theme/colored/external.png");
         Flow2AuthWidget.instance.logo_label.pixmap (logo_icon_filename);
     }
 

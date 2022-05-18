@@ -43,7 +43,7 @@ public class TestCSyncBNameTrigger : AbstractTestCSyncExclude {
     /***********************************************************
     ***********************************************************/
     protected static string translate_to_bname_trigger (bool wildcards_match_slash, string pattern) {
-        return storage = ExcludedFiles.extract_bname_trigger (pattern, wildcards_match_slash).const_data ();
+        return storage = CSync.ExcludedFiles.extract_bname_trigger (pattern, wildcards_match_slash).const_data ();
     }
 
 } // class TestCSyncBNameTrigger

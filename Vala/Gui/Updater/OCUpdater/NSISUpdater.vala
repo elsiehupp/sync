@@ -26,7 +26,7 @@ public class NSISUpdater : OCUpdater {
     /***********************************************************
     ***********************************************************/
     public override bool handle_startup () {
-        ConfigFile config;
+        LibSync.ConfigFile config;
         GLib.Settings settings = new GLib.Settings (config.config_file (), GLib.Settings.IniFormat);
         string update_filename = settings.get_value (update_available_c).to_string ();
         // has the previous run downloaded an update?
@@ -61,7 +61,7 @@ public class NSISUpdater : OCUpdater {
     /***********************************************************
     ***********************************************************/
     private void on_signal_seen_version () {
-        ConfigFile config;
+        LibSync.ConfigFile config;
         GLib.Settings settings = new GLib.Settings (config.config_file (), GLib.Settings.IniFormat);
         settings.get_value (seen_version_c, update_info ().version);
     }
@@ -80,7 +80,7 @@ public class NSISUpdater : OCUpdater {
         GLib.Uri url = new GLib.Uri (reply.url);
         this.file.close ();
 
-        ConfigFile config;
+        LibSync.ConfigFile config;
         GLib.Settings settings = new GLib.Settings (config.config_file (), GLib.Settings.IniFormat);
 
         // remove previously downloaded but not used installer
@@ -111,7 +111,7 @@ public class NSISUpdater : OCUpdater {
     /***********************************************************
     ***********************************************************/
     private void wipe_update_data () {
-        ConfigFile config;
+        LibSync.ConfigFile config;
         GLib.Settings settings = new GLib.Settings (config.config_file (), GLib.Settings.IniFormat);
         string update_filename = settings.get_value (update_available_c).to_string ();
         if (!update_filename == "")
@@ -149,7 +149,7 @@ public class NSISUpdater : OCUpdater {
         string txt = _("<p>A new version of the %1 Client is available.</p>"
                      + "<p><b>%2</b> is available for download. The installed version is %3.</p>")
                         .printf (
-                            Utility.escape (Theme.app_name_gui),
+                            Utility.escape (LibSync.Theme.app_name_gui),
                             Utility.escape (info.version_string ()), Utility.escape (client_version ())
                         );
 
@@ -213,7 +213,7 @@ public class NSISUpdater : OCUpdater {
         string txt = _("<p>A new version of the %1 Client is available but the updating process failed.</p>"
                      + "<p><b>%2</b> has been downloaded. The installed version is %3. If you confirm restart and update, your computer may reboot to complete the installation.</p>")
                         .printf (
-                            Utility.escape (Theme.app_name_gui),
+                            Utility.escape (LibSync.Theme.app_name_gui),
                             Utility.escape (target_version), Utility.escape (client_version ())
                         );
 
@@ -284,7 +284,7 @@ public class NSISUpdater : OCUpdater {
     /***********************************************************
     ***********************************************************/
     private override void version_info_arrived (UpdateInfo info) {
-        ConfigFile config;
+        LibSync.ConfigFile config;
         GLib.Settings settings = new GLib.Settings (config.config_file (), GLib.Settings.IniFormat);
         int64 info_version = Helper.string_version_to_int (info.version);
         var seen_string = settings.get_value (seen_version_c).to_string ();

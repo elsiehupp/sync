@@ -20,12 +20,12 @@ public class IconUtils : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static string find_svg_file_path (string filename, GLib.List<string> possible_colors) {
-        string result = Theme.THEME_PREFIX + filename;
+        string result = LibSync.Theme.THEME_PREFIX + filename;
         if (GLib.File.exists (result)) {
             return result;
         } else {
             foreach (var color in possible_colors) {
-                result = Theme.THEME_PREFIX.to_string () + color + "/" + filename;
+                result = LibSync.Theme.THEME_PREFIX.to_string () + color + "/" + filename;
 
                 if (GLib.File.exists (result)) {
                     return result;
@@ -43,7 +43,7 @@ public class IconUtils : GLib.Object {
     public static Gdk.Pixbuf pixmap_for_background (string filename, Gdk.RGBA background_color) {
         //  GLib.assert_true (!filename == "");
 
-        var pixmap_color = background_color.is_valid && !Theme.is_dark_color (background_color)
+        var pixmap_color = background_color.is_valid && !LibSync.Theme.is_dark_color (background_color)
             ? GLib.Color_constants.Svg.black
             : GLib.Color_constants.Svg.white;
         ;
@@ -73,7 +73,7 @@ public class IconUtils : GLib.Object {
 
         if (icon_base_colors.contains (custom_color_name)) {
             result = new Gtk.Image (
-                Theme.THEME_PREFIX + custom_color_name + "/" + filename
+                LibSync.Theme.THEME_PREFIX + custom_color_name + "/" + filename
             );
             if (result != null) {
                 return result;

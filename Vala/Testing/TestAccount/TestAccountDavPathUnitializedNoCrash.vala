@@ -15,7 +15,7 @@ public class TestAccountDavPathUnitializedNoCrash : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void TestAccountDavPathUnitializedNoCrash () {
-        unowned Account account = Account.create ();
+        LibSync.Account account = LibSync.Account.create ();
         account.dav_path;
     }
 

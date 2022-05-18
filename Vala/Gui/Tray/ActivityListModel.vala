@@ -338,18 +338,18 @@ public class ActivityListModel : GLib.Object {
             } else if (activity.type == Activity.Type.SYNC_RESULT) {
                 return "qrc:///client/theme/black/state-error.svg";
             } else if (activity.type == Activity.Type.SYNC_FILE_ITEM) {
-                if (activity.status == SyncFileItem.Status.NORMAL_ERROR
-                    || activity.status == SyncFileItem.Status.FATAL_ERROR
-                    || activity.status == SyncFileItem.Status.DETAIL_ERROR
-                    || activity.status == SyncFileItem.Status.BLOCKLISTED_ERROR) {
+                if (activity.status == LibSync.SyncFileItem.Status.NORMAL_ERROR
+                    || activity.status == LibSync.SyncFileItem.Status.FATAL_ERROR
+                    || activity.status == LibSync.SyncFileItem.Status.DETAIL_ERROR
+                    || activity.status == LibSync.SyncFileItem.Status.BLOCKLISTED_ERROR) {
                     return "qrc:///client/theme/black/state-error.svg";
-                } else if (activity.status == SyncFileItem.Status.SOFT_ERROR
-                    || activity.status == SyncFileItem.Status.CONFLICT
-                    || activity.status == SyncFileItem.Status.RESTORATION
-                    || activity.status == SyncFileItem.Status.FILE_LOCKED
-                    || activity.status == SyncFileItem.Status.FILENAME_INVALID) {
+                } else if (activity.status == LibSync.SyncFileItem.Status.SOFT_ERROR
+                    || activity.status == LibSync.SyncFileItem.Status.CONFLICT
+                    || activity.status == LibSync.SyncFileItem.Status.RESTORATION
+                    || activity.status == LibSync.SyncFileItem.Status.FILE_LOCKED
+                    || activity.status == LibSync.SyncFileItem.Status.FILENAME_INVALID) {
                     return "qrc:///client/theme/black/state-warning.svg";
-                } else if (activity.status == SyncFileItem.Status.FILE_IGNORED) {
+                } else if (activity.status == LibSync.SyncFileItem.Status.FILE_IGNORED) {
                     return "qrc:///client/theme/black/state-info.svg";
                 } else {
                     // File sync successful
@@ -409,7 +409,7 @@ public class ActivityListModel : GLib.Object {
         case DataRole.DISPLAY_ACTIONS:
             return this.display_actions;
         case DataRole.SHAREABLE:
-            return !data (index, DataRole.PATH).to_string () == "" && this.display_actions && activity.file_action != "file_deleted" && activity.status != SyncFileItem.Status.FILE_IGNORED;
+            return !data (index, DataRole.PATH).to_string () == "" && this.display_actions && activity.file_action != "file_deleted" && activity.status != LibSync.SyncFileItem.Status.FILE_IGNORED;
         default:
             return GLib.Variant ();
         }
@@ -429,7 +429,7 @@ public class ActivityListModel : GLib.Object {
         var path = data (model_index, DataRole.PATH).to_url ();
 
         var activity = this.final_list.at (activity_index);
-        if (activity.status == SyncFileItem.Status.CONFLICT) {
+        if (activity.status == LibSync.SyncFileItem.Status.CONFLICT) {
             //  GLib.assert_true (!activity.file == "");
             //  GLib.assert_true (!activity.folder_connection == "");
             //  GLib.assert_true (Utility.is_conflict_file (activity.file));
@@ -460,7 +460,7 @@ public class ActivityListModel : GLib.Object {
             this.current_conflict_dialog.open ();
             OwncloudGui.raise_dialog (this.current_conflict_dialog);
             return;
-        } else if (activity.status == SyncFileItem.Status.FILENAME_INVALID) {
+        } else if (activity.status == LibSync.SyncFileItem.Status.FILENAME_INVALID) {
             if (!this.current_invalid_filename_dialog == null) {
                 this.current_invalid_filename_dialog.close ();
             }

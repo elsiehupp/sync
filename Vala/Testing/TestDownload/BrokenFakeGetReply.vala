@@ -39,9 +39,9 @@ public class BrokenFakeGetReply : FakeGetReply {
 
     /***********************************************************
     ***********************************************************/
-    SyncFileItem get_item (GLib.SignalSpy spy, string path) {
+    LibSync.SyncFileItem get_item (GLib.SignalSpy spy, string path) {
         foreach (GLib.List<GLib.Variant> args in spy) {
-            var item = args[0].value<SyncFileItem> ();
+            var item = args[0].value<LibSync.SyncFileItem> ();
             if (item.destination () == path) {
                 return item;
             }

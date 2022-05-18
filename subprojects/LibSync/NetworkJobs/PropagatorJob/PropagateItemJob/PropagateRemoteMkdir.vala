@@ -252,7 +252,7 @@ public class PropagateRemoteMkdir : AbstractPropagateItemJob {
         if (!result) {
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error writing metadata to the database : %1").printf (result.error));
             return;
-        } else if (result == AbstractVfs.ConvertToPlaceholderResult.Locked) {
+        } else if (result == Common.AbstractVfs.ConvertToPlaceholderResult.Locked) {
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("The file %1 is currently in use").printf (this.item.file));
             return;
         }
@@ -301,7 +301,7 @@ public class PropagateRemoteMkdir : AbstractPropagateItemJob {
 
     private void on_signal_prop_find_job_result (string job_path, GLib.HashTable<string, GLib.Variant> result) {
         this.propagator.active_job_list.remove_one (this);
-        this.item.remote_permissions = RemotePermissions.from_server_string (result.value ("permissions").to_string ());
+        this.item.remote_permissions = Common.RemotePermissions.from_server_string (result.value ("permissions").to_string ());
 
         if (this.upload_encrypted_helper == null && !this.item.is_encrypted) {
             on_signal_success ();

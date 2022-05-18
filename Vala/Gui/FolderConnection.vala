@@ -71,7 +71,7 @@ public class FolderConnection : GLib.Object {
     ***********************************************************/
     public LibSync.SyncResult sync_result { public get; private set; }
 
-    private SyncEngine engine;
+    private LibSync.SyncEngine engine;
     private RequestEtagJob request_etag_job;
     private string last_etag;
     private GLib.Timer time_since_last_sync_done;
@@ -98,7 +98,7 @@ public class FolderConnection : GLib.Object {
     /***********************************************************
     Public get is used by the Socket API
     ***********************************************************/
-    public /*mutable*/ SyncJournalDb journal_database { public get; private set; }
+    public /*mutable*/ Common.SyncJournalDb journal_database { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
@@ -143,19 +143,19 @@ public class FolderConnection : GLib.Object {
     ***********************************************************/
     public bool virtual_files_enabled {
         public get {
-            return this.definition.virtual_files_mode != AbstractVfs.Off && !is_vfs_on_signal_off_switch_pending ();
+            return this.definition.virtual_files_mode != Common.AbstractVfs.Off && !is_vfs_on_signal_off_switch_pending ();
         }
         public set {
             Common.VfsMode new_mode = this.definition.virtual_files_mode;
-            if (value && this.definition.virtual_files_mode == AbstractVfs.Off) {
+            if (value && this.definition.virtual_files_mode == Common.AbstractVfs.Off) {
                 new_mode = this.best_available_vfs_mode;
-            } else if (!value && this.definition.virtual_files_mode != AbstractVfs.Off) {
-                new_mode = AbstractVfs.Off;
+            } else if (!value && this.definition.virtual_files_mode != Common.AbstractVfs.Off) {
+                new_mode = Common.AbstractVfs.Off;
             }
 
             if (new_mode != this.definition.virtual_files_mode) {
                 // TODO: Must wait for current sync to finish!
-                SyncEngine.wipe_virtual_files (path, this.journal_database, this.vfs);
+                LibSync.SyncEngine.wipe_virtual_files (path, this.journal_database, this.vfs);
 
                 this.vfs.stop ();
                 this.vfs.unregister_folder ();
@@ -167,7 +167,7 @@ public class FolderConnection : GLib.Object {
 
                 this.definition.virtual_files_mode = new_mode;
                 start_vfs ();
-                if (new_mode != AbstractVfs.Off) {
+                if (new_mode != Common.AbstractVfs.Off) {
                     this.save_in_folders_with_placeholders = true;
                     switch_to_virtual_files ();
                 }
@@ -207,7 +207,7 @@ public class FolderConnection : GLib.Object {
     /***********************************************************
     The vfs mode instance (created by plugin) to use. Never null.
     ***********************************************************/
-    public unowned AbstractVfs vfs { public get; private set; }
+    public unowned Common.AbstractVfs vfs { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
@@ -251,7 +251,7 @@ public class FolderConnection : GLib.Object {
     /***********************************************************
     Create a new FolderConnection
     ***********************************************************/
-    public FolderConnection (FolderDefinition definition, AccountState account_state, AbstractVfs vfs, GLib.Object parent = new GLib.Object ()) {
+    public FolderConnection (FolderDefinition definition, AccountState account_state, Common.AbstractVfs vfs, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account_state = account_state;
         this.definition = definition;
@@ -277,11 +277,11 @@ public class FolderConnection : GLib.Object {
 
         this.sync_result.folder_connection (this.definition.alias);
 
-        this.engine.reset (new SyncEngine (this.account_state.account, this.path, remote_path, this.journal_database));
+        this.engine.reset (new LibSync.SyncEngine (this.account_state.account, this.path, remote_path, this.journal_database));
         // pass the setting if hidden files are to be ignored, will be read in csync_update
         this.engine.ignore_hidden_files (this.definition.ignore_hidden_files);
 
-        ConfigFile.set_up_default_exclude_file_paths (this.engine.excluded_files ());
+        LibSync.ConfigFile.set_up_default_exclude_file_paths (this.engine.excluded_files ());
         if (!reload_excludes ()) {
             GLib.warning ();
         }
@@ -320,7 +320,7 @@ public class FolderConnection : GLib.Object {
             this.on_signal_add_error_to_gui
         );
         GLib.Timeout.single_shot (
-            SyncEngine.minimum_file_age_for_upload,
+            LibSync.SyncEngine.minimum_file_age_for_upload,
             this.on_signal_schedule_this_folder
         );
         ProgressDispatcher.instance.signal_folder_conflicts.connect (
@@ -338,17 +338,17 @@ public class FolderConnection : GLib.Object {
 
         // Potentially upgrade suffix vfs to windows vfs
         //  ENFORCE (this.vfs);
-        if (this.definition.virtual_files_mode == AbstractVfs.WithSuffix
+        if (this.definition.virtual_files_mode == Common.AbstractVfs.WithSuffix
             && this.definition.upgrade_vfs_mode) {
-            if (is_vfs_plugin_available (AbstractVfs.WindowsCfApi)) {
-                var winvfs = create_vfs_from_plugin (AbstractVfs.WindowsCfApi);
+            if (is_vfs_plugin_available (Common.AbstractVfs.WindowsCfApi)) {
+                var winvfs = create_vfs_from_plugin (Common.AbstractVfs.WindowsCfApi);
                 if (winvfs) {
                     // Wipe the existing suffix files from fs and journal_database
-                    SyncEngine.wipe_virtual_files (path, this.journal_database, this.vfs);
+                    LibSync.SyncEngine.wipe_virtual_files (path, this.journal_database, this.vfs);
 
                     // Then switch to winvfs mode
                     this.vfs.reset (winvfs.release ());
-                    this.definition.virtual_files_mode = AbstractVfs.WindowsCfApi;
+                    this.definition.virtual_files_mode = Common.AbstractVfs.WindowsCfApi;
                 }
             }
             save_to_settings ();
@@ -384,8 +384,8 @@ public class FolderConnection : GLib.Object {
         vfs_params.remote_path = remote_path_trailing_slash;
         vfs_params.account = this.account_state.account;
         vfs_params.journal_database = this.journal_database;
-        vfs_params.provider_name = Theme.app_name_gui;
-        vfs_params.provider_version = Theme.version;
+        vfs_params.provider_name = LibSync.Theme.app_name_gui;
+        vfs_params.provider_version = LibSync.Theme.version;
         vfs_params.multiple_accounts_registered = AccountManager.instance.accounts.size () > 1;
 
         this.vfs.signal_begin_hydrating.connect (
@@ -430,7 +430,7 @@ public class FolderConnection : GLib.Object {
             }
             return a;
         } else {
-            return Theme.app_name_gui;
+            return LibSync.Theme.app_name_gui;
         }
     }
 
@@ -609,7 +609,7 @@ public class FolderConnection : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void dirty_network_limits () {
-        ConfigFile config;
+        LibSync.ConfigFile config;
         int download_limit = -75; // 75%
         int use_down_limit = config.use_download_limit ();
         if (use_down_limit >= 1) {
@@ -646,7 +646,7 @@ public class FolderConnection : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public SyncEngine sync_engine {
+    public LibSync.SyncEngine sync_engine {
         return;
     }
 
@@ -823,7 +823,7 @@ public class FolderConnection : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void switch_to_virtual_files () {
-        SyncEngine.switch_to_virtual_files (path, this.journal_database, this.vfs);
+        LibSync.SyncEngine.switch_to_virtual_files (path, this.journal_database, this.vfs);
         this.has_switched_to_vfs = true;
     }
 
@@ -890,16 +890,16 @@ public class FolderConnection : GLib.Object {
 
 
     /***********************************************************
-    Connected to the corresponding signals in the SyncEngine
+    Connected to the corresponding signals in the LibSync.SyncEngine
     ***********************************************************/
-    public void on_signal_about_to_remove_all_files (LibSync.SyncFileItem.Direction directory, Callback callback) {
-        ConfigFile config_file;
-        if (!ConfigFile.prompt_delete_files ()) {
+    public void on_signal_about_to_remove_all_files (LibSync.LibSync.SyncFileItem.Direction directory, Callback callback) {
+        LibSync.ConfigFile config_file;
+        if (!LibSync.ConfigFile.prompt_delete_files ()) {
             callback (false);
             return;
         }
 
-        string message = directory == LibSync.SyncFileItem.Direction.DOWN
+        string message = directory == LibSync.LibSync.SyncFileItem.Direction.DOWN
             ? _("All files in the sync folder_connection \"%1\" folder_connection were deleted on the server.\n"
               + "These deletes will be synchronized to your local sync folder_connection, making such files "
               + "unavailable unless you have a right to restore. \n"
@@ -965,7 +965,7 @@ public class FolderConnection : GLib.Object {
         GLib.info (
             "*** Start syncing " + remote_url ().to_string ()
             + " -" + Common.Config.APPLICATION_NAME + "client version"
-            + Theme.version.to_string ()
+            + LibSync.Theme.version.to_string ()
         );
 
         this.file_log.on_signal_start (path);
@@ -1012,7 +1012,7 @@ public class FolderConnection : GLib.Object {
     Maybe multiply times 1000?
     ***********************************************************/
     private static GLib.TimeSpan full_local_discovery_interval () {
-        var interval = ConfigFile ().full_local_discovery_interval ();
+        var interval = LibSync.ConfigFile ().full_local_discovery_interval ();
         string env = qgetenv ("OWNCLOUD_FULL_LOCAL_DISCOVERY_INTERVAL");
         if (!env == "") {
             interval = env.to_long_long ();
@@ -1024,7 +1024,7 @@ public class FolderConnection : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void correct_placeholder_files () {
-        if (this.definition.virtual_files_mode == AbstractVfs.Off) {
+        if (this.definition.virtual_files_mode == Common.AbstractVfs.Off) {
             return;
         }
         string placeholders_corrected_key = "placeholders_corrected";
@@ -1043,7 +1043,7 @@ public class FolderConnection : GLib.Object {
         // Delete from journal_database and from filesystem.
         GLib.Dir folderpath = new GLib.Dir (this.definition.local_path);
         GLib.List<string> keep_nothing;
-        GLib.List<SyncJournalDb.DownloadInfo> deleted_infos =
+        GLib.List<Common.SyncJournalDb.DownloadInfo> deleted_infos =
             this.journal_database.and_delete_stale_download_infos (keep_nothing);
         foreach (var deleted_info in deleted_infos) {
             string temporary_path = folderpath.file_path (deleted_info.temporaryfile);
@@ -1102,7 +1102,7 @@ public class FolderConnection : GLib.Object {
 
         // Use the path to figure out whether it was our own change
         if (this.engine.was_file_touched (path)) {
-            GLib.debug ("Changed path was touched by SyncEngine, ignoring: " + path);
+            GLib.debug ("Changed path was touched by LibSync.SyncEngine, ignoring: " + path);
             return;
         }
 
@@ -1225,16 +1225,16 @@ public class FolderConnection : GLib.Object {
     ***********************************************************/
     private void on_signal_sync_finished (bool success) {
         GLib.info (
-            "Client version" + Theme.version.to_string ()
+            "Client version" + LibSync.Theme.version.to_string ()
             + " Qt " + q_version ()
             + " SSL " + GLib.SslSocket.ssl_library_version_string ().to_utf8 ()
         );
 
         bool sync_error = !this.sync_result.error_strings () = "";
         if (sync_error) {
-            GLib.warning ("SyncEngine finished with ERROR.");
+            GLib.warning ("LibSync.SyncEngine finished with ERROR.");
         } else {
-            GLib.info ("SyncEngine finished without problem.");
+            GLib.info ("LibSync.SyncEngine finished without problem.");
         }
         this.file_log.finish ();
         show_sync_result_popup ();
@@ -1263,7 +1263,7 @@ public class FolderConnection : GLib.Object {
 
         if (this.sync_result.status () == LibSync.SyncResult.Status.SUCCESS && success) {
             // Clear the allow list as all the folders that should be on that list are sync-ed
-            journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, {});
+            journal_database.selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, {});
         }
 
         if ((this.sync_result.status () == LibSync.SyncResult.Status.SUCCESS
@@ -1317,7 +1317,7 @@ public class FolderConnection : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_add_error_to_gui (LibSync.SyncFileItem.Status status, string error_message, string subject = "") {
+    private void on_signal_add_error_to_gui (LibSync.LibSync.SyncFileItem.Status status, string error_message, string subject = "") {
         ProgressDispatcher.instance.signal_add_error_to_gui (alias (), status, error_message, subject);
     }
 
@@ -1336,7 +1336,7 @@ public class FolderConnection : GLib.Object {
     A item is completed. Count the errors and forward to the
     ProgressDispatcher
     ***********************************************************/
-    private void on_signal_item_completed (SyncFileItem item) {
+    private void on_signal_item_completed (LibSync.SyncFileItem item) {
         if (item.instruction == CSync.SyncInstructions.NONE || item.instruction == CSync.SyncInstructions.UPDATE_METADATA) {
             // We only care about the updates that deserve to be shown in the UI
             return;
@@ -1354,7 +1354,7 @@ public class FolderConnection : GLib.Object {
     private void on_signal_run_etag_job () {
         GLib.info ("Trying to check " + remote_url ().to_string () + " for changes via ETag check. (time since last sync: " + (this.time_since_last_sync_done.elapsed () / 1000).to_string () + "s)");
 
-        unowned Account account = this.account_state.account;
+        LibSync.Account account = this.account_state.account;
 
         if (this.request_etag_job != null) {
             GLib.info (remote_url ().to_string () + " has ETag job queued, not trying to sync");
@@ -1435,29 +1435,29 @@ public class FolderConnection : GLib.Object {
         // Add the entry to the blocklist if it is neither in the blocklist or allowlist already
         bool ok1 = false;
         bool ok2 = false;
-        var blocklist = journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok1);
-        var allowlist = journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, ok2);
+        var blocklist = journal_database.selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok1);
+        var allowlist = journal_database.selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, ok2);
         if (ok1 && ok2 && !blocklist.contains (new_folder) && !allowlist.contains (new_folder)) {
             blocklist.append (new_folder);
-            journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, blocklist);
+            journal_database.selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, blocklist);
         }
 
         // And add the entry to the undecided list and signal the UI
-        var undecided_list = journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok1);
+        var undecided_list = journal_database.selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok1);
         if (ok1) {
             if (!undecided_list.contains (new_folder)) {
                 undecided_list.append (new_folder);
-                journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, undecided_list);
+                journal_database.selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, undecided_list);
                 signal_new_big_folder_discovered (new_folder);
             }
             string message = !is_external ? (_("A new folder_connection larger than %1 MB has been added : %2.\n")
-                                                    .printf (ConfigFile ().new_big_folder_size_limit.second)
+                                                    .printf (LibSync.ConfigFile ().new_big_folder_size_limit.second)
                                                     .printf (new_folder))
                                           : (_("A folder_connection from an external storage has been added.\n"));
             message += _("Please go in the settings to select it if you wish to download it.");
 
             var logger = LibSync.Logger.instance;
-            logger.post_optional_gui_log (Theme.app_name_gui, message);
+            logger.post_optional_gui_log (LibSync.Theme.app_name_gui, message);
         }
     }
 
@@ -1517,7 +1517,7 @@ public class FolderConnection : GLib.Object {
         }
 
         bool ok = false;
-        var blocklist = this.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
+        var blocklist = this.journal_database.selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
         if (!ok) {
             return;
         }
@@ -1533,7 +1533,7 @@ public class FolderConnection : GLib.Object {
                 + "It will not be synchronized.")
                   .printf (file_info.file_path);
 
-        LibSync.Logger.instance.post_optional_gui_log (Theme.app_name_gui, message);
+        LibSync.Logger.post_optional_gui_log (LibSync.Theme.app_name_gui, message);
     }
 
 
@@ -1551,14 +1551,14 @@ public class FolderConnection : GLib.Object {
             + "\n"
             + "%1"
             ).printf (message);
-        LibSync.Logger.instance.post_gui_log (Theme.app_name_gui, full_message);
+        LibSync.Logger.post_gui_log (LibSync.Theme.app_name_gui, full_message);
     }
 
 
     /***********************************************************
     Aborts any running sync and blocks it until hydration is on_signal_finished.
 
-    Hydration circumvents the regular SyncEngine and both mustn't be running
+    Hydration circumvents the regular LibSync.SyncEngine and both mustn't be running
     at the same time.
     ***********************************************************/
     private void on_signal_hydration_starts () {
@@ -1675,20 +1675,20 @@ public class FolderConnection : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void sync_options () {
-        SyncOptions opt;
-        ConfigFile config_file;
+        LibSync.SyncOptions opt;
+        LibSync.ConfigFile config_file;
 
-        var new_folder_limit = ConfigFile.new_big_folder_size_limit;
+        var new_folder_limit = LibSync.ConfigFile.new_big_folder_size_limit;
         opt.new_big_folder_size_limit = new_folder_limit.first ? new_folder_limit.second * 1000LL * 1000LL : -1; // convert from MB to B
-        opt.confirm_external_storage = ConfigFile.confirm_external_storage ();
-        opt.move_files_to_trash = ConfigFile.move_to_trash ();
+        opt.confirm_external_storage = LibSync.ConfigFile.confirm_external_storage ();
+        opt.move_files_to_trash = LibSync.ConfigFile.move_to_trash ();
         opt.vfs = this.vfs;
         opt.parallel_network_jobs = this.account_state.account.is_http2Supported () ? 20 : 6;
 
-        opt.initial_chunk_size = ConfigFile.chunk_size ();
-        opt.min_chunk_size = ConfigFile.min_chunk_size ();
-        opt.max_chunk_size = ConfigFile.max_chunk_size ();
-        opt.target_chunk_upload_duration = ConfigFile.target_chunk_upload_duration ();
+        opt.initial_chunk_size = LibSync.ConfigFile.chunk_size ();
+        opt.min_chunk_size = LibSync.ConfigFile.min_chunk_size ();
+        opt.max_chunk_size = LibSync.ConfigFile.max_chunk_size ();
+        opt.target_chunk_upload_duration = LibSync.ConfigFile.target_chunk_upload_duration ();
 
         opt.fill_from_environment_variables ();
         opt.verify_chunk_sizes ();

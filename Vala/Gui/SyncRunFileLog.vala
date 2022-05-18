@@ -103,9 +103,9 @@ public class SyncRunFileLog : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void log_item (SyncFileItem item) {
+    public void log_item (LibSync.SyncFileItem item) {
         // don't log the directory items that are in the list
-        if (item.direction == SyncFileItem.Direction.NONE
+        if (item.direction == LibSync.SyncFileItem.Direction.NONE
             || item.instruction == CSync.SyncInstructions.IGNORE) {
             return;
         }

@@ -37,7 +37,7 @@ public class TestSingleFileRenamed : AbstractTestAllFilesDeleted {
 
 
     protected void on_signal_about_to_remove_all_files_single_file_renamed (
-        SyncFileItem.Direction direction,
+        LibSync.SyncFileItem.Direction direction,
         Callback callback
     ) {
         about_to_remove_all_files_called++;

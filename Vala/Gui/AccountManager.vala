@@ -45,7 +45,7 @@ public class AccountManager : GLib.Object {
     public GLib.List<unowned AccountState> accounts { public get; private set; }
 
     /***********************************************************
-    Account ids from settings that weren't read
+    LibSync.Account ids from settings that weren't read
     ***********************************************************/
     private GLib.List<string> additional_blocked_account_ids;
 
@@ -63,7 +63,7 @@ public class AccountManager : GLib.Object {
     Saves the accounts to a given settings file
     ***********************************************************/
     public void save (bool save_credentials = true) {
-        var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
+        var settings = LibSync.ConfigFile.settings_with_group (ACCOUNTS_C);
         settings.get_value (VERSION_C, MAX_ACCOUNTS_VERSION);
         foreach (var acc in this.accounts) {
             settings.begin_group (acc.account.identifier);
@@ -87,7 +87,7 @@ public class AccountManager : GLib.Object {
         GLib.List<string> skip_settings_keys = new GLib.List<string> ();
         backward_migration_settings_keys (skip_settings_keys, skip_settings_keys);
 
-        var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
+        var settings = LibSync.ConfigFile.settings_with_group (ACCOUNTS_C);
         if (settings.status () != GLib.Settings.NoError || !settings.is_writable ()) {
             GLib.warning ("Could not read settings from "
                          + settings.filename ()
@@ -125,7 +125,7 @@ public class AccountManager : GLib.Object {
                     }
                 }
             } else {
-                GLib.info ("Account " + account_id + " is too new, ignoring.");
+                GLib.info ("LibSync.Account " + account_id + " is too new, ignoring.");
                 this.additional_blocked_account_ids.insert (account_id);
             }
             settings.end_group ();
@@ -139,7 +139,7 @@ public class AccountManager : GLib.Object {
     Add this account in the list of saved accounts.
     Typically called from the wizard
     ***********************************************************/
-    public AccountState add_account (unowned Account new_account) {
+    public AccountState add_account (LibSync.Account new_account) {
         var identifier = new_account.identifier;
         if (identifier == "" || !is_account_id_available (identifier)) {
             identifier = generate_free_account_id ();
@@ -170,7 +170,7 @@ public class AccountManager : GLib.Object {
     by its display name
     ***********************************************************/
     public unowned AccountState account (string name) {
-        foreach (Account acc in this.accounts) {
+        foreach (LibSync.Account acc in this.accounts) {
             if (acc.account.display_name == name) {
                 return acc;
             }
@@ -194,7 +194,7 @@ public class AccountManager : GLib.Object {
         account.account.credentials ().forget_sensitive_data ();
         GLib.File.remove (account.account.cookie_jar_path);
 
-        var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
+        var settings = LibSync.ConfigFile.settings_with_group (ACCOUNTS_C);
         settings.remove (account.account.identifier);
 
         // Forget E2E keys
@@ -211,8 +211,8 @@ public class AccountManager : GLib.Object {
     Creates an account and sets up some basic handlers.
     Does *not* add the account to the account manager just yet.
     ***********************************************************/
-    public static Account create_account () {
-        Account acc = Account.create ();
+    public static LibSync.Account create_account () {
+        LibSync.Account acc = LibSync.Account.create ();
         acc.ssl_error_handler (new SslDialogErrorHandler ());
         acc.signal_proxy_authentication_required.connect (
             ProxyAuthHandler.instance.on_signal_handle_proxy_authentication_required
@@ -227,7 +227,7 @@ public class AccountManager : GLib.Object {
     they are from the future.
     ***********************************************************/
     public static void backward_migration_settings_keys (GLib.List<string> delete_keys, GLib.List<string> ignore_keys) {
-        var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
+        var settings = LibSync.ConfigFile.settings_with_group (ACCOUNTS_C);
         int accounts_version = settings.get_value (VERSION_C).to_int ();
         if (accounts_version <= MAX_ACCOUNTS_VERSION) {
             foreach (var account_id in settings.child_groups ()) {
@@ -245,9 +245,9 @@ public class AccountManager : GLib.Object {
 
 
     /***********************************************************
-    saving and loading Account to settings
+    saving and loading LibSync.Account to settings
     ***********************************************************/
-    private void save_account_helper (Account account, GLib.Settings settings, bool save_credentials = true) {
+    private void save_account_helper (LibSync.Account account, GLib.Settings settings, bool save_credentials = true) {
         settings.get_value (VERSION_C, MAX_ACCOUNT_VERSION);
         settings.get_value (URL_C, acc.url.to_string ());
         settings.get_value (DAV_USER_C, acc.dav_user);
@@ -307,14 +307,14 @@ public class AccountManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private unowned Account load_account_helper (GLib.Settings settings) {
+    private LibSync.Account load_account_helper (GLib.Settings settings) {
         var url_config = settings.get_value (URL_C);
         if (!url_config.is_valid) {
             /***********************************************************
             No URL probably means a corrupted entry in the account settings
             ***********************************************************/
             GLib.warning ("No URL for account " + settings.group ());
-            return new Account ();
+            return new LibSync.Account ();
         }
 
         var acc = create_account ();
@@ -331,8 +331,8 @@ public class AccountManager : GLib.Object {
             }
         }
 
-        string override_url = Theme.override_server_url;
-        string force_auth = Theme.force_config_auth_type;
+        string override_url = LibSync.Theme.override_server_url;
+        string force_auth = LibSync.Theme.force_config_auth_type;
         if (!force_auth == "" && !override_url == "") {
             // If force_auth is set, this might also mean the override_uRL has changed.
             // See enterprise issues #1126
@@ -357,7 +357,7 @@ public class AccountManager : GLib.Object {
             }
         }
 
-        GLib.info ("Account for " + acc.url + " using auth type " + auth_type);
+        GLib.info ("LibSync.Account for " + acc.url + " using auth type " + auth_type);
 
         acc.server_version = settings.get_value (SERVER_VERSION_C).to_string ();
         acc.dav_user = settings.get_value (DAV_USER_C, "").to_string ();
@@ -388,10 +388,10 @@ public class AccountManager : GLib.Object {
     ***********************************************************/
     private bool restore_from_legacy_settings () {
         GLib.info ("Migrate: restore_from_legacy_settings, checking settings group "
-                  + Theme.app_name);
+                  + LibSync.Theme.app_name);
 
         // try to open the correctly themed settings
-        var settings = ConfigFile.settings_with_group (Theme.app_name);
+        var settings = LibSync.ConfigFile.settings_with_group (LibSync.Theme.app_name);
 
         // if the settings file could not be opened, the child_keys list is empty
         // then try to load settings from a very old place
@@ -411,7 +411,7 @@ public class AccountManager : GLib.Object {
                 oc_settings.begin_group ("own_cloud");
 
                 // Check the theme url to see if it is the same url that the o_c config was for
-                string override_url = Theme.override_server_url;
+                string override_url = LibSync.Theme.override_server_url;
                 if (!override_url == "") {
                     if (override_url.has_suffix ("/")) {
                         override_url.chop (1);
@@ -490,9 +490,9 @@ public class AccountManager : GLib.Object {
     /***********************************************************
     Saves account data, not including the credentials
     ***********************************************************/
-    public void on_signal_save_account (Account a) {
+    public void on_signal_save_account (LibSync.Account a) {
         GLib.debug ("Saving account " + a.url.to_string ());
-        var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
+        var settings = LibSync.ConfigFile.settings_with_group (ACCOUNTS_C);
         settings.begin_group (a.identifier);
         save_account_helper (a, settings, false); // don't save credentials they might not have been loaded yet
         settings.end_group ();
@@ -507,7 +507,7 @@ public class AccountManager : GLib.Object {
     ***********************************************************/
     public void on_signal_save_account_state (AccountState a) {
         GLib.debug ("Saving account state " + a.account.url.to_string ());
-        var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
+        var settings = LibSync.ConfigFile.settings_with_group (ACCOUNTS_C);
         settings.begin_group (a.account.identifier);
         a.write_to_settings (settings);
         settings.end_group ();

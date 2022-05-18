@@ -22,14 +22,6 @@ public class Account : GLib.Object {
     const int PUSH_NOTIFICATIONS_RECONNECT_INTERVAL = 1000 * 60 * 2;
     const int USERNAME_PREFILL_SERVER_VERSION_MIN_SUPPORTED_MAJOR = 24;
 
-    /***********************************************************
-    @brief Reimplement this to handle SSL errors from libsync
-    @ingroup libsync
-    ***********************************************************/
-    public abstract class AbstractSslErrorHandler : GLib.Object {
-        public abstract bool handle_errors (GLib.List<GnuTLS.ErrorCode> error_list, GLib.SslConfiguration conf, GLib.List<GLib.TlsCertificate> cert_list, Account account);
-    }
-
 
     /***********************************************************
     Because of bugs in Qt, we use this to store info needed for
@@ -1053,7 +1045,7 @@ public class Account : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_handle_ssl_errors (GLib.InputStream input_stream, GLib.List<GnuTLS.ErrorCode> errors) {
-        NetworkJobTimeoutPauser pauser = new NetworkJobTimeoutPauser (input_stream);
+        AbstractNetworkJob.NetworkJobTimeoutPauser pauser = new AbstractNetworkJob.NetworkJobTimeoutPauser (input_stream);
         GLib.debug ("SSL-Errors happened for url " + input_stream.url.to_string ());
         foreach (GnuTLS.ErrorCode error in errors) {
             GLib.debug ("\t_error in " + error.certificate () + ":"

@@ -49,7 +49,7 @@ public class FakeWebSocketServer : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.WebSocket authenticate_account (Account account, BeforeAuthentication before_authentication, AfterAuthentication after_authentication) {
+    public GLib.WebSocket authenticate_account (LibSync.Account account, BeforeAuthentication before_authentication, AfterAuthentication after_authentication) {
         var push_notifications = account.push_notifications ();
         GLib.assert_true (push_notifications);
         GLib.SignalSpy ready_spy = new GLib.SignalSpy (push_notifications, PushNotificationManager.ready);
@@ -142,8 +142,8 @@ public class FakeWebSocketServer : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static unowned Account create_account (string username = "user", string password = "password") {
-        var account = Account.create ();
+    public static LibSync.Account create_account (string username = "user", string password = "password") {
+        var account = LibSync.Account.create ();
 
         GLib.List<string> type_list = new GLib.List<string> ();
         type_list.append ("files");

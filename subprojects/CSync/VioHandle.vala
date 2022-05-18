@@ -39,7 +39,7 @@ public class VioHandle : GLib.Object {
     }
 
 
-    public FileStat read_directory (VioHandle directory_handle, AbstractVfs vfs) {
+    public FileStat read_directory (VioHandle directory_handle, Common.AbstractVfs vfs) {
 
         Posix.DirEnt posix_dirent = null;
         FileStat file_stat;
@@ -86,7 +86,7 @@ public class VioHandle : GLib.Object {
 
         if (CSync.VioHandle.stat_mb (full_path.const_data (), file_stat.get ()) < 0) {
             // Will get excluded by this.csync_detect_update.
-            file_stat.type = ItemType.SKIP;
+            file_stat.type = CSync.ItemType.SKIP;
         }
 
         // Override type for virtual files if desired
@@ -124,7 +124,7 @@ public class VioHandle : GLib.Object {
                 file_stat.type = ItemType.SOFT_LINK;
                 break;
             default:
-                file_stat.type = ItemType.SKIP;
+                file_stat.type = CSync.ItemType.SKIP;
                 break;
         }
 

@@ -20,7 +20,7 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
         SIGNED_OUT,
 
         /***********************************************************
-        Account would like to be connected but hasn't heard back yet.
+        LibSync.Account would like to be connected but hasn't heard back yet.
         ***********************************************************/
         DISCONNECTED,
 
@@ -59,7 +59,7 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
         ASKING_CREDENTIALS
     }
 
-    public unowned Account account { public get; private set; }
+    public LibSync.Account account { public get; private set; }
     public State state {
         public get {
             return this.state;
@@ -186,7 +186,7 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
     /***********************************************************
     Use the account as parent
     ***********************************************************/
-    public AccountState (Account account) {
+    public AccountState (LibSync.Account account) {
         base ();
         this.account = account;
         this.state = AccountState.State.DISCONNECTED;
@@ -222,11 +222,11 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
 
 
     /***********************************************************
-    Creates an account state from settings and an Account object.
+    Creates an account state from settings and an LibSync.Account object.
 
     Use from AccountManager with a prepared GLib.Settings object only.
     ***********************************************************/
-    public static AccountState load_from_settings (unowned Account account, GLib.Settings settings) {
+    public static AccountState load_from_settings (LibSync.Account account, GLib.Settings settings) {
         var account_state = new AccountState (account);
         return account_state;
     }
@@ -235,7 +235,7 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
     /***********************************************************
     Writes account state information to settings.
 
-    It does not write the Account data.
+    It does not write the LibSync.Account data.
     ***********************************************************/
     public void write_to_settings (GLib.Settings settings) { }
 
@@ -341,7 +341,7 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
     the right groups.
     ***********************************************************/
     public GLib.Settings settings () {
-        var s = ConfigFile.settings_with_group ("Accounts");
+        var s = LibSync.ConfigFile.settings_with_group ("Accounts");
         s.begin_group (this.account.identifier);
         return s;
     }
@@ -383,7 +383,7 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
         if (account.credentials ().ready ()) {
             account.credentials ().invalidate_token ();
         }
-        var creds = (HttpCredentials)account.credentials ();
+        var creds = (LibSync.HttpCredentials)account.credentials ();
         if (creds && creds.refresh_access_token ()) {
             return;
         }
@@ -420,7 +420,7 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
 
         // IF the account is connected the connection check can be skipped
         // if the last successful etag check job is not so long ago.
-        int polltime = ConfigFile ().remote_poll_interval ().seconds;
+        int polltime = LibSync.ConfigFile ().remote_poll_interval ().seconds;
         int elapsed = this.time_of_last_e_tag_check.secs_to (GLib.DateTime.current_date_time_utc ());
         if (is_connected && this.time_of_last_e_tag_check.is_valid
             && elapsed <= polltime.length) {

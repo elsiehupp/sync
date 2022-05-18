@@ -22,7 +22,7 @@ public class AbstractCredentialsWizardPage : GLib.WizardPage {
     public void clean_up_page () {
         // Reset the credentials when the 'Back' button is used.
 
-        unowned Account account = ((OwncloudWizard)wizard ()).account;
+        LibSync.Account account = ((OwncloudWizard)wizard ()).account;
         AbstractCredentials creds = account.credentials ();
         if (creds) {
             if (!creds.inherits ("DummyCredentials")) {

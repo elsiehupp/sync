@@ -23,7 +23,7 @@ public class TestModifyLocalFileWhileUploading : AbstractTestChunkingNg {
         // middle of the sync, modify the file
         GLib.Object.Connection con = connect (
             fake_folder.sync_engine,
-            SyncEngine.signal_transmission_progress,
+            LibSync.SyncEngine.signal_transmission_progress,
             this.on_signal_sync_engine_transmission_progress_modify_local_file_while_uploading
         );
 

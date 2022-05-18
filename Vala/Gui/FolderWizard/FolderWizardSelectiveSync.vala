@@ -18,24 +18,24 @@ public class FolderWizardSelectiveSync : GLib.WizardPage {
     /***********************************************************
     ***********************************************************/
     private SelectiveSyncWidget selective_sync;
-    private GLib.CheckBox virtual_files_check_box = null;
+    private Gtk.CheckBox virtual_files_check_box = null;
 
     /***********************************************************
     ***********************************************************/
-    public FolderWizardSelectiveSync (Account account) {
+    public FolderWizardSelectiveSync (LibSync.Account account) {
         var layout = new Gtk.Box (Gtk.Orientation.VERTICAL);
         this.selective_sync = new SelectiveSyncWidget (account, this);
         layout.add_widget (this.selective_sync);
 
-        if (Theme.show_virtual_files_option && this.best_available_vfs_mode != AbstractVfs.Off) {
-            this.virtual_files_check_box = new GLib.CheckBox (_("Use virtual files instead of downloading content immediately %1").printf (this.best_available_vfs_mode == AbstractVfs.WindowsCfApi ? "" : _(" (experimental)")));
+        if (LibSync.Theme.show_virtual_files_option && this.best_available_vfs_mode != Common.AbstractVfs.Off) {
+            this.virtual_files_check_box = new GLib.CheckBox (_("Use virtual files instead of downloading content immediately %1").printf (this.best_available_vfs_mode == Common.AbstractVfs.WindowsCfApi ? "" : _(" (experimental)")));
             this.virtual_files_check_box.clicked.connect (
                 this.on_signal_virtual_files_checkbox_clicked
             );
             this.virtual_files_check_box.signal_state_changed.connect (
                 this.on_virtual_files_check_box_state_changed
             );
-            this.virtual_files_check_box.checked (this.best_available_vfs_mode == AbstractVfs.WindowsCfApi);
+            this.virtual_files_check_box.checked (this.best_available_vfs_mode == Common.AbstractVfs.WindowsCfApi);
             layout.add_widget (this.virtual_files_check_box);
         }
     }
@@ -53,7 +53,7 @@ public class FolderWizardSelectiveSync : GLib.WizardPage {
     public bool validate_page () {
         bool use_virtual_files = this.virtual_files_check_box && this.virtual_files_check_box.is_checked ();
         if (use_virtual_files) {
-            var availability = AbstractVfs.check_availability (wizard ().field ("source_folder").to_string ());
+            var availability = Common.AbstractVfs.check_availability (wizard ().field ("source_folder").to_string ());
             if (!availability) {
                 var message = new Gtk.MessageBox (Gtk.MessageBox.Warning, _("Virtual files are not available for the selected folder"), availability.error, Gtk.MessageBox.Ok, this);
                 message.attribute (GLib.WA_DeleteOnClose);
@@ -76,9 +76,9 @@ public class FolderWizardSelectiveSync : GLib.WizardPage {
         }
         string alias = GLib.FileInfo (target_path).filename ();
         if (alias == "")
-            alias = Theme.app_name;
+            alias = LibSync.Theme.app_name;
         GLib.List<string> initial_blocklist;
-        if (Theme.wizard_selective_sync_default_nothing) {
+        if (LibSync.Theme.wizard_selective_sync_default_nothing) {
             initial_blocklist = { "/" };
         }
         this.selective_sync.folder_info (target_path, alias, initial_blocklist);
@@ -90,11 +90,11 @@ public class FolderWizardSelectiveSync : GLib.WizardPage {
                 this.virtual_files_check_box.enabled (false);
                 this.virtual_files_check_box.on_signal_text (_("Virtual files are not supported for Windows partition roots as local folder. Please choose a valid subfolder under drive letter."));
             } else {
-                this.virtual_files_check_box.checked (this.best_available_vfs_mode == AbstractVfs.WindowsCfApi);
+                this.virtual_files_check_box.checked (this.best_available_vfs_mode == Common.AbstractVfs.WindowsCfApi);
                 this.virtual_files_check_box.enabled (true);
-                this.virtual_files_check_box.on_signal_text (_("Use virtual files instead of downloading content immediately %1").printf (this.best_available_vfs_mode == AbstractVfs.WindowsCfApi ? "" : _(" (experimental)")));
+                this.virtual_files_check_box.on_signal_text (_("Use virtual files instead of downloading content immediately %1").printf (this.best_available_vfs_mode == Common.AbstractVfs.WindowsCfApi ? "" : _(" (experimental)")));
 
-                if (Theme.enforce_virtual_files_sync_folder) {
+                if (LibSync.Theme.enforce_virtual_files_sync_folder) {
                     this.virtual_files_check_box.checked (true);
                     this.virtual_files_check_box.disabled (true);
                 }
@@ -112,7 +112,7 @@ public class FolderWizardSelectiveSync : GLib.WizardPage {
         string target_path = wizard ().property ("target_path").to_string ();
         string alias = GLib.FileInfo (target_path).filename ();
         if (alias == "")
-            alias = Theme.app_name;
+            alias = LibSync.Theme.app_name;
         this.selective_sync.folder_info (target_path, alias);
         GLib.WizardPage.clean_up_page ();
     }

@@ -87,7 +87,7 @@ public class SettingsDialog : Gtk.Dialog {
     Maps the action in the dialog to their according account.
     Needed in case the account avatar changes.
     ***********************************************************/
-    private GLib.HashTable<Account *, GLib.Action> action_for_account;
+    private GLib.HashTable<LibSync.Account *, GLib.Action> action_for_account;
 
     /***********************************************************
     ***********************************************************/
@@ -106,7 +106,7 @@ public class SettingsDialog : Gtk.Dialog {
         base (parent);
         this.instance = new SettingsDialog ();
         this.gui = gui;
-        ConfigFile config;
+        LibSync.ConfigFile config;
 
         this.instance.up_ui (this);
         this.tool_bar = new GLib.ToolBar ();
@@ -125,7 +125,7 @@ public class SettingsDialog : Gtk.Dialog {
         object_name ("Settings"); // required account_settings group for save_geometry call
 
         // : This name refers to the application name e.g Nextcloud
-        window_title (_("%1 Settings").printf (Theme.app_name_gui));
+        window_title (_("%1 Settings").printf (LibSync.Theme.app_name_gui));
 
         AccountManager.instance.signal_account_added.connect (
             this.signal_account_added
@@ -240,7 +240,7 @@ public class SettingsDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     public void on_signal_account_avatar_changed () {
-        var account = (Account)sender ();
+        var account = (LibSync.Account)sender ();
         if (account && this.action_for_account.contains (account)) {
             GLib.Action action = this.action_for_account[account];
             if (action) {
@@ -256,7 +256,7 @@ public class SettingsDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     public void on_signal_account_display_name_changed () {
-        var account = (Account)sender ();
+        var account = (LibSync.Account)sender ();
         if (account && this.action_for_account.contains (account)) {
             GLib.Action action = this.action_for_account[account];
             if (action) {
@@ -273,7 +273,7 @@ public class SettingsDialog : Gtk.Dialog {
     Close event is not being called here
     ***********************************************************/
     protected override void reject () {
-        ConfigFile config;
+        LibSync.ConfigFile config;
         config.save_geometry (this);
         Gtk.Dialog.reject ();
     }
@@ -282,7 +282,7 @@ public class SettingsDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     protected override void on_signal_accept () {
-        ConfigFile config;
+        LibSync.ConfigFile config;
         config.save_geometry (this);
         Gtk.Dialog.on_signal_accept ();
     }
@@ -317,11 +317,11 @@ public class SettingsDialog : Gtk.Dialog {
     ***********************************************************/
     private void signal_account_added (AccountState account_state) {
         var height = this.tool_bar.size_hint ().height ();
-        bool branding_single_account = !Theme.multi_account;
+        bool branding_single_account = !LibSync.Theme.multi_account;
 
         GLib.Action account_action = null;
         Gtk.Image avatar = account_state.account.avatar ();
-        string action_text = branding_single_account ? _("Account") : account_state.account.display_name;
+        string action_text = branding_single_account ? _("LibSync.Account") : account_state.account.display_name;
         if (avatar == null) {
             account_action = create_color_aware_action (":/client/theme/account.svg",
                 action_text);
@@ -415,7 +415,7 @@ public class SettingsDialog : Gtk.Dialog {
         this.tool_bar.style_sheet (TOOLBAR_CSS ().printf (background, dark, highlight_color, highlight_text_color));
 
         foreach (GLib.Action a in this.action_group.actions ()) {
-            Gtk.IconInfo icon = Theme.create_color_aware_icon (a.property ("icon_path").to_string (), palette ());
+            Gtk.IconInfo icon = LibSync.Theme.create_color_aware_icon (a.property ("icon_path").to_string (), palette ());
             a.icon (icon);
             var btn = (Gtk.ToolButton)this.tool_bar.widget_for_action (a);
             if (btn) {
@@ -429,7 +429,7 @@ public class SettingsDialog : Gtk.Dialog {
     ***********************************************************/
     private GLib.Action create_color_aware_action (string icon_name, string filename) {
         // all buttons must have the same size in order to keep a good layout
-        Gtk.IconInfo colored_icon = Theme.create_color_aware_icon (icon_path, palette ());
+        Gtk.IconInfo colored_icon = LibSync.Theme.create_color_aware_icon (icon_path, palette ());
         return create_action_with_icon (colored_icon, filename, icon_path);
     }
 
@@ -451,7 +451,7 @@ public class SettingsDialog : Gtk.Dialog {
     settings. If width is bigger than 0, the string will be
     ellided so it does not exceed that width.
     ***********************************************************/
-    private static string short_display_name_for_settings (Account account, int width) {
+    private static string short_display_name_for_settings (LibSync.Account account, int width) {
         string user = account.dav_display_name ();
         if (user == "") {
             user = account.credentials ().user ();

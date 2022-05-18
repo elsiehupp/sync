@@ -35,7 +35,7 @@ public class NotificationConfirmJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public NotificationConfirmJob (unowned Account account) {
+    public NotificationConfirmJob (LibSync.Account account) {
         base (account, "");
         ignore_credential_failure (true);
     }

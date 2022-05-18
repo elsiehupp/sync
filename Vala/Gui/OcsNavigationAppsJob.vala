@@ -25,7 +25,7 @@ public class OcsNavigationAppsJob : OcsJob {
 
     /***********************************************************
     ***********************************************************/
-    public OcsNavigationAppsJob (Account account) {
+    public OcsNavigationAppsJob (LibSync.Account account) {
         base (account);
         path ("ocs/v2.php/core/navigation/apps");
         this.signal_job_finished.connect (

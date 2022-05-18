@@ -19,7 +19,7 @@ public class TestAllFilesDeletedKeep : AbstractTestAllFilesDeleted {
             delete_on_remote
         );
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        ConfigFile config;
+        LibSync.ConfigFile config;
         config.set_prompt_delete_files (true);
 
         //  Just set a blocklist so we can check it is still there. This directory does not exists but
@@ -27,7 +27,7 @@ public class TestAllFilesDeletedKeep : AbstractTestAllFilesDeleted {
         GLib.List<string> selective_sync_blocklist = new GLib.List<string> ();
         selective_sync_blocklist.append ("Q/");
         fake_folder.sync_engine.journal.set_selective_sync_list (
-            SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
+            Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
             selective_sync_blocklist
         );
 
@@ -60,7 +60,7 @@ public class TestAllFilesDeletedKeep : AbstractTestAllFilesDeleted {
         bool ok = true;
         GLib.assert_true (
             fake_folder.sync_engine.journal.get_gelective_sync_list (
-                SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
+                Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
                 ok
             ) ==
             selective_sync_blocklist
@@ -68,7 +68,7 @@ public class TestAllFilesDeletedKeep : AbstractTestAllFilesDeleted {
     }
 
 
-    protected void on_signal_about_to_remove_all_files_all_files_deleted_keep (LibSync.SyncFileItem.Direction directory, Callback callback) {
+    protected void on_signal_about_to_remove_all_files_all_files_deleted_keep (LibSync.LibSync.SyncFileItem.Direction directory, Callback callback) {
         GLib.assert_true (
             about_to_remove_all_files_called ==
             0
@@ -76,7 +76,7 @@ public class TestAllFilesDeletedKeep : AbstractTestAllFilesDeleted {
         about_to_remove_all_files_called++;
         GLib.assert_true (
             directory ==
-            delete_on_remote ? LibSync.SyncFileItem.Direction.DOWN : LibSync.SyncFileItem.Direction.UP
+            delete_on_remote ? LibSync.LibSync.SyncFileItem.Direction.DOWN : LibSync.LibSync.SyncFileItem.Direction.UP
         );
         callback (true);
         fake_folder.sync_engine.journal.clear_file_table (); // That's what FolderConnection is doing

@@ -49,7 +49,7 @@ public class FolderWizard : GLib.Wizard {
     /***********************************************************
     FolderConnection wizard itself
     ***********************************************************/
-    public FolderWizard (unowned Account account, Gtk.Widget parent = new Gtk.Widget ()) {
+    public FolderWizard (LibSync.Account account, Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.folder_wizard_source_page = new FolderWizardLocalPath (account);
         this.folder_wizard_target_page = null;
@@ -57,7 +57,7 @@ public class FolderWizard : GLib.Wizard {
         window_flags (window_flags () & ~GLib.WindowContextHelpButtonHint);
         page (Page.SOURCE, this.folder_wizard_source_page);
         this.folder_wizard_source_page.install_event_filter (this);
-        if (!Theme.single_sync_folder) {
+        if (!LibSync.Theme.single_sync_folder) {
             this.folder_wizard_target_page = new FolderWizardRemotePath (account);
             page (Page.TARGET, this.folder_wizard_target_page);
             this.folder_wizard_target_page.install_event_filter (this);

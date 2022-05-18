@@ -46,7 +46,7 @@ public class TestRecursiveDelete : AbstractTestSyncJournalDB {
     private void make_entry (string path) {
         SyncJournalFileRecord record;
         record.path = path;
-        record.remote_permissions = RemotePermissions.from_database_value ("RW");
+        record.remote_permissions = Common.RemotePermissions.from_database_value ("RW");
         this.database.set_file_record (record);
     }
 

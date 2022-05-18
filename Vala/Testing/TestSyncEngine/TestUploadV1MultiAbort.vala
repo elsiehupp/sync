@@ -14,7 +14,7 @@ public class TestUploadV1MultiAbort : AbstractTestSyncEngine {
     ***********************************************************/
     private TestUploadV1MultiAbort () {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
-        SyncOptions options;
+        LibSync.SyncOptions options;
         options.initial_chunk_size = 10;
         options.max_chunk_size = 10;
         options.min_chunk_size = 10;

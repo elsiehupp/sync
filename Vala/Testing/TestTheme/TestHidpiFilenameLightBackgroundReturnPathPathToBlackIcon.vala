@@ -17,7 +17,7 @@ public class TestHidpiFilenameLightBackgroundReturnPathPathToBlackIcon : Abstrac
         Gdk.RGBA background_color = Gdk.RGBA ("#ffffff");
         string icon_name = "icon-name";
 
-        var icon_path = Theme.hidpi_filename (icon_name + ".png", background_color, paint_device);
+        var icon_path = LibSync.Theme.hidpi_filename (icon_name + ".png", background_color, paint_device);
 
         GLib.assert_true (icon_path == ":/client/theme/black/" + icon_name + ".png");
     }

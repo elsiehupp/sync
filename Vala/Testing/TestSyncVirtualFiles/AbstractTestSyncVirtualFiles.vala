@@ -86,8 +86,8 @@ public class AbstractTestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected static AbstractVfs set_up_vfs (FakeFolder folder) {
-        var suffix_vfs = unowned<AbstractVfs> (create_vfs_from_plugin (AbstractVfs.WithSuffix).release ());
+    protected static Common.AbstractVfs set_up_vfs (FakeFolder folder) {
+        var suffix_vfs = unowned<Common.AbstractVfs> (create_vfs_from_plugin (Common.AbstractVfs.WithSuffix).release ());
         folder.switch_to_vfs (suffix_vfs);
 
         // Using this directly doesn't recursively unpin everything and instead leaves

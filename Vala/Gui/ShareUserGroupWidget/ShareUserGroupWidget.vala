@@ -48,7 +48,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
     ***********************************************************/
     private ShareUserGroupWidget instance;
     private GLib.Scroll_area parent_scroll_area;
-    private unowned Account account;
+    private LibSync.Account account;
     private string share_path;
     private string local_path;
     private SharePermissions max_sharing_permissions;
@@ -85,7 +85,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public ShareUserGroupWidget (
-        unowned Account account,
+        LibSync.Account account,
         string share_path,
         string local_path,
         SharePermissions max_sharing_permissions,
@@ -522,7 +522,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
         // this icon is not handled by on_signal_style_changed () . customize_style but we can live with that
         menu.add_action (
-            Theme.create_color_aware_icon (":/client/theme/copy.svg"),
+            LibSync.Theme.create_color_aware_icon (":/client/theme/copy.svg"),
             _("Copy link"),
             this,
             on_signal_private_link_copy ()
@@ -576,7 +576,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void customize_style () {
-        this.instance.confirm_share.icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
+        this.instance.confirm_share.icon (LibSync.Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
 
         this.pi_sharee.on_signal_color (GLib.Application.palette ().color (Gtk.Palette.Text));
 

@@ -132,7 +132,7 @@ public class WebViewPage : AbstractCredentialsWizardPage {
         this.user = user;
         this.pass = pass;
 
-        unowned Account account = this.oc_wizard.account;
+        LibSync.Account account = this.oc_wizard.account;
         account.url (host);
 
         GLib.info ("URL: " + field ("OcsUrl").to_string ());

@@ -57,8 +57,8 @@ public abstract class AbstractTestChunkingNg : GLib.Object {
     /***********************************************************
     Reduce max chunk size a bit so we get more chunks
     ***********************************************************/
-    protected static void set_chunk_size (SyncEngine engine, int64 size) {
-        SyncOptions options;
+    protected static void set_chunk_size (LibSync.SyncEngine engine, int64 size) {
+        LibSync.SyncOptions options;
         options.max_chunk_size = size;
         options.initial_chunk_size = size;
         options.min_chunk_size = size;

@@ -53,7 +53,7 @@ public class Flow2Auth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private Account account;
+    private LibSync.Account account;
     private GLib.Uri login_url;
     private string poll_token;
     private string poll_endpoint;
@@ -82,7 +82,7 @@ public class Flow2Auth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Flow2Auth (Account account, GLib.Object parent) {
+    public Flow2Auth (LibSync.Account account, GLib.Object parent) {
         base (parent);
         this.account = account;
         this.is_busy = false;
@@ -193,7 +193,7 @@ public class Flow2Auth : GLib.Object {
         this.poll_endpoint = poll_endpoint;
 
         // Start polling
-        ConfigFile config;
+        LibSync.ConfigFile config;
         GLib.TimeSpan polltime_in_microseconds = config.remote_poll_interval ();
         GLib.info ("setting remote poll timer interval to " + polltime_in_microseconds.length + "msec.");
         this.seconds_interval = (polltime_in_microseconds.length / 1000);

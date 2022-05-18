@@ -17,7 +17,7 @@ public class GetOrCreatePublicLinkShare : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private unowned Account account;
+    private LibSync.Account account;
     private ShareManager share_manager;
     private string local_file;
 
@@ -27,7 +27,7 @@ public class GetOrCreatePublicLinkShare : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public GetOrCreatePublicLinkShare (unowned Account account, string local_file,
+    public GetOrCreatePublicLinkShare (LibSync.Account account, string local_file,
         GLib.Object parent) {
         base (parent);
         this.account = account;

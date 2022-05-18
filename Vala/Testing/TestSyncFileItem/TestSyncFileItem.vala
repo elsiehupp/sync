@@ -11,8 +11,8 @@ public class TestSyncFileItem : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private SyncFileItem create_item (string file ) {
-        SyncFileItem i;
+    private LibSync.SyncFileItem create_item (string file ) {
+        LibSync.SyncFileItem i;
         i.file = file;
         return i;
     }
@@ -21,15 +21,15 @@ public class TestSyncFileItem : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private TestComparatorData () {
-        GLib.Test.add_column<SyncFileItem> ("a");
-        GLib.Test.add_column<SyncFileItem> ("b");
-        GLib.Test.add_column<SyncFileItem> ("c");
+        GLib.Test.add_column<LibSync.SyncFileItem> ("a");
+        GLib.Test.add_column<LibSync.SyncFileItem> ("b");
+        GLib.Test.add_column<LibSync.SyncFileItem> ("c");
 
         GLib.Test.new_row ("a1") + create_item ("client") + create_item ("client/build") + create_item ("client-build") ;
         GLib.Test.new_row ("a2") + create_item ("test/t1") + create_item ("test/t2") + create_item ("test/t3") ;
         GLib.Test.new_row ("a3") + create_item ("ABCD") + create_item ("abcd") + create_item ("zzzz");
 
-        SyncFileItem moved_item1;
+        LibSync.SyncFileItem moved_item1;
         moved_item1.file = "folder/source/file.f";
         moved_item1.rename_target = "folder/destination/file.f";
         moved_item1.instruction = CSync.SyncInstructions.RENAME;
@@ -43,9 +43,9 @@ public class TestSyncFileItem : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private TestComparator () {
-        GLib.FETCH ( SyncFileItem , a );
-        GLib.FETCH ( SyncFileItem , b );
-        GLib.FETCH ( SyncFileItem , c );
+        GLib.FETCH ( LibSync.SyncFileItem , a );
+        GLib.FETCH ( LibSync.SyncFileItem , b );
+        GLib.FETCH ( LibSync.SyncFileItem , c );
 
         GLib.assert_true (a < b);
         GLib.assert_true (b < c);

@@ -14,8 +14,8 @@ public class TestMovedWithErrorData : AbstractTestSyncMove {
     private TestMovedWithErrorData () {
         GLib.Test.add_column<Common.VfsMode> ("vfs_mode");
 
-        GLib.Test.new_row ("AbstractVfs.Off") + AbstractVfs.Off;
-        GLib.Test.new_row ("AbstractVfs.WithSuffix") + AbstractVfs.WithSuffix;
+        GLib.Test.new_row ("Common.AbstractVfs.Off") + Common.AbstractVfs.Off;
+        GLib.Test.new_row ("Common.AbstractVfs.WithSuffix") + Common.AbstractVfs.WithSuffix;
     }
 
 } // class TestMovedWithErrorData

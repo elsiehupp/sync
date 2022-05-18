@@ -41,7 +41,7 @@ public class TestRemoteDiscoveryError : GLib.Object {
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
         GLib.SignalSpy error_spy = new GLib.SignalSpy (
             fake_folder.sync_engine,
-            SyncEngine.signal_sync_error
+            LibSync.SyncEngine.signal_sync_error
         );
         GLib.assert_true (fake_folder.sync_once () == sync_succeeds);
 

@@ -40,15 +40,15 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
         register_field ("OCUser*", this.instance.le_username);
         register_field ("OCPasswd*", this.instance.le_password);
 
-        Theme theme = Theme.instance;
+        LibSync.Theme theme = LibSync.Theme.instance;
         switch (theme.user_identifier_type) {
-        case Theme.UserIdentifierType.USER_NAME:
+        case LibSync.Theme.UserIdentifierType.USER_NAME:
             // default, handled in instance file
             break;
-        case Theme.UserIdentifierType.EMAIL:
+        case LibSync.Theme.UserIdentifierType.EMAIL:
             this.instance.username_label.on_signal_text (_("&Email"));
             break;
-        case Theme.UserIdentifierType.CUSTOM:
+        case LibSync.Theme.UserIdentifierType.CUSTOM:
             this.instance.username_label.on_signal_text (theme.custom_user_id);
             break;
         default:
@@ -56,7 +56,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
         }
         this.instance.le_username.placeholder_text (theme.user_id_hint);
 
-        title (WizardCommon.title_template ().printf (_("Connect to %1").printf (Theme.app_name_gui)));
+        title (WizardCommon.title_template ().printf (_("Connect to %1").printf (LibSync.Theme.app_name_gui)));
         sub_title (WizardCommon.sub_title_template ().printf (_("Enter user credentials")));
 
         this.instance.result_layout.add_widget (this.progress_indicator);
@@ -81,7 +81,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
 
         var oc_wizard = (OwncloudWizard)wizard ();
         AbstractCredentials credentials = oc_wizard.account.credentials;
-        var http_creds = (HttpCredentials)credentials;
+        var http_creds = (LibSync.HttpCredentials)credentials;
         if (http_creds) {
             string user = http_creds.fetch_user ();
             if (!user == "") {
@@ -215,13 +215,13 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
         this.instance.top_label.hide ();
         this.instance.bottom_label.hide ();
 
-        Theme theme = Theme.instance;
-        GLib.Variant variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_TOP);
+        LibSync.Theme theme = LibSync.Theme.instance;
+        GLib.Variant variant = theme.custom_media (LibSync.Theme.CustomMediaType.OC_SETUP_TOP);
         if (!variant == null) {
             WizardCommon.set_up_custom_media (variant, this.instance.top_label);
         }
 
-        variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_BOTTOM);
+        variant = theme.custom_media (LibSync.Theme.CustomMediaType.OC_SETUP_BOTTOM);
         WizardCommon.set_up_custom_media (variant, this.instance.bottom_label);
     }
 

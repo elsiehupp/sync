@@ -31,7 +31,7 @@ public class ShareLinkWidget : Gtk.Widget {
 
     private const string PASSWORD_IS_PLACEHOLDER = "●●●●●●●●";
 
-    private unowned Account account;
+    private LibSync.Account account;
     private string share_path;
     private string local_path;
     private string share_url;
@@ -351,7 +351,7 @@ public class ShareLinkWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public ShareLinkWidget (
-        unowned Account account,
+        LibSync.Account account,
         string share_path,
         string local_path,
         SharePermissions max_sharing_permissions,
@@ -797,19 +797,19 @@ public class ShareLinkWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void customize_style () {
-        this.unshare_link_action.icon (Theme.create_color_aware_icon (":/client/theme/delete.svg"));
+        this.unshare_link_action.icon (LibSync.Theme.create_color_aware_icon (":/client/theme/delete.svg"));
 
-        this.add_another_link_action.icon (Theme.create_color_aware_icon (":/client/theme/add.svg"));
+        this.add_another_link_action.icon (LibSync.Theme.create_color_aware_icon (":/client/theme/add.svg"));
 
-        this.enable_share_link.icon (Theme.create_color_aware_icon (":/client/theme/copy.svg"));
+        this.enable_share_link.icon (LibSync.Theme.create_color_aware_icon (":/client/theme/copy.svg"));
 
-        this.share_link_icon_label.pixmap (Theme.create_color_aware_pixmap (":/client/theme/public.svg"));
+        this.share_link_icon_label.pixmap (LibSync.Theme.create_color_aware_pixmap (":/client/theme/public.svg"));
 
-        this.share_link_tool_button.icon (Theme.create_color_aware_icon (":/client/theme/more.svg"));
+        this.share_link_tool_button.icon (LibSync.Theme.create_color_aware_icon (":/client/theme/more.svg"));
 
-        this.confirm_note.icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
-        this.confirm_password.icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
-        this.confirm_expiration_date.icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
+        this.confirm_note.icon (LibSync.Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
+        this.confirm_password.icon (LibSync.Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
+        this.confirm_expiration_date.icon (LibSync.Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
 
         this.password_progress_indicator.on_signal_color (GLib.Application.palette ().color (Gtk.Palette.Text));
     }

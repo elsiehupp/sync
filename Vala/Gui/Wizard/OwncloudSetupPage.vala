@@ -57,11 +57,11 @@ public class OwncloudSetupPage : GLib.WizardPage {
 
         setup_server_address_description_label ();
 
-        Theme theme = Theme.instance;
+        LibSync.Theme theme = LibSync.Theme.instance;
         if (theme.override_server_url == "") {
             this.instance.le_url.postfix (theme.wizard_url_postfix);
             this.instance.le_url.placeholder_text (theme.WIZARD_URL_HINT);
-        } else if (Theme.force_override_server_url) {
+        } else if (LibSync.Theme.force_override_server_url) {
             this.instance.le_url.enabled (false);
         }
 
@@ -119,8 +119,8 @@ public class OwncloudSetupPage : GLib.WizardPage {
 
         this.instance.le_url.focus ();
 
-        var is_server_url_overridden = !Theme.override_server_url = "";
-        if (is_server_url_overridden && !Theme.force_override_server_url) {
+        var is_server_url_overridden = !LibSync.Theme.override_server_url = "";
+        if (is_server_url_overridden && !LibSync.Theme.force_override_server_url) {
             // If the url is overwritten but we don't force to use that url
             // Just focus the next button to let the user navigate quicker
             if (next_button) {
@@ -386,13 +386,13 @@ public class OwncloudSetupPage : GLib.WizardPage {
         this.instance.top_label.hide ();
         this.instance.bottom_label.hide ();
 
-        Theme theme = Theme.instance;
-        GLib.Variant variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_TOP);
+        LibSync.Theme theme = LibSync.Theme.instance;
+        GLib.Variant variant = theme.custom_media (LibSync.Theme.CustomMediaType.OC_SETUP_TOP);
         if (!variant == null) {
             WizardCommon.set_up_custom_media (variant, this.instance.top_label);
         }
 
-        variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_BOTTOM);
+        variant = theme.custom_media (LibSync.Theme.CustomMediaType.OC_SETUP_BOTTOM);
         WizardCommon.set_up_custom_media (variant, this.instance.bottom_label);
 
         var le_url_palette = this.instance.le_url.palette ();
@@ -405,7 +405,7 @@ public class OwncloudSetupPage : GLib.WizardPage {
     /***********************************************************
     ***********************************************************/
     private void logo () {
-        this.instance.logo_label.pixmap (Theme.wizard_application_logo);
+        this.instance.logo_label.pixmap (LibSync.Theme.wizard_application_logo);
     }
 
 
@@ -415,7 +415,7 @@ public class OwncloudSetupPage : GLib.WizardPage {
         logo ();
 
         if (this.progress_indicator) {
-            var is_dark_background = Theme.is_dark_color (palette ().window ().color ());
+            var is_dark_background = LibSync.Theme.is_dark_color (palette ().window ().color ());
             if (is_dark_background) {
                 this.progress_indicator.on_signal_color (GLib.white);
             } else {
@@ -430,7 +430,7 @@ public class OwncloudSetupPage : GLib.WizardPage {
     /***********************************************************
     ***********************************************************/
     private void setup_server_address_description_label () {
-        var app_name = Theme.app_name_gui;
+        var app_name = LibSync.Theme.app_name_gui;
         this.instance.server_address_description_label.on_signal_text (_("The link to your %1 web interface when you open it in the browser.", "%1 will be replaced with the application name").printf (app_name));
     }
 

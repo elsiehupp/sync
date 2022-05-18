@@ -38,8 +38,8 @@ public class TestMovedWithError : AbstractTestSyncMove {
 
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
-        if (vfs_mode != AbstractVfs.Off) {
-            var vfs = unowned<AbstractVfs> (create_vfs_from_plugin (vfs_mode).release ());
+        if (vfs_mode != Common.AbstractVfs.Off) {
+            var vfs = unowned<Common.AbstractVfs> (create_vfs_from_plugin (vfs_mode).release ());
             GLib.assert_true (vfs);
             fake_folder.switch_to_vfs (vfs);
             fake_folder.sync_journal ().internal_pin_states.set_for_path ("", Common.ItemAvailability.ONLINE_ONLY);
@@ -61,14 +61,14 @@ public class TestMovedWithError : AbstractTestSyncMove {
         // sync2 file is in error state, check_error_blocklisting sets instruction to IGNORED
         fake_folder.sync_once ();
 
-        if (vfs_mode != AbstractVfs.Off) {
+        if (vfs_mode != Common.AbstractVfs.Off) {
             fake_folder.sync_journal ().internal_pin_states.set_for_path ("", PinState.ALWAYS_LOCAL);
             fake_folder.sync_once ();
         }
 
         GLib.assert_true (!fake_folder.current_local_state ().find (src));
         GLib.assert_true (fake_folder.current_local_state ().find (get_name (dest)));
-        if (vfs_mode == AbstractVfs.WithSuffix) {
+        if (vfs_mode == Common.AbstractVfs.WithSuffix) {
             // the placeholder was not restored as it is still in error state
             GLib.assert_true (!fake_folder.current_local_state ().find (dest));
         }

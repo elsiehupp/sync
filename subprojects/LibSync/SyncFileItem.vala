@@ -213,7 +213,7 @@ public class SyncFileItem : GLib.Object {
     /***********************************************************
     Variable useful to report to the user
     ***********************************************************/
-    public Common.RemotePermissions remote_permissions;
+    public Common.Common.RemotePermissions remote_permissions;
 
     /***********************************************************
     Contains a string only in case of error

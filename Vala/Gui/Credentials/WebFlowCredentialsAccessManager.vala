@@ -55,9 +55,9 @@ public class WebFlowCredentialsAccessManager : LibSync.Soup.ClientContext {
     /***********************************************************
     #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
     ***********************************************************/
-    private static void add_settings_to_job (Account account, Secret.Collection.Job qkeychain_job) {
+    private static void add_settings_to_job (LibSync.Account account, Secret.Collection.Job qkeychain_job) {
         //  Q_UNUSED (account)
-        var settings = ConfigFile.settings_with_group (Theme.app_name);
+        var settings = LibSync.ConfigFile.settings_with_group (LibSync.Theme.app_name);
         settings.parent (qkeychain_job); // make the qkeychain_job parent to make setting deleted properly
         qkeychain_job.settings (settings.release ());
     }

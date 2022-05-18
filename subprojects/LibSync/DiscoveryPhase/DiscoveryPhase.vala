@@ -93,7 +93,7 @@ public class DiscoveryPhase : GLib.Object {
     /***********************************************************
     Input
     ***********************************************************/
-    public SyncJournalDb statedatabase;
+    public Common.SyncJournalDb statedatabase;
 
     /***********************************************************
     Input
@@ -108,11 +108,11 @@ public class DiscoveryPhase : GLib.Object {
     /***********************************************************
     Input
     ***********************************************************/
-    public ExcludedFiles excludes;
+    public CSync.ExcludedFiles excludes;
 
     /***********************************************************
     Input
-    FIXME: maybe move in ExcludedFiles
+    FIXME: maybe move in CSync.ExcludedFiles
     ***********************************************************/
     public GLib.Regex invalid_filename_rx;
 
@@ -252,10 +252,10 @@ public class DiscoveryPhase : GLib.Object {
     ***********************************************************/
     internal void check_selective_sync_new_folder (
         string path,
-        RemotePermissions remote_permissions,
+        Common.RemotePermissions remote_permissions,
         Callback callback) {
-        if (this.sync_options.confirm_external_storage && this.sync_options.vfs.mode () == AbstractVfs.Off
-            && remote_permissions.has_permission (RemotePermissions.Permissions.IS_MOUNTED)) {
+        if (this.sync_options.confirm_external_storage && this.sync_options.vfs.mode () == Common.AbstractVfs.Off
+            && remote_permissions.has_permission (Common.RemotePermissions.Permissions.IS_MOUNTED)) {
             // external storage.
 
             // Note: DiscoverySingleDirectoryJob.on_signal_directory_listing_iterated_slot make sure that only the
@@ -277,7 +277,7 @@ public class DiscoveryPhase : GLib.Object {
         }
 
         var limit = this.sync_options.new_big_folder_size_limit;
-        if (limit < 0 || this.sync_options.vfs.mode () != AbstractVfs.Off) {
+        if (limit < 0 || this.sync_options.vfs.mode () != Common.AbstractVfs.Off) {
             // no limit, everything is allowed;
             return callback (false);
         }
@@ -502,7 +502,7 @@ public class DiscoveryPhase : GLib.Object {
             } else if (property == "d_dC") {
                 result.direct_download_cookies = value;
             } else if (property == "permissions") {
-                result.remote_permissions = RemotePermissions.from_server_string (value);
+                result.remote_permissions = Common.RemotePermissions.from_server_string (value);
             } else if (property == "checksums") {
                 result.checksum_header = find_best_checksum (value.to_utf8 ());
             } else if (property == "share-types" && !value == "") {
@@ -514,7 +514,7 @@ public class DiscoveryPhase : GLib.Object {
                     // But for our purpose, we want to know if the file is shared. It does not matter
                     // if we are the owner or not.
                     // Piggy back on the persmission field
-                    result.remote_permissions.permission (RemotePermissions.Permissions.IS_SHARED);
+                    result.remote_permissions.permission (Common.RemotePermissions.Permissions.IS_SHARED);
                 }
             } else if (property == "is-encrypted" && value == "1") {
                 result.is_e2e_encrypted = true;

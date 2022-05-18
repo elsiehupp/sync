@@ -19,14 +19,14 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     ***********************************************************/
     private Ui_Folder_wizard_target_page instance;
     private bool warn_was_visible;
-    private unowned Account account;
+    private LibSync.Account account;
     private bool lscol_timer_active = false;
     private bool lscol_timer_repeat = false;
     private GLib.List<string> encrypted_paths;
 
     /***********************************************************
     ***********************************************************/
-    public FolderWizardRemotePath (unowned Account account) {
+    public FolderWizardRemotePath (LibSync.Account account) {
         base ();
         this.warn_was_visible = false;
         this.account = account;
@@ -175,7 +175,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     ***********************************************************/
     protected void on_signal_create_remote_folder_finished () {
         GLib.debug ("webdav mkdir request finished");
-        on_signal_show_warning (_("FolderConnection was successfully created on %1.").printf (Theme.app_name_gui));
+        on_signal_show_warning (_("FolderConnection was successfully created on %1.").printf (LibSync.Theme.app_name_gui));
         on_signal_refresh_folders ();
         this.instance.folder_entry.on_signal_text (((MkColJob)sender ()).path);
         on_signal_lscol_folder_entry ();
@@ -187,10 +187,10 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     protected void on_signal_handle_mkdir_network_error (GLib.InputStream reply) {
         GLib.warning ("webdav mkdir request failed: " + reply.error);
         if (!this.account.credentials ().still_valid (reply)) {
-            on_signal_show_warning (_("Authentication failed accessing %1").printf (Theme.app_name_gui));
+            on_signal_show_warning (_("Authentication failed accessing %1").printf (LibSync.Theme.app_name_gui));
         } else {
             on_signal_show_warning (_("Failed to create the folder on %1. Please check manually.")
-                         .printf (Theme.app_name_gui));
+                         .printf (LibSync.Theme.app_name_gui));
         }
     }
 
@@ -207,7 +207,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
             on_signal_show_warning (""); // hides the warning pane
             return;
         }
-        var lscol_job = (LscolJob)sender ();
+        var lscol_job = (LibSync.LscolJob)sender ();
         //  GLib.assert_true (lscol_job);
         on_signal_show_warning (_("Failed to list a folder. Error : %1")
                      .printf (lscol_job.error_string_parsing_body ()));
@@ -216,14 +216,14 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_update_directories (LscolJob lscol_job, GLib.List<string> list) {
+    protected void on_signal_update_directories (LibSync.LscolJob lscol_job, GLib.List<string> list) {
         string webdav_folder = GLib.Uri (this.account.dav_url ()).path;
 
         GLib.TreeWidgetItem root = this.instance.folder_tree_widget.top_level_item (0);
         if (!root) {
             root = new GLib.TreeWidgetItem (this.instance.folder_tree_widget);
-            root.on_signal_text (0, Theme.app_name_gui);
-            root.icon (0, Theme.application_icon);
+            root.on_signal_text (0, LibSync.Theme.app_name_gui);
+            root.icon (0, LibSync.Theme.application_icon);
             root.tool_tip (0, _("Choose this to sync the entire account"));
             root.data (0, GLib.USER_ROLE, "/");
         }
@@ -332,7 +332,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         if (path.has_prefix ("/"))
             path = path.mid (1);
 
-        LscolJob lscol_job = run_lscol_job (path);
+        LibSync.LscolJob lscol_job = run_lscol_job (path);
         // No error handling, no updating, we do this manually
         // because of extra logic in the typed-path case.
         disconnect (lscol_job, null, this, null);
@@ -349,15 +349,15 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_typed_path_found (GLib.List<string> subpaths) {
-        on_signal_update_directories (LscolJob lscol_job, subpaths);
+        on_signal_update_directories (subpaths);
         select_by_path (this.instance.folder_entry.text ());
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private LscolJob run_lscol_job (string path) {
-        var lscol_job = new LscolJob (this.account, path, this);
+    private LibSync.LscolJob run_lscol_job (string path) {
+        var lscol_job = new LibSync.LscolJob (this.account, path, this);
         var props = new GLib.List<string> ({ "resourcetype" });
         if (this.account.capabilities.client_side_encryption_available) {
             props += "http://nextcloud.org/ns:is-encrypted";

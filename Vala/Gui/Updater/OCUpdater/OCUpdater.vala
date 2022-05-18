@@ -137,16 +137,16 @@ public class OCUpdater : AbstractUpdater {
     /***********************************************************
     ***********************************************************/
     public bool perform_update () {
-        ConfigFile config;
+        LibSync.ConfigFile config;
         GLib.Settings settings = new GLib.Settings (config.config_file (), GLib.Settings.IniFormat);
         string update_file = settings.get_value (update_available_c).to_string ();
         if (!update_file == "" && new GLib.File (update_file).exists ()
             && !update_succeeded () /* Someone might have run the updater manually between restarts */) {
             var message_box_start_installer = new Gtk.MessageBox (Gtk.MessageBox.Information,
-                _("New %1 update ready").printf (Theme.app_name_gui),
+                _("New %1 update ready").printf (LibSync.Theme.app_name_gui),
                 _("A new update for %1 is about to be installed. The updater may ask "
                 + "for additional privileges during the process. Your computer may reboot to complete the installation.")
-                    .printf (Theme.app_name_gui),
+                    .printf (LibSync.Theme.app_name_gui),
                 Gtk.MessageBox.Ok,
                 null);
 
@@ -219,7 +219,7 @@ public class OCUpdater : AbstractUpdater {
     have been called Windows_updater
     ***********************************************************/
     public void on_signal_start_installer () {
-        ConfigFile config;
+        LibSync.ConfigFile config;
         GLib.Settings settings = new GLib.Settings (config.config_file (), GLib.Settings.IniFormat);
         string update_file = settings.get_value (update_available_c).to_string ();
         settings.get_value (auto_update_attempted_c, true);
@@ -336,7 +336,7 @@ public class OCUpdater : AbstractUpdater {
     /***********************************************************
     ***********************************************************/
     protected bool update_succeeded () {
-        ConfigFile config;
+        LibSync.ConfigFile config;
         GLib.Settings settings = new GLib.Settings (config.config_file (), GLib.Settings.IniFormat);
 
         int64 target_version_int = Helper.string_version_to_int (settings.get_value (update_target_version_c).to_string ());

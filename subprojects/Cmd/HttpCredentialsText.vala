@@ -10,7 +10,7 @@ namespace Cmd {
 
 @copyright GPLv3 or Later
 ***********************************************************/
-public class HttpCredentialsText : HttpCredentials {
+public class HttpCredentialsText : LibSync.HttpCredentials {
 
     /***********************************************************
     ***********************************************************/

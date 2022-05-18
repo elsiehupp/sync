@@ -11,11 +11,11 @@ namespace Ui {
 @brief The SslDialogErrorHandler class
 @ingroup gui
 ***********************************************************/
-public class SslDialogErrorHandler : AbstractSslErrorHandler {
+public class SslDialogErrorHandler : LibSync.AbstractSslErrorHandler {
 
     /***********************************************************
     ***********************************************************/
-    public override bool handle_errors (GLib.List<GLib.SslError> errors, GLib.SslConfiguration conf, GLib.List<GLib.SslCertificate> certificates, unowned Account account) {
+    public override bool handle_errors (GLib.List<GLib.SslError> errors, GLib.SslConfiguration conf, GLib.List<GLib.SslCertificate> certificates, LibSync.Account account) {
         //  (void)conf;
         if (!certificates) {
             GLib.critical ("Certs parameter required but is NULL!");

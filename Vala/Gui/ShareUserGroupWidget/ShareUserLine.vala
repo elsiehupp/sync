@@ -15,7 +15,7 @@ public class ShareUserLine : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private ShareUserLine instance;
-    private unowned Account account;
+    private LibSync.Account account;
 
     unowned UserGroupShare share { public get; private set; }
 
@@ -42,7 +42,7 @@ public class ShareUserLine : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public ShareUserLine (unowned Account account,
+    public ShareUserLine (LibSync.Account account,
         UserGroupShare Share,
         SharePermissions max_sharing_permissions,
         bool is_file,
@@ -222,7 +222,7 @@ public class ShareUserLine : Gtk.Widget {
         https://github.com/owncloud/client/issues/4996
             */
         if (share.share_type == Share.Type.REMOTE
-            && share.account.server_version_int < Account.make_server_version (9, 1, 0)) {
+            && share.account.server_version_int < LibSync.Account.make_server_version (9, 1, 0)) {
             this.permission_reshare.visible (false);
             this.instance.permission_tool_button.visible (false);
         }
@@ -643,16 +643,16 @@ public class ShareUserLine : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void customize_style () {
-        this.instance.permission_tool_button.icon (Theme.create_color_aware_icon (":/client/theme/more.svg"));
+        this.instance.permission_tool_button.icon (LibSync.Theme.create_color_aware_icon (":/client/theme/more.svg"));
 
         Gtk.IconInfo delete_icon = Gtk.IconInfo.from_theme (
             "user-trash",
-            Theme.create_color_aware_icon (":/client/theme/delete.svg")
+            LibSync.Theme.create_color_aware_icon (":/client/theme/delete.svg")
         );
 
         this.delete_share_button.icon (delete_icon);
 
-        this.instance.note_confirm_button.icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
+        this.instance.note_confirm_button.icon (LibSync.Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
         this.instance.progress_indicator.on_signal_color (GLib.Application.palette ().color (Gtk.Palette.Window_text));
 
         // make sure to force Background_role to Gtk.Palette.Window_text for a lable, because it's parent always has a different role set that applies to children unless customized
@@ -841,9 +841,9 @@ public class ShareUserLine : Gtk.Widget {
     private Gdk.RGBA background_color_for_sharee_type (Sharee.Type type) {
         switch (type) {
         case Sharee.Type.ROOM:
-            return Theme.wizard_header_background_color;
+            return LibSync.Theme.wizard_header_background_color;
         case Sharee.Type.EMAIL:
-            return Theme.wizard_header_title_color;
+            return LibSync.Theme.wizard_header_title_color;
         case Sharee.Type.GROUP:
         case Sharee.Type.FEDERATED:
         case Sharee.Type.CIRCLE:

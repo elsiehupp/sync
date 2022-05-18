@@ -29,7 +29,7 @@ public class FileStat : GLib.Object {
     public int64 size = 0;
     public uint64 inode = 0;
 
-    public RemotePermissions remote_permissions;
+    public Common.RemotePermissions remote_permissions;
     public ItemType type = BITFIELD (4);
     public bool child_modified = BITFIELD (1);
     public bool has_ignored_files = BITFIELD (1); // Specify that a directory, or child directory contains ignored files.
@@ -56,7 +56,7 @@ public class FileStat : GLib.Object {
     public SyncInstructions instruction = SyncInstructions.NONE; // u32
 
     public FileStat () {
-        this.type = ItemType.SKIP;
+        this.type = CSync.ItemType.SKIP;
         this.child_modified = false;
         this.has_ignored_files = false;
         this.is_hidden = false;

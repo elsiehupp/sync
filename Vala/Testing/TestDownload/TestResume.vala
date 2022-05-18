@@ -19,7 +19,7 @@ public class TestResume : GLib.Object {
         fake_folder.sync_engine.set_ignore_hidden_files (true);
         GLib.SignalSpy complete_spy = new GLib.SignalSpy (
             fake_folder.sync_engine,
-            signal_item_completed (SyncFileItem)
+            signal_item_completed (LibSync.SyncFileItem)
         );
         var size = 30 * 1000 * 1000;
         fake_folder.remote_modifier ().insert ("A/a0", size);
@@ -28,7 +28,7 @@ public class TestResume : GLib.Object {
         fake_folder.set_server_override (this.override_delegate_resume1);
 
         GLib.assert_true (!fake_folder.sync_once ()); // The sync must fail because not all the file was downloaded
-        GLib.assert_true (get_item (complete_spy, "A/a0").status == SyncFileItem.Status.SOFT_ERROR);
+        GLib.assert_true (get_item (complete_spy, "A/a0").status == LibSync.SyncFileItem.Status.SOFT_ERROR);
         GLib.assert_true (get_item (complete_spy, "A/a0").error_string == "The file could not be downloaded completely.");
         GLib.assert_true (fake_folder.sync_engine.is_another_sync_needed ());
 

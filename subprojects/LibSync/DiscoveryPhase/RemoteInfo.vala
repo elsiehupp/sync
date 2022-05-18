@@ -19,7 +19,7 @@ public class RemoteInfo : GLib.Object {
     public string etag;
     public public string file_identifier;
     public string checksum_header;
-    public RemotePermissions remote_permissions;
+    public Common.RemotePermissions remote_permissions;
     public time_t modtime = 0;
     public int64 size = 0;
     public int64 size_of_folder = 0;

@@ -42,7 +42,7 @@ public class OcsShareJob : OcsJob {
     /***********************************************************
     Constructor for new shares or listing of shares
     ***********************************************************/
-    public OcsShareJob (unowned Account account) {
+    public OcsShareJob (LibSync.Account account) {
         base (account);
         path ("ocs/v2.php/apps/files_sharing/api/v1/shares");
         this.signal_job_finished.connect (

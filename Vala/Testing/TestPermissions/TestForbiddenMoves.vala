@@ -50,10 +50,10 @@ public class TestForbiddenMoves : AbstractTestPermissions {
         rm.insert ("zallowed/sub/file");
         rm.insert ("zallowed/sub2/file");
 
-        on_set_all_perm (rm.find ("norename"), RemotePermissions.from_server_string ("WDVCK"));
-        on_set_all_perm (rm.find ("nomove"), RemotePermissions.from_server_string ("WDNCK"));
-        on_set_all_perm (rm.find ("nocreatefile"), RemotePermissions.from_server_string ("WDNVK"));
-        on_set_all_perm (rm.find ("nocreatedir"), RemotePermissions.from_server_string ("WDNVC"));
+        on_set_all_perm (rm.find ("norename"), Common.RemotePermissions.from_server_string ("WDVCK"));
+        on_set_all_perm (rm.find ("nomove"), Common.RemotePermissions.from_server_string ("WDNCK"));
+        on_set_all_perm (rm.find ("nocreatefile"), Common.RemotePermissions.from_server_string ("WDNVK"));
+        on_set_all_perm (rm.find ("nocreatedir"), Common.RemotePermissions.from_server_string ("WDNVC"));
 
         GLib.assert_true (fake_folder.sync_once ());
 
@@ -72,7 +72,7 @@ public class TestForbiddenMoves : AbstractTestPermissions {
         lm.rename ("zallowed/sub2", "nocreatedir/zsub2");
 
         // also hook into discovery!!
-        GLib.List<unowned SyncFileItem> discovery;
+        GLib.List<unowned LibSync.SyncFileItem> discovery;
         fake_folder.sync_engine.signal_about_to_propagate.connect (
             this.on_signal_sync_engine_about_to_propagate
         );
@@ -137,7 +137,7 @@ public class TestForbiddenMoves : AbstractTestPermissions {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_sync_engine_about_to_propagate (GLib.List<unowned SyncFileItem> *discovery, GLib.List<unowned SyncFileItem> v) {
+    private void on_signal_sync_engine_about_to_propagate (GLib.List<unowned LibSync.SyncFileItem> *discovery, GLib.List<unowned LibSync.SyncFileItem> v) {
         discovery = *v;
     }
 

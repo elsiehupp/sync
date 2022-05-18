@@ -18,7 +18,7 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    unowned Account account {
+    LibSync.Account account {
         public get {
             this.account_state.account;
         }
@@ -102,7 +102,7 @@ public class User : GLib.Object {
             this.on_signal_has_local_folder_changed
         );
         this.signal_gui_log.connect (
-            LibSync.Logger.instance.on_signal_gui_log
+            LibSync.Logger.on_signal_gui_log
         );
         this.account_state.account.account_changed_avatar.connect (
             this.signal_avatar_changed
@@ -360,7 +360,7 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void process_completed_sync_item (FolderConnection folder_connection, SyncFileItem sync_file_item) {
+    public void process_completed_sync_item (FolderConnection folder_connection, LibSync.SyncFileItem sync_file_item) {
         Activity activity;
         activity.type = Activity.Type.SYNC_FILE_ITEM; //client activity
         activity.status = sync_file_item.status;
@@ -382,10 +382,10 @@ public class User : GLib.Object {
             activity.file_action = "file_changed";
         }
 
-        if (sync_file_item.status == LibSync.SyncFileItem.Status.NO_STATUS || sync_file_item.status == LibSync.SyncFileItem.Status.SUCCESS) {
+        if (sync_file_item.status == LibSync.LibSync.SyncFileItem.Status.NO_STATUS || sync_file_item.status == LibSync.LibSync.SyncFileItem.Status.SUCCESS) {
             GLib.warning ("Item " + sync_file_item.file + " retrieved successfully.");
 
-            if (sync_file_item.direction != LibSync.SyncFileItem.Direction.UP) {
+            if (sync_file_item.direction != LibSync.LibSync.SyncFileItem.Direction.UP) {
                 activity.message = _("Synced %1").printf (sync_file_item.original_file);
             } else if (activity.file_action == "file_renamed") {
                 activity.message = _("You renamed %1").printf (sync_file_item.original_file);
@@ -402,11 +402,11 @@ public class User : GLib.Object {
             GLib.warning ("Item " + sync_file_item.file + " retrieved resulted in error " + sync_file_item.error_string);
             activity.subject = sync_file_item.error_string;
 
-            if (sync_file_item.status == LibSync.SyncFileItem.Status.FileIgnored) {
+            if (sync_file_item.status == LibSync.LibSync.SyncFileItem.Status.FileIgnored) {
                 this.activity_model.add_ignored_file_to_list (activity);
             } else {
                 // add 'protocol error' to activity list
-                if (sync_file_item.status == LibSync.SyncFileItem.Status.FileNameInvalid) {
+                if (sync_file_item.status == LibSync.LibSync.SyncFileItem.Status.FileNameInvalid) {
                     show_desktop_notification (sync_file_item.file, activity.subject);
                 }
                 this.activity_model.add_error_to_activity_list (activity);
@@ -417,7 +417,7 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_item_completed (string folder_connection, SyncFileItem sync_file_item) {
+    public void on_signal_item_completed (string folder_connection, LibSync.SyncFileItem sync_file_item) {
         try {
             var folder_connection = FolderManager.instance.folder_by_alias (folder_connection);
 
@@ -472,7 +472,7 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_add_error_to_gui (string folder_alias, LibSync.SyncFileItem.Status status, string error_message, string subject) {
+    public void on_signal_add_error_to_gui (string folder_alias, LibSync.LibSync.SyncFileItem.Status status, string error_message, string subject) {
         try {
             var folder_connection = FolderManager.instance.folder_by_alias (folder_alias);
 
@@ -575,17 +575,17 @@ public class User : GLib.Object {
                         continue;
                     }
 
-                    if (activity.status == LibSync.SyncFileItem.Status.CONFLICT && !GLib.FileInfo (folder_connection.path + activity.file).exists ()) {
+                    if (activity.status == LibSync.LibSync.SyncFileItem.Status.CONFLICT && !GLib.FileInfo (folder_connection.path + activity.file).exists ()) {
                         this.activity_model.remove_activity_from_activity_list (activity);
                         continue;
                     }
 
-                    if (activity.status == LibSync.SyncFileItem.Status.FILE_LOCKED && !GLib.FileInfo (folder_connection.path + activity.file).exists ()) {
+                    if (activity.status == LibSync.LibSync.SyncFileItem.Status.FILE_LOCKED && !GLib.FileInfo (folder_connection.path + activity.file).exists ()) {
                         this.activity_model.remove_activity_from_activity_list (activity);
                         continue;
                     }
 
-                    if (activity.status == LibSync.SyncFileItem.Status.FILE_IGNORED && !GLib.FileInfo (folder_connection.path + activity.file).exists ()) {
+                    if (activity.status == LibSync.LibSync.SyncFileItem.Status.FILE_IGNORED && !GLib.FileInfo (folder_connection.path + activity.file).exists ()) {
                         this.activity_model.remove_activity_from_activity_list (activity);
                         continue;
                     }
@@ -613,7 +613,7 @@ public class User : GLib.Object {
             GLib.List<string> conflicts;
             foreach (Activity activity in this.activity_model.errors_list ()) {
                 if (activity.folder_connection_alias == folder_connection_alias
-                    && activity.status == LibSync.SyncFileItem.Status.CONFLICT) {
+                    && activity.status == LibSync.LibSync.SyncFileItem.Status.CONFLICT) {
                     conflicts.append (activity.file);
                 }
             }
@@ -818,16 +818,16 @@ public class User : GLib.Object {
         disconnect (this.account_state.account.push_notifications (), PushNotificationManager.notifications_changed, this, User.on_signal_received_push_notification);
         disconnect (this.account_state.account.push_notifications (), PushNotificationManager.activities_changed, this, User.on_signal_received_push_activity);
 
-        disconnect (this.account_state.account, Account.push_notifications_disabled, this, User.on_signal_disconnect_push_notifications);
+        disconnect (this.account_state.account, LibSync.Account.push_notifications_disabled, this, User.on_signal_disconnect_push_notifications);
 
         // connection to Web_socket may have dropped or an error occured, so we need to bring back the polling until we have re-established the connection
-        on_signal_notification_refresh_interval (ConfigFile ().notification_refresh_interval ());
+        on_signal_notification_refresh_interval (LibSync.ConfigFile ().notification_refresh_interval ());
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_received_push_notification (Account account) {
+    private void on_signal_received_push_notification (LibSync.Account account) {
         if (account.identifier == this.account_state.account.identifier) {
             on_signal_refresh_notifications ();
         }
@@ -836,7 +836,7 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_received_push_activity (Account account) {
+    private void on_signal_received_push_activity (LibSync.Account account) {
         if (account.identifier == this.account_state.account.identifier) {
             on_signal_refresh_activities ();
         }
@@ -889,15 +889,15 @@ public class User : GLib.Object {
     We only care about conflict issues that we are able to
     resolve
     ***********************************************************/
-    private static bool is_unsolvable_conflict (SyncFileItem sync_file_item) {
-        return sync_file_item.status == LibSync.SyncFileItem.Status.CONFLICT && !Utility.is_conflict_file (sync_file_item.file);
+    private static bool is_unsolvable_conflict (LibSync.SyncFileItem sync_file_item) {
+        return sync_file_item.status == LibSync.LibSync.SyncFileItem.Status.CONFLICT && !Utility.is_conflict_file (sync_file_item.file);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void show_desktop_notification (string title, string message) {
-        ConfigFile config;
+        LibSync.ConfigFile config;
         if (!config.optional_server_notifications () || !are_desktop_notifications_allowed) {
             return;
         }

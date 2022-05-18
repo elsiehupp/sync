@@ -78,24 +78,24 @@ public class WelcomePage : GLib.WizardPage {
     /***********************************************************
     ***********************************************************/
     private void style_slide_show () {
-        var theme = Theme.instance;
+        var theme = LibSync.Theme.instance;
         var background_color = palette ().window ().color ();
 
-        var wizard_nextcloud_icon_filename = theme.is_branded ? Theme.hidpi_filename ("wizard-nextcloud.png", background_color)
-                                                                    : Theme.hidpi_filename (":/client/theme/colored/wizard-nextcloud.png");
-        var wizard_files_icon_filename = theme.is_branded ? Theme.hidpi_filename ("wizard-files.png", background_color)
-                                                                : Theme.hidpi_filename (":/client/theme/colored/wizard-files.png");
-        var wizard_groupware_icon_filename = theme.is_branded ? Theme.hidpi_filename ("wizard-groupware.png", background_color)
-                                                                    : Theme.hidpi_filename (":/client/theme/colored/wizard-groupware.png");
-        var wizard_talk_icon_filename = theme.is_branded ? Theme.hidpi_filename ("wizard-talk.png", background_color)
-                                                               : Theme.hidpi_filename (":/client/theme/colored/wizard-talk.png");
+        var wizard_nextcloud_icon_filename = theme.is_branded ? LibSync.Theme.hidpi_filename ("wizard-nextcloud.png", background_color)
+                                                                    : LibSync.Theme.hidpi_filename (":/client/theme/colored/wizard-nextcloud.png");
+        var wizard_files_icon_filename = theme.is_branded ? LibSync.Theme.hidpi_filename ("wizard-files.png", background_color)
+                                                                : LibSync.Theme.hidpi_filename (":/client/theme/colored/wizard-files.png");
+        var wizard_groupware_icon_filename = theme.is_branded ? LibSync.Theme.hidpi_filename ("wizard-groupware.png", background_color)
+                                                                    : LibSync.Theme.hidpi_filename (":/client/theme/colored/wizard-groupware.png");
+        var wizard_talk_icon_filename = theme.is_branded ? LibSync.Theme.hidpi_filename ("wizard-talk.png", background_color)
+                                                               : LibSync.Theme.hidpi_filename (":/client/theme/colored/wizard-talk.png");
 
         this.instance.slide_show.add_slide (wizard_nextcloud_icon_filename, _("Keep your data secure and under your control"));
         this.instance.slide_show.add_slide (wizard_files_icon_filename, _("Secure collaboration & file exchange"));
         this.instance.slide_show.add_slide (wizard_groupware_icon_filename, _("Easy-to-use web mail, calendaring & contacts"));
         this.instance.slide_show.add_slide (wizard_talk_icon_filename, _("Screensharing, online meetings & web conferences"));
 
-        bool is_dark_background = Theme.is_dark_color (background_color);
+        bool is_dark_background = LibSync.Theme.is_dark_color (background_color);
         this.instance.slide_show_next_button.icon (theme.ui_theme_icon ("control-next.svg", is_dark_background));
         this.instance.slide_show_previous_button.icon (theme.ui_theme_icon ("control-prev.svg", is_dark_background));
     }
@@ -119,7 +119,7 @@ public class WelcomePage : GLib.WizardPage {
     /***********************************************************
     ***********************************************************/
     private void set_up_login_button () {
-        string app_name = Theme.app_name_gui;
+        string app_name = LibSync.Theme.app_name_gui;
 
         this.instance.login_button.on_signal_text (_("Log in to your %1").printf (app_name));
         this.instance.login_button.clicked.connect (

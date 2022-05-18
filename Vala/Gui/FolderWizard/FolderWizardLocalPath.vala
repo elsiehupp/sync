@@ -21,11 +21,11 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
 
     FolderConnection.Map folder_map { private get; public set; }
 
-    private unowned Account account;
+    private LibSync.Account account;
 
     /***********************************************************
     ***********************************************************/
-    public FolderWizardLocalPath (Account account) {
+    public FolderWizardLocalPath (LibSync.Account account) {
         base ();
         this.account = account;
         this.instance.up_ui (this);
@@ -37,7 +37,7 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
 
         GLib.Uri server_url = this.account.url;
         server_url.user_name (this.account.credentials ().user ());
-        string default_path = GLib.Dir.home_path + "/" + Theme.app_name;
+        string default_path = GLib.Dir.home_path + "/" + LibSync.Theme.app_name;
         default_path = FolderManager.instance.find_good_path_for_new_sync_folder (default_path, server_url);
         this.instance.local_folder_line_edit.on_signal_text (GLib.Dir.to_native_separators (default_path));
         this.instance.local_folder_line_edit.tool_tip (_("Enter the path to the local folder."));

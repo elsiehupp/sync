@@ -533,7 +533,7 @@ public class UnifiedSearchResultsListModel : GLib.Object {
         this.unified_search_text_editing_finished_timer_active = false;
 
         if (this.account_state == null || this.account_state.account == null) {
-            GLib.critical ("Account state is invalid. Could not on_signal_start search!");
+            GLib.critical ("LibSync.Account state is invalid. Could not on_signal_start search!");
             return;
         }
 

@@ -48,7 +48,7 @@ public class FolderDefinition : GLib.Object {
     /***********************************************************
     Which virtual files setting the folder uses
     ***********************************************************/
-    public Common.VfsMode virtual_files_mode = AbstractVfs.Off;
+    public Common.VfsMode virtual_files_mode = Common.AbstractVfs.Off;
 
     /***********************************************************
     The CLSID where this folder appears in registry for the Explorer navigation pane entry.
@@ -73,7 +73,7 @@ public class FolderDefinition : GLib.Object {
         settings.get_value ("virtual_files_mode", Common.VfsMode.to_string (folder.virtual_files_mode));
 
         // Ensure new vfs modes won't be attempted by older clients
-        if (folder.virtual_files_mode == AbstractVfs.WindowsCfApi) {
+        if (folder.virtual_files_mode == Common.AbstractVfs.WindowsCfApi) {
             settings.get_value (VERSION_C, 3);
         } else {
             settings.get_value (VERSION_C, 2);
@@ -101,7 +101,7 @@ public class FolderDefinition : GLib.Object {
         folder.ignore_hidden_files = settings.get_value ("ignore_hidden_files", GLib.Variant (true)).to_bool ();
         folder.navigation_pane_clsid = settings.get_value ("navigation_pane_clsid").to_uuid ();
 
-        folder.virtual_files_mode = AbstractVfs.Off;
+        folder.virtual_files_mode = Common.AbstractVfs.Off;
         string vfs_mode_string = settings.get_value ("virtual_files_mode").to_string ();
         if (!vfs_mode_string == "") {
             if (var mode = Common.VfsMode.from_string (vfs_mode_string)) {
@@ -111,7 +111,7 @@ public class FolderDefinition : GLib.Object {
             }
         } else {
             if (settings.get_value ("use_placeholders").to_bool ()) {
-                folder.virtual_files_mode = AbstractVfs.WithSuffix;
+                folder.virtual_files_mode = Common.AbstractVfs.WithSuffix;
                 folder.upgrade_vfs_mode = true; // maybe winvfs is available?
             }
         }
@@ -182,8 +182,8 @@ public class FolderDefinition : GLib.Object {
     Returns the relative journal path that's appropriate for
     this folder and account.
     ***********************************************************/
-    public string default_journal_path (unowned Account account) {
-        return SyncJournalDb.make_database_name (local_path, account.url, target_path, account.credentials ().user ());
+    public string default_journal_path (LibSync.Account account) {
+        return Common.SyncJournalDb.make_database_name (local_path, account.url, target_path, account.credentials ().user ());
     }
 
 } // class FolderDefinition

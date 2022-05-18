@@ -40,7 +40,7 @@ public abstract class AbstractTestOAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected Account account;
+    protected LibSync.Account account;
 
     /***********************************************************
     ***********************************************************/
@@ -55,7 +55,7 @@ public abstract class AbstractTestOAuth : GLib.Object {
     ***********************************************************/
     protected virtual void test () {
         fake_soup_context = new FakeQNAM ({});
-        account = Account.create ();
+        account = LibSync.Account.create ();
         account.set_url (s_oauth_test_server);
         account.set_credentials (new FakeCredentials (fake_soup_context));
         fake_soup_context.set_parent (this);
@@ -90,7 +90,7 @@ public abstract class AbstractTestOAuth : GLib.Object {
         GLib.assert_true (url.to_string ().has_prefix (s_oauth_test_server.to_string ()));
         GLib.UrlQuery query = new GLib.UrlQuery (url);
         GLib.assert_true (query.query_item_value ("response_type") == "code");
-        GLib.assert_true (query.query_item_value ("client_id") == Theme.oauth_client_id);
+        GLib.assert_true (query.query_item_value ("client_id") == LibSync.Theme.oauth_client_id);
         GLib.Uri redirect_uri = new GLib.Uri (query.query_item_value ("redirect_uri"));
         GLib.assert_true (redirect_uri.host () == "localhost");
         redirect_uri.set_query ("code=" + code);

@@ -18,7 +18,7 @@ public class LocalInfo : GLib.Object {
     public time_t modtime = 0;
     public int64 size = 0;
     public uint64 inode = 0;
-    public ItemType type = ItemType.SKIP;
+    public ItemType type = CSync.ItemType.SKIP;
     public bool is_directory = false;
     public bool is_hidden = false;
     public bool is_virtual_file = false;

@@ -8,7 +8,7 @@ namespace LibSync {
 
 @copyright GPLv3 or Later
 ***********************************************************/
-public class VfsXAttr : Common.AbstractVfs {
+public class VfsXAttr : Common.Common.AbstractVfs {
 
     /***********************************************************
     ***********************************************************/

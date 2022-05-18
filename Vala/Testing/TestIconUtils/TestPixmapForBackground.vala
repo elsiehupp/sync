@@ -13,10 +13,10 @@ public class TestPixmapForBackground : AbstractTestIconUtils {
     /***********************************************************
     ***********************************************************/
     private TestPixmapForBackground () {
-        GLib.Dir black_svg_dir = new GLib.Dir (Theme.THEME_PREFIX + "black");
+        GLib.Dir black_svg_dir = new GLib.Dir (LibSync.Theme.THEME_PREFIX + "black");
         GLib.List<string> black_images = black_svg_dir.entry_list ("*.svg");
 
-        GLib.Dir white_svg_dir = new GLib.Dir (Theme.THEME_PREFIX + "white");
+        GLib.Dir white_svg_dir = new GLib.Dir (LibSync.Theme.THEME_PREFIX + "white");
         GLib.List<string> white_images = white_svg_dir.entry_list ("*.svg");
 
         GLib.assert_true (!black_images == "");

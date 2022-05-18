@@ -57,8 +57,8 @@ public abstract class AbstractTestSyncXAttr : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected static AbstractVfs set_up_vfs (FakeFolder folder) {
-        var xattr_vfs = new AbstractVfs (create_vfs_from_plugin (AbstractVfs.XAttr).release ());
+    protected static Common.AbstractVfs set_up_vfs (FakeFolder folder) {
+        var xattr_vfs = new Common.AbstractVfs (create_vfs_from_plugin (Common.AbstractVfs.XAttr).release ());
         folder.sync_engine.sync_file_status_tracker.signal_file_status_changed.connect (
             xattr_vfs.on_signal_file_status_changed
         );

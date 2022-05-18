@@ -17,7 +17,7 @@ public class AbstractTestUnifiedSearchListmodel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected FakeQNAM fake_access_manager;
-    protected Account account;
+    protected LibSync.Account account;
     protected AccountState account_state;
     protected UnifiedSearchResultsListModel model;
     protected GLib.AbstractItemModelTester model_tester;
@@ -34,7 +34,7 @@ public class AbstractTestUnifiedSearchListmodel : GLib.Object {
     ***********************************************************/
     protected void on_signal_init_test_case () {
         fake_access_manager.reset (new FakeQNAM ({}));
-        account = Account.create ();
+        account = LibSync.Account.create ();
         account.set_credentials (new FakeCredentials (fake_access_manager));
         account.set_url (GLib.Uri ("http://example.de"));
 

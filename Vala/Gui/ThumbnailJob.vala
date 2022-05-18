@@ -19,7 +19,7 @@ public class ThumbnailJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public ThumbnailJob (string path, unowned Account account, GLib.Object parent = new GLib.Object ()) {
+    public ThumbnailJob (string path, LibSync.Account account, GLib.Object parent = new GLib.Object ()) {
         base (account, "index.php/apps/files/api/v1/thumbnail/150/150/" + path, parent);
         ignore_credential_failure (true);
     }

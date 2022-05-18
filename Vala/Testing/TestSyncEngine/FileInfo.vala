@@ -15,7 +15,7 @@ public class FileInfo : AbstractFileModifier {
     public int operation_status = 200;
     public bool is_directory = true;
     public bool is_shared = false;
-    public RemotePermissions permissions; // When uset, defaults to everything
+    public Common.RemotePermissions permissions; // When uset, defaults to everything
     public GLib.DateTime last_modified = GLib.DateTime.current_date_time_utc ().add_days (-7);
 
     public string checksums;

@@ -21,8 +21,8 @@ public class SocketUploadJob : GLib.Object {
     private string remote_path;
     private string pattern;
     private GLib.TemporaryFile temporary;
-    private SyncJournalDb database;
-    private SyncEngine sync_engine;
+    private Common.SyncJournalDb database;
+    private LibSync.SyncEngine sync_engine;
     private GLib.List<string> synced_files = new GLib.List<string> ();
 
     /***********************************************************
@@ -53,8 +53,8 @@ public class SocketUploadJob : GLib.Object {
             return;
         }
 
-        this.database = new SyncJournalDb (this.temporary.filename (), this);
-        this.sync_engine = new SyncEngine (account.account, this.local_path.has_suffix ("/") ? this.local_path : this.local_path + "/", this.remote_path, this.database);
+        this.database = new Common.SyncJournalDb (this.temporary.filename (), this);
+        this.sync_engine = new LibSync.SyncEngine (account.account, this.local_path.has_suffix ("/") ? this.local_path : this.local_path + "/", this.remote_path, this.database);
         this.sync_engine.parent (this.database);
 
         this.sync_engine.signal_item_completed.connect (
@@ -72,7 +72,7 @@ public class SocketUploadJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_sync_engine_item_completed (SyncFileItem item) {
+    private void on_signal_sync_engine_item_completed (LibSync.SyncFileItem item) {
         this.synced_files.append (item.file);
     }
 
@@ -119,7 +119,7 @@ public class SocketUploadJob : GLib.Object {
         var mkcol_job = new MkColJob (this.sync_engine.account, this.remote_path);
         mkcol_job.signal_finished_without_error.connect (
             this.sync_engine,
-            SyncEngine.on_signal_start_sync
+            LibSync.SyncEngine.on_signal_start_sync
         );
         mkcol_job.signal_finished_with_error.connect (
             this.on_signal_mkcol_job_finished_with_error

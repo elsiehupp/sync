@@ -15,7 +15,7 @@ public class TestFileRecordChecksum : AbstractTestSyncJournalDB {
     private TestFileRecordChecksum () {
         SyncJournalFileRecord record = new SyncJournalFileRecord ();
         record.path = "foo-checksum";
-        record.remote_permissions = RemotePermissions.from_database_value (" ");
+        record.remote_permissions = Common.RemotePermissions.from_database_value (" ");
         record.checksum_header = "MD5:mychecksum";
         record.modtime = Utility.date_time_to_time_t (GLib.DateTime.current_date_time_utc ());
         GLib.assert_true (this.database.set_file_record (record));
@@ -35,7 +35,7 @@ public class TestFileRecordChecksum : AbstractTestSyncJournalDB {
 
         record = new SyncJournalFileRecord ()
         record.path = "foo-nochecksum";
-        record.remote_permissions = RemotePermissions.from_database_value ("RW");
+        record.remote_permissions = Common.RemotePermissions.from_database_value ("RW");
         record.modtime = Utility.date_time_to_time_t (GLib.DateTime.current_date_time_utc ());
 
         GLib.assert_true (this.database.set_file_record (record));

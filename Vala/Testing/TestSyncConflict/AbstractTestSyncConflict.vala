@@ -16,13 +16,13 @@ public abstract class AbstractTestSyncConflict : GLib.Object {
 
     protected static bool item_successful (ItemCompletedSpy spy, string path, CSync.SyncInstructions instr) {
         var item = spy.find_item (path);
-        return item.status == SyncFileItem.Status.SUCCESS && item.instruction == instr;
+        return item.status == LibSync.SyncFileItem.Status.SUCCESS && item.instruction == instr;
     }
 
 
     protected static bool item_conflict (ItemCompletedSpy spy, string path) {
         var item = spy.find_item (path);
-        return item.status == SyncFileItem.Status.CONFLICT && item.instruction == CSync.SyncInstructions.CONFLICT;
+        return item.status == LibSync.SyncFileItem.Status.CONFLICT && item.instruction == CSync.SyncInstructions.CONFLICT;
     }
 
 

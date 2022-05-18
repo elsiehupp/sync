@@ -33,11 +33,11 @@ public class TestHttp2Resend : GLib.Object {
 
         GLib.SignalSpy complete_spy = new GLib.SignalSpy (
             fake_folder.sync_engine,
-            signal_item_completed (SyncFileItem)
+            signal_item_completed (LibSync.SyncFileItem)
         );
         GLib.assert_true (!fake_folder.sync_once ());
         GLib.assert_true (resend_actual == 4); // the 4th fails because it only resends 3 times
-        GLib.assert_true (get_item (complete_spy, "A/resendme").status == SyncFileItem.Status.NORMAL_ERROR);
+        GLib.assert_true (get_item (complete_spy, "A/resendme").status == LibSync.SyncFileItem.Status.NORMAL_ERROR);
         GLib.assert_true (get_item (complete_spy, "A/resendme").error_string.contains (server_message));
     }
 

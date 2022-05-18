@@ -14,26 +14,26 @@ public class TestCSyncExcludedPerDir : AbstractTestCSyncExclude {
     ***********************************************************/
     private TestCSyncExcludedPerDir () {
         var temporary_directory = GLib.StandardPaths.writable_location (GLib.StandardPaths.TempLocation);
-        excluded_files.reset (new ExcludedFiles (temporary_directory + "/"));
+        excluded_files.reset (new CSync.ExcludedFiles (temporary_directory + "/"));
         excluded_files.set_wildcards_match_slash (false);
         excluded_files.add_manual_exclude ("A");
         excluded_files.reload_exclude_files ();
 
-        GLib.assert_true (check_file_full ("A") == CSync.ExcludedFiles.Type.LIST);
+        GLib.assert_true (check_file_full ("A") == CSync.CSync.ExcludedFiles.Type.LIST);
 
         excluded_files.clear_manual_excludes ();
         excluded_files.add_manual_exclude ("A", temporary_directory + "/B/");
         excluded_files.reload_exclude_files ();
 
-        GLib.assert_true (check_file_full ("A") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
-        GLib.assert_true (check_file_full ("B/A") == CSync.ExcludedFiles.Type.LIST);
+        GLib.assert_true (check_file_full ("A") == CSync.CSync.ExcludedFiles.Type.NOT_EXCLUDED);
+        GLib.assert_true (check_file_full ("B/A") == CSync.CSync.ExcludedFiles.Type.LIST);
 
         excluded_files.clear_manual_excludes ();
         excluded_files.add_manual_exclude ("A/a1", temporary_directory + "/B/");
         excluded_files.reload_exclude_files ();
 
-        GLib.assert_true (check_file_full ("A") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
-        GLib.assert_true (check_file_full ("B/A/a1") == CSync.ExcludedFiles.Type.LIST);
+        GLib.assert_true (check_file_full ("A") == CSync.CSync.ExcludedFiles.Type.NOT_EXCLUDED);
+        GLib.assert_true (check_file_full ("B/A/a1") == CSync.CSync.ExcludedFiles.Type.LIST);
 
         string foo_directory = "check_csync1/foo";
         GLib.assert_true (new GLib.Dir (temporary_directory).mkpath (foo_directory));
@@ -46,8 +46,8 @@ public class TestCSyncExcludedPerDir : AbstractTestCSyncExclude {
 
         excluded_files.add_exclude_file_path (foo_exclude_list);
         excluded_files.reload_exclude_files ();
-        GLib.assert_true (check_file_full (foo_directory + "/bar") == CSync.ExcludedFiles.Type.LIST);
-        GLib.assert_true (check_file_full (oo_directory + "/baz") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
+        GLib.assert_true (check_file_full (foo_directory + "/bar") == CSync.CSync.ExcludedFiles.Type.LIST);
+        GLib.assert_true (check_file_full (oo_directory + "/baz") == CSync.CSync.ExcludedFiles.Type.NOT_EXCLUDED);
     }
 
 } // class TestCSyncExcludedPerDir

@@ -20,7 +20,7 @@ public class TestErrorMessage : GLib.Object {
         fake_folder.sync_engine.set_ignore_hidden_files (true);
         GLib.SignalSpy complete_spy = new GLib.SignalSpy (
             fake_folder.sync_engine,
-            signal_item_completed (SyncFileItem)
+            signal_item_completed (LibSync.SyncFileItem)
         );
         var size = 3500000;
         fake_folder.remote_modifier ().insert ("A/broken", size);
@@ -41,7 +41,7 @@ public class TestErrorMessage : GLib.Object {
             });
         GLib.assert_true (!fake_folder.sync_once ());  // Fail because A/broken
         GLib.assert_true (!timed_out);
-        GLib.assert_true (get_item (complete_spy, "A/broken").status == SyncFileItem.Status.NORMAL_ERROR);
+        GLib.assert_true (get_item (complete_spy, "A/broken").status == LibSync.SyncFileItem.Status.NORMAL_ERROR);
         GLib.assert_true (get_item (complete_spy, "A/broken").error_string.contains (server_message));
     }
 

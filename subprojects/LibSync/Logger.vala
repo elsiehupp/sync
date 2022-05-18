@@ -54,11 +54,12 @@ public class Logger : GLib.Object {
         }
     }
 
-    private bool do_file_flush = false;
-    int log_expire { private get; public set; }
-    bool log_debug {
+
+    /***********************************************************
+    ***********************************************************/
+    public static bool log_debug {
         public get {
-            return this.log_debug;
+            return Logger.log_debug;
         }
         public set {
             GLib.List<string> rules = new GLib.List<string> ();
@@ -69,21 +70,23 @@ public class Logger : GLib.Object {
                 rules.append ("");
                 remove_log_rule (rules);
             }
-            this.log_debug = value;
+            Logger.log_debug = value;
         }
     }
+    public static string log_directory;
+    private static bool temporary_folder_log_directory;
+    public static int log_expire { private get; public set; }
+    public static bool log_flush { private get; public set; }
 
     private GLib.OutputStream logstream;
     private /*mutable*/ GLib.Mutex mutex;
-    public string log_directory;
-    private bool temporary_folder_log_dir = false;
 
-    GLib.List<string> log_rules {
+    public static GLib.List<string> log_rules {
         private get {
             return this.log_rules;
         }
         public set {
-            this.log_rules = value;
+            Logger.log_rules = value;
             string temporary;
             GLib.OutputStream output = new GLib.OutputStream (temporary);
             foreach (var p in value) {
@@ -107,8 +110,6 @@ public class Logger : GLib.Object {
     ***********************************************************/
     private Logger (GLib.Object parent = new GLib.Object ()) {
         base (parent);
-        this.log_debug = false;
-        this.log_expire = 0;
         q_message_pattern ("%{time yyyy-MM-dd hh:mm:ss:zzz} [ %{type} %{category} %{file}:%{line} "
                             + "]%{if-debug}\t[ %{function} ]%{endif}:\t%{message}");
         this.crash_log.resize (CRASH_LOG_SIZE);
@@ -118,8 +119,16 @@ public class Logger : GLib.Object {
     }
 
 
+    static construct {
+        log_flush = false;
+        log_debug = false;
+        log_expire = 0;
+        temporary_folder_log_directory = false;
+    }
+
+
     private void message_handler (QtMsgType type, GLib.MessageLogContext context, string message) {
-        Logger.instance.do_log (type, context, message);
+        Logger.do_log (type, context, message);
     }
 
 
@@ -134,15 +143,19 @@ public class Logger : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static Logger instance {
-        return Logger.log;
+        public get {
+            return Logger.log;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool is_logging_to_file () {
-        GLib.MutexLocker lock = new GLib.MutexLocker (this.mutex);
-        return this.logstream;
+    public static is_logging_to_file {
+        public get {
+            GLib.MutexLocker lock = new GLib.MutexLocker (this.mutex);
+            return this.logstream;
+        }
     }
 
 
@@ -156,7 +169,7 @@ public class Logger : GLib.Object {
             this.crash_log[this.crash_log_index] = message;
             if (this.logstream != null) {
                 (this.logstream) + message + GLib.endl;
-                if (this.do_file_flush) {
+                if (this.log_flush) {
                     this.logstream.flush ();
                 }
             }
@@ -202,13 +215,6 @@ public class Logger : GLib.Object {
 
 
     /***********************************************************
-    ***********************************************************/
-    public void log_flush (bool flush) {
-        this.do_file_flush = flush;
-    }
-
-
-    /***********************************************************
     Returns where the automatic logdir would be
     ***********************************************************/
     public string temporary_folder_log_dir_path {
@@ -225,15 +231,15 @@ public class Logger : GLib.Object {
 
     Used in conjunction with ConfigFile.automatic_log_dir
     ***********************************************************/
-    public void setup_temporary_folder_log_dir () {
+    public static void setup_temporary_folder_log_dir () {
         var directory = temporary_folder_log_dir_path;
         if (!new GLib.Dir ().mkpath (directory)) {
             return;
         }
-        this.log_debug = true;
-        this.log_expire = 4; /*hours*/
-        this.log_directory = directory;
-        this.temporary_folder_log_dir = true;
+        Logger.log_debug = true;
+        Logger.log_expire = 4; /*hours*/
+        Logger.log_directory = directory;
+        Logger.temporary_folder_log_directory = true;
     }
 
 
@@ -241,14 +247,14 @@ public class Logger : GLib.Object {
     For switching off via logwindow
     ***********************************************************/
     public void disable_temporary_folder_log_dir () {
-        if (!this.temporary_folder_log_dir)
+        if (!this.temporary_folder_log_directory)
             return;
 
         on_signal_enter_next_log_file ();
         this.log_directory = "";
         this.log_debug = false;
         this.log_file = "";
-        this.temporary_folder_log_dir = false;
+        this.temporary_folder_log_directory = false;
     }
 
 

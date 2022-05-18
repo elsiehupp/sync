@@ -125,7 +125,7 @@ public class ConnectionValidator : GLib.Object {
     ***********************************************************/
     private GLib.List<string> errors;
     private unowned AccountState account_state;
-    private unowned Account account;
+    private LibSync.Account account;
     private bool is_checking_server_and_auth;
 
     /***********************************************************
@@ -173,7 +173,7 @@ public class ConnectionValidator : GLib.Object {
     ***********************************************************/
     public void on_signal_system_proxy_lookup_done (Soup.NetworkProxy proxy) {
         if (this.account == null) {
-            GLib.warning ("Bailing out, Account had been deleted.");
+            GLib.warning ("Bailing out, LibSync.Account had been deleted.");
             return;
         }
 
@@ -443,14 +443,14 @@ public class ConnectionValidator : GLib.Object {
 
         // We cannot deal with servers < 7.0.0
         if (this.account.server_version_int
-            && this.account.server_version_int < Account.make_server_version (7, 0, 0)) {
+            && this.account.server_version_int < LibSync.Account.make_server_version (7, 0, 0)) {
             this.errors.append (_("The configured server for this client is too old"));
             this.errors.append (_("Please update to the latest server and restart the client."));
             report_result (ServerVersionMismatch);
             return false;
         }
         // We attempt to work with servers >= 7.0.0 but warn users.
-        // Check usages of Account.server_version_unsupported for details.
+        // Check usages of LibSync.Account.server_version_unsupported for details.
 
     //  #if GLib.T_VERSION >= GLib.T_VERSION_CHECK (5, 9, 0)
         // Record that the server supports HTTP/2

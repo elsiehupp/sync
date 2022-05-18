@@ -38,13 +38,13 @@ public abstract class AbstractTestSyncMove : GLib.Object {
 
     protected static bool item_successful (ItemCompletedSpy spy, string path, CSync.SyncInstructions instr) {
         var item = spy.find_item (path);
-        return item.status == SyncFileItem.Status.SUCCESS && item.instruction == instr;
+        return item.status == LibSync.SyncFileItem.Status.SUCCESS && item.instruction == instr;
     }
 
 
     protected static bool item_conflict (ItemCompletedSpy spy, string path) {
         var item = spy.find_item (path);
-        return item.status == SyncFileItem.Status.CONFLICT && item.instruction == CSync.SyncInstructions.CONFLICT;
+        return item.status == LibSync.SyncFileItem.Status.CONFLICT && item.instruction == CSync.SyncInstructions.CONFLICT;
     }
 
 
@@ -82,7 +82,7 @@ public abstract class AbstractTestSyncMove : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private static string get_name (Common.VfsMode vfs_mode, string s) {
-        if (vfs_mode == AbstractVfs.WithSuffix) {
+        if (vfs_mode == Common.AbstractVfs.WithSuffix) {
             return s + Common.Config.APPLICATION_DOTVIRTUALFILE_SUFFIX;
         }
         return s;

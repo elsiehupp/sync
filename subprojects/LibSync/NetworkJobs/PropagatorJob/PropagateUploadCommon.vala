@@ -515,7 +515,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
         if (!result) {
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error));
             return;
-        } else if (result == AbstractVfs.ConvertToPlaceholderResult.Locked) {
+        } else if (result == Common.AbstractVfs.ConvertToPlaceholderResult.Locked) {
             on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").printf (this.item.file));
             return;
         }

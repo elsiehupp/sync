@@ -149,7 +149,7 @@ public abstract class AbstractVfs : GLib.Object {
     Create a new dehydrated placeholder. Called from PropagateDownload.
     Q_REQUIRED_RESULT
     ***********************************************************/
-    public abstract Result<void, string> create_placeholder (SyncFileItem sync_file_item);
+    public abstract Result<void, string> create_placeholder (LibSync.SyncFileItem sync_file_item);
 
 
     /***********************************************************
@@ -159,7 +159,7 @@ public abstract class AbstractVfs : GLib.Object {
     (like pin states) may be essential for some vfs plugins.
     Q_REQUIRED_RESULT
     ***********************************************************/
-    public abstract Result<void, string> dehydrate_placeholder (SyncFileItem sync_file_item);
+    public abstract Result<void, string> dehydrate_placeholder (LibSync.SyncFileItem sync_file_item);
 
 
     /***********************************************************
@@ -169,7 +169,7 @@ public abstract class AbstractVfs : GLib.Object {
     become hydrated placeholder files.
     Q_REQUIRED_RESULT
     ***********************************************************/
-    public abstract bool needs_metadata_update (SyncFileItem sync_file_item);
+    public abstract bool needs_metadata_update (LibSync.SyncFileItem sync_file_item);
 
 
     /***********************************************************
@@ -189,7 +189,7 @@ public abstract class AbstractVfs : GLib.Object {
     ***********************************************************/
     public abstract Result<AbstractVfs.ConvertToPlaceholderResult, string> convert_to_placeholder (
         string filename,
-        SyncFileItem sync_file_item,
+        LibSync.SyncFileItem sync_file_item,
         string replaces_file = "");
 
 

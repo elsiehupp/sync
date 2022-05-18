@@ -15,14 +15,14 @@ public class TestSelectiveSyncBigFolders : GLib.Object {
     ***********************************************************/
     private TestSelectiveSyncBigFolders () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        SyncOptions options;
+        LibSync.SyncOptions options;
         options.new_big_folder_size_limit = 20000; // 20 K
         fake_folder.sync_engine.set_sync_options (options);
 
         GLib.List<string> size_requests;
         fake_folder.set_server_override (this.override_delegate);
 
-        GLib.SignalSpy signal_new_big_folder = new GLib.SignalSpy (fake_folder.sync_engine, SyncEngine.signal_new_big_folder);
+        GLib.SignalSpy signal_new_big_folder = new GLib.SignalSpy (fake_folder.sync_engine, LibSync.SyncEngine.signal_new_big_folder);
 
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
@@ -64,7 +64,7 @@ public class TestSelectiveSyncBigFolders : GLib.Object {
 
         // Simulate that we accept all files by seting a wildcard allow list
         fake_folder.sync_engine.journal.set_selective_sync_list (
-            SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
+            Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
             { "/" }
         );
         fake_folder.sync_engine.journal.schedule_path_for_remote_discovery ("A/new_big_dir");

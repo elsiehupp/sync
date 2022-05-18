@@ -42,7 +42,7 @@ public class AbstractTestPermissions : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected static void set_all_perm (FileInfo file_info, RemotePermissions remote_permissions) {
+    protected static void set_all_perm (FileInfo file_info, Common.RemotePermissions remote_permissions) {
         file_info.permissions = remote_permissions;
         foreach (var sub_file_info in file_info.children) {
             set_all_perm (sub_file_info, remote_permissions);
@@ -56,7 +56,7 @@ public class AbstractTestPermissions : GLib.Object {
         GLib.Regex regular_expression = new GLib.Regex ("this.PERM_ ([^this.]*)this.[^/]*$");
         var m = regular_expression.match (info.name);
         if (m.has_match ()) {
-            info.permissions = RemotePermissions.from_server_string (m.captured (1));
+            info.permissions = Common.RemotePermissions.from_server_string (m.captured (1));
         }
 
         foreach (FileInfo sub in info.children) {
@@ -71,7 +71,7 @@ public class AbstractTestPermissions : GLib.Object {
     function.
        @see https://github.com/owncloud/client/issues/2038
     ***********************************************************/
-    protected static static void assert_csync_journal_ok (SyncJournalDb journal) {
+    protected static static void assert_csync_journal_ok (Common.SyncJournalDb journal) {
         // The DB is openend in locked mode : close to allow us to access.
         journal.close ();
 
@@ -86,13 +86,13 @@ public class AbstractTestPermissions : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected static SyncFileItem find_discovery_item (GLib.List<unowned SyncFileItem> spy, string path) {
+    protected static LibSync.SyncFileItem find_discovery_item (GLib.List<unowned LibSync.SyncFileItem> spy, string path) {
         foreach (var item in spy) {
             if (item.destination () == path) {
                 return item;
             }
         }
-        return new SyncFileItem (new SyncFileItem ());
+        return new LibSync.SyncFileItem (new LibSync.SyncFileItem ());
     }
 
 
@@ -106,7 +106,7 @@ public class AbstractTestPermissions : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected static bool discovery_instruction (GLib.List<unowned SyncFileItem> spy, string path, CSync.SyncInstructions instr) {
+    protected static bool discovery_instruction (GLib.List<unowned LibSync.SyncFileItem> spy, string path, CSync.SyncInstructions instr) {
         var item = find_discovery_item (spy, path);
         return item.instruction == instr;
     }

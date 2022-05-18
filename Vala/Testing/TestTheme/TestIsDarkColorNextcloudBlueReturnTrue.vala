@@ -15,7 +15,7 @@ public class TestIsDarkColorNextcloudBlueReturnTrue : AbstractTestTheme {
     private TestIsDarkColorNextcloudBlueReturnTrue () {
         Gdk.RGBA color = Gdk.RGBA (0, 130, 201);
 
-        var result = Theme.is_dark_color (color);
+        var result = LibSync.Theme.is_dark_color (color);
 
         GLib.assert_true (result == true);
     }

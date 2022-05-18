@@ -13,7 +13,7 @@ public class TestReloadExcludeFilesFileDoesNotExistReturnFalse : AbstractTestCSy
     /***********************************************************
     ***********************************************************/
     private TestReloadExcludeFilesFileDoesNotExistReturnFalse () {
-        excluded_files.reset (new ExcludedFiles ());
+        excluded_files.reset (new CSync.ExcludedFiles ());
         string non_existing_file = "directory/.sync-exclude.lst";
         excluded_files.add_exclude_file_path (non_existing_file);
         GLib.assert_true (excluded_files.reload_exclude_files () == false);

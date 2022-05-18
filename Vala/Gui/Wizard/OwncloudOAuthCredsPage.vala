@@ -32,17 +32,17 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
         base ();
         this.instance.up_ui (this);
 
-        Theme theme = Theme.instance;
+        LibSync.Theme theme = LibSync.Theme.instance;
         this.instance.top_label.hide ();
         this.instance.bottom_label.hide ();
-        GLib.Variant variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_TOP);
+        GLib.Variant variant = theme.custom_media (LibSync.Theme.CustomMediaType.OC_SETUP_TOP);
         WizardCommon.set_up_custom_media (variant, this.instance.top_label);
-        variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_BOTTOM);
+        variant = theme.custom_media (LibSync.Theme.CustomMediaType.OC_SETUP_BOTTOM);
         WizardCommon.set_up_custom_media (variant, this.instance.bottom_label);
 
         WizardCommon.init_error_label (this.instance.error_label);
 
-        title (WizardCommon.title_template ().printf (_("Connect to %1").printf (Theme.app_name_gui)));
+        title (WizardCommon.title_template ().printf (_("Connect to %1").printf (LibSync.Theme.app_name_gui)));
         sub_title (WizardCommon.sub_title_template ().printf (_("Login in your browser")));
 
         this.instance.open_link_button.clicked.connect (

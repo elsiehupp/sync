@@ -33,16 +33,16 @@ public class TestDirectoryDownloadWithError : AbstractTestSyncEngine {
 
         GLib.List<string> seen;
         foreach (GLib.List<GLib.Variant> args in complete_spy) {
-            var item = args[0].value<SyncFileItem> ();
+            var item = args[0].value<LibSync.SyncFileItem> ();
             GLib.debug () + item.file + item.is_directory () + item.status;
             GLib.assert_true (!seen.contains (item.file)); // signal only sent once per item
             seen.insert (item.file);
             if (item.file == "Y/Z/d2") {
-                GLib.assert_true (item.status == SyncFileItem.Status.NORMAL_ERROR);
+                GLib.assert_true (item.status == LibSync.SyncFileItem.Status.NORMAL_ERROR);
             } else if (item.file == "Y/Z/d3") {
-                GLib.assert_true (item.status != SyncFileItem.Status.SUCCESS);
+                GLib.assert_true (item.status != LibSync.SyncFileItem.Status.SUCCESS);
             } else if (!item.is_directory ()) {
-                GLib.assert_true (item.status == SyncFileItem.Status.SUCCESS);
+                GLib.assert_true (item.status == LibSync.SyncFileItem.Status.SUCCESS);
             }
         }
     }

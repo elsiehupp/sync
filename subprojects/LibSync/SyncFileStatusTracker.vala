@@ -138,7 +138,7 @@ public class SyncFileStatusTracker : GLib.Object {
                 this.sync_problems[item.destination ()] = Common.SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED;
             }
 
-            SharedFlag shared_flag = item.remote_permissions.has_permission (RemotePermissions.Permissions.IS_SHARED) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED;
+            SharedFlag shared_flag = item.remote_permissions.has_permission (Common.RemotePermissions.Permissions.IS_SHARED) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED;
             if (item.instruction != CSync.SyncInstructions.NONE
                 && item.instruction != CSync.SyncInstructions.UPDATE_METADATA
                 && item.instruction != CSync.SyncInstructions.IGNORE
@@ -186,7 +186,7 @@ public class SyncFileStatusTracker : GLib.Object {
             this.sync_problems.erase (item.destination ());
         }
 
-        SharedFlag shared_flag = item.remote_permissions.has_permission (RemotePermissions.Permissions.IS_SHARED) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED;
+        SharedFlag shared_flag = item.remote_permissions.has_permission (Common.RemotePermissions.Permissions.IS_SHARED) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED;
         if (item.instruction != CSync.SyncInstructions.NONE
             && item.instruction != CSync.SyncInstructions.UPDATE_METADATA
             && item.instruction != CSync.SyncInstructions.IGNORE
@@ -359,9 +359,9 @@ public class SyncFileStatusTracker : GLib.Object {
             return resolve_sync_and_error_status ("", SharedFlag.NOT_SHARED);
         }
 
-        // The SyncEngine won't notify us at all for CSync.ExcludedFiles.Type.EXCLUDE_SILENT
-        // and CSync.ExcludedFiles.Type.EXCLUDE_AND_REMOVE excludes. Even though it's possible
-        // that the status of CSync.ExcludedFiles.Type.LIST excludes will change if the user
+        // The SyncEngine won't notify us at all for CSync.CSync.ExcludedFiles.Type.EXCLUDE_SILENT
+        // and CSync.CSync.ExcludedFiles.Type.EXCLUDE_AND_REMOVE excludes. Even though it's possible
+        // that the status of CSync.CSync.ExcludedFiles.Type.LIST excludes will change if the user
         // update the exclude list at runtime and doing it statically here removes
         // our ability to notify changes through the signal_file_status_changed signal,
         // it's an acceptable compromize to treat all exclude types the same.
@@ -381,7 +381,7 @@ public class SyncFileStatusTracker : GLib.Object {
         // First look it up in the database to know if it's shared
         SyncJournalFileRecord sync_journal_file_record;
         if (this.sync_engine.journal.get_file_record (relative_path, sync_journal_file_record) && sync_journal_file_record.is_valid) {
-            return this.resolve_sync_and_error_status (relative_path, sync_journal_file_record.remote_permissions.has_permission (RemotePermissions.Permissions.IS_SHARED) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED);
+            return this.resolve_sync_and_error_status (relative_path, sync_journal_file_record.remote_permissions.has_permission (Common.RemotePermissions.Permissions.IS_SHARED) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED);
         }
 
         // Must be a new file not yet in the database, check if it's syncing or has an error.

@@ -65,7 +65,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
         );
         button_text (GLib.Wizard.FinishButton, _("Connect"));
 
-        if (Theme.enforce_virtual_files_sync_folder) {
+        if (LibSync.Theme.enforce_virtual_files_sync_folder) {
             this.instance.r_sync_everything.disabled (true);
             this.instance.r_selective_sync.disabled (true);
             this.instance.b_selective_sync.disabled (true);
@@ -87,9 +87,9 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
             this.on_signal_selective_sync_clicked
         );
 
-        Theme theme = Theme.instance;
+        LibSync.Theme theme = LibSync.Theme.instance;
         Gtk.IconInfo app_icon = theme.application_icon;
-        int app_icon_size = Theme.is_hidpi () ? 128 : 64;
+        int app_icon_size = LibSync.Theme.is_hidpi () ? 128 : 64;
 
         this.instance.l_server_icon.pixmap (app_icon.pixmap (app_icon_size));
 
@@ -102,7 +102,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
             this.instance.conf_trailling_size_label.hide ();
         }
 
-        this.instance.r_virtual_file_sync.on_signal_text (_("Use virtual files instead of downloading content immediately %1").printf (this.best_available_vfs_mode == AbstractVfs.WindowsCfApi ? "" : _(" (experimental)")));
+        this.instance.r_virtual_file_sync.on_signal_text (_("Use virtual files instead of downloading content immediately %1").printf (this.best_available_vfs_mode == Common.AbstractVfs.WindowsCfApi ? "" : _(" (experimental)")));
     }
 
 
@@ -128,7 +128,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
     public void initialize_page () {
         WizardCommon.init_error_label (this.instance.error_label);
 
-        if (!Theme.show_virtual_files_option || this.best_available_vfs_mode == AbstractVfs.Off) {
+        if (!LibSync.Theme.show_virtual_files_option || this.best_available_vfs_mode == Common.AbstractVfs.Off) {
             // If the layout were wrapped in a widget, the var-grouping of the
             // radio buttons no longer works and there are surprising margins.
             // Just manually hide the button and remove the layout.
@@ -159,7 +159,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
         );
         quota_job.on_signal_start ();
 
-        if (Theme.wizard_selective_sync_default_nothing) {
+        if (LibSync.Theme.wizard_selective_sync_default_nothing) {
             this.selective_sync_blocklist = {
                 "/"
             };
@@ -167,11 +167,11 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
             GLib.Timeout.add (0, this.on_signal_selective_sync_clicked);
         }
 
-        ConfigFile config_file;
-        var new_folder_limit = ConfigFile.new_big_folder_size_limit;
+        LibSync.ConfigFile config_file;
+        var new_folder_limit = LibSync.ConfigFile.new_big_folder_size_limit;
         this.instance.conf_check_box_size.checked (new_folder_limit.first);
         this.instance.conf_spin_box.value (new_folder_limit.second);
-        this.instance.conf_check_box_external.checked (ConfigFile.confirm_external_storage ());
+        this.instance.conf_check_box_external.checked (LibSync.ConfigFile.confirm_external_storage ());
 
         fetch_user_avatar ();
         user_information ();
@@ -199,7 +199,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
     ***********************************************************/
     public bool validate_page () {
         if (use_virtual_file_sync ()) {
-            var availability = AbstractVfs.check_availability (local_folder ());
+            var availability = Common.AbstractVfs.check_availability (local_folder ());
             if (!availability) {
                 var message = new Gtk.MessageBox (Gtk.MessageBox.Warning, _("Virtual files are not available for the selected folder"), availability.error, Gtk.MessageBox.Ok, this);
                 message.attribute (GLib.WA_DeleteOnClose);
@@ -215,9 +215,9 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
             signal_complete_changed ();
 
             if (this.instance.r_sync_everything.is_checked ()) {
-                ConfigFile.new_big_folder_size_limit (this.instance.conf_check_box_size.is_checked (),
+                LibSync.ConfigFile.new_big_folder_size_limit (this.instance.conf_check_box_size.is_checked (),
                     this.instance.conf_spin_box.value ());
-                ConfigFile.confirm_external_storage (this.instance.conf_check_box_external.is_checked ());
+                LibSync.ConfigFile.confirm_external_storage (this.instance.conf_check_box_external.is_checked ());
             }
 
             signal_create_local_and_remote_folders (local_folder (), this.remote_folder);
@@ -333,7 +333,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
     /***********************************************************
     ***********************************************************/
     private bool on_signal_selective_sync_clicked () {
-        unowned Account acc = ((OwncloudWizard) wizard ()).account;
+        LibSync.Account acc = ((OwncloudWizard) wizard ()).account;
         var dialog = new SelectiveSyncDialog (acc, this.remote_folder, this.selective_sync_blocklist, this);
         dialog.attribute (GLib.WA_DeleteOnClose);
 
@@ -443,13 +443,13 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
         this.instance.top_label.hide ();
         this.instance.bottom_label.hide ();
 
-        Theme theme = Theme.instance;
-        GLib.Variant variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_TOP);
+        LibSync.Theme theme = LibSync.Theme.instance;
+        GLib.Variant variant = theme.custom_media (LibSync.Theme.CustomMediaType.OC_SETUP_TOP);
         if (!variant == null) {
             WizardCommon.set_up_custom_media (variant, this.instance.top_label);
         }
 
-        variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_BOTTOM);
+        variant = theme.custom_media (LibSync.Theme.CustomMediaType.OC_SETUP_BOTTOM);
         WizardCommon.set_up_custom_media (variant, this.instance.bottom_label);
 
         WizardCommon.customize_hint_label (this.instance.l_free_space);
@@ -480,7 +480,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
             } else {
                 status_string = Utility.escape (_(" (%1 folder \"%2\" is synced to local folder \"%3\")")
                                         .printf (
-                                            Theme.app_name,
+                                            LibSync.Theme.app_name,
                                             this.remote_folder,
                                             GLib.Dir.to_native_separators (loc_folder)
                                         )
@@ -576,7 +576,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
     ***********************************************************/
     private void customize_style () {
         if (this.progress_indicator) {
-            var is_dark_background = Theme.is_dark_color (palette ().window ().color ());
+            var is_dark_background = LibSync.Theme.is_dark_color (palette ().window ().color ());
             if (is_dark_background) {
                 this.progress_indicator.on_signal_color (GLib.white);
             } else {
@@ -621,7 +621,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
     /***********************************************************
     ***********************************************************/
     private void style_sync_logo () {
-        var sync_arrow_icon = Theme.create_color_aware_icon (":/client/theme/sync-arrow.svg", palette ());
+        var sync_arrow_icon = LibSync.Theme.create_color_aware_icon (":/client/theme/sync-arrow.svg", palette ());
         this.instance.sync_logo_label.pixmap (sync_arrow_icon.pixmap (Gdk.Rectangle (50, 50)));
     }
 
@@ -630,8 +630,8 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
     ***********************************************************/
     private void style_local_folder_label () {
         var background_color = palette ().window ().color ();
-        var folder_icon_filename = Theme.is_branded ? Theme.hidpi_filename ("folder.png", background_color)
-                                                                       : Theme.hidpi_filename (":/client/theme/colored/folder.png");
+        var folder_icon_filename = LibSync.Theme.is_branded ? LibSync.Theme.hidpi_filename ("folder.png", background_color)
+                                                                       : LibSync.Theme.hidpi_filename (":/client/theme/colored/folder.png");
         this.instance.l_local.pixmap (folder_icon_filename);
     }
 
@@ -665,12 +665,12 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
     ***********************************************************/
     private void fetch_user_avatar () {
         // Reset user avatar
-        var app_icon = Theme.application_icon;
+        var app_icon = LibSync.Theme.application_icon;
         this.instance.l_server_icon.pixmap (app_icon.pixmap (48));
         // Fetch user avatar
         var account = this.oc_wizard.account;
         var avatar_size = 64;
-        if (Theme.is_hidpi ()) {
+        if (LibSync.Theme.is_hidpi ()) {
             avatar_size *= 2;
         }
         AvatarJob avatar_job = new AvatarJob (account, account.dav_user, avatar_size, this);
@@ -718,7 +718,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
             radio_checked (this.instance.r_sync_everything);
             this.instance.r_virtual_file_sync.enabled (false);
         } else {
-            this.instance.r_virtual_file_sync.on_signal_text (_("Use virtual files instead of downloading content immediately %1").printf (this.best_available_vfs_mode == AbstractVfs.WindowsCfApi ? "" : _(" (experimental)")));
+            this.instance.r_virtual_file_sync.on_signal_text (_("Use virtual files instead of downloading content immediately %1").printf (this.best_available_vfs_mode == Common.AbstractVfs.WindowsCfApi ? "" : _(" (experimental)")));
             this.instance.r_virtual_file_sync.enabled (true);
         }
         //  

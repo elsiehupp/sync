@@ -33,7 +33,7 @@ public class Theme : GLib.Object {
     public static Theme instance {
         public get {
             if (Theme.instance == null) {
-                Theme.instance = new THEME_CLASS ();
+                Theme.instance = new Theme ();
                 // some themes may not call the base ctor
                 Theme.mono = false;
             }
@@ -790,7 +790,7 @@ public class Theme : GLib.Object {
                     .printf (help_url);
 
             dev_string += _("<p><small>Using files plugin : %1</small></p>")
-                            .printf (AbstractVfs.Mode.to_string (this.best_available_vfs_mode));
+                            .printf (Common.AbstractVfs.Mode.to_string (this.best_available_vfs_mode));
             dev_string += "<br>%1"
                     .printf (GLib.SysInfo.product_type () % '-' % GLib.SysInfo.kernel_version ());
 
@@ -1224,7 +1224,7 @@ public class Theme : GLib.Object {
     ***********************************************************/
     public static bool show_virtual_files_option {
         public get {
-            return new ConfigFile ().show_experimental_options () || Theme.best_available_vfs_mode == AbstractVfs.WindowsCfApi;
+            return new ConfigFile ().show_experimental_options () || Theme.best_available_vfs_mode == Common.AbstractVfs.WindowsCfApi;
         }
     }
 
@@ -1233,7 +1233,7 @@ public class Theme : GLib.Object {
     ***********************************************************/
     public static bool enforce_virtual_files_sync_folder {
         public get {
-            return ENFORCE_VIRTUAL_FILES_SYNC_FOLDER && Theme.best_available_vfs_mode != AbstractVfs.Off;
+            return ENFORCE_VIRTUAL_FILES_SYNC_FOLDER && Theme.best_available_vfs_mode != Common.AbstractVfs.Off;
         }
     }
 
@@ -1270,7 +1270,7 @@ public class Theme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private const string THEME_PREFIX = ":/client/theme/";
+    public const string THEME_PREFIX = ":/client/theme/";
 
 
     /***********************************************************

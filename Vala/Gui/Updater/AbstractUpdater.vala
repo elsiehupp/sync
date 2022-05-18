@@ -126,7 +126,7 @@ public abstract class AbstractUpdater : GLib.Object {
     private static GLib.UrlQuery query_params {
         public get {
             GLib.UrlQuery query;
-            Theme theme = Theme.instance;
+            LibSync.Theme theme = LibSync.Theme.instance;
             string platform = "stranger";
             if (Utility.is_linux ()) {
                 platform = "linux";
@@ -153,13 +153,13 @@ public abstract class AbstractUpdater : GLib.Object {
             string suffix = Common.NextcloudVersion.MIRALL_VERSION_SUFFIX;
             query.add_query_item ("versionsuffix", suffix);
 
-            var channel = ConfigFile ().update_channel;
+            var channel = LibSync.ConfigFile ().update_channel;
             if (channel != "stable") {
                 query.add_query_item ("channel", channel);
             }
 
             // update_segment (see configfile.h)
-            ConfigFile config;
+            LibSync.ConfigFile config;
             var update_segment = config.update_segment ();
             query.add_query_item ("updatesegment", string.number (update_segment));
 

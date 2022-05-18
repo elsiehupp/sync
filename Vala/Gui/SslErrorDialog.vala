@@ -16,11 +16,11 @@ public class SslErrorDialog : Gtk.Dialog {
 
     private string custom_config_handle;
     private SslErrorDialog instance;
-    private unowned Account account;
+    private LibSync.Account account;
 
     /***********************************************************
     ***********************************************************/
-    public SslErrorDialog (unowned Account account, Gtk.Widget parent = new Gtk.Widget ()) {
+    public SslErrorDialog (LibSync.Account account, Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.all_trusted = false;
         this.instance = new SslErrorDialog ();
@@ -34,7 +34,7 @@ public class SslErrorDialog : Gtk.Dialog {
             this.instance.dialog_button_box.button (GLib.DialogButtonBox.Cancel);
         ok_button.enabled (false);
 
-        this.instance.cb_trust_connect.enabled (!Theme.forbid_bad_ssl);
+        this.instance.cb_trust_connect.enabled (!LibSync.Theme.forbid_bad_ssl);
         this.instance.cb_trust_connect.clicked.connect (
             ok_button.enabled
         );

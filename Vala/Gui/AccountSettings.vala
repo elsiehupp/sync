@@ -332,7 +332,7 @@ public class AccountSettings : Gtk.Widget {
         AccountState.State state = this.account_state != null ? this.account_state.state : AccountState.State.DISCONNECTED;
         if (state != AccountState.State.DISCONNECTED) {
             this.instance.ssl_button.update_account_state (this.account_state);
-            unowned Account account = this.account_state.account;
+            LibSync.Account account = this.account_state.account;
             GLib.Uri safe_url = new GLib.Uri (account.url);
             safe_url.password (""); // Remove the password from the URL to avoid showing it in the UI
             foreach (FolderConnection folder_connection in FolderManager.instance.map ().values ()) {
@@ -393,7 +393,7 @@ public class AccountSettings : Gtk.Widget {
                 show_connection_label (
                     _("No connection to %1 at %2.")
                         .printf (
-                            Utility.escape (Theme.app_name_gui),
+                            Utility.escape (LibSync.Theme.app_name_gui),
                             server
                         ),
                     this.account_state.connection_errors);
@@ -402,7 +402,7 @@ public class AccountSettings : Gtk.Widget {
                 show_connection_label (
                     _("Server configuration error : %1 at %2.")
                         .printf (
-                            Utility.escape (Theme.app_name_gui),
+                            Utility.escape (LibSync.Theme.app_name_gui),
                             server
                         ),
                     this.account_state.connection_errors);
@@ -415,7 +415,7 @@ public class AccountSettings : Gtk.Widget {
         } else {
             // own_cloud is not yet configured.
             show_connection_label (_("No %1 connection configured.")
-                                    .printf (Utility.escape (Theme.app_name_gui)));
+                                    .printf (Utility.escape (LibSync.Theme.app_name_gui)));
         }
 
         /* Allow to expand the item if the account is connected. */
@@ -443,7 +443,7 @@ public class AccountSettings : Gtk.Widget {
             Verify if the user has a private key already uploaded to the server,
             if it has, do not offer to create one.
              */
-            GLib.info ("Account " + on_signal_accounts_state ().account.display_name
+            GLib.info ("LibSync.Account " + on_signal_accounts_state ().account.display_name
                       + " Client Side Encryption " + on_signal_accounts_state ().account.capabilities.client_side_encryption_available);
 
             if (this.account_state.account.capabilities.client_side_encryption_available) {
@@ -787,8 +787,8 @@ public class AccountSettings : Gtk.Widget {
 
         // Wipe selective sync blocklist
         bool ok = false;
-        var old_blocklist = folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
-        folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, {});
+        var old_blocklist = folder_connection.journal_database.selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
+        folder_connection.journal_database.selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, {});
 
         // Change the folder_connection vfs mode and load the plugin
         folder_connection.virtual_files_enabled = true;
@@ -888,7 +888,7 @@ public class AccountSettings : Gtk.Widget {
 
         // Wipe pin states and selective sync database
         folder_connection.root_pin_state (PinState.ALWAYS_LOCAL);
-        folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, {});
+        folder_connection.journal_database.selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, {});
 
         // Prevent issues with missing local files
         folder_connection.on_signal_next_sync_full_local_discovery ();
@@ -983,13 +983,13 @@ public class AccountSettings : Gtk.Widget {
 
         FolderConnection folder_connection = FolderManager.instance.add_folder (this.account_state, definition);
         if (folder_connection) {
-            if (definition.virtual_files_mode != AbstractVfs.Off && folder_wizard.property ("use_virtual_files").to_bool ()) {
+            if (definition.virtual_files_mode != Common.AbstractVfs.Off && folder_wizard.property ("use_virtual_files").to_bool ()) {
                 folder_connection.root_pin_state (Common.ItemAvailability.ONLINE_ONLY);
             }
-            folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, selective_sync_block_list);
+            folder_connection.journal_database.selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, selective_sync_block_list);
 
             // The user already accepted the selective sync dialog. everything is in the allow list
-            folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, "/");
+            folder_connection.journal_database.selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, "/");
             FolderManager.instance.schedule_all_folders ();
             signal_folder_changed ();
         }
@@ -1010,7 +1010,7 @@ public class AccountSettings : Gtk.Widget {
         // Deleting the account potentially deletes 'this', so
         // the Gtk.MessageBox should be destroyed before that happens.
         var message_box = new Gtk.MessageBox (Gtk.MessageBox.Question,
-            _("Confirm Account Removal"),
+            _("Confirm LibSync.Account Removal"),
             _("<p>Do you really want to remove the connection to the account <i>%1</i>?</p>"
             + "<p><b>Note:</b> This will <b>not</b> delete any files.</p>")
                 .printf (this.account_state.account.display_name),
@@ -1064,7 +1064,7 @@ public class AccountSettings : Gtk.Widget {
             }
 
             bool ok = false;
-            var undecided_list = folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok);
+            var undecided_list = folder_connection.journal_database.selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok);
             foreach (var item in undecided_list) {
                 // FIXME: add the folder_connection alias in a hoover hint.
                 // folder_connection.alias () + "/"
@@ -1088,7 +1088,7 @@ public class AccountSettings : Gtk.Widget {
         }
 
         if (message != "") {
-            ConfigFile config;
+            LibSync.ConfigFile config;
             string info = !config.confirm_external_storage ()
                 ? _("There are folders that were not synchronized because they are too big: ")
                 : !config.new_big_folder_size_limit.first
@@ -1116,7 +1116,7 @@ public class AccountSettings : Gtk.Widget {
         var file_id = folder_info.file_id;
 
         if (folder_connection.virtual_files_enabled
-            && folder_connection.vfs.mode () == AbstractVfs.WindowsCfApi) {
+            && folder_connection.vfs.mode () == Common.AbstractVfs.WindowsCfApi) {
             show_enable_e2ee_with_virtual_files_warning_dialog (encrypt_folder);
             return;
         }
@@ -1315,7 +1315,7 @@ public class AccountSettings : Gtk.Widget {
             vfs_pin_action.triggered.connect (
                 this.on_signal_current_folder_availability (PinState.ALWAYS_LOCAL)
             );
-            vfs_pin_action.disabled (Theme.enforce_virtual_files_sync_folder);
+            vfs_pin_action.disabled (LibSync.Theme.enforce_virtual_files_sync_folder);
 
             vfs_free_space_action = availability_menu.add_action (Utility.vfs_free_space_action_text ());
             vfs_free_space_action.triggered.connect (
@@ -1326,14 +1326,14 @@ public class AccountSettings : Gtk.Widget {
             disable_vfs_action.triggered.connect (
                 this.on_signal_disable_vfs_current_folder
             );
-            disable_vfs_action.disabled (Theme.enforce_virtual_files_sync_folder);
+            disable_vfs_action.disabled (LibSync.Theme.enforce_virtual_files_sync_folder);
         }
 
-        if (Theme.show_virtual_files_option
-            && !FolderManager.instance.folder_by_alias (alias).virtual_files_enabled () && AbstractVfs.check_availability (FolderManager.instance.folder_by_alias (alias).path)) {
+        if (LibSync.Theme.show_virtual_files_option
+            && !FolderManager.instance.folder_by_alias (alias).virtual_files_enabled () && Common.AbstractVfs.check_availability (FolderManager.instance.folder_by_alias (alias).path)) {
             var mode = this.best_available_vfs_mode;
-            if (mode == AbstractVfs.WindowsCfApi || ConfigFile ().show_experimental_options ()) {
-                ensable_vfs_action = menu.add_action (_("Enable virtual file support %1 …").printf (mode == AbstractVfs.WindowsCfApi ? "" : _(" (experimental)")));
+            if (mode == Common.AbstractVfs.WindowsCfApi || LibSync.ConfigFile ().show_experimental_options ()) {
+                ensable_vfs_action = menu.add_action (_("Enable virtual file support %1 …").printf (mode == Common.AbstractVfs.WindowsCfApi ? "" : _(" (experimental)")));
                 // TODO: remove when UX decision is made
                 ensable_vfs_action.enabled (!Utility.is_path_windows_drive_partition_root (FolderManager.instance.folder_by_alias (alias).path));
                 //  
@@ -1558,7 +1558,7 @@ public class AccountSettings : Gtk.Widget {
                                + "border-radius: 5px;";
         if (errors.length () == 0) {
             string message = message;
-            Theme.replace_link_color_string_background_aware (message);
+            LibSync.Theme.replace_link_color_string_background_aware (message);
             this.instance.connect_label.on_signal_text (message);
             this.instance.connect_label.tool_tip ("");
             this.instance.connect_label.style_sheet ("");
@@ -1566,7 +1566,7 @@ public class AccountSettings : Gtk.Widget {
             errors.prepend (message);
             string message = errors.join ("\n");
             GLib.debug (message);
-            Theme.replace_link_color_string (message, Gdk.RGBA ("#c1c8e6"));
+            LibSync.Theme.replace_link_color_string (message, Gdk.RGBA ("#c1c8e6"));
             this.instance.connect_label.on_signal_text (message);
             this.instance.connect_label.tool_tip ("");
             this.instance.connect_label.style_sheet (err_style);
@@ -1639,7 +1639,7 @@ public class AccountSettings : Gtk.Widget {
     ***********************************************************/
     private void customize_style () {
         string message = this.instance.connect_label.text ();
-        Theme.replace_link_color_string_background_aware (message);
+        LibSync.Theme.replace_link_color_string_background_aware (message);
         this.instance.connect_label.on_signal_text (message);
 
         Gdk.RGBA color = palette ().highlight ().color ();

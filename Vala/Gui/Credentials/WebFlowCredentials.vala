@@ -186,7 +186,7 @@ public class WebFlowCredentials : AbstractCredentials {
             return;
         }
 
-        var delete_password_job = new DeletePasswordJob (Theme.app_name, this);
+        var delete_password_job = new DeletePasswordJob (LibSync.Theme.app_name, this);
         delete_password_job.insecure_fallback (false);
         delete_password_job.key (keychain_key);
         delete_password_job.on_signal_start ();
@@ -200,7 +200,7 @@ public class WebFlowCredentials : AbstractCredentials {
     /***********************************************************
     To fetch the user name as early as possible
     ***********************************************************/
-    public override void account (Account account) {
+    public override void account (LibSync.Account account) {
         AbstractCredentials.account (account);
         if (this.user == "") {
             fetch_user ();
@@ -375,7 +375,7 @@ public class WebFlowCredentials : AbstractCredentials {
             this.keychain_migration ? "" : this.account.identifier
         );
 
-        var read_password_job = new ReadPasswordJob (Theme.app_name, this);
+        var read_password_job = new LibSync.ReadPasswordJob (LibSync.Theme.app_name, this);
     //  #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
         add_settings_to_job (this.account, read_password_job);
     //  #endif
@@ -391,7 +391,7 @@ public class WebFlowCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     private void on_signal_read_password_job_finished (Secret.Collection.Job incoming_job) {
-        var read_password_job = (ReadPasswordJob)incoming_job;
+        var read_password_job = (LibSync.ReadPasswordJob)incoming_job;
         Secret.Collection.Error error = read_password_job.error;
 
         // If we could not find the entry try the old entries
@@ -483,7 +483,7 @@ public class WebFlowCredentials : AbstractCredentials {
         }
 
         // done storing ca certificates, time for the password
-        var write_password_job = new WritePasswordJob (Theme.app_name, this);
+        var write_password_job = new LibSync.WritePasswordJob (LibSync.Theme.app_name, this);
     //  #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
         add_settings_to_job (this.account, write_password_job);
     //  #endif

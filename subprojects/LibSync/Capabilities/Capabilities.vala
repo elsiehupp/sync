@@ -221,13 +221,13 @@ public class Capabilities : GLib.Object {
     /***********************************************************
     Returns which kind of push notfications are available
     ***********************************************************/
-    public PushNotificationTypes available_push_notifications () {
+    public PushNotificationType available_push_notifications () {
         if (!this.capabilities.contains ("notify_push")) {
             return PushNotificationType.NONE;
         }
 
         var types = this.capabilities["notify_push"].to_map ()["type"].to_string_list ();
-        PushNotificationTypes push_notification_types;
+        PushNotificationType push_notification_types;
 
         if (types.contains ("files")) {
             push_notification_types.flag (PushNotificationType.FILES);

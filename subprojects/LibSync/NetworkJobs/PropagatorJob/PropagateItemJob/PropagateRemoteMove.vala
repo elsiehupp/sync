@@ -73,7 +73,7 @@ public class PropagateRemoteMove : AbstractPropagateItemJob {
         var vfs = this.propagator.sync_options.vfs;
         var itype = this.item.type;
         //  GLib.assert_true (itype != ItemType.VIRTUAL_FILE_DOWNLOAD && itype != ItemType.VIRTUAL_FILE_DEHYDRATION);
-        if (vfs.mode () == AbstractVfs.WithSuffix && itype != ItemType.DIRECTORY) {
+        if (vfs.mode () == Common.AbstractVfs.WithSuffix && itype != ItemType.DIRECTORY) {
             var suffix = vfs.file_suffix ();
             bool source_had_suffix = remote_source.has_suffix (suffix);
             bool destination_had_suffix = remote_destination.has_suffix (suffix);
@@ -160,11 +160,11 @@ public class PropagateRemoteMove : AbstractPropagateItemJob {
     /***********************************************************
     Rename the directory in the selective sync list
     ***********************************************************/
-    public static bool adjust_selective_sync (SyncJournalDb journal, string from_, string to_) {
+    public static bool adjust_selective_sync (Common.SyncJournalDb journal, string from_, string to_) {
         bool ok = false;
         // We only care about preserving the blocklist.   The allow list should anyway be empty.
         // And the undecided list will be repopulated on the next sync, if there is anything too big.
-        GLib.List<string> list = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
+        GLib.List<string> list = journal.get_selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
         if (!ok)
             return false;
 
@@ -182,7 +182,7 @@ public class PropagateRemoteMove : AbstractPropagateItemJob {
         }
 
         if (changed) {
-            journal.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, list);
+            journal.selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, list);
         }
         return true;
     }
@@ -256,7 +256,7 @@ public class PropagateRemoteMove : AbstractPropagateItemJob {
         if (!result) {
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error));
             return;
-        } else if (result == AbstractVfs.ConvertToPlaceholderResult.Locked) {
+        } else if (result == Common.AbstractVfs.ConvertToPlaceholderResult.Locked) {
             on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").printf (signal_new_item.file));
             return;
         }

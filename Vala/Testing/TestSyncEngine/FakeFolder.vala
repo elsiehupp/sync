@@ -29,9 +29,9 @@ public class FakeFolder : GLib.Object {
 
     // FIXME: Clarify ownership, double delete
     FakeQNAM fake_access_manager;
-    unowned Account account;
-    SyncJournalDb journal_database;
-    public SyncEngine sync_engine;
+    LibSync.Account account;
+    Common.SyncJournalDb journal_database;
+    public LibSync.SyncEngine sync_engine;
 
 
     /***********************************************************
@@ -39,9 +39,9 @@ public class FakeFolder : GLib.Object {
     public FakeFolder (FileInfo template_file_info, Gpseq.Optional<FileInfo> local_file_info = new Gpseq.Optional<FileInfo> (), string remote_path = "") {
         this.local_modifier = this.temporary_directory.path;
         // Needs to be done once
-        SyncEngine.minimum_file_age_for_upload = std.chrono.milliseconds (0);
-        LibSync.Logger.instance.set_log_file ("-");
-        LibSync.Logger.instance.add_log_rule ({ "sync.httplogger=true" });
+        LibSync.SyncEngine.minimum_file_age_for_upload = std.chrono.milliseconds (0);
+        LibSync.Logger.set_log_file ("-");
+        LibSync.Logger.add_log_rule ({ "sync.httplogger=true" });
 
         GLib.Dir root_directory = new GLib.Dir (this.temporary_directory.path);
         GLib.debug ("FakeFolder operating on " + root_directory);
@@ -52,14 +52,14 @@ public class FakeFolder : GLib.Object {
         }
 
         this.fake_access_manager = new FakeQNAM (template_file_info);
-        this.account = Account.create ();
+        this.account = LibSync.Account.create ();
         this.account.set_url (GLib.Uri ("http://admin:admin@localhost/owncloud"));
         this.account.set_credentials (new FakeCredentials (this.fake_access_manager));
         this.account.set_dav_display_name ("fakename");
         this.account.set_server_version ("10.0.0");
 
-        this.journal_database = std.make_unique<SyncJournalDb> (local_path + ".sync_test.db");
-        this.sync_engine = std.make_unique<SyncEngine> (this.account, local_path, remote_path, this.journal_database.get ());
+        this.journal_database = std.make_unique<Common.SyncJournalDb> (local_path + ".sync_test.db");
+        this.sync_engine = std.make_unique<LibSync.SyncEngine> (this.account, local_path, remote_path, this.journal_database.get ());
         // Ignore temporary files from the download. (This is in the default exclude list, but we don't load it)
         this.sync_engine.excluded_files ().add_manual_exclude ("]*.~*");
 
@@ -81,7 +81,7 @@ public class FakeFolder : GLib.Object {
     delegate void Callback (bool value);
 
 
-    void on_signal_sync_engine_about_to_remove_all_files (LibSync.SyncFileItem.Direction direction, Callback callback) {
+    void on_signal_sync_engine_about_to_remove_all_files (LibSync.LibSync.SyncFileItem.Direction direction, Callback callback) {
         GLib.Timeout.add (
             1 * 1000,
             this.sync_engine.get ().on_timer_finished
@@ -97,7 +97,7 @@ public class FakeFolder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void switch_to_vfs (AbstractVfs vfs) {
+    public void switch_to_vfs (Common.AbstractVfs vfs) {
         var opts = this.sync_engine.sync_options ();
 
         opts.vfs.stop ();
@@ -120,7 +120,7 @@ public class FakeFolder : GLib.Object {
     }
 
 
-    private void on_signal_sync_engine_destroyed (AbstractVfs vfs) {
+    private void on_signal_sync_engine_destroyed (Common.AbstractVfs vfs) {
         vfs.stop ();
         vfs.unregister_folder ();
     }
@@ -128,14 +128,14 @@ public class FakeFolder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Account account {
+    public LibSync.Account account {
         return this.account;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public SyncJournalDb sync_journal () {
+    public Common.SyncJournalDb sync_journal () {
         return this.journal_database;
     }
 
@@ -237,7 +237,7 @@ public class FakeFolder : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string local_path {
-        // SyncEngine wants a trailing slash
+        // LibSync.SyncEngine wants a trailing slash
         if (this.temporary_directory.path.has_suffix ("/"))
             return this.temporary_directory.path;
         return this.temporary_directory.path + "/";
@@ -276,7 +276,7 @@ public class FakeFolder : GLib.Object {
             spy = "";
             GLib.assert_true (spy.wait ());
             foreach (GLib.List<GLib.Variant> args in spy) {
-                var item = args[0].value<SyncFileItem> ();
+                var item = args[0].value<LibSync.SyncFileItem> ();
                 if (item.destination () == relative_path)
                     return;
             }

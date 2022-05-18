@@ -35,7 +35,7 @@ public class ShareeModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private unowned Account account;
+    private LibSync.Account account;
     private string search;
     private string type;
 
@@ -49,7 +49,7 @@ public class ShareeModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public ShareeModel (unowned Account account, string type, GLib.Object parent = new GLib.Object ()) {
+    public ShareeModel (LibSync.Account account, string type, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account = account;
         this.type = type;

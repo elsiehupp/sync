@@ -37,13 +37,13 @@ public class SelectiveSyncDialog : Gtk.Dialog {
     /***********************************************************
     Dialog for a specific folder_connection (used from the account settings button)
     ***********************************************************/
-    public SelectiveSyncDialog.for_folder (unowned Account account, FolderConnection folder_connection, Gtk.Widget parent = null, GLib.WindowFlags window_flags = {}) {
+    public SelectiveSyncDialog.for_folder (LibSync.Account account, FolderConnection folder_connection, Gtk.Widget parent = null, GLib.WindowFlags window_flags = {}) {
         base (parent, window_flags);
         this.folder_connection = folder_connection;
         this.ok_button = null; // defined in on_signal_init ()
         bool ok = false;
         on_signal_init (account);
-        GLib.List<string> selective_sync_list = this.folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
+        GLib.List<string> selective_sync_list = this.folder_connection.journal_database.selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
         if (ok) {
             this.selective_sync.folder_info (this.folder_connection.remote_path, this.folder_connection.alias (), selective_sync_list);
         } else {
@@ -59,7 +59,7 @@ public class SelectiveSyncDialog : Gtk.Dialog {
     /***********************************************************
     Dialog for the whole account (Used from the wizard)
     ***********************************************************/
-    public SelectiveSyncDialog.for_path (unowned Account account, string folder_connection, GLib.List<string> blocklist, Gtk.Widget parent = null, GLib.WindowFlags window_flags = {}) {
+    public SelectiveSyncDialog.for_path (LibSync.Account account, string folder_connection, GLib.List<string> blocklist, Gtk.Widget parent = null, GLib.WindowFlags window_flags = {}) {
         base (parent, window_flags);
         this.folder_connection = null;
         on_signal_init (account);
@@ -72,12 +72,12 @@ public class SelectiveSyncDialog : Gtk.Dialog {
     public override void on_signal_accept () {
         if (this.folder_connection != null) {
             bool ok = false;
-            var old_block_list_set = this.folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok).to_set ();
+            var old_block_list_set = this.folder_connection.journal_database.selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok).to_set ();
             if (!ok) {
                 return;
             }
             GLib.List<string> block_list = this.selective_sync.create_block_list ();
-            this.folder_connection.journal_database.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
+            this.folder_connection.journal_database.selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
 
             FolderManager folder_man = FolderManager.instance;
             if (this.folder_connection.is_busy ()) {
@@ -123,7 +123,7 @@ public class SelectiveSyncDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_init (unowned Account account) {
+    private void on_signal_init (LibSync.Account account) {
         window_title (_("Choose What to Sync"));
         var layout = new Gtk.Box (Gtk.Orientation.VERTICAL);
 

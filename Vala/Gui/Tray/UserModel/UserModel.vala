@@ -249,7 +249,7 @@ public class UserModel : GLib.Object {
             }
 
             end_insert_rows ();
-            ConfigFile config;
+            LibSync.ConfigFile config;
             this.users.last ().on_signal_notification_refresh_interval (config.notification_refresh_interval ());
             signal_new_user_selected ();
         }
@@ -398,7 +398,7 @@ public class UserModel : GLib.Object {
 
         Gtk.MessageBox message_box = new Gtk.MessageBox (
             Gtk.MessageBox.Question,
-            _("Confirm Account Removal"),
+            _("Confirm LibSync.Account Removal"),
             _("<p>Do you really want to remove the connection to the account <i>%1</i>?</p>"
             + "<p><b>Note:</b> This will <b>not</b> delete any files.</p>")
                 .printf (this.users[identifier].name ()),

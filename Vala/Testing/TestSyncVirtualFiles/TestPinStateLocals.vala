@@ -14,7 +14,7 @@ public class TestPinStateLocals : AbstractTestSyncVirtualFiles {
     ***********************************************************/
     private TestPinStateLocals () {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
-        AbstractVfs vfs = set_up_vfs (fake_folder);
+        Common.AbstractVfs vfs = set_up_vfs (fake_folder);
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         fake_folder.remote_modifier ().mkdir ("local");

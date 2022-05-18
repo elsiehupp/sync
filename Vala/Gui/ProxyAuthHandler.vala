@@ -69,15 +69,15 @@ public class ProxyAuthHandler : GLib.Object {
     private GLib.Settings settings;
 
     /***********************************************************
-    Pointer to the most-recently-run ReadPasswordJob, needed
+    Pointer to the most-recently-run LibSync.ReadPasswordJob, needed
     due to reentrancy.
     ***********************************************************/
-    private Secret.Collection.ReadPasswordJob read_password_job;
+    private Secret.Collection.LibSync.ReadPasswordJob read_password_job;
 
     /***********************************************************
     For checking the proxy config settings.
     ***********************************************************/
-    private ConfigFile config_file;
+    private LibSync.ConfigFile config_file;
 
     /***********************************************************
     To distinguish between a new Soup.Session asking for credentials and
@@ -113,8 +113,8 @@ public class ProxyAuthHandler : GLib.Object {
 
             // If the user explicitly configured the proxy in the
             // network settings, don't ask about it.
-            if (this.ConfigFile.proxy_type () == Soup.NetworkProxy.HttpProxy
-                || this.ConfigFile.proxy_type () == Soup.NetworkProxy.Socks5Proxy) {
+            if (this.LibSync.ConfigFile.proxy_type () == Soup.NetworkProxy.HttpProxy
+                || this.LibSync.ConfigFile.proxy_type () == Soup.NetworkProxy.Socks5Proxy) {
                 this.blocked = true;
             }
         }
@@ -125,7 +125,7 @@ public class ProxyAuthHandler : GLib.Object {
 
         // Find the responsible Soup.Session if possible.
         Soup.Context sending_access_manager = null;
-        var account = (Account) sender ();
+        var account = (LibSync.Account) sender ();
         if (account) {
             // Since we go into an event loop, it's possible for the account's soup_context
             // to be destroyed before we get back. We can use this to check for its
@@ -193,8 +193,8 @@ public class ProxyAuthHandler : GLib.Object {
     private ProxyAuthHandler () {
         this.dialog = new ProxyAuthDialog ();
 
-        this.ConfigFile.reset (new ConfigFile ());
-        this.settings.reset (new GLib.Settings (this.ConfigFile.config_file (), GLib.Settings.IniFormat));
+        this.LibSync.ConfigFile.reset (new LibSync.ConfigFile ());
+        this.settings.reset (new GLib.Settings (this.LibSync.ConfigFile.config_file (), GLib.Settings.IniFormat));
         this.settings.begin_group ("Proxy");
         this.settings.begin_group ("Credentials");
     }
@@ -250,7 +250,7 @@ public class ProxyAuthHandler : GLib.Object {
                 return false;
             }
 
-            this.read_password_job.reset (new ReadPasswordJob (Theme.app_name));
+            this.read_password_job.reset (new LibSync.ReadPasswordJob (LibSync.Theme.app_name));
             this.read_password_job.settings (this.settings);
             this.read_password_job.insecure_fallback (false);
             this.read_password_job.key (keychain_password_key ());
@@ -275,7 +275,7 @@ public class ProxyAuthHandler : GLib.Object {
 
         this.username = "";
         if (this.read_password_job.error != EntryNotFound) {
-            GLib.warning ("ReadPasswordJob failed with " + this.read_password_job.error_string);
+            GLib.warning ("LibSync.ReadPasswordJob failed with " + this.read_password_job.error_string);
         }
         return false;
     }
@@ -293,7 +293,7 @@ public class ProxyAuthHandler : GLib.Object {
 
         this.settings.get_value (keychain_username_key (), this.username);
 
-        var write_password_job = new WritePasswordJob (Theme.app_name, this);
+        var write_password_job = new LibSync.WritePasswordJob (LibSync.Theme.app_name, this);
         write_password_job.settings (this.settings);
         write_password_job.insecure_fallback (false);
         write_password_job.key (keychain_password_key ());
@@ -308,7 +308,7 @@ public class ProxyAuthHandler : GLib.Object {
 
         write_password_job.delete_later ();
         if (write_password_job.error != NoError) {
-            GLib.warning ("WritePasswordJob failed with " + write_password_job.error_string);
+            GLib.warning ("LibSync.WritePasswordJob failed with " + write_password_job.error_string);
         }
     }
 

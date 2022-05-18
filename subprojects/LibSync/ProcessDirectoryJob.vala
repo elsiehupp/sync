@@ -195,7 +195,7 @@ public class ProcessDirectoryJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private RemotePermissions root_permissions;
+    private Common.RemotePermissions root_permissions;
 
     /***********************************************************
     ***********************************************************/
@@ -578,22 +578,22 @@ public class ProcessDirectoryJob : GLib.Object {
         bool is_hidden, bool is_symlink) {
         var excluded = this.discovery_data.excludes.traversal_pattern_match (path, is_directory ? ItemType.DIRECTORY : ItemType.FILE);
 
-        // FIXME: move to ExcludedFiles 's regular_expression ?
+        // FIXME: move to CSync.ExcludedFiles 's regular_expression ?
         bool is_invalid_pattern = false;
-        if (excluded == CSync.ExcludedFiles.Type.NOT_EXCLUDED && !this.discovery_data.invalid_filename_rx.pattern () == "") {
+        if (excluded == CSync.CSync.ExcludedFiles.Type.NOT_EXCLUDED && !this.discovery_data.invalid_filename_rx.pattern () == "") {
             if (path.contains (this.discovery_data.invalid_filename_rx)) {
-                excluded = CSync.ExcludedFiles.Type.INVALID_CHAR;
+                excluded = CSync.CSync.ExcludedFiles.Type.INVALID_CHAR;
                 is_invalid_pattern = true;
             }
         }
-        if (excluded == CSync.ExcludedFiles.Type.NOT_EXCLUDED && this.discovery_data.ignore_hidden_files && is_hidden) {
-            excluded = CSync.ExcludedFiles.Type.HIDDEN;
+        if (excluded == CSync.CSync.ExcludedFiles.Type.NOT_EXCLUDED && this.discovery_data.ignore_hidden_files && is_hidden) {
+            excluded = CSync.CSync.ExcludedFiles.Type.HIDDEN;
         }
-        if (excluded == CSync.ExcludedFiles.Type.NOT_EXCLUDED
+        if (excluded == CSync.CSync.ExcludedFiles.Type.NOT_EXCLUDED
             && local_name != ""
             && this.discovery_data.server_blocklisted_files.contains (local_name)
         ) {
-            excluded = CSync.ExcludedFiles.Type.SERVER_BLOCKLISTED;
+            excluded = CSync.CSync.ExcludedFiles.Type.SERVER_BLOCKLISTED;
             is_invalid_pattern = true;
         }
 
@@ -608,13 +608,13 @@ public class ProcessDirectoryJob : GLib.Object {
         //      GLib.TextEncoder encoder = new GLib.TextEncoder (local_codec, GMime.Encoding.Convert_invalid_to_null);
         //      if (encoder.from_unicode (path).contains ('\0')) {
         //          GLib.warning ("Cannot encode " + path + " to local encoding " + local_codec.name ());
-        //          excluded = CSync.ExcludedFiles.Type.CANNOT_ENCODE;
+        //          excluded = CSync.CSync.ExcludedFiles.Type.CANNOT_ENCODE;
         //      }
         //  }
 
-        if (excluded == CSync.ExcludedFiles.Type.NOT_EXCLUDED && !is_symlink) {
+        if (excluded == CSync.CSync.ExcludedFiles.Type.NOT_EXCLUDED && !is_symlink) {
             return false;
-        } else if (excluded == CSync.ExcludedFiles.Type.EXCLUDE_SILENT || excluded == CSync.ExcludedFiles.Type.EXCLUDE_AND_REMOVE) {
+        } else if (excluded == CSync.CSync.ExcludedFiles.Type.EXCLUDE_SILENT || excluded == CSync.CSync.ExcludedFiles.Type.EXCLUDE_AND_REMOVE) {
             this.discovery_data.signal_silently_excluded (path);
             return true;
         }
@@ -629,14 +629,14 @@ public class ProcessDirectoryJob : GLib.Object {
             item.error_string = _("Symbolic links are not supported in syncing.");
         } else {
             switch (excluded) {
-            case CSync.ExcludedFiles.Type.NOT_EXCLUDED:
-            case CSync.ExcludedFiles.Type.EXCLUDE_SILENT:
-            case CSync.ExcludedFiles.Type.EXCLUDE_AND_REMOVE:
+            case CSync.CSync.ExcludedFiles.Type.NOT_EXCLUDED:
+            case CSync.CSync.ExcludedFiles.Type.EXCLUDE_SILENT:
+            case CSync.CSync.ExcludedFiles.Type.EXCLUDE_AND_REMOVE:
                 GLib.fatal ("These were handled earlier");
-            case CSync.ExcludedFiles.Type.LIST:
+            case CSync.CSync.ExcludedFiles.Type.LIST:
                 item.error_string = _("File is listed on the ignore list.");
                 break;
-            case CSync.ExcludedFiles.Type.INVALID_CHAR:
+            case CSync.CSync.ExcludedFiles.Type.INVALID_CHAR:
                 if (item.file.has_suffix ('.')) {
                     item.error_string = _("File names ending with a period are not supported on this file system.");
                 } else {
@@ -657,28 +657,28 @@ public class ProcessDirectoryJob : GLib.Object {
                 }
                 item.status = SyncFileItem.Status.FILENAME_INVALID;
                 break;
-            case CSync.ExcludedFiles.Type.TRAILING_SPACE:
+            case CSync.CSync.ExcludedFiles.Type.TRAILING_SPACE:
                 item.error_string = _("Filename contains trailing spaces.");
                 item.status = SyncFileItem.Status.FILENAME_INVALID;
                 break;
-            case CSync.ExcludedFiles.Type.LONG_FILENAME:
+            case CSync.CSync.ExcludedFiles.Type.LONG_FILENAME:
                 item.error_string = _("Filename is too long.");
                 item.status = SyncFileItem.Status.FILENAME_INVALID;
                 break;
-            case CSync.ExcludedFiles.Type.HIDDEN:
+            case CSync.CSync.ExcludedFiles.Type.HIDDEN:
                 item.error_string = _("File/FolderConnection is ignored because it's hidden.");
                 break;
-            case CSync.ExcludedFiles.Type.STAT_FAILED:
+            case CSync.CSync.ExcludedFiles.Type.STAT_FAILED:
                 item.error_string = _("Stat failed.");
                 break;
-            case CSync.ExcludedFiles.Type.CONFLICT:
+            case CSync.CSync.ExcludedFiles.Type.CONFLICT:
                 item.error_string = _("Conflict : Server version downloaded, local copy renamed and not uploaded.");
                 item.status = SyncFileItem.Status.CONFLICT;
             break;
-            case CSync.ExcludedFiles.Type.CANNOT_ENCODE:
+            case CSync.CSync.ExcludedFiles.Type.CANNOT_ENCODE:
                 item.error_string = _("The filename cannot be encoded on your file system.");
                 break;
-            case CSync.ExcludedFiles.Type.SERVER_BLOCKLISTED:
+            case CSync.CSync.ExcludedFiles.Type.SERVER_BLOCKLISTED:
                 item.error_string = _("The filename is blocklisted on the server.");
                 break;
             }
@@ -957,7 +957,7 @@ public class ProcessDirectoryJob : GLib.Object {
     private QueryMode server_query_mode (SyncJournalFileRecord database_entry, RemoteInfo server_entry) {
         if (this.discovery_data != null
             && this.discovery_data.sync_options.vfs
-            && this.discovery_data.sync_options.vfs.mode () != AbstractVfs.Off
+            && this.discovery_data.sync_options.vfs.mode () != Common.AbstractVfs.Off
             && database_entry.is_directory ()
             && database_entry.is_e2e_encrypted
         ) {
@@ -989,7 +989,7 @@ public class ProcessDirectoryJob : GLib.Object {
         var opts = this.discovery_data.sync_options;
         if (!local_entry.is_valid
             && item.type == ItemType.FILE
-            && opts.vfs.mode () != AbstractVfs.Off
+            && opts.vfs.mode () != Common.AbstractVfs.Off
             && this.pin_state != PinState.ALWAYS_LOCAL
             && !FileSystem.is_exclude_file (item.file)) {
             item.type = ItemType.VIRTUAL_FILE;
@@ -998,7 +998,7 @@ public class ProcessDirectoryJob : GLib.Object {
             }
         }
 
-        if (opts.vfs.mode () != AbstractVfs.Off && !item.encrypted_filename == "") {
+        if (opts.vfs.mode () != Common.AbstractVfs.Off && !item.encrypted_filename == "") {
             // We are syncing a file for the first time (local entry is invalid) and it is encrypted file that will be virtual once synced
             // to avoid having error of "file has changed during sync" when trying to hydrate it excplicitly - we must remove Constants.E2EE_TAG_SIZE bytes from the end
             // as explicit hydration does not care if these bytes are present in the placeholder or not, but, the size must not change in the middle of the sync
@@ -1493,7 +1493,7 @@ public class ProcessDirectoryJob : GLib.Object {
         // TODO: We may want to execute the same logic for non-VFS mode, as, moving/renaming the same folder by 2 or more clients at the same time is not possible in Web UI.
         // Keeping it like this (for VFS files and folders only) just to fix a user issue.
 
-        if (! (this.discovery_data != null && this.discovery_data.sync_options.vfs && this.discovery_data.sync_options.vfs.mode () != AbstractVfs.Off)) {
+        if (! (this.discovery_data != null && this.discovery_data.sync_options.vfs && this.discovery_data.sync_options.vfs.mode () != Common.AbstractVfs.Off)) {
             // for VFS files and folders only
             return;
         }
@@ -1502,7 +1502,7 @@ public class ProcessDirectoryJob : GLib.Object {
             return;
         }
 
-        if (local_entry.is_directory && this.discovery_data.sync_options.vfs.mode () != AbstractVfs.WindowsCfApi) {
+        if (local_entry.is_directory && this.discovery_data.sync_options.vfs.mode () != Common.AbstractVfs.WindowsCfApi) {
             // for VFS folders on Windows only
             return;
         }
@@ -1517,9 +1517,9 @@ public class ProcessDirectoryJob : GLib.Object {
         bool is_file_place_holder = !local_entry.is_directory && this.discovery_data.sync_options.vfs.is_dehydrated_placeholder (this.discovery_data.local_directory + path.local);
 
         // either correct availability, or a result with error if the folder is new or otherwise has no availability set yet
-        var folder_place_holder_availability = local_entry.is_directory ? this.discovery_data.sync_options.vfs.availability (path.local) : AbstractVfs.AvailabilityResult (AbstractVfs.AvailabilityError.NO_SUCH_ITEM);
+        var folder_place_holder_availability = local_entry.is_directory ? this.discovery_data.sync_options.vfs.availability (path.local) : Common.AbstractVfs.AvailabilityResult (Common.AbstractVfs.AvailabilityError.NO_SUCH_ITEM);
 
-        var folder_pin_state = local_entry.is_directory ? this.discovery_data.sync_options.vfs.pin_state (path.local) : Gpseq.Optional<AbstractVfs.PinState> (PinState.UNSPECIFIED);
+        var folder_pin_state = local_entry.is_directory ? this.discovery_data.sync_options.vfs.pin_state (path.local) : Gpseq.Optional<Common.AbstractVfs.PinState> (PinState.UNSPECIFIED);
 
         if (!is_file_place_holder && !folder_place_holder_availability.is_valid && !folder_pin_state.is_valid) {
             // not a file placeholder and not a synced folder placeholder (new local folder)
@@ -1825,12 +1825,12 @@ public class ProcessDirectoryJob : GLib.Object {
             if (perms == null) {
                 // No permissions set
                 return true;
-            } else if (item.is_directory () && !perms.has_permission (RemotePermissions.Permissions.CAN_ADD_SUB_DIRECTORIES)) {
+            } else if (item.is_directory () && !perms.has_permission (Common.RemotePermissions.Permissions.CAN_ADD_SUB_DIRECTORIES)) {
                 GLib.warning ("check_for_permission: ERROR " + item.file);
                 item.instruction = CSync.SyncInstructions.ERROR;
                 item.error_string = _("Not allowed because you don't have permission to add subfolders to that folder");
                 return false;
-            } else if (!item.is_directory () && !perms.has_permission (RemotePermissions.Permissions.CAN_ADD_FILE)) {
+            } else if (!item.is_directory () && !perms.has_permission (Common.RemotePermissions.Permissions.CAN_ADD_FILE)) {
                 GLib.warning ("check_for_permission: ERROR " + item.file);
                 item.instruction = CSync.SyncInstructions.ERROR;
                 item.error_string = _("Not allowed because you don't have permission to add files in that folder");
@@ -1844,7 +1844,7 @@ public class ProcessDirectoryJob : GLib.Object {
                 // No permissions set
                 return true;
             }
-            if (!perms.has_permission (RemotePermissions.Permissions.CAN_WRITE)) {
+            if (!perms.has_permission (Common.RemotePermissions.Permissions.CAN_WRITE)) {
                 item.instruction = CSync.SyncInstructions.CONFLICT;
                 item.error_string = _("Not allowed to upload this file because it is read-only on the server, restoring");
                 item.direction = SyncFileItem.Direction.DOWN;
@@ -1878,7 +1878,7 @@ public class ProcessDirectoryJob : GLib.Object {
                 // No permissions set
                 return true;
             }
-            if (!perms.has_permission (RemotePermissions.Permissions.CAN_DELETE)) {
+            if (!perms.has_permission (Common.RemotePermissions.Permissions.CAN_DELETE)) {
                 item.instruction = CSync.SyncInstructions.NEW;
                 item.direction = SyncFileItem.Direction.DOWN;
                 item.is_restoration = true;
@@ -1900,9 +1900,9 @@ public class ProcessDirectoryJob : GLib.Object {
     directory is allowed. Return true if it is allowed, false
     otherwise
     ***********************************************************/
-    private MovePermissionResult check_move_permissions (RemotePermissions src_perm, string src_path, bool is_directory) {
+    private MovePermissionResult check_move_permissions (Common.RemotePermissions src_perm, string src_path, bool is_directory) {
         //  . MovePermissionResult {
-        RemotePermissions dest_perms;
+        Common.RemotePermissions dest_perms;
         if (this.root_permissions != null) {
             dest_perms = this.root_permissions;
         } else if (this.dir_item) {
@@ -1918,8 +1918,8 @@ public class ProcessDirectoryJob : GLib.Object {
         bool destination_ok = true;
         bool destination_new_ok = true;
         if (dest_perms == null) {
-        } else if ( (is_directory && !dest_perms.has_permission (RemotePermissions.Permissions.CAN_ADD_SUB_DIRECTORIES)) ||
-                  (!is_directory && !dest_perms.has_permission (RemotePermissions.Permissions.CAN_ADD_FILE))) {
+        } else if ( (is_directory && !dest_perms.has_permission (Common.RemotePermissions.Permissions.CAN_ADD_SUB_DIRECTORIES)) ||
+                  (!is_directory && !dest_perms.has_permission (Common.RemotePermissions.Permissions.CAN_ADD_FILE))) {
             destination_new_ok = false;
         }
         if (!is_rename && !destination_new_ok) {
@@ -1930,8 +1930,8 @@ public class ProcessDirectoryJob : GLib.Object {
         // check if we are allowed to move from the source
         bool source_ok = true;
         if (!file_perms == null
-            && ( (is_rename && !file_perms.has_permission (RemotePermissions.Permissions.CAN_RENAME))
-                    || (!is_rename && !file_perms.has_permission (RemotePermissions.Permissions.CAN_MOVE)))) {
+            && ( (is_rename && !file_perms.has_permission (Common.RemotePermissions.Permissions.CAN_RENAME))
+                    || (!is_rename && !file_perms.has_permission (Common.RemotePermissions.Permissions.CAN_MOVE)))) {
             // We are not allowed to move or rename this file
             source_ok = false;
         }
@@ -2038,7 +2038,7 @@ public class ProcessDirectoryJob : GLib.Object {
     Convenience to detect suffix-vfs modes
     ***********************************************************/
     private bool is_vfs_with_suffix () {
-        return this.discovery_data.sync_options.vfs.mode () == AbstractVfs.WithSuffix;
+        return this.discovery_data.sync_options.vfs.mode () == Common.AbstractVfs.WithSuffix;
     }
 
 
@@ -2106,7 +2106,7 @@ public class ProcessDirectoryJob : GLib.Object {
     }
 
 
-    private void on_signal_discovery_single_directory_job_first_directory_permissions (RemotePermissions perms) {
+    private void on_signal_discovery_single_directory_job_first_directory_permissions (Common.RemotePermissions perms) {
         this.root_permissions = perms;
     }
 

@@ -80,9 +80,9 @@ public class LegalNotice : Gtk.Dialog {
         notice += _("<p>Licensed under the GNU General Public License (GPL) Version 2.0 or any later version.</p>");
 
         notice += "<p>&nbsp;</p>";
-        notice += Theme.about_details;
+        notice += LibSync.Theme.about_details;
 
-        Theme.replace_link_color_string_background_aware (notice);
+        LibSync.Theme.replace_link_color_string_background_aware (notice);
 
         this.instance.notice.text_interaction_flags (GLib.Text_selectable_by_mouse | GLib.TextBrowserInteraction);
         this.instance.notice.on_signal_text (notice);

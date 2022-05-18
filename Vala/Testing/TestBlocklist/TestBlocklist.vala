@@ -43,7 +43,7 @@ public class TestBlocklist : GLib.Object {
         GLib.assert_true (!fake_folder.sync_once ()); {
             var it = complete_spy.find_item (test_filename);
             GLib.assert_true (it);
-            GLib.assert_true (it.status == SyncFileItem.Status.NORMAL_ERROR); // initial error visible
+            GLib.assert_true (it.status == LibSync.SyncFileItem.Status.NORMAL_ERROR); // initial error visible
             GLib.assert_true (it.instruction == CSync.SyncInstructions.NEW);
 
             var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
@@ -64,7 +64,7 @@ public class TestBlocklist : GLib.Object {
         GLib.assert_true (!fake_folder.sync_once ()); {
             var it = complete_spy.find_item (test_filename);
             GLib.assert_true (it);
-            GLib.assert_true (it.status == SyncFileItem.Status.BLOCKLISTED_ERROR);
+            GLib.assert_true (it.status == LibSync.SyncFileItem.Status.BLOCKLISTED_ERROR);
             GLib.assert_true (it.instruction == CSync.SyncInstructions.IGNORE); // no retry happened!
 
             var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
@@ -89,7 +89,7 @@ public class TestBlocklist : GLib.Object {
         GLib.assert_true (!fake_folder.sync_once ());
         var it = complete_spy.find_item (test_filename);
         GLib.assert_true (it);
-        GLib.assert_true (it.status == SyncFileItem.Status.BLOCKLISTED_ERROR); // blocklisted as it's just a retry
+        GLib.assert_true (it.status == LibSync.SyncFileItem.Status.BLOCKLISTED_ERROR); // blocklisted as it's just a retry
         GLib.assert_true (it.instruction == CSync.SyncInstructions.NEW); // retry!
 
         entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
@@ -110,7 +110,7 @@ public class TestBlocklist : GLib.Object {
         GLib.assert_true (!fake_folder.sync_once ()); {
             var it = complete_spy.find_item (test_filename);
             GLib.assert_true (it);
-            GLib.assert_true (it.status == SyncFileItem.Status.BLOCKLISTED_ERROR);
+            GLib.assert_true (it.status == LibSync.SyncFileItem.Status.BLOCKLISTED_ERROR);
             GLib.assert_true (it.instruction == CSync.SyncInstructions.NEW); // retry!
 
             var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
@@ -136,7 +136,7 @@ public class TestBlocklist : GLib.Object {
         GLib.assert_true (fake_folder.sync_once ()); {
             var it = complete_spy.find_item (test_filename);
             GLib.assert_true (it);
-            GLib.assert_true (it.status == SyncFileItem.Status.SUCCESS);
+            GLib.assert_true (it.status == LibSync.SyncFileItem.Status.SUCCESS);
             GLib.assert_true (it.instruction == CSync.SyncInstructions.NEW);
 
             var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);

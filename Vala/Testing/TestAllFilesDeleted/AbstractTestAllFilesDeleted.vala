@@ -8,9 +8,9 @@ namespace Occ {
 namespace Testing {
 
 /***********************************************************
-This test ensure that the SyncEngine.signal_about_to_remove_all_files
+This test ensure that the LibSync.SyncEngine.signal_about_to_remove_all_files
 is correctly called and that when we the user choose to
-remove all files SyncJournalDb.clear_file_table makes works
+remove all files Common.SyncJournalDb.clear_file_table makes works
 as expected
 ***********************************************************/
 public abstract class AbstractTestAllFilesDeleted : GLib.Object {

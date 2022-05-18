@@ -32,7 +32,7 @@ public class TestMoveFailsInAConflict : GLib.Object {
         string conflict_file;
         var trans_progress = connect (
             fake_folder.sync_engine,
-            SyncEngine.signal_transmission_progress,
+            LibSync.SyncEngine.signal_transmission_progress,
             this.on_signal_sync_engine_transmission_progress
         );
 

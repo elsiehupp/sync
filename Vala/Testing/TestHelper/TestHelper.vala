@@ -3,7 +3,7 @@
 namespace Occ {
 namespace Testing {
 
-public class HttpCredentialsTest : HttpCredentials {
+public class HttpCredentialsTest : LibSync.HttpCredentials {
 
     /***********************************************************
     ***********************************************************/

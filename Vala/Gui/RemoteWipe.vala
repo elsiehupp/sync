@@ -17,7 +17,7 @@ public class RemoteWipe : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private unowned Account account;
+    private LibSync.Account account;
     private string app_password;
     private bool account_removed;
     private Soup.Context network_manager;
@@ -30,7 +30,7 @@ public class RemoteWipe : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public RemoteWipe (Account account, GLib.Object parent = new GLib.Object ()) {
+    public RemoteWipe (LibSync.Account account, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account = account;
         this.app_password = "";

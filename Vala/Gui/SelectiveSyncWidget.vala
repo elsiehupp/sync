@@ -30,9 +30,9 @@ public class SelectiveSyncWidget : Gtk.Widget {
     /***********************************************************
     During account setup we want to filter out excluded folders
     from the view without having a
-    FolderConnection.SyncEngine.ExcludedFiles instance.
+    FolderConnection.LibSync.SyncEngine.CSync.ExcludedFiles instance.
     ***********************************************************/
-    private ExcludedFiles excluded_files;
+    private CSync.ExcludedFiles excluded_files;
 
     /***********************************************************
     ***********************************************************/
@@ -40,7 +40,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public SelectiveSyncWidget (unowned Account account, Gtk.Widget parent = new Gtk.Widget ()) {
+    public SelectiveSyncWidget (LibSync.Account account, Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.account = account;
         this.inserting = false;
@@ -72,7 +72,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
         this.folder_tree.header_item ().on_signal_text (0, _("Name"));
         this.folder_tree.header_item ().on_signal_text (1, _("Size"));
 
-        ConfigFile.set_up_default_exclude_file_paths (this.excluded_files);
+        LibSync.ConfigFile.set_up_default_exclude_file_paths (this.excluded_files);
         this.excluded_files.on_signal_reload_exclude_files ();
     }
 
@@ -187,8 +187,8 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_update_directories (LscolJob lscol_job, GLib.List<string> list) {
-        var lscol_job = (LscolJob)sender ();
+    private void on_signal_update_directories (LibSync.LscolJob lscol_job, GLib.List<string> list) {
+        var lscol_job = (LibSync.LscolJob)sender ();
         GLib.ScopedValueRollback<bool> is_inserting (this.inserting);
         this.inserting = true;
 
@@ -236,7 +236,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
         if (!root) {
             root = new SelectiveSyncTreeViewItem (this.folder_tree);
             root.on_signal_text (0, this.root_name);
-            root.icon (0, Theme.application_icon);
+            root.icon (0, LibSync.Theme.application_icon);
             root.data (0, GLib.USER_ROLE, "");
             root.check_state (0, GLib.Checked);
             int64 size = lscol_job ? lscol_job.folder_infos[path_to_remove].size : -1;
@@ -296,7 +296,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
         if (!this.folder_path == "") {
             prefix = this.folder_path + "/";
         }
-        var lscol_job = new LscolJob (this.account, prefix + directory, this);
+        var lscol_job = new LibSync.LscolJob (this.account, prefix + directory, this);
         lscol_job.properties (
             {
                 "resourcetype",
@@ -402,7 +402,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
     private void refresh_folders () {
         this.encrypted_paths = "";
 
-        var lscol_job = new LscolJob (this.account, this.folder_path, this);
+        var lscol_job = new LibSync.LscolJob (this.account, this.folder_path, this);
         var props = GLib.List<string> ("resourcetype"
                                          + "http://owncloud.org/ns:size";
         if (this.account.capabilities.client_side_encryption_available) {

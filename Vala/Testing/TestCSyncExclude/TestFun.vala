@@ -13,7 +13,7 @@ public class TestFun : AbstractTestCSyncExclude {
     /***********************************************************
     ***********************************************************/
     private TestFun () {
-        ExcludedFiles excluded;
+        CSync.ExcludedFiles excluded;
         bool exclude_hidden = true;
         bool keep_hidden = false;
 

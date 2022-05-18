@@ -26,7 +26,7 @@ public class OcsShareeJob : OcsJob {
 
     /***********************************************************
     ***********************************************************/
-    public OcsShareeJob (Account account) {
+    public OcsShareeJob (LibSync.Account account) {
         base (account);
         path ("ocs/v2.php/apps/files_sharing/api/v1/sharees");
         this.signal_job_finished.connect (

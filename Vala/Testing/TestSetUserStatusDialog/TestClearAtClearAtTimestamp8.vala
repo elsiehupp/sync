@@ -10,7 +10,7 @@ namespace Testing {
 public class TestClearAtClearAtTimestamp8 : GLib.Object {
 
     private TestClearAtClearAtTimestamp8 (GLib.DateTime current_time) {
-        UserStatus user_status;
+        LibSync.UserStatus user_status;
         ClearAt clear_at;
         clear_at.type = ClearAtType.TIMESTAMP;
         clear_at.timestamp = current_time.add_days (7).to_time_t ();

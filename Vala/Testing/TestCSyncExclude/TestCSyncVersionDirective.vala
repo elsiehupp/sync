@@ -13,8 +13,8 @@ public class TestCSyncVersionDirective : AbstractTestCSyncExclude {
     /***********************************************************
     ***********************************************************/
     private TestCSyncVersionDirective () {
-        ExcludedFiles excludes;
-        excludes.set_client_version (ExcludedFiles.Version (2, 5, 0));
+        CSync.ExcludedFiles excludes;
+        excludes.set_client_version (CSync.ExcludedFiles.Version (2, 5, 0));
 
         GLib.List<Pair<string, bool>> tests = new GLib.List<Pair<string, bool>> (
             { "#!version == 2.5.0", true },

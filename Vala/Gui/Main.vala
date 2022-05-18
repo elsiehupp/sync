@@ -33,7 +33,7 @@ void warn_systray () {
         + "If you are running XFCE, please follow "
         + "<a href=\"http://docs.xfce.org/xfce/xfce4-panel/systray\">these instructions</a>. "
         + "Otherwise, please install a system tray application such as \"trayer\" and try again.")
-            .printf (Theme.app_name_gui));
+            .printf (LibSync.Theme.app_name_gui));
 }
 
 int main (int argc, char **argv) {
@@ -49,10 +49,10 @@ int main (int argc, char **argv) {
         "com.nextcloud.desktopclient", 1, 0, "UnifiedSearchResultsListModel", "UnifiedSearchResultsListModel");
     q_register_meta_type<UnifiedSearchResultsListModel> ("UnifiedSearchResultsListModel*");
 
-    qml_register_uncreatable_type<UserStatus> ("com.nextcloud.desktopclient", 1, 0, "UserStatus", "Access to Status enum");
+    qml_register_uncreatable_type<LibSync.UserStatus> ("com.nextcloud.desktopclient", 1, 0, "LibSync.UserStatus", "Access to Status enum");
 
     q_register_meta_type_stream_operators<Emoji> ();
-    q_register_meta_type<UserStatus> ("UserStatus");
+    q_register_meta_type<LibSync.UserStatus> ("LibSync.UserStatus");
 
     // Work around a bug in KDE's qqc2-desktop-style which breaks
     // buttons with icons not based on a name, by forcing a style name

@@ -9,11 +9,11 @@ namespace Testing {
 
 public class StatusPushSpy : GLib.SignalSpy {
 
-    SyncEngine sync_engine;
+    LibSync.SyncEngine sync_engine;
 
     /***********************************************************
     ***********************************************************/
-    public StatusPushSpy (SyncEngine sync_engine) {
+    public StatusPushSpy (LibSync.SyncEngine sync_engine) {
         base (sync_engine.sync_file_status_tracker, SIGNAL (signal_file_status_changed (string, SyncFileStatus)));
         this.sync_engine (sync_engine);
     }

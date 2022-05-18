@@ -16,7 +16,7 @@ public class TestAddExcludeFilePathAddDefaultExcludeFileReturnCorrectMap : Abstr
         string base_path = "sync_folder/";
         string folder1 = "sync_folder/folder1/";
         string folder2 = folder1 + "folder2/";
-        excluded_files.reset (new ExcludedFiles (base_path));
+        excluded_files.reset (new CSync.ExcludedFiles (base_path));
 
         string default_exclude_list = "desktop-client/config-folder/sync-exclude.lst";
         string folder1_exclude_list = folder1 + ".sync-exclude.lst";

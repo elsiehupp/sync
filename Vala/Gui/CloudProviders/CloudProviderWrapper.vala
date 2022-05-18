@@ -381,7 +381,7 @@ public class CloudProviderWrapper : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static bool should_show_in_recents_menu (SyncFileItem item) {
+    private static bool should_show_in_recents_menu (LibSync.SyncFileItem item) {
         return !Progress.is_ignored_kind (item.status)
                 && item.instruction != CSync.SyncInstructions.EVAL
                 && item.instruction != CSync.SyncInstructions.NONE;

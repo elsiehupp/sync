@@ -33,7 +33,7 @@ public class OwncloudWizard : GLib.Wizard {
 
     /***********************************************************
     ***********************************************************/
-    public unowned Account account { public get; public set; }
+    public LibSync.Account account { public get; public set; }
     private WelcomePage welcome_page;
     private OwncloudSetupPage setup_page;
     private OwncloudHttpCredsPage http_creds_page;
@@ -174,7 +174,7 @@ public class OwncloudWizard : GLib.Wizard {
             this.on_signal_skip_folder_configuration
         );
 
-        window_title (_("Add %1 account").printf (Theme.instance.app_name_gui));
+        window_title (_("Add %1 account").printf (LibSync.Theme.instance.app_name_gui));
         wizard_style (GLib.Wizard.ModernStyle);
         option (GLib.Wizard.NoBackButtonOnStartPage);
         option (GLib.Wizard.NoBackButtonOnLastPage);
@@ -312,10 +312,10 @@ public class OwncloudWizard : GLib.Wizard {
         Gtk.MessageBox message_box = null;
         GLib.PushButton accept_button = null;
         switch (best_vfs_mode) {
-        case AbstractVfs.WindowsCfApi:
+        case Common.AbstractVfs.WindowsCfApi:
             callback (true);
             return;
-        case AbstractVfs.WithSuffix:
+        case Common.AbstractVfs.WithSuffix:
             message_box = new Gtk.MessageBox (
                 Gtk.MessageBox.Warning,
                 _("Enable experimental feature?"),
@@ -336,8 +336,8 @@ public class OwncloudWizard : GLib.Wizard {
             accept_button = message_box.add_button (_("Enable experimental placeholder mode"), Gtk.MessageBox.AcceptRole);
             message_box.add_button (_("Stay safe"), Gtk.MessageBox.RejectRole);
             break;
-        case AbstractVfs.XAttr:
-        case AbstractVfs.Off:
+        case Common.AbstractVfs.XAttr:
+        case Common.AbstractVfs.Off:
             GLib.assert_not_reached ();
         }
 

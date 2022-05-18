@@ -32,7 +32,7 @@ public class TestCSyncRegexTraversal : AbstractTestCSyncExclude {
     /***********************************************************
     ***********************************************************/
     private string translate_to_regexp_syntax (string pattern) {
-        string storage = ExcludedFiles.convert_to_regexp_syntax (pattern, false);
+        string storage = CSync.ExcludedFiles.convert_to_regexp_syntax (pattern, false);
         return storage.const_data ();
     }
 

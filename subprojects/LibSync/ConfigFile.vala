@@ -49,7 +49,7 @@ public class ConfigFile : GLib.Object {
     private const string MAX_CHUNK_SIZE_C = "max_chunk_size";
     private const string TARGET_CHUNK_UPLOAD_DURATION_C = "target_chunk_upload_duration";
     private const string AUTOMATIC_LOG_DIR_C = "log_to_temporary_log_dir";
-    private const string LOG_DIR_C = "log_dir";
+    private const string LOG_DIR_C = "log_directory";
     private const string LOG_DEBUG_C = "log_debug";
     private const string LOG_EXPIRE_C = "log_expire";
     private const string LOG_FLUSH_C = "log_flush";
@@ -1132,9 +1132,9 @@ public class ConfigFile : GLib.Object {
 
 
     /***********************************************************
-    Add the system and user exclude file path to the ExcludedFiles instance.
+    Add the system and user exclude file path to the CSync.ExcludedFiles instance.
     ***********************************************************/
-    public static void set_up_default_exclude_file_paths (ExcludedFiles excluded_files) {
+    public static void set_up_default_exclude_file_paths (CSync.ExcludedFiles excluded_files) {
         ConfigFile config;
         string system_list = config.exclude_file (ConfigFile.SYSTEM_SCOPE);
         string user_list = config.exclude_file (ConfigFile.USER_SCOPE);

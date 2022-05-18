@@ -144,7 +144,7 @@ public class CheckVioExt : GLib.Object {
         directory_handle = CSync.VioHandle.open_directory (directory);
         assert_non_null (directory_handle);
 
-        AbstractVfs vfs = null;
+        Common.AbstractVfs vfs = null;
         while ( (dirent = CSync.VioHandle.read_directory (directory_handle, vfs)) ) {
             assert_non_null (dirent.get ());
             if (!dirent.original_path == "") {

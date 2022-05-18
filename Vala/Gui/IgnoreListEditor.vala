@@ -31,14 +31,14 @@ public class IgnoreListEditor : Gtk.Dialog {
         window_flags (window_flags () & ~GLib.WindowContextHelpButtonHint);
         instance.up_ui (this);
 
-        ConfigFile config_file;
+        LibSync.ConfigFile config_file;
         //  FIXME This is not true. The entries are hardcoded below in setup_table_read_only_items
         read_only_tooltip = _("This entry is provided by the system at \"%1\" "
                             + "and cannot be modified in this view.")
-                              .printf (GLib.Dir.to_native_separators (ConfigFile.exclude_file (ConfigFile.SYSTEM_SCOPE)));
+                              .printf (GLib.Dir.to_native_separators (LibSync.ConfigFile.exclude_file (LibSync.ConfigFile.SYSTEM_SCOPE)));
 
         setup_table_read_only_items ();
-        var user_config = ConfigFile.exclude_file (ConfigFile.Scope.USER_SCOPE);
+        var user_config = LibSync.ConfigFile.exclude_file (LibSync.ConfigFile.Scope.USER_SCOPE);
         instance.ignore_table_widget.read_ignore_file (user_config);
 
         this.accepted.connect (
@@ -89,9 +89,9 @@ public class IgnoreListEditor : Gtk.Dialog {
         }
         instance.ignore_table_widget.on_signal_remove_all_items ();
 
-        ConfigFile config_file;
+        LibSync.ConfigFile config_file;
         setup_table_read_only_items ();
-        instance.ignore_table_widget.read_ignore_file (ConfigFile.exclude_file (ConfigFile.SYSTEM_SCOPE), false);
+        instance.ignore_table_widget.read_ignore_file (LibSync.ConfigFile.exclude_file (LibSync.ConfigFile.SYSTEM_SCOPE), false);
     }
 
 

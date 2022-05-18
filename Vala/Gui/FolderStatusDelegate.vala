@@ -458,7 +458,7 @@ public class FolderStatusDelegate : GLib.StyledItemDelegate {
     /***********************************************************
     ***********************************************************/
     private void customize_style () {
-        this.icon_more = Theme.create_color_aware_icon (":/client/theme/more.svg");
+        this.icon_more = LibSync.Theme.create_color_aware_icon (":/client/theme/more.svg");
     }
 
 

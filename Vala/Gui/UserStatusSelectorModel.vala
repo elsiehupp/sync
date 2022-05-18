@@ -193,7 +193,7 @@ public class UserStatusSelectorModel : GLib.Object {
     ***********************************************************/
     public GLib.Uri online_icon {
         public get {
-            return Theme.status_online_image_source;
+            return LibSync.Theme.status_online_image_source;
         }
     }
 
@@ -202,7 +202,7 @@ public class UserStatusSelectorModel : GLib.Object {
     ***********************************************************/
     public GLib.Uri away_icon {
         public get {
-            return Theme.status_away_image_source;
+            return LibSync.Theme.status_away_image_source;
         }
     }
 
@@ -212,7 +212,7 @@ public class UserStatusSelectorModel : GLib.Object {
     ***********************************************************/
     public GLib.Uri dnd_icon {
         public get {
-            return Theme.status_do_not_disturb_image_source;
+            return LibSync.Theme.status_do_not_disturb_image_source;
         }
     }
 
@@ -221,7 +221,7 @@ public class UserStatusSelectorModel : GLib.Object {
     ***********************************************************/
     public GLib.Uri invisible_icon {
         public get {
-            return Theme.status_invisible_image_source;
+            return LibSync.Theme.status_invisible_image_source;
         }
     }
 

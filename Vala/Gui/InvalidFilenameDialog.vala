@@ -31,7 +31,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private unowned Account account;
+    private LibSync.Account account;
     private FolderConnection folder_connection;
     private string file_path;
     private string relative_file_path;
@@ -45,7 +45,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public InvalidFilenameDialog (unowned Account account, FolderConnection folder_connection, string file_path, Gtk.Widget parent = new Gtk.Widget ()) {
+    public InvalidFilenameDialog (LibSync.Account account, FolderConnection folder_connection, string file_path, Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.instance = new InvalidFilenameDialog ();
         this.account = account;
@@ -184,7 +184,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
         if (!values.contains ("permissions")) {
             return;
         }
-        var remote_permissions = RemotePermissions.from_server_string (values["permissions"].to_string ());
+        var remote_permissions = Common.RemotePermissions.from_server_string (values["permissions"].to_string ());
         if (!remote_permissions.has_permission (remote_permissions.Permissions.CAN_RENAME)
             || !remote_permissions.has_permission (remote_permissions.Permissions.CAN_MOVE)) {
             this.instance.error_label.on_signal_text (

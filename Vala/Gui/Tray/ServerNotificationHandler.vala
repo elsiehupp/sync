@@ -43,7 +43,7 @@ public class ServerNotificationHandler : GLib.Object {
         // not yet valid, its assumed that notifications are available.
         if (this.account_state.account.capabilities.is_valid) {
             if (!this.account_state.account.capabilities.notifications_available ()) {
-                GLib.info ("Account" + this.account_state.account.display_name + "does not have notifications enabled.");
+                GLib.info ("LibSync.Account" + this.account_state.account.display_name + "does not have notifications enabled.");
                 delete_later ();
                 return;
             }

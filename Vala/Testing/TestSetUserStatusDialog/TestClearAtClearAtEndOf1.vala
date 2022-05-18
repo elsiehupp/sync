@@ -10,7 +10,7 @@ namespace Testing {
 public class TestClearAtClearAtEndOf1 : GLib.Object {
 
     private TestClearAtClearAtEndOf1 () {
-        UserStatus user_status;
+        LibSync.UserStatus user_status;
         ClearAt clear_at;
         clear_at.type = ClearAtType.END_OF;
         clear_at.endof = "day";

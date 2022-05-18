@@ -21,7 +21,7 @@ public class EncryptFolderJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     //  private unowned Account account;
-    private SyncJournalDb journal;
+    private Common.SyncJournalDb journal;
     //  private string path;
     private string file_identifier;
     private string folder_token;
@@ -33,7 +33,7 @@ public class EncryptFolderJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public EncryptFolderJob.for_account (Account account, SyncJournalDb journal, string path, string file_identifier, GLib.Object parent = new GLib.Object ()) {
+    public EncryptFolderJob.for_account (Account account, Common.SyncJournalDb journal, string path, string file_identifier, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account = account;
         this.journal = journal;

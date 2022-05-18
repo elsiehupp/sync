@@ -64,17 +64,17 @@ public class GeneralSettings : Gtk.Widget {
 
         public static GLib.List<ZipEntry> create_file_list () {
             var list = new GLib.List<ZipEntry> ();
-            list.append (file_info_to_zip_entry (GLib.File.new_for_path (ConfigFile.config_file)));
+            list.append (file_info_to_zip_entry (GLib.File.new_for_path (LibSync.ConfigFile.config_file)));
 
             var logger = LibSync.Logger.instance;
 
-            if (!logger.log_dir () == "") {
+            if (!logger.log_directory () == "") {
                 list.append (new ZipEntry (
                     "",
                     "logs"
                 ));
 
-                GLib.Dir directory = new GLib.Dir (logger.log_dir ());
+                GLib.Dir directory = new GLib.Dir (logger.log_directory ());
                 var info_list = directory.entry_info_list (GLib.Dir.Files);
                 std.transform (std.cbegin (info_list), std.cend (info_list),
                             std.back_inserter (list),
@@ -109,7 +109,7 @@ public class GeneralSettings : Gtk.Widget {
 
             zip.add_file ("__nextcloud_client_parameters.txt", GLib.Application.arguments ().join (' ').to_utf8 ());
 
-            string build_info = Theme.about + "\n\n" + Theme.about_details;
+            string build_info = LibSync.Theme.about + "\n\n" + LibSync.Theme.about_details;
             zip.add_file ("__nextcloud_client_buildinfo.txt", build_info.to_utf8 ());
         }
     }
@@ -138,12 +138,12 @@ public class GeneralSettings : Gtk.Widget {
 
         // Rename 'Explorer' appropriately on non-Windows
 
-        if (Utility.has_system_launch_on_signal_startup (Theme.app_name)) {
+        if (Utility.has_system_launch_on_signal_startup (LibSync.Theme.app_name)) {
             this.instance.autostart_check_box.checked (true);
             this.instance.autostart_check_box.disabled (true);
             this.instance.autostart_check_box.tool_tip (_("You cannot disable autostart because system-wide autostart is enabled."));
         } else {
-            bool has_auto_start = Utility.has_launch_on_signal_startup (Theme.app_name);
+            bool has_auto_start = Utility.has_launch_on_signal_startup (LibSync.Theme.app_name);
             // make sure the binary location is correctly set
             on_signal_toggle_launch_on_signal_startup (has_auto_start);
             this.instance.autostart_check_box.checked (has_auto_start);
@@ -153,7 +153,7 @@ public class GeneralSettings : Gtk.Widget {
         }
 
         // setup about section
-        string about = Theme.about;
+        string about = LibSync.Theme.about;
         this.instance.about_label.text_interaction_flags (GLib.Text_selectable_by_mouse | GLib.TextBrowserInteraction);
         this.instance.about_label.on_signal_text (about);
         this.instance.about_label.open_external_links (true);
@@ -204,7 +204,7 @@ public class GeneralSettings : Gtk.Widget {
         // OEM themes are not obliged to ship mono icons, so there
         // is no point in offering an option
         this.instance.mono_icons_check_box.visible (
-            Theme.mono_icons_available
+            LibSync.Theme.mono_icons_available
         );
 
         this.instance.ignored_files_button.clicked.connect (
@@ -275,22 +275,22 @@ public class GeneralSettings : Gtk.Widget {
         if (this.currently_loading) {
             return;
         }
-        ConfigFile config_file;
+        LibSync.ConfigFile config_file;
         bool is_checked = this.instance.mono_icons_check_box.is_checked ();
-        ConfigFile.mono_icons (is_checked);
-        Theme.systray_use_mono_icons (is_checked);
-        ConfigFile.crash_reporter (this.instance.crashreporter_check_box.is_checked ());
+        LibSync.ConfigFile.mono_icons (is_checked);
+        LibSync.Theme.systray_use_mono_icons (is_checked);
+        LibSync.ConfigFile.crash_reporter (this.instance.crashreporter_check_box.is_checked ());
 
-        ConfigFile.new_big_folder_size_limit (this.instance.new_folder_limit_check_box.is_checked (),
+        LibSync.ConfigFile.new_big_folder_size_limit (this.instance.new_folder_limit_check_box.is_checked (),
             this.instance.new_folder_limit_spin_box.value ());
-        ConfigFile.confirm_external_storage (this.instance.new_external_storage.is_checked ());
+        LibSync.ConfigFile.confirm_external_storage (this.instance.new_external_storage.is_checked ());
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_toggle_launch_on_signal_startup (bool enable) {
-        Theme theme = Theme.instance;
+        LibSync.Theme theme = LibSync.Theme.instance;
         Utility.launch_on_signal_startup (theme.app_name, theme.app_name_gui, enable);
     }
 
@@ -298,16 +298,16 @@ public class GeneralSettings : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_toggle_optional_server_notifications (bool enable) {
-        ConfigFile config_file;
-        ConfigFile.optional_server_notifications (enable);
+        LibSync.ConfigFile config_file;
+        LibSync.ConfigFile.optional_server_notifications (enable);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_show_in_explorer_navigation_pane (bool checked) {
-        ConfigFile config_file;
-        ConfigFile.show_in_explorer_navigation_pane (checked);
+        LibSync.ConfigFile config_file;
+        LibSync.ConfigFile.show_in_explorer_navigation_pane (checked);
         // Now update the registry with the change.
         FolderManager.instance.navigation_pane_helper.show_in_explorer_navigation_pane = checked;
     }
@@ -317,7 +317,7 @@ public class GeneralSettings : Gtk.Widget {
     ***********************************************************/
     private void on_signal_ignored_files_button_clicked () {
         if (this.ignore_editor == null) {
-            ConfigFile config_file;
+            LibSync.ConfigFile config_file;
             this.ignore_editor = new IgnoreListEditor (this);
             this.ignore_editor.attribute (GLib.WA_DeleteOnClose, true);
             this.ignore_editor.open ();
@@ -349,16 +349,16 @@ public class GeneralSettings : Gtk.Widget {
     ***********************************************************/
     private void load_misc_settings () {
         var scope = new GLib.ScopedValueRollback<bool> (this.currently_loading, true);
-        ConfigFile config_file;
-        this.instance.mono_icons_check_box.checked (ConfigFile.mono_icons ());
-        this.instance.server_notifications_check_box.checked (ConfigFile.optional_server_notifications ());
-        this.instance.show_in_explorer_navigation_pane_check_box.checked (ConfigFile.show_in_explorer_navigation_pane ());
-        this.instance.crashreporter_check_box.checked (ConfigFile.crash_reporter ());
-        var new_folder_limit = ConfigFile.new_big_folder_size_limit;
+        LibSync.ConfigFile config_file;
+        this.instance.mono_icons_check_box.checked (LibSync.ConfigFile.mono_icons ());
+        this.instance.server_notifications_check_box.checked (LibSync.ConfigFile.optional_server_notifications ());
+        this.instance.show_in_explorer_navigation_pane_check_box.checked (LibSync.ConfigFile.show_in_explorer_navigation_pane ());
+        this.instance.crashreporter_check_box.checked (LibSync.ConfigFile.crash_reporter ());
+        var new_folder_limit = LibSync.ConfigFile.new_big_folder_size_limit;
         this.instance.new_folder_limit_check_box.checked (new_folder_limit.first);
         this.instance.new_folder_limit_spin_box.value (new_folder_limit.second);
-        this.instance.new_external_storage.checked (ConfigFile.confirm_external_storage ());
-        this.instance.mono_icons_check_box.checked (ConfigFile.mono_icons ());
+        this.instance.new_external_storage.checked (LibSync.ConfigFile.confirm_external_storage ());
+        this.instance.mono_icons_check_box.checked (LibSync.ConfigFile.mono_icons ());
     }
 
 
@@ -380,7 +380,7 @@ public class GeneralSettings : Gtk.Widget {
     #if defined (BUILD_UPDATER)
     ***********************************************************/
     private void update_info () {
-        if (ConfigFile ().skip_update_check () || AbstractUpdater.instance == null) {
+        if (LibSync.ConfigFile ().skip_update_check () || AbstractUpdater.instance == null) {
             // updater disabled on compile
             this.instance.updates_group_box.visible (false);
             return;
@@ -399,7 +399,7 @@ public class GeneralSettings : Gtk.Widget {
         string status = AbstractUpdater.instance.status_string (
             OCUpdater.UpdateStatusStringFormat.HTML
         );
-        Theme.replace_link_color_string_background_aware (status);
+        LibSync.Theme.replace_link_color_string_background_aware (status);
 
         this.instance.update_state_label.open_external_links (false);
         this.instance.update_state_label.link_activated.connect (
@@ -418,12 +418,12 @@ public class GeneralSettings : Gtk.Widget {
         );
 
         this.instance.auto_check_for_updates_check_box.checked (
-            ConfigFile ().auto_update_check ()
+            LibSync.ConfigFile ().auto_update_check ()
         );
 
         // Channel selection
         this.instance.update_channel.current_index (
-            ConfigFile ().update_channel == "beta" ? 1 : 0
+            LibSync.ConfigFile ().update_channel == "beta" ? 1 : 0
         );
         this.instance.update_channel.current_text_changed.connect (
             this.on_signal_update_channel_current_text_changed // GLib.UniqueConnection
@@ -450,7 +450,7 @@ public class GeneralSettings : Gtk.Widget {
     #if defined (BUILD_UPDATER)
     ***********************************************************/
     private void on_signal_update_channel_current_text_changed (string channel) {
-        if (channel == ConfigFile.update_channel) {
+        if (channel == LibSync.ConfigFile.update_channel) {
             return;
         }
 
@@ -485,11 +485,11 @@ public class GeneralSettings : Gtk.Widget {
     private void on_signal_change_update_channel_message_box_finished (string channel, Gtk.MessageBox change_update_channel_message_box, Gtk.Button accept_button) {
         change_update_channel_message_box.delete_later ();
         if (change_update_channel_message_box.clicked_button () == accept_button) {
-            ConfigFile.update_channel = channel;
+            LibSync.ConfigFile.update_channel = channel;
             AbstractUpdater.instance.update_url = AbstractUpdater.update_url;
             AbstractUpdater.instance.check_for_update ();
         } else {
-            this.instance.update_channel.current_text (ConfigFile ().update_channel);
+            this.instance.update_channel.current_text (LibSync.ConfigFile ().update_channel);
         }
     }
 
@@ -499,7 +499,7 @@ public class GeneralSettings : Gtk.Widget {
     ***********************************************************/
     private void on_signal_update_check_now () {
         // don't show update info if updates are disabled
-        if (!ConfigFile.skip_update_check) {
+        if (!LibSync.ConfigFile.skip_update_check) {
             this.instance.update_button.enabled (false);
             AbstractUpdater.instance.check_for_update ();
         }
@@ -510,7 +510,7 @@ public class GeneralSettings : Gtk.Widget {
     #if defined (BUILD_UPDATER)
     ***********************************************************/
     private void on_signal_auto_check_for_updates_check_box_toggled () {
-        ConfigFile.auto_update_check (
+        LibSync.ConfigFile.auto_update_check (
             this.instance.auto_check_for_updates_check_box.is_checked (),
             ""
         );
@@ -521,8 +521,8 @@ public class GeneralSettings : Gtk.Widget {
     ***********************************************************/
     private void customize_style () {
         // setup about section
-        Theme.replace_link_color_string_background_aware (Theme.about);
-        this.instance.about_label.on_signal_text (Theme.about);
+        LibSync.Theme.replace_link_color_string_background_aware (LibSync.Theme.about);
+        this.instance.about_label.on_signal_text (LibSync.Theme.about);
 
     //  #if defined (BUILD_UPDATER)
         // updater info

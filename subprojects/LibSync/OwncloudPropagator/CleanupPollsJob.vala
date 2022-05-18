@@ -16,7 +16,7 @@ public class CleanupPollsJob : GLib.Object {
     unowned Account account;
     Common.SyncJournalDb journal;
     string local_path;
-    unowned AbstractVfs vfs;
+    unowned Common.AbstractVfs vfs;
 
     internal signal void signal_finished ();
     internal signal void signal_aborted (string error);
@@ -28,7 +28,7 @@ public class CleanupPollsJob : GLib.Object {
         Account account,
         Common.SyncJournalDb journal,
         string local_path,
-        AbstractVfs vfs,
+        Common.AbstractVfs vfs,
         GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.poll_infos = poll_infos;

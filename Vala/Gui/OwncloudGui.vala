@@ -94,7 +94,7 @@ public class OwncloudGui : GLib.Object {
         this.tray = Systray.instance;
         this.tray.tray_engine = new GLib.QmlApplicationEngine (this);
         // for the beginning, set the offline icon until the account was verified
-        this.tray.icon = Theme.folder_offline_icon_for_tray;
+        this.tray.icon = LibSync.Theme.folder_offline_icon_for_tray;
 
         this.tray.show ();
 
@@ -125,13 +125,13 @@ public class OwncloudGui : GLib.Object {
         FolderManager.instance.signal_folder_sync_state_change.connect (
             this.on_signal_sync_state_change
         );
-        LibSync.Logger.instance.signal_gui_log.connect (
+        LibSync.Logger.signal_gui_log.connect (
             this.on_signal_show_tray_message
         );
-        LibSync.Logger.instance.signal_optional_gui_log.connect (
+        LibSync.Logger.signal_optional_gui_log.connect (
             this.on_signal_show_optional_tray_message
         );
-        LibSync.Logger.instance.signal_gui_message.connect (
+        LibSync.Logger.signal_gui_message.connect (
             this.on_signal_show_gui_message
         );
     }
@@ -240,7 +240,7 @@ public class OwncloudGui : GLib.Object {
         }
 
         if (problem_accounts.length () != 0) {
-            this.tray.icon (Theme.folder_offline_icon_for_tray);
+            this.tray.icon (LibSync.Theme.folder_offline_icon_for_tray);
             if (all_disconnected) {
                 status_text (_("Disconnected"));
             } else {
@@ -249,7 +249,7 @@ public class OwncloudGui : GLib.Object {
             GLib.List<string> messages = new GLib.List<string> ()
             messages.append (_("Disconnected from accounts:"));
             foreach (unowned AccountState account in problem_accounts) {
-                string message = _("Account %1 : %2").printf (account.account.display_name, AccountState.state_string (account.state));
+                string message = _("LibSync.Account %1 : %2").printf (account.account.display_name, AccountState.state_string (account.state));
                 if (!account.connection_errors.empty ()) {
                     message += "\n";
                     message += account.connection_errors ().join ("\n");
@@ -262,13 +262,13 @@ public class OwncloudGui : GLib.Object {
         }
 
         if (all_signed_out) {
-            this.tray.icon (Theme.folder_offline_icon_for_tray);
+            this.tray.icon (LibSync.Theme.folder_offline_icon_for_tray);
             this.tray.tool_tip (_("Please sign in"));
             status_text (_("Signed out"));
             return false; // only run once
         } else if (all_paused) {
-            this.tray.icon (Theme.sync_state_icon (LibSync.SyncResult.Status.PAUSED, true));
-            this.tray.tool_tip (_("Account synchronization is disabled"));
+            this.tray.icon (LibSync.Theme.sync_state_icon (LibSync.SyncResult.Status.PAUSED, true));
+            this.tray.tool_tip (_("LibSync.Account synchronization is disabled"));
             status_text (_("Synchronization is paused"));
             return false; // only run once
         }
@@ -294,7 +294,7 @@ public class OwncloudGui : GLib.Object {
             icon_status = LibSync.SyncResult.Status.PROBLEM;
         }
 
-        Gtk.IconInfo status_icon = Theme.sync_state_icon (icon_status, true);
+        Gtk.IconInfo status_icon = LibSync.Theme.sync_state_icon (icon_status, true);
         this.tray.icon (status_icon);
 
         // create the tray blob message, check if we have an defined state
@@ -513,7 +513,7 @@ public class OwncloudGui : GLib.Object {
             || result.status () == LibSync.SyncResult.Status.PROBLEM
             || result.status () == LibSync.SyncResult.Status.SYNC_ABORT_REQUESTED
             || result.status () == LibSync.SyncResult.Status.ERROR) {
-            LibSync.Logger.instance.on_signal_enter_next_log_file ();
+            LibSync.Logger.on_signal_enter_next_log_file ();
         }
     }
 
@@ -569,7 +569,7 @@ public class OwncloudGui : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_open_owncloud () {
-        var account = (Account) sender ().property (PROPERTY_ACCOUNT_C);
+        var account = (LibSync.Account) sender ().property (PROPERTY_ACCOUNT_C);
         if (account) {
             OpenExternal.open_browser (account.url);
         }
@@ -589,7 +589,7 @@ public class OwncloudGui : GLib.Object {
 
 
     /***********************************************************
-    This should rather be in application.... or rather in ConfigFile?
+    This should rather be in application.... or rather in LibSync.ConfigFile?
     ***********************************************************/
     public void on_signal_open_settings_dialog () {
         // if account is set up, on_signal_start the configuration wizard.
@@ -625,7 +625,7 @@ public class OwncloudGui : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_help () {
-        GLib.DesktopServices.open_url (GLib.Uri (Theme.help_url));
+        GLib.DesktopServices.open_url (GLib.Uri (LibSync.Theme.help_url));
     }
 
 
@@ -645,7 +645,7 @@ public class OwncloudGui : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_tray_message_if_server_unsupported (Account account) {
+    public void on_signal_tray_message_if_server_unsupported (LibSync.Account account) {
         if (account.server_version_unsupported) {
             on_signal_show_tray_message (
                 _("Unsupported Server Version"),
@@ -679,7 +679,7 @@ public class OwncloudGui : GLib.Object {
         bool resharing_allowed = true; // lets assume the good
         if (folder_connection.journal_database.file_record (file, file_record) && file_record.is_valid) {
             // check the permission : Is resharing allowed?
-            if (!file_record.remote_permissions == null && !file_record.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_RESHARE)) {
+            if (!file_record.remote_permissions == null && !file_record.remote_permissions.has_permission (Common.RemotePermissions.Permissions.CAN_RESHARE)) {
                 resharing_allowed = false;
             }
         }

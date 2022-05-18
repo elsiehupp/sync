@@ -39,9 +39,9 @@ public struct SetupParameters {
     string remote_path;
 
     /***********************************************************
-    Account url, credentials etc for network calls
+    LibSync.Account url, credentials etc for network calls
     ***********************************************************/
-    unowned Account account;
+    LibSync.Account account;
 
     /***********************************************************
     Access to the sync folder's database.

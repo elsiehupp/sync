@@ -1,6 +1,7 @@
 project('com.elsiehupp.NextcloudVala.LibSync', 'c', 'vala', version: '1.0.0')
 
 srcs = files([
+    'AbstractSslErrorHandler.vala',
     'Account.vala',
     'BandwidthManager.vala',
 

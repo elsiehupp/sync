@@ -8,7 +8,7 @@ namespace LibSync {
 
 @copyright GPLv3 or Later
 ***********************************************************/
-public class VfsSuffix : Common.AbstractVfs {
+public class VfsSuffix : Common.Common.AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
@@ -131,9 +131,9 @@ public class VfsSuffix : Common.AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
-    public Result<AbstractVfs.ConvertToPlaceholderResult, string> convert_to_placeholder (string filename, SyncFileItem item, string value) {
+    public Result<Common.AbstractVfs.ConvertToPlaceholderResult, string> convert_to_placeholder (string filename, SyncFileItem item, string value) {
         // Nothing necessary
-        return AbstractVfs.ConvertToPlaceholderResult.Ok;
+        return Common.AbstractVfs.ConvertToPlaceholderResult.Ok;
     }
 
 

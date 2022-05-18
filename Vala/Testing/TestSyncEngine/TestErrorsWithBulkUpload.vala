@@ -18,7 +18,7 @@ public class TestErrorsWithBulkUpload : AbstractTestSyncEngine {
         fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.VariantMap ( { "bulkupload", "1.0" } ) } });
 
         // Disable parallel uploads
-        SyncOptions sync_options;
+        LibSync.SyncOptions sync_options;
         sync_options.parallel_network_jobs = 0;
         fake_folder.sync_engine.set_sync_options (sync_options);
 

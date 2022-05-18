@@ -81,7 +81,7 @@ public class SyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public ExcludedFiles excluded_files { public get; private set; }
+    public CSync.ExcludedFiles excluded_files { public get; private set; }
     public SyncFileStatusTracker sync_file_status_tracker { public get; private set; }
     public Common.Utility.StopWatch stop_watch { public get; private set; }
 
@@ -265,7 +265,7 @@ public class SyncEngine : GLib.Object {
         // Everything in the SyncEngine expects a trailing slash for the local_path.
         //  GLib.assert_true (local_path.has_suffix ("/"));
 
-        this.excluded_files.reset (new ExcludedFiles (local_path));
+        this.excluded_files.reset (new CSync.ExcludedFiles (local_path));
 
         this.sync_file_status_tracker.reset (new SyncFileStatusTracker (this));
 
@@ -400,7 +400,7 @@ public class SyncEngine : GLib.Object {
 
         this.last_local_discovery_style = this.local_discovery_style;
 
-        if (this.sync_options.vfs.mode () == AbstractVfs.WithSuffix && this.sync_options.vfs.file_suffix () == "") {
+        if (this.sync_options.vfs.mode () == Common.AbstractVfs.WithSuffix && this.sync_options.vfs.file_suffix () == "") {
             signal_sync_error (_("Using virtual files with suffix, but suffix is not set"));
             on_signal_finalize (false);
             return;
@@ -673,9 +673,9 @@ public class SyncEngine : GLib.Object {
     different kind of vfs.
 
     Note that hydrated* placeholder files might still be left. These will
-    get cleaned up by AbstractVfs.unregister_folder ().
+    get cleaned up by Common.AbstractVfs.unregister_folder ().
     ***********************************************************/
-    public static void wipe_virtual_files (string local_path, Common.SyncJournalDb journal, AbstractVfs vfs) {
+    public static void wipe_virtual_files (string local_path, Common.SyncJournalDb journal, Common.AbstractVfs vfs) {
         GLib.info ("Wiping virtual files inside " + local_path);
         journal.get_files_below_path (
             "",
@@ -709,7 +709,7 @@ public class SyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static void switch_to_virtual_files (string local_path, Common.SyncJournalDb journal, AbstractVfs vfs) {
+    public static void switch_to_virtual_files (string local_path, Common.SyncJournalDb journal, Common.AbstractVfs vfs) {
         GLib.info ("Convert to virtual files inside" + local_path);
         journal.get_files_below_path (
             {},
@@ -804,8 +804,8 @@ public class SyncEngine : GLib.Object {
                 SyncJournalFileRecord prev;
                 if (this.journal.get_file_record (item.file, prev)
                     && prev.is_valid
-                    && prev.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_WRITE) != item.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_WRITE)) {
-                    FileSystem.file_read_only_weak (file_path, item.remote_permissions != null && !item.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_WRITE));
+                    && prev.remote_permissions.has_permission (Common.RemotePermissions.Permissions.CAN_WRITE) != item.remote_permissions.has_permission (Common.RemotePermissions.Permissions.CAN_WRITE)) {
+                    FileSystem.file_read_only_weak (file_path, item.remote_permissions != null && !item.remote_permissions.has_permission (Common.RemotePermissions.Permissions.CAN_WRITE));
                 }
                 var record = item.to_sync_journal_file_record_with_inode (file_path);
                 if (record.checksum_header == "")
@@ -1418,7 +1418,7 @@ public class SyncEngine : GLib.Object {
     private void check_for_permission (GLib.List<unowned SyncFileItem> sync_items);
 
 
-    private RemotePermissions get_permissions (string file);
+    private Common.RemotePermissions get_permissions (string file);
 
 
     /***********************************************************

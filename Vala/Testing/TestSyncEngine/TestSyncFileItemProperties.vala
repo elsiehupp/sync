@@ -10,7 +10,7 @@ namespace Testing {
 public class TestSyncFileItemProperties : AbstractTestSyncEngine {
 
     /***********************************************************
-    Checks whether SyncFileItem instances have the expected
+    Checks whether LibSync.SyncFileItem instances have the expected
     properties before start of propagation.
     ***********************************************************/
     private TestSyncFileItemProperties () {
@@ -52,8 +52,8 @@ public class TestSyncFileItemProperties : AbstractTestSyncEngine {
     }
 
 
-    private void on_signal_sync_engine_about_to_propagate (GLib.List<unowned SyncFileItem> items) {
-        SyncFileItem a1, b1, c1;
+    private void on_signal_sync_engine_about_to_propagate (GLib.List<unowned LibSync.SyncFileItem> items) {
+        LibSync.SyncFileItem a1, b1, c1;
         foreach (var item in items) {
             if (item.file == "A/a1") {
                 a1 = item;
@@ -69,7 +69,7 @@ public class TestSyncFileItemProperties : AbstractTestSyncEngine {
         // a1 : should have local size and modtime
         GLib.assert_true (a1);
         GLib.assert_true (a1.instruction == CSync.SyncInstructions.SYNC);
-        GLib.assert_true (a1.direction == SyncFileItem.Direction.UP);
+        GLib.assert_true (a1.direction == LibSync.SyncFileItem.Direction.UP);
         GLib.assert_true (a1.size == (int64) 5);
 
         GLib.assert_true (Utility.date_time_from_time_t (a1.modtime) == changed_mtime);
@@ -79,7 +79,7 @@ public class TestSyncFileItemProperties : AbstractTestSyncEngine {
         // b2 : should have remote size and modtime
         GLib.assert_true (b1);
         GLib.assert_true (b1.instruction == CSync.SyncInstructions.SYNC);
-        GLib.assert_true (b1.direction == SyncFileItem.Direction.DOWN);
+        GLib.assert_true (b1.direction == LibSync.SyncFileItem.Direction.DOWN);
         GLib.assert_true (b1.size == (int64) 17);
         GLib.assert_true (Utility.date_time_from_time_t (b1.modtime) == changed_mtime);
         GLib.assert_true (b1.previous_size == (int64) 16);
@@ -88,7 +88,7 @@ public class TestSyncFileItemProperties : AbstractTestSyncEngine {
         // c1 : conflicts are downloads, so remote size and modtime
         GLib.assert_true (c1);
         GLib.assert_true (c1.instruction == CSync.SyncInstructions.CONFLICT);
-        GLib.assert_true (c1.direction == SyncFileItem.Direction.NONE);
+        GLib.assert_true (c1.direction == LibSync.SyncFileItem.Direction.NONE);
         GLib.assert_true (c1.size == (int64) 25);
         GLib.assert_true (Utility.date_time_from_time_t (c1.modtime) == changed_mtime2);
         GLib.assert_true (c1.previous_size == (int64) 26);

@@ -24,7 +24,7 @@ public class ShareManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private unowned Account account;
+    private LibSync.Account account;
 
     internal signal void signal_share_created (Share share);
     internal signal void signal_link_share_created (LinkShare share);
@@ -44,7 +44,7 @@ public class ShareManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public ShareManager (
-        unowned Account account,
+        LibSync.Account account,
         GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account = account;
@@ -248,7 +248,7 @@ public class ShareManager : GLib.Object {
         // From own_cloud server 8.2 the url field is always set for public shares
         if (data.contains ("url")) {
             url = new GLib.Uri (data.value ("url").to_string ());
-        } else if (this.account.server_version_int >= Account.make_server_version (8, 0, 0)) {
+        } else if (this.account.server_version_int >= LibSync.Account.make_server_version (8, 0, 0)) {
             // From own_cloud server version 8 on, a different share link scheme is used.
             url = new GLib.Uri (Utility.concat_url_path (this.account.url, "index.php/s/" + data.value ("token").to_string ())).to_string ();
         } else {
@@ -347,7 +347,7 @@ public class ShareManager : GLib.Object {
     /***********************************************************
     When a share is modified, we need to tell the folders so they can adjust overlay icons
     ***********************************************************/
-    private static void update_folder (unowned Account account, string path) {
+    private static void update_folder (LibSync.Account account, string path) {
         foreach (FolderConnection folder_connection in FolderManager.instance.map ()) {
             if (folder_connection.account_state.account != account) {
                 continue;
