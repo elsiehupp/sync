@@ -55,7 +55,7 @@ public class DummyCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     public override void ask_from_user () {
-        /* emit */ (signal_asked ());
+        signal_asked ();
     }
 
 

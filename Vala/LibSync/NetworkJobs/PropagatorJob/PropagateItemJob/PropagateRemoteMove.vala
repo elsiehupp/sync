@@ -130,7 +130,7 @@ public class PropagateRemoteMove : AbstractPropagateItemJob {
         GLib.debug (remote_source + remote_destination);
 
         this.move_job = new MoveJob (this.propagator.account, remote_source, remote_destination, this);
-        this.move_job.signal_finished.connect (
+        this.move_job.signal_move_job_finished.connect (
             this.on_signal_move_job_finished
         );
         this.propagator.active_job_list.append (this);
@@ -190,7 +190,7 @@ public class PropagateRemoteMove : AbstractPropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_move_job_finished () {
+    private void on_signal_move_job_finished (MoveJob move_job) {
         this.propagator.active_job_list.remove_one (this);
 
         //  GLib.assert_true (this.move_job);

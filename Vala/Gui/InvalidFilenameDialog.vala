@@ -120,7 +120,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_move_job_finished () {
+    private void on_signal_move_job_finished (MoveJob move_job) {
         var move_job = (MoveJob)sender ();
         var error = move_job.input_stream.error;
 

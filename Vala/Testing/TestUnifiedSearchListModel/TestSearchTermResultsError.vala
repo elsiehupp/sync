@@ -30,7 +30,7 @@ public class TestSearchTermResultsError : AbstractTestUnifiedSearchListmodel {
 
         GLib.assert_true (search_in_progress_changed.wait ());
 
-        // make sure search has on_signal_finished
+        // make sure search has finished
         GLib.assert_true (!model.is_search_in_progress ());
 
         // make sure the model is empty and an error string has been set

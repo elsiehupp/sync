@@ -230,7 +230,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             var move_job = new MoveJob (this.propagator.account, Utility.concat_url_path (chunk_url (), "/.file"),
                 destination, headers, this);
             this.jobs.append (move_job);
-            move_job.signal_finished.connect (
+            move_job.signal_move_job_finished.connect (
                 this.on_signal_move_job_finished
             );
             move_job.destroyed.connect (
@@ -541,7 +541,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_move_job_finished () {
+    private void on_signal_move_job_finished (MoveJob move_job) {
         this.propagator.active_job_list.remove_one (this);
         var move_job = (MoveJob)sender ();
         on_signal_network_job_destroyed (move_job); // remove it from the this.jobs list

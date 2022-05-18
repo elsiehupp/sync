@@ -21,7 +21,7 @@ public class MoveJob : AbstractNetworkJob {
 
     GLib.HashTable<string, string> extra_headers;
 
-    internal signal void signal_finished ();
+    internal signal void signal_move_job_finished ();
 
     /***********************************************************
     ***********************************************************/
@@ -64,11 +64,12 @@ public class MoveJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public bool on_signal_finished () {
+    public bool on_signal_finished (MoveJob move_job) {
         GLib.info ("MOVE of " + this.reply.request ().url
-            + " finished with status " + reply_status_string ());
+            + " finished with status " + reply_status_string ()
+        );
 
-        signal_finished ();
+        signal_move_job_finished ();
         return true;
     }
 

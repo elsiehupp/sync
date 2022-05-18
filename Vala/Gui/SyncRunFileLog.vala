@@ -155,7 +155,7 @@ public class SyncRunFileLog : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void finish () {
-        this.out += "#=#=#=# Syncrun on_signal_finished " + date_time_str (GLib.DateTime.current_date_time_utc ())
+        this.out += "#=#=#=# Syncrun finished " + date_time_str (GLib.DateTime.current_date_time_utc ())
                   + " (last step: " + this.lap_duration.elapsed () + " msec"
                   + ", total: " + this.total_duration.elapsed () + " msec) " + endl;
         this.file.close ();

@@ -1096,7 +1096,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
         // find the single item to display :  This is going to be the bigger item, or the last completed
         // item if no items are in progress.
         SyncFileItem cur_item = progress.last_completed_item;
-        int64 cur_item_progress = -1; // -1 means on_signal_finished
+        int64 cur_item_progress = -1; // -1 means finished
         int64 bigger_item_size = 0;
         uint64 estimated_up_bandwidth = 0;
         uint64 estimated_down_bandwidth = 0;
@@ -1210,7 +1210,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_update_directories (GLib.List<string> list) {
+    private void on_signal_update_directories (LscolJob lscol_job, GLib.List<string> list) {
         var lscol_job = (LscolJob) sender ());
         //  GLib.assert_true (lscol_job);
         GLib.ModelIndex index = (GLib.PersistentModelIndex)lscol_job.property (PROPERTY_PARENT_INDEX_C);

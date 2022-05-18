@@ -51,10 +51,15 @@ public class ExcludedFiles : GLib.Object {
             return this.string_value;
         }
 
-        //  public BasePathString (string other) {
-        //      base (other);
-        //      //  GLib.assert_true (has_suffix ("/"));
-        //  }
+
+        public uint hash () {
+            return this.string_value.hash ();
+        }
+
+
+        public bool equal (BasePathString other) {
+            return this.to_string () == other.to_string ();
+        }
     }
 
     /***********************************************************
@@ -212,6 +217,19 @@ public class ExcludedFiles : GLib.Object {
     }
 
 
+    construct {
+        this.exclude_files = new GLib.HashTable<BasePathString, GLib.List<string>> (BasePathString.hash, BasePathString.equal);
+        this.manual_excludes = new GLib.HashTable<BasePathString, GLib.List<string>> (BasePathString.hash, BasePathString.equal);
+        this.all_excludes = new GLib.HashTable<BasePathString, GLib.List<string>> (BasePathString.hash, BasePathString.equal);
+        this.bname_traversal_regex_file = new GLib.HashTable<BasePathString, GLib.Regex> (BasePathString.hash, BasePathString.equal);
+        this.bname_traversal_regex_dir = new GLib.HashTable<BasePathString, GLib.Regex> (BasePathString.hash, BasePathString.equal);
+        this.full_traversal_regex_file = new GLib.HashTable<BasePathString, GLib.Regex> (BasePathString.hash, BasePathString.equal);
+        this.full_traversal_regex_dir = new GLib.HashTable<BasePathString, GLib.Regex> (BasePathString.hash, BasePathString.equal);
+        this.full_regex_file = new GLib.HashTable<BasePathString, GLib.Regex> (BasePathString.hash, BasePathString.equal);
+        this.full_regex_dir = new GLib.HashTable<BasePathString, GLib.Regex> (BasePathString.hash, BasePathString.equal);
+    }
+
+
     /***********************************************************
     Adds a new path to a file containing exclude patterns.
 
@@ -308,7 +326,7 @@ public class ExcludedFiles : GLib.Object {
     Primarily used in tests.
     ***********************************************************/
     public void clear_manual_excludes () {
-        this.manual_excludes = "";
+        this.manual_excludes = new GLib.HashTable<BasePathString, GLib.List<string>>;
         on_signal_reload_exclude_files ();
     }
 

@@ -327,10 +327,8 @@ public class AccountSettings : Gtk.Widget {
 
 
     /***********************************************************
-    The paramaters are currently umused. I just added them
-    because they are required by the signal signature.
     ***********************************************************/
-    public void on_signal_account_state_changed (AccountState account_state, AccountState.State state) {
+    public void on_signal_account_state_changed () {
         AccountState.State state = this.account_state != null ? this.account_state.state : AccountState.State.DISCONNECTED;
         if (state != AccountState.State.DISCONNECTED) {
             this.instance.ssl_button.update_account_state (this.account_state);

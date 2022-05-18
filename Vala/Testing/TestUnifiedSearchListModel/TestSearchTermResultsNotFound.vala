@@ -31,7 +31,7 @@ public class TestSearchTermResultsNotFound : AbstractTestUnifiedSearchListmodel 
 
         GLib.assert_true (search_in_progress_changed.wait ());
 
-        // make sure search has on_signal_finished
+        // make sure search has finished
         GLib.assert_true (!model.is_search_in_progress ());
 
         GLib.assert_true (model.row_count () == 0);

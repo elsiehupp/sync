@@ -14,7 +14,7 @@ public class CookieJar : Soup.CookieJar {
 
     /***********************************************************
     ***********************************************************/
-    internal signal void new_cookies_for_url (GLib.List<Soup.Cookie> cookie_list, GLib.Uri url);
+    internal signal void signal_new_cookies_for_url (GLib.List<Soup.Cookie> cookie_list, GLib.Uri url);
 
     /***********************************************************
     ***********************************************************/
@@ -27,7 +27,7 @@ public class CookieJar : Soup.CookieJar {
     ***********************************************************/
     public bool cookies_from_url (GLib.List<Soup.Cookie> cookie_list, GLib.Uri url) {
         if (Soup.CookieJar.cookies_from_url (cookie_list, url)) {
-            /* emit */ new_cookies_for_url (cookie_list, url);
+            signal_new_cookies_for_url (cookie_list, url);
             return true;
         }
 

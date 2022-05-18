@@ -81,7 +81,7 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
                 } else if (this.state == State.SERVICE_UNAVAILABLE) {
                     // Check if we are actually down for maintenance.
                     // To do this we must clear the connection validator that just
-                    // produced the 503. It's on_signal_finished anyway and will delete itself.
+                    // produced the 503. It's finished anyway and will delete itself.
                     this.connection_validator = null;
                     on_signal_check_connectivity ();
                 }

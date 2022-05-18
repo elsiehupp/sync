@@ -755,7 +755,7 @@ public class FolderManager : GLib.Object {
         case LibSync.SyncResult.Status.SUCCESS:
         case LibSync.SyncResult.Status.PROBLEM:
             if (has_unresolved_conflicts) {
-                folder_message = _("Sync on_signal_finished with unresolved conflicts.");
+                folder_message = _("Sync finished with unresolved conflicts.");
             } else {
                 folder_message = _("Last Sync was successful.");
             }

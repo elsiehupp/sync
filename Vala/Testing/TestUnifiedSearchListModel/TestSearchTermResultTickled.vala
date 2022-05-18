@@ -31,7 +31,7 @@ public class TestSearchTermResultTickled : AbstractTestUnifiedSearchListmodel {
 
         GLib.assert_true (search_in_progress_changed.wait ());
 
-        // make sure search has on_signal_finished and some results has been received
+        // make sure search has finished and some results has been received
         GLib.assert_true (!model.is_search_in_progress ());
 
         GLib.assert_true (model.row_count () != 0);

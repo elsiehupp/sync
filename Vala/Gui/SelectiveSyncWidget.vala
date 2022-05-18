@@ -187,7 +187,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_update_directories (GLib.List<string> list) {
+    private void on_signal_update_directories (LscolJob lscol_job, GLib.List<string> list) {
         var lscol_job = (LscolJob)sender ();
         GLib.ScopedValueRollback<bool> is_inserting (this.inserting);
         this.inserting = true;

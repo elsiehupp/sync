@@ -174,7 +174,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_create_remote_folder_finished () {
-        GLib.debug ("webdav mkdir request on_signal_finished");
+        GLib.debug ("webdav mkdir request finished");
         on_signal_show_warning (_("FolderConnection was successfully created on %1.").printf (Theme.app_name_gui));
         on_signal_refresh_folders ();
         this.instance.folder_entry.on_signal_text (((MkColJob)sender ()).path);
@@ -216,7 +216,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_update_directories (GLib.List<string> list) {
+    protected void on_signal_update_directories (LscolJob lscol_job, GLib.List<string> list) {
         string webdav_folder = GLib.Uri (this.account.dav_url ()).path;
 
         GLib.TreeWidgetItem root = this.instance.folder_tree_widget.top_level_item (0);
@@ -349,7 +349,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_typed_path_found (GLib.List<string> subpaths) {
-        on_signal_update_directories (subpaths);
+        on_signal_update_directories (LscolJob lscol_job, subpaths);
         select_by_path (this.instance.folder_entry.text ());
     }
 

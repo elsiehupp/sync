@@ -70,7 +70,7 @@ public class SocketApiJobV2 : GLib.Object {
                 "arguments", object
             }
         }).to_json (GLib.JsonDocument.Compact));
-        /* emit */ on_signal_finished ();
+        signal_finished ();
     }
 
 } // class SocketApiJobV2
