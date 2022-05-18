@@ -242,7 +242,7 @@ public class ExcludedFiles : GLib.Object {
         string file_path,
         string base_path,
         bool exclude_hidden) {
-        if (!file_path.has_prefix (base_path, Utility.fs_case_preserving () ? GLib.CaseInsensitive : GLib.CaseSensitive)) {
+        if (!file_path.has_prefix (base_path, Utility.fs_case_preserving ? GLib.CaseInsensitive : GLib.CaseSensitive)) {
             // Mark paths we're not responsible for as excluded...
             return true;
         }
@@ -757,7 +757,7 @@ public class ExcludedFiles : GLib.Object {
                 .printf (full_file_dir_keep, full_dir_keep, bname_file_dir_keep, bname_dir_keep, full_file_dir_remove, full_dir_remove, bname_file_dir_remove, bname_dir_remove));
 
         GLib.Regex.PatternOptions pattern_options = GLib.Regex.NoPatternOption;
-        if (Utility.fs_case_preserving ()) {
+        if (Utility.fs_case_preserving) {
             pattern_options |= GLib.Regex.CaseInsensitiveOption;
         }
         this.bname_traversal_regex_file[base_path].pattern_options (pattern_options);

@@ -62,7 +62,9 @@ public class Utility : GLib.Object {
     /***********************************************************
     ***********************************************************/
     static void setup_fav_link_private (string folder) {
-        // Nautilus : add to ~/.gtk-bookmarks
+        /***********************************************************
+        Nautilus : add to ~/.gtk-bookmarks
+        ***********************************************************/
         GLib.File gtk_bookmarks = GLib.File.new_for_path (GLib.Dir.home_path + "/.config/gtk-3.0/bookmarks");
         string folder_url = "file://" + folder;
         if (gtk_bookmarks.open (GLib.File.ReadWrite)) {
@@ -85,9 +87,7 @@ public class Utility : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    static void remove_fav_link_private (string folder) {
-        //  Q_UNUSED (folder)
-    }
+    static void remove_fav_link_private (string folder) { }
 
 
     /***********************************************************
@@ -107,9 +107,14 @@ public class Utility : GLib.Object {
 
         GLib.File file = GLib.File.new_for_path (fname);
         if (file.open (GLib.IODevice.WriteOnly | GLib.IODevice.Text)) {
-            string outfile; // = new GLib.OutputStream (file);
+            string outfile;
+            /***********************************************************
+            outfile = new GLib.OutputStream (file);
+            ***********************************************************/
             outfile = rand_string;
-            // optional, as GLib.File destructor will already do it:
+            /***********************************************************
+            Optional, as GLib.File destructor will already do it:
+            ***********************************************************/
             file.close ();
             return true;
         }
@@ -128,14 +133,18 @@ public class Utility : GLib.Object {
         string s;
         double value = octets;
 
-        // Whether we care about decimals : only for GB/MB and only
-        // if it's less than 10 units.
+        /***********************************************************
+        Whether we care about decimals : only for GB/MB and only if
+        it's less than 10 units.
+        ***********************************************************/
         bool round = true;
 
-        // do not display terra byte with the current units, as when
-        // the MB, GB and KB units were made, there was no TB,
-        // see the JEDEC standard
-        // https://en.wikipedia.org/wiki/JEDEC_memory_standards
+        /***********************************************************
+        do not display terra byte with the current units, as when
+        the MB, GB and KB units were made, there was no TB,
+        see the JEDEC standard
+        https://en.wikipedia.org/wiki/JEDEC_memory_standards
+        ***********************************************************/
         if (octets >= GB) {
             s = _("%L1 GB");
             value /= GB;
@@ -199,9 +208,10 @@ public class Utility : GLib.Object {
     on startup will be hidden.
 
     Currently only implemented on Windows.
+
+    @param app_name is unused
     ***********************************************************/
     public static bool has_system_launch_on_signal_startup (string app_name) {
-        //  Q_UNUSED (app_name)
         return false;
     }
 
@@ -224,8 +234,10 @@ public class Utility : GLib.Object {
     }
 
 
+    /***********************************************************
+    @param app_name is unused
+    ***********************************************************/
     static bool has_launch_on_signal_startup_private (string app_name) {
-        //  Q_UNUSED (app_name)
         string desktop_file_location = get_user_autostart_dir_private ()
                                         + Common.Config.LINUX_APPLICATION_ID
                                         + ".desktop";
@@ -240,8 +252,10 @@ public class Utility : GLib.Object {
     }
 
 
+    /***********************************************************
+    @param app_name is unused
+    ***********************************************************/
     static void launch_on_signal_startup_private (string app_name, string gui_name, bool enable) {
-        //  Q_UNUSED (app_name)
         string user_auto_start_path = get_user_autostart_dir_private ();
         string desktop_file_location = user_auto_start_path
                                         + Common.Config.LINUX_APPLICATION_ID
@@ -256,14 +270,19 @@ public class Utility : GLib.Object {
                 GLib.warning ("Could not write var on_signal_start entry" + desktop_file_location);
                 return;
             }
-            // When running inside an AppImage, we need to set the path to the
-            // AppImage instead of the path to the executable
+            /***********************************************************
+            When running inside an AppImage, we need to set the path to
+            the AppImage instead of the path to the executable.
+            ***********************************************************/
             string app_image_path = q_environment_variable ("APPIMAGE");
             bool running_inside_app_image = !app_image_path == null && GLib.File.exists (app_image_path);
             string executable_path = running_inside_app_image ? app_image_path : GLib.Application.application_file_path;
 
-            string ts; // = new GLib.OutputStream (ini_file);
-            //  ts.codec ("UTF-8");
+            string ts;
+            /***********************************************************
+            ts = new GLib.OutputStream (ini_file);
+            ts.codec ("UTF-8");
+            ***********************************************************/
             ts = "[Desktop Entry]\n"
                + "Name=" + gui_name + "\n"
                + "GenericName=" + "File Synchronizer\n"
@@ -289,8 +308,14 @@ public class Utility : GLib.Object {
     ***********************************************************/
     public static uint32 convert_size_to_uint (size_t convert_var) {
         if (convert_var > uint.MAX) {
-            //  throw std.bad_cast ();
-            convert_var = uint.MAX; // intentionally default to wrong value here to not crash: exception handling TBD
+            /***********************************************************
+            throw std.bad_cast ();
+            ***********************************************************/
+            /***********************************************************
+            Intentionally default to wrong value here to not crash:
+            exception handling TBD.
+            ***********************************************************/
+            convert_var = uint.MAX;
         }
         return (uint32)convert_var;
     }
@@ -300,8 +325,14 @@ public class Utility : GLib.Object {
     ***********************************************************/
     public static int convert_size_to_int (size_t convert_var) {
         if (convert_var > int.MAX) {
-            //  throw std.bad_cast ();
-            convert_var = int.MAX; // intentionally default to wrong value here to not crash : exception handling TBD
+            /***********************************************************
+            throw std.bad_cast ();
+            ***********************************************************/
+            /***********************************************************
+            Intentionally default to wrong value here to not crash:
+            exception handling TBD.
+            ***********************************************************/
+            convert_var = int.MAX;
         }
         return (int)convert_var;
     }
@@ -347,7 +378,9 @@ public class Utility : GLib.Object {
         return string_value;
     }
 
-    // porting methods
+    /***********************************************************
+    Porting Methods
+    ***********************************************************/
 
     /***********************************************************
     ***********************************************************/
@@ -494,31 +527,37 @@ public class Utility : GLib.Object {
     /***********************************************************
     er for --debug
     ***********************************************************/
-    //  public static void crash () {
-    //      volatile int a = (int *)null;
-    //      *a = 1;
-    //  }
+    /***********************************************************
+    public static void crash () {
+        volatile int a = (int *)null;
+        *a = 1;
+    }
+    ***********************************************************/
 
     /***********************************************************
     This can be overriden from the tests
     ***********************************************************/
-    public static bool fs_case_preserving_override () {
-        string env = qgetenv ("OWNCLOUD_TEST_CASE_PRESERVING");
-        if (!env == "") {
-            return env.to_int ();
+    public static bool fs_case_preserving_override {
+        public get {
+            string env = qgetenv ("OWNCLOUD_TEST_CASE_PRESERVING");
+            if (!env == "") {
+                return env.to_int ();
+            }
+            return Utility.is_windows () || Utility.is_mac ();
         }
-        return Utility.is_windows () || Utility.is_mac ();
     }
 
 
     /***********************************************************
-    Case preserving file system underneath?
-    if this function returns true, the file system is case preserving,
-    that means "test" means the same as "TEST" for filenames.
+    Case preserving file system underneath? If this function
+    returns true, the file system is case preserving, that means
+    "test" means the same as "TEST" for filenames.
     if false, the two cases are two different files.
     ***********************************************************/
-    public static bool fs_case_preserving () {
-        return fs_case_preserving_override;
+    public static bool fs_case_preserving {
+        public get {
+            return fs_case_preserving_override;
+        }
     }
 
 
@@ -531,12 +570,14 @@ public class Utility : GLib.Object {
         GLib.Dir fd1 = new GLib.Dir (fn1);
         GLib.Dir fd2 = new GLib.Dir (fn2);
 
-        // Attention: If the path does not exist, canonical_path returns ""
-        // ONLY use this function with existing paths.
+        /***********************************************************
+        Attention: If the path does not exist, canonical_path
+        returns "". ONLY use this function with existing paths.
+        ***********************************************************/
         string a = fd1.canonical_path;
         string b = fd2.canonical_path;
 
-        if (fs_case_preserving ()) {
+        if (fs_case_preserving) {
             return a != "" && a.down () == b.down ();
         } else {
             return a != "" && a == b;
@@ -595,16 +636,22 @@ public class Utility : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static string normalize_etag (string etag) {
-        // strip "XXXX-gzip"
+        /***********************************************************
+        Strip "XXXX-gzip".
+        ***********************************************************/
         if (etag.has_prefix ("\"") && etag.has_suffix ("-gzip\"")) {
             etag.chop (6);
             etag.remove (0, 1);
         }
-        // strip trailing -gzip
+        /***********************************************************
+        Strip trailing "-gzip".
+        ***********************************************************/
         if (etag.has_suffix ("-gzip")) {
             etag.chop (5);
         }
-        // strip normal quotes
+        /***********************************************************
+        Strip normal quotes.
+        ***********************************************************/
         if (etag.has_prefix ("\"") && etag.has_suffix ("\"") {
             etag.chop (1);
             etag.remove (0, 1);
@@ -706,7 +753,9 @@ public class Utility : GLib.Object {
         }
 
 
-        // out helpers, return the measured times.
+        /***********************************************************
+        Out helpers, return the measured times.
+        ***********************************************************/
         public GLib.DateTime time_of_lap (string lap_name) {
             uint64 t = duration_of_lap (lap_name);
             if (t == 0) {
@@ -718,7 +767,9 @@ public class Utility : GLib.Object {
         }
 
 
-        // out helpers, return the measured times.
+        /***********************************************************
+        Out helpers, return the measured times.
+        ***********************************************************/
         public uint64 duration_of_lap (string lap_name) {
             return this.lap_times.value (lap_name, 0);
         }
@@ -744,13 +795,20 @@ public class Utility : GLib.Object {
         GLib.UrlQuery query_items = {}) {
         string path = url.path;
         if (concat_path != "") {
-            // avoid "//"
+            /***********************************************************
+            Avoid "//"
+            ***********************************************************/
             if (path.has_suffix ("/") && concat_path.has_prefix ("/")) {
                 path.chop (1);
-            } // avoid missing "/""
+            }
+            /***********************************************************
+            Avoid missing "/""
+            ***********************************************************/
             else if (!path.has_suffix ("/") && !concat_path.has_prefix ("/")) {
                 path += "/";
             }
+            /***********************************************************
+            ***********************************************************/
             path += concat_path; // put the complete path together
         }
 
@@ -765,7 +823,9 @@ public class Utility : GLib.Object {
     Returns a new settings pre-set in a specific group.  The Settings will be created
     with the given parent. If no parent is specified, the caller must destroy the settings
     ***********************************************************/
-    // public static GLib.Settings settings_with_group (string group, GLib.Object parent = new GLib.Object ());
+    /***********************************************************
+    public static GLib.Settings settings_with_group (string group, GLib.Object parent = new GLib.Object ());
+    ***********************************************************/
 
 
     /***********************************************************
@@ -803,17 +863,24 @@ public class Utility : GLib.Object {
     public static string make_conflict_filename (
         string filename, GLib.DateTime dt, string user) {
         string conflict_filename = filename;
-        // Add conflict tag before the extension.
+        /***********************************************************
+        Add conflict tag before the extension.
+        ***********************************************************/
         int dot_location = conflict_filename.last_index_of (".");
-        // If no extension, add it at the end  (take care of cases like foo/.hidden or foo.bar/file)
+        /***********************************************************
+        If no extension, add it at the end (take care of cases like
+        foo/.hidden or foo.bar/file).
+        ***********************************************************/
         if (dot_location <= conflict_filename.last_index_of ("/") + 1) {
             dot_location = conflict_filename.length;
         }
 
         string conflict_marker = " (conflicted copy ";
         if (user != "") {
-            // Don't allow parens in the user name, to ensure
-            // we can find the beginning and end of the conflict tag.
+            /***********************************************************
+            Don't allow parentheses in the user name, to ensure we can
+            find the beginning and end of the conflict tag.
+            ***********************************************************/
             string user_name = sanitize_for_filename (user).replace ("(", "_").replace (")", "_");
             conflict_marker += user_name + " ";
         }
@@ -827,26 +894,32 @@ public class Utility : GLib.Object {
     /***********************************************************
     Returns whether a file name indicates a conflict file
     ***********************************************************/
-    //  public static bool is_conflict_file (char name) {
-    //      const string bname = std.strrchr (name, "/");
-    //      if (bname) {
-    //          bname += 1;
-    //      } else {
-    //          bname = name;
-    //      }
+    /***********************************************************
+    public static bool is_conflict_file (char name) {
+        const string bname = std.strrchr (name, "/");
+        if (bname) {
+            bname += 1;
+        } else {
+            bname = name;
+        }
 
-    //      // Old pattern
-    //      if (std.strstr (bname, "this.conflict-")) {
-    //          return true;
-    //      }
+        /***********************************************************
+        Old pattern
+        ***********************************************************
+        if (std.strstr (bname, "this.conflict-")) {
+            return true;
+        }
 
-    //      // New pattern
-    //      if (std.strstr (bname, " (conflicted copy")) {
-    //          return true;
-    //      }
+        /***********************************************************
+        New pattern
+        ***********************************************************
+        if (std.strstr (bname, " (conflicted copy")) {
+            return true;
+        }
 
-    //      return false;
-    //  }
+        return false;
+    }
+    ***********************************************************/
 
 
     /***********************************************************
@@ -877,26 +950,39 @@ public class Utility : GLib.Object {
     SyncJournal.conflict_file_base_name ()
     ***********************************************************/
     public static string conflict_file_base_name_from_pattern (string conflict_name) {
-        // This function must be able to deal with conflict files for conflict files.
-        // To do this, we scan backwards, for the outermost conflict marker and
-        // strip only that to generate the conflict file base name.
+        /***********************************************************
+        This function must be able to deal with conflict files for
+        conflict files. To do this, we scan backwards, for the
+        outermost conflict marker and strip only that to generate
+        the conflict file base name.
+        ***********************************************************/
         var start_old = conflict_name.last_index_of ("this.conflict-");
 
-        // A single space before " (conflicted copy" is considered part of the tag
+        /***********************************************************
+        A single space before " (conflicted copy" is considered part
+        of the tag.
+        ***********************************************************/
         var start_new = conflict_name.last_index_of (" (conflicted copy");
         if (start_new > 0 && conflict_name[start_new - 1] == ' ') {
             start_new -= 1;
         }
 
-        // The rightmost tag is relevant
+        /***********************************************************
+        The rightmost tag is relevant
+        ***********************************************************/
         var tag_start = int.max (start_old, start_new);
         if (tag_start == -1) {
             return "";
         }
 
-        // Find the end of the tag
+        /***********************************************************
+        Find the end of the tag
+        ***********************************************************/
         var tag_end = conflict_name.length;
-        var dot = conflict_name.last_index_of ("."); // dot could be part of user name for new tag!
+        /***********************************************************
+        Dot could be part of user name for new tag!
+        ***********************************************************/
+        var dot = conflict_name.last_index_of (".");
         if (dot > tag_start) {
             tag_end = dot;
         }
@@ -913,9 +999,10 @@ public class Utility : GLib.Object {
     /***********************************************************
     @brief Check whether the path is a root of a Windows drive
     partition ([c:/, d:/, e:/, etc.)
+
+    @param path is unused
     ***********************************************************/
     public static bool is_path_windows_drive_partition_root (string path) {
-        //  Q_UNUSED (path)
         return false;
     }
 
@@ -940,13 +1027,17 @@ public class Utility : GLib.Object {
     }
 
 
-    // GLib.TBUG-3945 and issue #4855: GLib.T_TRANSLATE_NOOP does not work with plural form because lupdate
-    // limitation unless we fake more arguments
-    // (it must be in the form ("context", "source", "comment", n)
-    //  #undef GLib.T_TRANSLATE_NOOP
-    //  const int GLib.T_TRANSLATE_NOOP (context, string_value, ...) string_value
-    //      Q_DECL_CONSTEXPR Period periods[] = { { GLib.T_TRANSLATE_NOOP ("%n year (s)", 0, this.), 365 * 24 * 3600 * 1000LL }, { GLib.T_TRANSLATE_NOOP ("%n month (s)", 0, this.), 30 * 24 * 3600 * 1000LL }, { GLib.T_TRANSLATE_NOOP ("%n day (s)", 0, this.), 24 * 3600 * 1000LL }, { GLib.T_TRANSLATE_NOOP ("%n hour (s)", 0, this.), 3600 * 1000LL }, { GLib.T_TRANSLATE_NOOP ("%n minute (s)", 0, this.), 60 * 1000LL }, { GLib.T_TRANSLATE_NOOP ("%n second (s)", 0, this.), 1000LL }, { null, 0 }
-    //  };
+    /***********************************************************
+    GLib.TBUG-3945 and issue #4855: GLib.T_TRANSLATE_NOOP does
+    not work with plural form because lupdate limitation unless
+    we fake more arguments (it must be in the form ("context",
+    "source", "comment", n).
+
+    #undef GLib.T_TRANSLATE_NOOP
+    const int GLib.T_TRANSLATE_NOOP (context, string_value, ...) string_value
+        Q_DECL_CONSTEXPR Period periods[] = { { GLib.T_TRANSLATE_NOOP ("%n year (s)", 0, this.), 365 * 24 * 3600 * 1000LL }, { GLib.T_TRANSLATE_NOOP ("%n month (s)", 0, this.), 30 * 24 * 3600 * 1000LL }, { GLib.T_TRANSLATE_NOOP ("%n day (s)", 0, this.), 24 * 3600 * 1000LL }, { GLib.T_TRANSLATE_NOOP ("%n hour (s)", 0, this.), 3600 * 1000LL }, { GLib.T_TRANSLATE_NOOP ("%n minute (s)", 0, this.), 60 * 1000LL }, { GLib.T_TRANSLATE_NOOP ("%n second (s)", 0, this.), 1000LL }, { null, 0 }
+    };
+    ***********************************************************/
 
 } // class Utility
 

@@ -638,7 +638,7 @@ public class OwncloudGui : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_account_state_changed () {
+    public void on_signal_account_state_changed (AccountState account_state, AccountState.State state) {
         on_signal_compute_overall_sync_status ();
     }
 

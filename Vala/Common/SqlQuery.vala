@@ -33,24 +33,19 @@ query: {
 ***********************************************************/
 public class SqlQuery : GLib.Object {
 
-    // Q_DISABLE_COPY (SqlQuery)
-
     /***********************************************************
     ***********************************************************/
     private Sqlite.Database sqlite_database = null;
     private Sqlite.Statement sqlite_statement = null;
     public string error { public get; private set; }
-    private int err_id;
+    public int error_id { public get; private set; }
     private string sql;
 
     /***********************************************************
+    private friend class Sqlite.Database;
+    private friend class PreparedSqlQueryManager;
     ***********************************************************/
-    //  private friend class Sqlite.Database;
-    //  private friend class PreparedSqlQueryManager;
 
-    /***********************************************************
-    ***********************************************************/
-    //  public SqlQuery () = default;
 
     /***********************************************************
     ***********************************************************/
@@ -95,25 +90,20 @@ public class SqlQuery : GLib.Object {
                     Utility.usleep (Sqlite.SLEEP_TIME_USEC);
                 }
             } while ( (n < Sqlite.REPEAT_COUNT) && ( (rc == Sqlite.BUSY) || (rc == Sqlite.LOCKED)));
-            this.err_id = rc;
+            this.error_id = rc;
 
-            if (this.err_id != Sqlite.OK) {
+            if (this.error_id != Sqlite.OK) {
                 this.error = this.sqlite_database.errmsg ();
                 GLib.warning ("Sqlite prepare sqlite_statement error:" + this.error + "in" + this.sql;
-                //  ENFORCE (allow_failure, "SQLITE Prepare error");
+                /***********************************************************
+                ENFORCE (allow_failure, "SQLITE Prepare error");
+                ***********************************************************/
             } else {
-                //  GLib.assert_true (this.sqlite_statement);
+                GLib.assert_true (this.sqlite_statement != null);
                 this.sqlite_database.queries.insert (this);
             }
         }
-        return this.err_id;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public int error_id {
-        public get;
+        return this.error_id;
     }
 
 
@@ -182,7 +172,9 @@ public class SqlQuery : GLib.Object {
             return false;
         }
 
-        // Don't do anything for selects, that is how we use the lib :-|
+        /***********************************************************
+        Don't do anything for selects, that is how we use the lib :-|
+        ***********************************************************/
         if (!is_select () && !is_pragma ()) {
             int rc = 0, n = 0;
             do {
@@ -196,18 +188,21 @@ public class SqlQuery : GLib.Object {
                     n++;
                 }
             } while ((n < Sqlite.REPEAT_COUNT) && ( (rc == Sqlite.BUSY) || (rc == Sqlite.LOCKED)));
-            this.err_id = rc;
+            this.error_id = rc;
 
-            if (this.err_id != Sqlite.DONE && this.err_id != Sqlite.ROW) {
-                this.error = string.from_utf8 (this.sqlite_database.errmsg ());
-                GLib.warning ("Sqlite exec sqlite_statement error:" + this.err_id.to_string () + this.error + "in" + this.sql);
-                if (this.err_id == Sqlite.IOERR) {
+            if (this.error_id != Sqlite.DONE && this.error_id != Sqlite.ROW) {
+                this.error = this.sqlite_database.errmsg ().to_string ();
+                GLib.warning ("Sqlite exec sqlite_statement error:" + this.error_id.to_string () + this.error + "in" + this.sql);
+                if (this.error_id == Sqlite.IOERR) {
                     GLib.warning ("IOERR errcode: " + this.sqlite_database.errcode ().to_string () + this.sqlite_database.errmsg ());
                 }
             } else {
                 GLib.debug ("Last exec affected " + number_of_rows_affected ().to_string () + " rows.");
             }
-            return (this.err_id == Sqlite.DONE); // either Sqlite.ROW or Sqlite.DONE
+            /***********************************************************
+            Either Sqlite.ROW or Sqlite.DONE
+            ***********************************************************/
+            return (this.error_id == Sqlite.DONE);
         }
 
         return true;
@@ -229,8 +224,8 @@ public class SqlQuery : GLib.Object {
 
         int n = 0;
         while (true) {
-            this.err_id = this.sqlite_statement.step ();
-            if (n < Sqlite.REPEAT_COUNT && first_step && (this.err_id == Sqlite.LOCKED || this.err_id == Sqlite.BUSY)) {
+            this.error_id = this.sqlite_statement.step ();
+            if (n < Sqlite.REPEAT_COUNT && first_step && (this.error_id == Sqlite.LOCKED || this.error_id == Sqlite.BUSY)) {
                 this.sqlite_statement.reset (); // not necessary after sqlite version 3.6.23.1
                 n++;
                 Utility.usleep (Sqlite.SLEEP_TIME_USEC);
@@ -240,11 +235,11 @@ public class SqlQuery : GLib.Object {
         }
 
         NextResult result = new NextResult ();
-        result.ok = this.err_id == Sqlite.ROW || this.err_id == Sqlite.DONE;
-        result.has_data = this.err_id == Sqlite.ROW;
+        result.ok = this.error_id == Sqlite.ROW || this.error_id == Sqlite.DONE;
+        result.has_data = this.error_id == Sqlite.ROW;
         if (!result.ok) {
             this.error = this.sqlite_database.errmsg ();
-            GLib.warning ("Sqlite step sqlite_statement error:" + this.err_id.to_string () + this.error + "in" + this.sql);
+            GLib.warning ("Sqlite step sqlite_statement error:" + this.error_id.to_string () + this.error + "in" + this.sql);
         }
 
         return result;
@@ -296,41 +291,43 @@ public class SqlQuery : GLib.Object {
     private void bind_value_internal (int pos, GLib.Variant value) {
         int res = -1;
         if (this.sqlite_statement == null) {
-            //  GLib.assert_true (false);
+            GLib.assert_true (false);
             return;
         }
 
-        switch (value.type ()) {
-        case GLib.Variant.Int:
-        case GLib.Variant.Bool:
+        switch (value.get_type ()) {
+        case GLib.VariantType.INT:
+        case GLib.VariantType.BOOLEAN:
             res = this.sqlite_statement.bind_int (pos, value.to_int ());
             break;
-        case GLib.Variant.Double:
+        case GLib.VariantType.DOUBLE:
             res = this.sqlite_statement.bind_double (pos, value.to_double ());
             break;
-        case GLib.Variant.UInt:
-        case GLib.Variant.Long_long:
-        case GLib.Variant.ULong_long:
+        case GLib.VariantType.UINT:
+        case GLib.VariantType.INT64:
+        case GLib.VariantType.UINT64:
             res = this.sqlite_statement.bind_int64 (pos, value.to_long_long ());
             break;
-        case GLib.Variant.Date_time: {
+        case GLib.VariantType.DATE_TIME: {
             GLib.DateTime date_time = value.to_date_time ();
             string string_value = date_time.to_string ("yyyy-MM-dd_thh:mm:ss.zzz");
             res = this.sqlite_statement.bind_text16 (pos, string_value.utf16 (),
                 string_value.length * (int)sizeof (ushort), Sqlite.TRANSIENT);
             break;
         }
-        case GLib.Variant.Time: {
+        case GLib.VariantType.TIME: {
             GLib.Time time = value.to_time ();
             string string_value = time.to_string ("hh:mm:ss.zzz");
             res = this.sqlite_statement.bind_text16 (pos, string_value.utf16 (),
                 string_value.length * (int)sizeof (ushort), Sqlite.TRANSIENT);
             break;
         }
-        case GLib.Variant.String: {
+        case GLib.VariantType.STRING: {
             if (value.to_string () != null) {
-                // lifetime of string == lifetime of its qvariant
-                var string_value = (string)value.const_data ();
+                /***********************************************************
+                lifetime of string == lifetime of its variant
+                ***********************************************************/
+                string string_value = (string)value.const_data ();
                 res = this.sqlite_statement.bind_text16 (pos, string_value.utf16 (),
                     (string_value.length) * (int)sizeof (char), Sqlite.TRANSIENT);
             } else {
@@ -338,14 +335,16 @@ public class SqlQuery : GLib.Object {
             }
             break;
         }
-        case GLib.Variant.Byte_array: {
+        case GLib.VariantType.BYTE_ARRAY: {
             var ba = value.to_byte_array ();
             res = this.sqlite_statement.bind_text (pos, ba.const_data (), ba.length, Sqlite.TRANSIENT);
             break;
         }
         default: {
             string string_value = value.to_string ();
-            // Sqlite.TRANSIENT makes sure that sqlite buffers the data
+            /***********************************************************
+            Sqlite.TRANSIENT makes sure that sqlite buffers the data
+            ***********************************************************/
             res = this.sqlite_statement.bind_text16 (
                 pos,
                 value.to_string ().utf16 (),
@@ -358,13 +357,13 @@ public class SqlQuery : GLib.Object {
         if (res != Sqlite.OK) {
             GLib.warning ("ERROR binding SQL value:" + value.to_string () + "error:" + res.to_string ());
         }
-        //  GLib.assert_true (res == Sqlite.OK);
+        GLib.assert_true (res == Sqlite.OK);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void finish () {
+    internal void finish () {
         if (this.sqlite_statement == null) {
             return;
         }

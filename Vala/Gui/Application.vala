@@ -818,10 +818,10 @@ public class Application : GLib.Application {
     ***********************************************************/
     protected void on_signal_account_state_removed (AccountState account_state) {
         if (this.gui != null) {
-            disconnect (account_state, AccountState.signal_state_changed,
-                this.gui, OwncloudGui.on_signal_account_state_changed);
-            disconnect (account_state.account, Account.server_version_changed,
-                this.gui, OwncloudGui.on_signal_tray_message_if_server_unsupported);
+            disconnect (account_state.signal_state_changed,
+                this.gui.on_signal_account_state_changed);
+            disconnect (account_state.account.server_version_changed,
+                this.gui.on_signal_tray_message_if_server_unsupported);
         }
         if (this.folder_manager != null) {
             account_state.signal_state_changed.disconnect (

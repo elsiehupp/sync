@@ -234,9 +234,9 @@ public class ShareDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_account_state_changed (int state) {
-        bool enabled = (state == AccountState.State.Connected);
-        GLib.debug ("Account connected? " + enabled);
+    private void on_signal_account_state_changed (AccountState account_state, AccountState.State state) {
+        bool enabled = (state == AccountState.State.CONNECTED);
+        GLib.debug ("Account connected? " + enabled.to_string ());
 
         if (this.user_group_widget != null) {
             this.user_group_widget.enabled (enabled);

@@ -15,7 +15,6 @@ public class PreparedSqlQueryManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private SqlQuery queries[Key.PREPARED_QUERY_COUNT];
-    //  private Q_DISABLE_COPY (PreparedSqlQueryManager)
 
     /***********************************************************
     ***********************************************************/
@@ -69,8 +68,7 @@ public class PreparedSqlQueryManager : GLib.Object {
     ***********************************************************/
     public PreparedSqlQuery get_for_key (Key key) {
         var query = this.queries[key];
-        //  ENFORCE (query.stmt)
-        //  GLib.assert_true (!Sqlite3StmtBusy (query.stmt));
+        GLib.assert_true (!Sqlite3StmtBusy (query.stmt));
         return new PreparedSqlQuery (
             query
         );
@@ -82,8 +80,10 @@ public class PreparedSqlQueryManager : GLib.Object {
     ***********************************************************/
     public PreparedSqlQuery get_for_key_sql_and_database (Key key, string sql, Sqlite.Database database) {
         var query = this.queries[key];
-        //  GLib.assert_true (!Sqlite3StmtBusy (query.stmt));
-        //  ENFORCE (!query.sqldb || database == query.sqldb)
+        GLib.assert_true (!Sqlite3StmtBusy (query.stmt));
+        /***********************************************************
+        ENFORCE (!query.sqldb || database == query.sqldb)
+        ***********************************************************/
         if (!query.stmt) {
             query.sqldb = database;
             query.db = database.sqlite_db ();

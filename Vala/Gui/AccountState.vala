@@ -90,8 +90,8 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
                 }
             }
 
-            // might not have changed but the underlying this.connection_errors might have
-            signal_state_changed (this.state);
+            // Might not have changed but the underlying this.connection_errors might have
+            signal_state_changed (this, this.state);
         }
     }
 
@@ -176,7 +176,7 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
     }
 
 
-    internal signal void signal_state_changed (State state);
+    internal signal void signal_state_changed (AccountState account_state, AccountState.State state);
     internal signal void signal_is_connected_changed ();
     internal signal void signal_has_fetched_navigation_apps ();
     internal signal void signal_status_changed ();

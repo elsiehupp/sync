@@ -288,16 +288,11 @@ public class DiscoveryPhase : GLib.Object {
             new GLib.List<string> (
                 "resourcetype"
                 + "http://owncloud.org/ns:size"));
-        GLib.Object.connect (
-            propfind_job,
-            PropfindJob.signal_finished_with_error,
+        propfind_job.signal_finished_with_error.connect (
             this, () => {
                 return callback (false);
             });
-        GLib.Object.connect (
-            propfind_job,
-            PropfindJob.result,
-            this,
+        propfind_job.result.connect (
             this.on_signal_prop_find_job_result
         );
         propfind_job.start ();

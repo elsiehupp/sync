@@ -278,8 +278,7 @@ public class ConnectionValidator : GLib.Object {
     /***********************************************************
     status.php could not be loaded (network or server issue!).
     ***********************************************************/
-    protected void on_signal_no_status_found (GLib.InputStream reply) {
-        var check_server_job = (CheckServerJob)sender ();
+    protected void on_signal_no_status_found (CheckServerJob check_server_job, GLib.InputStream reply) {
         GLib.warning (reply.error + check_server_job.error_string + reply.peek (1024));
         if (reply.error == GLib.InputStream.SslHandshakeFailedError) {
             report_result (SslError);
@@ -311,8 +310,7 @@ public class ConnectionValidator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_auth_failed (GLib.InputStream reply) {
-        var propfind_job = (PropfindJob) sender ();
+    protected void on_signal_auth_failed (PropfindJob propfind_job, GLib.InputStream reply) {
         Status stat = Status.TIMEOUT;
 
         if (reply.error == GLib.InputStream.SslHandshakeFailedError) {
@@ -457,16 +455,18 @@ public class ConnectionValidator : GLib.Object {
     //  #if GLib.T_VERSION >= GLib.T_VERSION_CHECK (5, 9, 0)
         // Record that the server supports HTTP/2
         // Actual decision if we should use HTTP/2 is done in Soup.ClientContext.create_request
-        var abstract_network_job = (AbstractNetworkJob) sender ();
-        if (abstract_network_job) {
-            if (abstract_network_job.input_stream) {
-                this.account.http2_supported (
-                    abstract_network_job.input_stream.attribute (
-                        Soup.Request.HTTP2WasUsedAttribute
-                    ).to_bool ()
-                );
-            }
-        }
+        // Sender doesn't work because this is not actually called
+        // by a signal.
+        //  var abstract_network_job = (AbstractNetworkJob) sender ();
+        //  if (abstract_network_job) {
+        //      if (abstract_network_job.input_stream) {
+        //          this.account.http2_supported (
+        //              abstract_network_job.input_stream.attribute (
+        //                  Soup.Request.HTTP2WasUsedAttribute
+        //              ).to_bool ()
+        //          );
+        //      }
+        //  }
     }
 
 } // class ConnectionValidator

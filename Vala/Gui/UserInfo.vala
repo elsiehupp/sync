@@ -194,7 +194,7 @@ public class UserInfo : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_account_state_changed () {
+    private void on_signal_account_state_changed (AccountState account_state, AccountState.State state) {
         if (can_get_info ()) {
             // Obviously assumes there will never be more than thousand of hours between last info
             // received and now, hence why we static_cast

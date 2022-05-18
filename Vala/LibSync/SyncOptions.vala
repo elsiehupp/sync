@@ -156,7 +156,7 @@ public class SyncOptions : GLib.Object {
     A pattern like /own.*\/.*txt matching the full path
     ***********************************************************/
     public void path_pattern (string pattern) {
-        this.file_regex.pattern_options (Utility.fs_case_preserving () ? GLib.Regex.CaseInsensitiveOption : GLib.Regex.NoPatternOption);
+        this.file_regex.pattern_options (Utility.fs_case_preserving ? GLib.Regex.CaseInsensitiveOption : GLib.Regex.NoPatternOption);
         this.file_regex.pattern (pattern);
     }
 

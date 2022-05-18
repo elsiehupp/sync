@@ -954,7 +954,7 @@ public class FolderManager : GLib.Object {
 
         // check if the local directory isn't used yet in another own_cloud sync
         GLib.CaseSensitivity case_sensitivity = GLib.CaseSensitive;
-        if (Utility.fs_case_preserving ()) {
+        if (Utility.fs_case_preserving) {
             case_sensitivity = GLib.CaseInsensitive;
         }
 
@@ -1190,7 +1190,7 @@ public class FolderManager : GLib.Object {
     Schedules folders of newly connected accounts, terminates and
     de-schedules folders of disconnected accounts.
     ***********************************************************/
-    public void on_signal_account_state_changed () {
+    public void on_signal_account_state_changed (AccountState account_state, AccountState.State state) {
         var account_state = (AccountState)sender ();
         if (!account_state) {
             return;

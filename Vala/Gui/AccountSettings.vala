@@ -327,8 +327,10 @@ public class AccountSettings : Gtk.Widget {
 
 
     /***********************************************************
+    The paramaters are currently umused. I just added them
+    because they are required by the signal signature.
     ***********************************************************/
-    public void on_signal_account_state_changed () {
+    public void on_signal_account_state_changed (AccountState account_state, AccountState.State state) {
         AccountState.State state = this.account_state != null ? this.account_state.state : AccountState.State.DISCONNECTED;
         if (state != AccountState.State.DISCONNECTED) {
             this.instance.ssl_button.update_account_state (this.account_state);
@@ -939,9 +941,7 @@ public class AccountSettings : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_folder_wizard_accepted () {
-        var folder_wizard = (FolderWizard) sender ();
-
+    protected void on_signal_folder_wizard_accepted (FolderWizard folder_wizard) {
         GLib.info ("FolderConnection wizard completed.");
 
         FolderDefinition definition;
@@ -1475,9 +1475,8 @@ public class AccountSettings : Gtk.Widget {
     /***********************************************************
     Encryption Related Stuff
     ***********************************************************/
-    protected void on_signal_encrypt_folder_finished (int status) {
-        GLib.info ("Current folder_connection encryption status code: " + status.to_string ());
-        var encrypt_folder_job = (EncryptFolderJob) sender ();
+    protected void on_signal_encrypt_folder_finished (EncryptFolderJob encrypt_folder_job, EncryptFolderJob.Status status) {
+        GLib.info ("Current folder_connection encryption status code: " + EncryptFolderJob.Status.to_string (status));
         //  GLib.assert_true (encrypt_folder_job);
         if (!encrypt_folder_job.error_string == "") {
             Gtk.MessageBox.warning (null, _("Warning"), encrypt_folder_job.error_string);

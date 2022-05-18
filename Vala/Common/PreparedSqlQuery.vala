@@ -36,16 +36,6 @@ public class PreparedSqlQuery : GLib.Object {
         return this.ok;
     }
 
-    //  public SqlQuery operator. () {
-    //      //  GLib.assert_true (this.ok);
-    //      return this.query;
-    //  }
-
-    //  public SqlQuery operator* () & {
-    //      //  GLib.assert_true (this.ok);
-    //      return this.query;
-    //  }
-
 } // class PreparedSqlQuery
 
 } // namespace Common

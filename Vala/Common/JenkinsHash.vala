@@ -208,29 +208,32 @@ public class JenkinsHash : GLib.Object {
         /* handle the last 23 bytes */
         c += length;
         switch (len) {
-            case 23 : c+= ( (uint64)key[22]<<56);  // Q_FALLTHROUGH ();
-            case 22 : c+= ( (uint64)key[21]<<48);  // Q_FALLTHROUGH ();
-            case 21 : c+= ( (uint64)key[20]<<40);  // Q_FALLTHROUGH ();
-            case 20 : c+= ( (uint64)key[19]<<32);  // Q_FALLTHROUGH ();
-            case 19 : c+= ( (uint64)key[18]<<24);  // Q_FALLTHROUGH ();
-            case 18 : c+= ( (uint64)key[17]<<16);  // Q_FALLTHROUGH ();
-            case 17 : c+= ( (uint64)key[16]<<8);   // Q_FALLTHROUGH ();
+            /***********************************************************
+            These cases intentionally fall through.
+            ***********************************************************/
+            case 23 : c+= ( (uint64)key[22]<<56);
+            case 22 : c+= ( (uint64)key[21]<<48);
+            case 21 : c+= ( (uint64)key[20]<<40);
+            case 20 : c+= ( (uint64)key[19]<<32);
+            case 19 : c+= ( (uint64)key[18]<<24);
+            case 18 : c+= ( (uint64)key[17]<<16);
+            case 17 : c+= ( (uint64)key[16]<<8); 
             /* the first byte of c is reserved for the length */
-            case 16 : b+= ( (uint64)key[15]<<56);  // Q_FALLTHROUGH ();
-            case 15 : b+= ( (uint64)key[14]<<48);  // Q_FALLTHROUGH ();
-            case 14 : b+= ( (uint64)key[13]<<40);  // Q_FALLTHROUGH ();
-            case 13 : b+= ( (uint64)key[12]<<32);  // Q_FALLTHROUGH ();
-            case 12 : b+= ( (uint64)key[11]<<24);  // Q_FALLTHROUGH ();
-            case 11 : b+= ( (uint64)key[10]<<16);  // Q_FALLTHROUGH ();
-            case 10 : b+= ( (uint64)key[ 9]<<8);   // Q_FALLTHROUGH ();
-            case  9 : b+= ( (uint64)key[ 8]);      // Q_FALLTHROUGH ();
-            case  8 : a+= ( (uint64)key[ 7]<<56);  // Q_FALLTHROUGH ();
-            case  7 : a+= ( (uint64)key[ 6]<<48);  // Q_FALLTHROUGH ();
-            case  6 : a+= ( (uint64)key[ 5]<<40);  // Q_FALLTHROUGH ();
-            case  5 : a+= ( (uint64)key[ 4]<<32);  // Q_FALLTHROUGH ();
-            case  4 : a+= ( (uint64)key[ 3]<<24);  // Q_FALLTHROUGH ();
-            case  3 : a+= ( (uint64)key[ 2]<<16);  // Q_FALLTHROUGH ();
-            case  2 : a+= ( (uint64)key[ 1]<<8);   // Q_FALLTHROUGH ();
+            case 16 : b+= ( (uint64)key[15]<<56);
+            case 15 : b+= ( (uint64)key[14]<<48);
+            case 14 : b+= ( (uint64)key[13]<<40);
+            case 13 : b+= ( (uint64)key[12]<<32);
+            case 12 : b+= ( (uint64)key[11]<<24);
+            case 11 : b+= ( (uint64)key[10]<<16);
+            case 10 : b+= ( (uint64)key[ 9]<<8); 
+            case  9 : b+= ( (uint64)key[ 8]);    
+            case  8 : a+= ( (uint64)key[ 7]<<56);
+            case  7 : a+= ( (uint64)key[ 6]<<48);
+            case  6 : a+= ( (uint64)key[ 5]<<40);
+            case  5 : a+= ( (uint64)key[ 4]<<32);
+            case  4 : a+= ( (uint64)key[ 3]<<24);
+            case  3 : a+= ( (uint64)key[ 2]<<16);
+            case  2 : a+= ( (uint64)key[ 1]<<8); 
             case  1 : a+= ( (uint64)key[ 0]);
             /* case 0 : nothing left to add */
         }

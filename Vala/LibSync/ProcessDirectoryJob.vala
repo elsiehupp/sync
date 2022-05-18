@@ -1636,7 +1636,7 @@ public class ProcessDirectoryJob : GLib.Object {
         if (GLib.File.exists (this.discovery_data.local_directory + original_path)
             // Exception : If the rename changes case only (like "foo" . "Foo") the
             // old filename might still point to the same file.
-            && ! (Utility.fs_case_preserving ()
+            && ! (Utility.fs_case_preserving
                     && original_path.compare (path.local, GLib.CaseInsensitive) == 0
                     && original_path != path.local)) {
             GLib.info ("Not a move; base_record file still exists at " + original_path);

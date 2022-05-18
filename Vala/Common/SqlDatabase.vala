@@ -12,8 +12,6 @@ namespace Common {
 ***********************************************************/
 public class SqliteDatabase : GLib.Object {
 
-    // Q_DISABLE_COPY (Sqlite.Database)
-
     /***********************************************************
     ***********************************************************/
     private enum CheckDbResult {
@@ -48,29 +46,26 @@ public class SqliteDatabase : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private int err_id = 0;
+    private int error_id = 0;
 
     /***********************************************************
     ***********************************************************/
-    //  private friend class SqlQuery;
     private GLib.List<SqlQuery> queries;
 
-    /***********************************************************
-    ***********************************************************/
-    //  public Sqlite.Database () = default;
 
-
-    ~Sqlite.Database () {
+    ~SqliteDatabase () {
         close ();
     }
 
 
+    /***********************************************************
     int sqlite_do (var A) {
-        this.err_id = (A);
-        if (this.err_id != Sqlite.OK && this.err_id != Sqlite.DONE && this.err_id != Sqlite.ROW) {
+        this.error_id = (A);
+        if (this.error_id != Sqlite.OK && this.error_id != Sqlite.DONE && this.error_id != Sqlite.ROW) {
             this.error = string.from_utf8 (sqlite3_errmsg (this.database));
         }
     }
+    ***********************************************************/
 
 
     /***********************************************************
@@ -96,18 +91,23 @@ public class SqliteDatabase : GLib.Object {
         var check_result = check_database ();
         if (check_result != CheckDbResult.OK) {
             if (check_result == CheckDbResult.CANT_PREPARE) {
-                // When disk space is low, preparing may fail even though the database is fine.
-                // Typically CANTOPEN or IOERR.
-                int64 free_space = Utility.free_disk_space (new GLib.FileInfo (filename).directory ().absolute_path);
+                /***********************************************************
+                When disk space is low, preparing may fail even though the
+                database is fine. Typically CANTOPEN or IOERR.
+                ***********************************************************/
+                int64 free_space = Utility.free_disk_space (File.new_for_path (filename).get_parent ().get_path ());
                 if (free_space != -1 && free_space < 1000000) {
-                    GLib.warning ("Can't prepare consistency check and disk space is low: " + free_space);
+                    GLib.warning ("Can't prepare consistency check and disk space is low: " + free_space.to_string ());
                     close ();
                     return false;
                 }
 
-                // Even when there's enough disk space, it might very well be that the
-                // file is on a read-only filesystem and can't be opened because of that.
-                if (this.err_id == Sqlite.CANTOPEN) {
+                /***********************************************************
+                Even when there's enough disk space, it might very well be
+                that the file is on a read-only filesystem and can't be
+                opened because of that.
+                ***********************************************************/
+                if (this.error_id == Sqlite.CANTOPEN) {
                     GLib.warning ("Can't open database to prepare consistency check, aborting.");
                     close ();
                     return false;
@@ -116,7 +116,11 @@ public class SqliteDatabase : GLib.Object {
 
             GLib.critical ("Consistency check failed, removing broken database " + filename);
             close ();
-            GLib.File.remove (filename);
+            try {
+                GLib.File.new_for_path (filename).delete ();
+            } catch (GLib.Error error) {
+                GLib.critical ("Deleting " + filename + " failed with error " + error.message);
+            }
 
             return open_helper (filename, Sqlite.OPEN_READWRITE | Sqlite.OPEN_CREATE);
         }
@@ -153,7 +157,7 @@ public class SqliteDatabase : GLib.Object {
             return false;
         }
         this.database.exec ("BEGIN", null, null);
-        return this.err_id == Sqlite.OK;
+        return this.error_id == Sqlite.OK;
     }
 
 
@@ -164,7 +168,7 @@ public class SqliteDatabase : GLib.Object {
             return false;
         }
         this.database.exec ("COMMIT", null, null);
-        return this.err_id == Sqlite.OK;
+        return this.error_id == Sqlite.OK;
     }
 
 
@@ -172,11 +176,13 @@ public class SqliteDatabase : GLib.Object {
     ***********************************************************/
     public void close () {
         if (this.database != null) {
-            foreach (var q in this.queries) {
-                q.finish ();
+            foreach (var query in this.queries) {
+                query.finish ();
             }
-            //  this.database.close ();
-            if (this.err_id != Sqlite.OK) {
+            /***********************************************************
+            this.database.close ();
+            ***********************************************************/
+            if (this.error_id != Sqlite.OK) {
                 GLib.warning ("Closing database failed " + this.error);
             }
             this.database = null;
@@ -202,13 +208,10 @@ public class SqliteDatabase : GLib.Object {
 
         Sqlite.Database.open_v2 (filename, out this.database, sqlite_flags, null);
 
-        if (this.err_id != Sqlite.OK) {
+        if (this.error_id != Sqlite.OK) {
             GLib.warning ("Error:" + this.error + "for" + filename);
-            if (this.err_id == Sqlite.CANTOPEN) {
-                //  GLib.warning ("CANTOPEN extended errcode: " + sqlite3_extended_errcode (this.database);
-    //  #if Sqlite.VERSION_NUMBER >= 3012000
+            if (this.error_id == Sqlite.CANTOPEN) {
                 GLib.warning ("CANTOPEN system errmsg: " + this.database.errmsg ());
-    //  #endif
             }
             close ();
             return false;
@@ -228,18 +231,21 @@ public class SqliteDatabase : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private CheckDbResult check_database () {
-        // quick_check can fail with a disk IO error when diskspace is low
-        SqlQuery quick_check = new SqlQuery (this);
+        /***********************************************************
+        quick_check can fail with a disk IO error when diskspace is
+        low.
+        ***********************************************************/
+        SqlQuery quick_check = new SqlQuery (this.database);
 
         if (quick_check.prepare ("PRAGMA quick_check;", /*allow_failure=*/true) != Sqlite.OK) {
             GLib.warning ("Error preparing quick_check on database");
-            this.err_id = quick_check.error_id ();
+            this.error_id = quick_check.error_id;
             this.error = quick_check.error;
             return CheckDbResult.CANT_PREPARE;
         }
         if (!quick_check.exec ()) {
             GLib.warning ("Error running quick_check on database");
-            this.err_id = quick_check.error_id ();
+            this.error_id = quick_check.error_id;
             this.error = quick_check.error;
             return CheckDbResult.CANT_EXEC;
         }

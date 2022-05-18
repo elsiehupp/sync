@@ -122,7 +122,7 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_account_state_changed () {
+    private void on_signal_account_state_changed (AccountState account_state, AccountState.State state) {
         if (is_connected) {
             on_signal_refresh_immediately ();
         }

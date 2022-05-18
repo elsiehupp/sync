@@ -66,7 +66,7 @@ public class PropagateLocalMkdir : AbstractPropagateItemJob {
             }
         }
 
-        if (Utility.fs_case_preserving () && this.propagator.local_filename_clash (this.item.file)) {
+        if (Utility.fs_case_preserving && this.propagator.local_filename_clash (this.item.file)) {
             GLib.warning ("New folder to create locally already exists with different case:" + this.item.file);
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Attention, possible case sensitivity clash with %1").printf (new_directory_string));
             return;

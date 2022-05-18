@@ -51,7 +51,7 @@ public class CheckServerJob : AbstractNetworkJob {
 
     \a input_stream is never null
     ***********************************************************/
-    internal signal void signal_instance_not_found (GLib.InputStream input_stream);
+    internal signal void signal_instance_not_found (CheckServerJob check_server_job, GLib.InputStream input_stream);
 
 
     /***********************************************************
@@ -150,7 +150,7 @@ public class CheckServerJob : AbstractNetworkJob {
         int http_status = this.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (body == "" || http_status != 200) {
             GLib.warning ("Error: status.php replied " + http_status + body);
-            signal_instance_not_found (this.input_stream);
+            signal_instance_not_found (this, this.input_stream);
         } else {
             Json.ParserError error;
             var status = GLib.JsonDocument.from_json (body, error);
@@ -164,7 +164,7 @@ public class CheckServerJob : AbstractNetworkJob {
                 signal_instance_found (this.server_url, status.object ());
             } else {
                 GLib.warning ("No proper answer on " + this.input_stream.url);
-                signal_instance_not_found (this.input_stream);
+                signal_instance_not_found (this, this.input_stream);
             }
         }
         return true;

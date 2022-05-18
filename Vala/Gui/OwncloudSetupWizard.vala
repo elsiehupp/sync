@@ -451,11 +451,11 @@ public class OwncloudSetupWizard : GLib.Object {
         var entity_exists_job = (EntityExistsJob)sender ();
         bool ok = true;
         string error;
-        GLib.InputStream.NetworkError err_id = reply.error;
+        GLib.InputStream.NetworkError error_id = reply.error;
 
-        if (err_id == GLib.InputStream.NoError) {
+        if (error_id == GLib.InputStream.NoError) {
             GLib.info ("Remote folder found, all cool!");
-        } else if (err_id == GLib.InputStream.ContentNotFoundError) {
+        } else if (error_id == GLib.InputStream.ContentNotFoundError) {
             if (this.remote_folder == "") {
                 error = _("No remote folder specified!");
                 ok = false;

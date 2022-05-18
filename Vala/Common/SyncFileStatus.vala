@@ -53,7 +53,10 @@ public class SyncFileStatus : GLib.Object {
             status_string = "SYNC";
             break;
         case SyncFileStatusTag.STATUS_WARNING:
-            // The protocol says IGNORE, but all implementations show a yellow warning sign.
+            /***********************************************************
+            The protocol says IGNORE, but all implementations show a
+            yellow warning sign.
+            ***********************************************************/
             status_string = "IGNORE";
             break;
         case SyncFileStatusTag.STATUS_UP_TO_DATE:
@@ -63,7 +66,10 @@ public class SyncFileStatus : GLib.Object {
             status_string = "ERROR";
             break;
         case SyncFileStatusTag.STATUS_EXCLUDED:
-            // The protocol says IGNORE, but all implementations show a yellow warning sign.
+            /***********************************************************
+            The protocol says IGNORE, but all implementations show a
+            yellow warning sign.
+            ***********************************************************/
             status_string = "IGNORE";
             break;
         }
@@ -75,15 +81,9 @@ public class SyncFileStatus : GLib.Object {
     }
 
 
-
-    //  inline bool operator== (SyncFileStatus a, SyncFileStatus b) {
-    //      return a.tag () == b.tag () && a.shared () == b.shared ();
-    //  }
-
-
-    //  inline bool operator!= (SyncFileStatus a, SyncFileStatus b) {
-    //      return ! (a == b);
-    //  }
+    public bool equal (SyncFileStatus a, SyncFileStatus b) {
+        return a.tag == b.tag && a.shared == b.shared;
+    }
 
 } // class SyncFileStatus
 

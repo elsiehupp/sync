@@ -415,7 +415,7 @@ public class OwncloudPropagator : GLib.Object {
         string file = this.local_directory + rel_file;
         GLib.assert (!file == "");
 
-        if (!file == "" && Utility.fs_case_preserving ()) {
+        if (!file == "" && Utility.fs_case_preserving) {
             GLib.debug ("CaseClashCheck for " + file);
             // On Linux, the file system is case sensitive, but this code is useful for testing.
             // Just check that there is no other file with the same name and different casing.

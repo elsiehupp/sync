@@ -30,7 +30,7 @@ public class PropfindJob : AbstractNetworkJob {
     public GLib.List<string> properties;
 
     internal signal void signal_result (GLib.HashTable<string, GLib.Variant> values);
-    internal signal void signal_finished_with_error (GLib.InputStream reply);
+    internal signal void signal_finished_with_error (PropfindJob propfind_job, GLib.InputStream reply);
 
     /***********************************************************
     ***********************************************************/
@@ -111,14 +111,14 @@ public class PropfindJob : AbstractNetworkJob {
             }
             if (reader.has_error ()) {
                 GLib.warning ("XML parser error: " + reader.error_string);
-                signal_finished_with_error (this.reply);
+                signal_finished_with_error (this, this.reply);
             } else {
                 signal_result (items);
             }
         } else {
             GLib.warning ("*not* successful, http result code is" + http_result_code
                 + (http_result_code == 302 ? this.reply.header (Soup.Request.LocationHeader).to_string (): ""));
-            signal_finished_with_error (this.reply);
+            signal_finished_with_error (this, this.reply);
         }
         return true;
     }
