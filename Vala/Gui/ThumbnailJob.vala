@@ -15,7 +15,7 @@ Job that allows fetching a preview (of 150x150 for now) of
 a given file. Once the job has finished the
 signal_job_finished signal will be emitted.
 ***********************************************************/
-public class ThumbnailJob : AbstractNetworkJob {
+public class ThumbnailJob : LibSync.AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
@@ -29,7 +29,7 @@ public class ThumbnailJob : AbstractNetworkJob {
     ***********************************************************/
     public override void on_signal_start () {
         send_request ("GET", make_account_url (path));
-        AbstractNetworkJob.on_signal_start ();
+        LibSync.AbstractNetworkJob.on_signal_start ();
     }
 
 

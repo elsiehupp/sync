@@ -66,6 +66,7 @@ srcs = files([
     'ProxyAuthHandler.vala',
     'RemoteWipe.vala',
     'SelectiveSyncDialog.vala',
+    'SelectiveSyncTreeViewItem.vala',
     'SettingsDialog.vala',
     'ShareDialog.vala',
     'Sharee.vala',
@@ -83,8 +84,15 @@ srcs = files([
     'ShareUserGroupWidget/ShareUserGroupWidget.vala',
     'ShareUserGroupWidget/ShareUserLine.vala',
 
+    'SocketApi/BloomFilter.vala',
+    'SocketApi/GetOrCreatePublicLinkShare.vala',
+    'SocketApi/ListenerClosure.vala',
     'SocketApi/SocketApi.vala',
+    'SocketApi/SocketApiJob.vala',
+    'SocketApi/SocketApiJobV2.vala',
+    'SocketApi/SocketListener.vala',
     'SocketApi/SocketUploadJob.vala',
+
     'SslButton.vala',
     'SslErrorDialog.vala',
     'SyncRunFileLog.vala',
@@ -92,6 +100,7 @@ srcs = files([
     'ThumbnailJob.vala',
     'ToolTipUpdater.vala',
 
+    'Tray/Activity.vala',
     'Tray/ActivityLink.vala',
     'Tray/ActivityListModel.vala',
     'Tray/AsyncImageResponse.vala',

@@ -126,7 +126,7 @@ public class TestSyncDehydration : AbstractTestSyncXAttr {
     /***********************************************************
     ***********************************************************/
     private static bool has_dehydrated_database_entries (FakeFolder fake_folder, string path) {
-        SyncJournalFileRecord record;
+        Common.SyncJournalFileRecord record;
         fake_folder.sync_journal ().get_file_record (path, record);
         return record.is_valid && record.type == ItemType.VIRTUAL_FILE;
     }

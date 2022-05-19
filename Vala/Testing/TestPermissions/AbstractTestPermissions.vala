@@ -86,7 +86,7 @@ public class AbstractTestPermissions : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected static LibSync.SyncFileItem find_discovery_item (GLib.List<unowned LibSync.SyncFileItem> spy, string path) {
+    protected static LibSync.SyncFileItem find_discovery_item (GLib.List<LibSync.SyncFileItem> spy, string path) {
         foreach (var item in spy) {
             if (item.destination () == path) {
                 return item;
@@ -106,7 +106,7 @@ public class AbstractTestPermissions : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected static bool discovery_instruction (GLib.List<unowned LibSync.SyncFileItem> spy, string path, CSync.SyncInstructions instr) {
+    protected static bool discovery_instruction (GLib.List<LibSync.SyncFileItem> spy, string path, CSync.SyncInstructions instr) {
         var item = find_discovery_item (spy, path);
         return item.instruction == instr;
     }

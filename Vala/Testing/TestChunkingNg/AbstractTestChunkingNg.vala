@@ -46,7 +46,7 @@ public abstract class AbstractTestChunkingNg : GLib.Object {
     /***********************************************************
     Need to make sure size_when_abort gets passed back to caller!
     ***********************************************************/
-    protected void on_signal_progress_delegate (ProgressInfo progress, int64 *size_when_abort) {
+    protected void on_signal_progress_delegate (LibSync.ProgressInfo progress, int64 *size_when_abort) {
         if (progress.completed_size () > (progress.total_size () /3 )) {
             size_when_abort = progress.completed_size ();
             fake_folder.sync_engine.on_signal_abort ();

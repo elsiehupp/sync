@@ -65,7 +65,7 @@ public class TestAvoidReadFromDatabaseOnNextSync : AbstractTestSyncJournalDB {
 
 
     private void make_entry (string path, ItemType type) {
-        SyncJournalFileRecord record;
+        Common.SyncJournalFileRecord record;
         record.path = path;
         record.type = type;
         record.etag = initial_etag;
@@ -75,7 +75,7 @@ public class TestAvoidReadFromDatabaseOnNextSync : AbstractTestSyncJournalDB {
 
 
     private void get_etag (string path) {
-        SyncJournalFileRecord record;
+        Common.SyncJournalFileRecord record;
         this.database.get_file_record (path, record);
         return record.etag;
     }

@@ -62,7 +62,7 @@ public class WebFlowCredentials : AbstractCredentials {
         string password,
         GLib.SslCertificate certificate = GLib.SslCertificate (),
         GLib.ByteArray key = GLib.ByteArray (),
-        GLib.List<GLib.SslCertificate> ca_certificates = GLib.List<GLib.SslCertificate> ()) {
+        GLib.List<GLib.SslCertificate> ca_certificates = new GLib.List<GLib.SslCertificate> ()) {
         this.user = user;
         this.password = password;
         this.client_ssl_key = key;

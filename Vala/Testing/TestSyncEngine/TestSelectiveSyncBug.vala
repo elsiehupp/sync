@@ -107,7 +107,7 @@ public class TestSelectiveSyncBug : AbstractTestSyncEngine {
 
 
     private static string get_etag (FakeFoler fake_folder, string file) {
-        SyncJournalFileRecord record;
+        Common.SyncJournalFileRecord record;
         fake_folder.sync_journal ().get_file_record (file, record);
         return record.etag;
     }

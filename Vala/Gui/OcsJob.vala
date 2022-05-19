@@ -21,7 +21,7 @@ All the communication logic is handled in this class.
 
 All OCS jobs (e.g. sharing) should extend this class.
 ***********************************************************/
-public class OcsJob : AbstractNetworkJob {
+public class OcsJob : LibSync.AbstractNetworkJob {
 
     private const int OCS_SUCCESS_STATUS_CODE = 100;
 
@@ -166,7 +166,7 @@ public class OcsJob : AbstractNetworkJob {
         query_items.add_query_item ("format", "json");
         GLib.Uri url = Utility.concat_url_path (account.url, this.path, query_items);
         send_request (this.verb, url, this.request, buffer);
-        AbstractNetworkJob.on_signal_start ();
+        LibSync.AbstractNetworkJob.on_signal_start ();
     }
 
 

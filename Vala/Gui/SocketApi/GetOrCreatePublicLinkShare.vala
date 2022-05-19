@@ -58,7 +58,7 @@ public class GetOrCreatePublicLinkShare : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_shares_fetched (GLib.List<unowned Share> shares) {
+    private void on_signal_shares_fetched (GLib.List<Share> shares) {
         var share_name = SocketApi._("Context menu share");
 
         // If there already is a context menu share, reuse it

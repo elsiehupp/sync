@@ -10,13 +10,13 @@ public class TestPushNotificationsWebSocketUrl_UrlAvailableReturnUrl : GLib.Obje
     private TestPushNotificationsWebSocketUrl_UrlAvailableReturnUrl () {
         string websocket_url = "testurl";
 
-        GLib.VariantMap endpoints_map;
+        GLib.HashMap endpoints_map;
         endpoints_map["websocket"] = websocket_url;
 
-        GLib.VariantMap notify_push_map;
+        GLib.HashMap notify_push_map;
         notify_push_map["endpoints"] = endpoints_map;
 
-        GLib.VariantMap capabilities_map;
+        GLib.HashMap capabilities_map;
         capabilities_map["notify_push"] = notify_push_map;
 
         var capabilities = Capabilities (capabilities_map);

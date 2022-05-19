@@ -50,7 +50,7 @@ public class SyncEngine : GLib.Object {
     /***********************************************************
     Must only be acessed during update and reconcile
     ***********************************************************/
-    private GLib.List<unowned SyncFileItem> sync_items;
+    private GLib.List<SyncFileItem> sync_items;
 
 
     /***********************************************************
@@ -178,7 +178,7 @@ public class SyncEngine : GLib.Object {
     /***********************************************************
     After the above signals. with the items that actually need propagating
     ***********************************************************/
-    internal signal void signal_about_to_propagate (GLib.List<unowned SyncFileItem> value);
+    internal signal void signal_about_to_propagate (GLib.List<SyncFileItem> value);
 
 
     /***********************************************************
@@ -256,10 +256,10 @@ public class SyncEngine : GLib.Object {
         this.another_sync_needed = AnotherSyncNeeded.NO_FOLLOW_UP_SYNC;
         this.last_local_discovery_style = DiscoveryPhase.LocalDiscoveryStyle.FILESYSTEM_ONLY;
         q_register_meta_type<SyncFileItem> ("SyncFileItem");
-        q_register_meta_type<unowned SyncFileItem> ("unowned SyncFileItem");
+        q_register_meta_type<SyncFileItem> ("unowned SyncFileItem");
         q_register_meta_type<SyncFileItem.Status> ("SyncFileItem.Status");
         q_register_meta_type<SyncFileStatus> ("SyncFileStatus");
-        q_register_meta_type<GLib.List<unowned SyncFileItem>> ("GLib.List<unowned SyncFileItem>");
+        q_register_meta_type<GLib.List<SyncFileItem>> ("GLib.List<SyncFileItem>");
         q_register_meta_type<SyncFileItem.Direction> ("SyncFileItem.Direction");
 
         // Everything in the SyncEngine expects a trailing slash for the local_path.
@@ -689,7 +689,7 @@ public class SyncEngine : GLib.Object {
     }
 
 
-    private static void files_below_path_wipe_filter (SyncJournalFileRecord record) {
+    private static void files_below_path_wipe_filter (Common.SyncJournalFileRecord record) {
         if (record.type != ItemType.VIRTUAL_FILE && record.type != ItemType.VIRTUAL_FILE_DOWNLOAD) {
             return;
         }
@@ -718,7 +718,7 @@ public class SyncEngine : GLib.Object {
     }
 
 
-    private static files_below_path_switch_filter (SyncJournalFileRecord record) {
+    private static files_below_path_switch_filter (Common.SyncJournalFileRecord record) {
         var path = record.path;
         var filename = GLib.File.new_for_path (path).filename ();
         if (FileSystem.is_exclude_file (filename)) {
@@ -801,7 +801,7 @@ public class SyncEngine : GLib.Object {
                 string file_path = this.local_path + item.file;
 
                 // If the 'W' remote permission changed, update the local filesystem
-                SyncJournalFileRecord prev;
+                Common.SyncJournalFileRecord prev;
                 if (this.journal.get_file_record (item.file, prev)
                     && prev.is_valid
                     && prev.remote_permissions.has_permission (Common.RemotePermissions.Permissions.CAN_WRITE) != item.remote_permissions.has_permission (Common.RemotePermissions.Permissions.CAN_WRITE)) {
@@ -1270,7 +1270,7 @@ public class SyncEngine : GLib.Object {
     Cleans up unnecessary downloadinfo entries in the journal as
     well as their temporary files.
     ***********************************************************/
-    private void delete_stale_download_infos (GLib.List<unowned SyncFileItem> sync_items) {
+    private void delete_stale_download_infos (GLib.List<SyncFileItem> sync_items) {
         // Find all downloadinfo paths that we want to preserve.
         GLib.List<string> download_file_paths;
         foreach (unowned SyncFileItem it in sync_items) {
@@ -1295,7 +1295,7 @@ public class SyncEngine : GLib.Object {
     /***********************************************************
     Removes stale uploadinfos from the journal.
     ***********************************************************/
-    private void delete_stale_upload_infos (GLib.List<unowned SyncFileItem> sync_items) {
+    private void delete_stale_upload_infos (GLib.List<SyncFileItem> sync_items) {
         // Find all blocklisted paths that we want to preserve.
         GLib.List<string> upload_file_paths;
         foreach (unowned SyncFileItem it in sync_items) {
@@ -1324,7 +1324,7 @@ public class SyncEngine : GLib.Object {
     /***********************************************************
     Removes stale error blocklist entries from the journal.
     ***********************************************************/
-    private void delete_stale_error_blocklist_entries (GLib.List<unowned SyncFileItem> sync_items) {
+    private void delete_stale_error_blocklist_entries (GLib.List<SyncFileItem> sync_items) {
         // Find all blocklisted paths that we want to preserve.
         GLib.List<string> blocklist_file_paths;
         foreach (unowned SyncFileItem it in sync_items) {
@@ -1375,7 +1375,7 @@ public class SyncEngine : GLib.Object {
                 record.initial_base_path = base_path;
 
                 // Determine fileid of target file
-                SyncJournalFileRecord base_record;
+                Common.SyncJournalFileRecord base_record;
                 if (this.journal.get_file_record (base_path, base_record) && base_record.is_valid) {
                     record.base_file_id = base_record.file_id;
                 }
@@ -1415,7 +1415,7 @@ public class SyncEngine : GLib.Object {
     Check if we are allowed to propagate everything, and if we
     are not, adjust the instructions to recover
     ***********************************************************/
-    private void check_for_permission (GLib.List<unowned SyncFileItem> sync_items);
+    private void check_for_permission (GLib.List<SyncFileItem> sync_items);
 
 
     private Common.RemotePermissions get_permissions (string file);
@@ -1433,7 +1433,7 @@ public class SyncEngine : GLib.Object {
     we still downloaded the old file in a conflict file just
     in case.
     ***********************************************************/
-    private void restore_old_files (GLib.List<unowned SyncFileItem> sync_items) {
+    private void restore_old_files (GLib.List<SyncFileItem> sync_items) {
 
         foreach (var sync_item in q_as_const (sync_items)) {
             if (sync_item.direction != SyncFileItem.Direction.DOWN)

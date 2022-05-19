@@ -13,7 +13,7 @@ public class TestRemoteDiscoveryErrorData : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private TestRemoteDiscoveryErrorData () {
-        //  GLib.RegisterMetaType<ErrorCategory> ();
+        //  GLib.RegisterMetaType<LibSync.ErrorCategory> ();
         GLib.Test.add_column<int> ("error_kind");
         GLib.Test.add_column<string> ("expected_error_string");
         GLib.Test.add_column<bool> ("sync_succeeds");

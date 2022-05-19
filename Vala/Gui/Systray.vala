@@ -46,7 +46,7 @@ public class Systray : GLib.SystemTrayIcon {
 
         /***********************************************************
         ***********************************************************/
-        public override Soup.Context create (GLib.Object parent) {
+        public override Soup.ClientContext create (GLib.Object parent) {
             return new Soup.ClientContext (parent);
         }
     }
@@ -255,9 +255,9 @@ public class Systray : GLib.SystemTrayIcon {
 
     /***********************************************************
     ***********************************************************/
-    public void show_message (string title, string message, Message_icon icon) {
+    public void show_message (string title, string message, MessageIcon icon) {
         if (GLib.DBusInterface (NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE).is_valid) {
-            GLib.VariantMap hints = {{"desktop-entry", LINUX_APPLICATION_ID}};
+            GLib.HashMap hints = {{"desktop-entry", LINUX_APPLICATION_ID}};
             GLib.List<GLib.Variant> args = {
                 APPLICATION_NAME,
                 (uint32)0,

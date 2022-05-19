@@ -40,7 +40,7 @@ public class TestFakeConflict : AbstractTestSyncEngine {
 
         // check that mtime in journal and filesystem agree
         string a1path = fake_folder.local_path + "A/a1";
-        SyncJournalFileRecord a1record;
+        Common.SyncJournalFileRecord a1record;
         fake_folder.sync_journal ().get_file_record ("A/a1", a1record);
         GLib.assert_true (a1record.modtime == (int64)FileSystem.get_mod_time (a1path));
 

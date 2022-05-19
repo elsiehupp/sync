@@ -65,7 +65,7 @@ public class SocketApi : GLib.Object {
     ***********************************************************/
     const int MIRALL_SOCKET_API_VERSION = "1.1";
 
-    internal signal void signal_share_command_received (string share_path, string local_path, ShareDialogStartPage start_page);
+    internal signal void signal_share_command_received (string share_path, string local_path, OwncloudGui.ShareDialogStartPage start_page);
     internal signal void signal_file_activity_command_received (string share_path, string local_path);
 
     /***********************************************************
@@ -75,8 +75,8 @@ public class SocketApi : GLib.Object {
         string socket_path;
 
         q_register_meta_type<SocketListener> ("SocketListener*");
-        q_register_meta_type<unowned SocketApiJob> ("unowned SocketApiJob");
-        q_register_meta_type<unowned SocketApiJobV2> ("unowned SocketApiJobV2");
+        q_register_meta_type<SocketApiJob> ("unowned SocketApiJob");
+        q_register_meta_type<SocketApiJobV2> ("unowned SocketApiJobV2");
 
         if (Utility.is_windows ()) {
             socket_path
@@ -475,7 +475,7 @@ public class SocketApi : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static void on_signal_prop_find_job_result (GLib.VariantMap result) {
+    private static void on_signal_prop_find_job_result (GLib.HashMap result) {
         var private_link_url = result["privatelink"].to_string ();
         var numeric_file_id = result["fileid"].to_byte_array ();
         if (!private_link_url == "") {
@@ -555,8 +555,8 @@ public class SocketApi : GLib.Object {
 
         /***********************************************************
         ***********************************************************/
-        public SyncJournalFileRecord journal_record () {
-            SyncJournalFileRecord record;
+        public Common.SyncJournalFileRecord journal_record () {
+            Common.SyncJournalFileRecord record;
             if (this.folder_connection == null) {
                 return record;
             }
@@ -599,7 +599,7 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     Opens share dialog, sends reply
     ***********************************************************/
-    private void process_share_request (string local_file, SocketListener listener, ShareDialogStartPage start_page) {
+    private void process_share_request (string local_file, SocketListener listener, OwncloudGui.ShareDialogStartPage start_page) {
         var theme = LibSync.Theme.instance;
 
         var file_data = FileData.file_data (local_file);
@@ -710,7 +710,7 @@ public class SocketApi : GLib.Object {
     Context menu action
     ***********************************************************/
     private void command_SHARE (string local_file, SocketListener listener) {
-        process_share_request (local_file, listener, ShareDialogStartPage.USERS_AND_GROUPS);
+        process_share_request (local_file, listener, OwncloudGui.ShareDialogStartPage.USERS_AND_GROUPS);
     }
 
 
@@ -718,7 +718,7 @@ public class SocketApi : GLib.Object {
     Context menu action
     ***********************************************************/
     private void command_MANAGE_PUBLIC_LINKS (string local_file, SocketListener listener) {
-        process_share_request (local_file, listener, ShareDialogStartPage.PUBLIC_LINKS);
+        process_share_request (local_file, listener, OwncloudGui.ShareDialogStartPage.PUBLIC_LINKS);
     }
 
 
@@ -749,7 +749,7 @@ public class SocketApi : GLib.Object {
 
 
     private void on_signal_get_or_create_public_link_share_error () {
-        signal_share_command_received (file_data.server_relative_path, file_data.local_path, ShareDialogStartPage.PUBLIC_LINKS);
+        signal_share_command_received (file_data.server_relative_path, file_data.local_path, OwncloudGui.ShareDialogStartPage.PUBLIC_LINKS);
     }
 
 
@@ -1103,7 +1103,7 @@ public class SocketApi : GLib.Object {
                 listener.on_signal_send_message ("MENU_ITEM:ACTIVITY" + flag_string + _("Activity"));
             }
 
-            DirectEditor editor = direct_editor_for_local_file (file_data.local_path);
+            LibSync.DirectEditor editor = direct_editor_for_local_file (file_data.local_path);
             if (editor) {
                 //  listener.on_signal_send_message ("MENU_ITEM:EDIT" + flag_string + _("Edit via ") + editor.name ());
                 listener.on_signal_send_message ("MENU_ITEM:EDIT" + flag_string + _("Edit"));
@@ -1258,7 +1258,7 @@ public class SocketApi : GLib.Object {
         if (!record.is_valid)
             return;
 
-        DirectEditor editor = direct_editor_for_local_file (file_data.local_path);
+        LibSync.DirectEditor editor = direct_editor_for_local_file (file_data.local_path);
         if (!editor) {
             return;
         }
@@ -1291,7 +1291,7 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     Direct Editing
     ***********************************************************/
-    private DirectEditor direct_editor_for_local_file (string local_file) {
+    private LibSync.DirectEditor direct_editor_for_local_file (string local_file) {
         FileData file_data = FileData.file_data (local_file);
         var capabilities = file_data.folder_connection.account_state.account.capabilities;
 
@@ -1302,7 +1302,7 @@ public class SocketApi : GLib.Object {
             GLib.MimeDatabase database;
             GLib.MimeType type = database.mime_type_for_file (local_file, mime_match_mode);
 
-            DirectEditor* editor = capabilities.direct_editor_for_mimetype (type);
+            LibSync.DirectEditor* editor = capabilities.direct_editor_for_mimetype (type);
             if (!editor) {
                 editor = capabilities.direct_editor_for_optional_mimetype (type);
             }

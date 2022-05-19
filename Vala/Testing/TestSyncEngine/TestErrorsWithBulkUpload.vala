@@ -15,7 +15,7 @@ public class TestErrorsWithBulkUpload : AbstractTestSyncEngine {
     ***********************************************************/
     private TestErrorsWithBulkUpload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.VariantMap ( { "bulkupload", "1.0" } ) } });
+        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.HashMap ( { "bulkupload", "1.0" } ) } });
 
         // Disable parallel uploads
         LibSync.SyncOptions sync_options;

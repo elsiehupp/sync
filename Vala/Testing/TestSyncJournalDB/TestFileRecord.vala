@@ -12,7 +12,7 @@ public class TestFileRecord : AbstractTestSyncJournalDB {
     /***********************************************************
     ***********************************************************/
     private TestFileRecord () {
-        SyncJournalFileRecord record;
+        Common.SyncJournalFileRecord record;
         GLib.assert_true (this.database.get_file_record ("nonexistant", record));
         GLib.assert_true (!record.is_valid);
 
@@ -29,7 +29,7 @@ public class TestFileRecord : AbstractTestSyncJournalDB {
         record.checksum_header = "MD5:mychecksum";
         GLib.assert_true (this.database.set_file_record (record));
 
-        SyncJournalFileRecord stored_record;
+        Common.SyncJournalFileRecord stored_record;
         GLib.assert_true (this.database.get_file_record ("foo", stored_record));
         GLib.assert_true (stored_record == record);
 

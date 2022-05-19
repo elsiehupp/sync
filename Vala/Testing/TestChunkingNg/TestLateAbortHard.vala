@@ -15,7 +15,7 @@ public class TestLateAbortHard : AbstractTestChunkingNg {
     ***********************************************************/
     private TestLateAbortHard () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.VariantMap ( { "chunking", "1.0" } ) }, { "checksums", new GLib.VariantMap ( { "supportedTypes", { "SHA1" } } ) } });
+        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.HashMap ( { "chunking", "1.0" } ) }, { "checksums", new GLib.HashMap ( { "supportedTypes", { "SHA1" } } ) } });
         int size = 15 * 1000 * 1000; // 15 MB
         set_chunk_size (fake_folder.sync_engine, 1 * 1000 * 1000);
 
@@ -84,10 +84,10 @@ public class TestLateAbortHard : AbstractTestChunkingNg {
     Now the next sync gets a NEW/NEW conflict and since there's
     no checksum it just becomes a UPDATE_METADATA.
     ***********************************************************/
-    private static void check_etag_updated (GLib.List<unowned LibSync.SyncFileItem> items) {
+    private static void check_etag_updated (GLib.List<LibSync.SyncFileItem> items) {
         GLib.assert_true (items.size () == 1);
         GLib.assert_true (items[0].file == "A");
-        SyncJournalFileRecord record;
+        Common.SyncJournalFileRecord record;
         GLib.assert_true (fake_folder.sync_journal ().get_file_record ("A/a0", record));
         GLib.assert_true (record.etag == fake_folder.remote_modifier ().find ("A/a0").etag);
     }

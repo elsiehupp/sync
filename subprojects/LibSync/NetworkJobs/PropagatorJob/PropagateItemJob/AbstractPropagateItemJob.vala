@@ -87,7 +87,7 @@ public abstract class AbstractPropagateItemJob : AbstractPropagatorJob {
 
         var path_components = parent_path.split ("/");
         while (!path_components == "") {
-            SyncJournalFileRecord record;
+            Common.SyncJournalFileRecord record;
             this.propagator.journal.get_file_record (path_components.join ("/"), record);
             if (record.is_valid && record.is_e2e_encrypted) {
                 return true;

@@ -13,7 +13,7 @@ public class TestCreateConflictWhileSyncing : AbstractTestChunkingNg {
     ***********************************************************/
     private TestCreateConflictWhileSyncing () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.VariantMap ({ "chunking", "1.0" }) } });
+        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.HashMap ({ "chunking", "1.0" }) } });
         int size = 10 * 1000 * 1000; // 10 MB
         set_chunk_size (fake_folder.sync_engine, 1 * 1000 * 1000);
 
@@ -69,7 +69,7 @@ public class TestCreateConflictWhileSyncing : AbstractTestChunkingNg {
     }
 
 
-    private void on_signal_sync_engine_transmission_progress_create_conflict_while_syncing (ProgressInfo progress) {
+    private void on_signal_sync_engine_transmission_progress_create_conflict_while_syncing (LibSync.ProgressInfo progress) {
         if (progress.completed_size () > (progress.total_size () / 2 )) {
             fake_folder.remote_modifier ().set_contents ("A/a0", 'C');
             disconnect (con);

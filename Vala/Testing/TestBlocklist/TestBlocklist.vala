@@ -172,8 +172,8 @@ public class TestBlocklist : GLib.Object {
     }
 
 
-    SyncJournalFileRecord journal_record (FakeFolder folder, string path) {
-        SyncJournalFileRecord record;
+    Common.SyncJournalFileRecord journal_record (FakeFolder folder, string path) {
+        Common.SyncJournalFileRecord record;
         folder.sync_journal ().get_file_record (path, record);
         return record;
     }

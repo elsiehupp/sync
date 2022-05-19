@@ -28,7 +28,7 @@ public class ShareManager : GLib.Object {
 
     internal signal void signal_share_created (Share share);
     internal signal void signal_link_share_created (LinkShare share);
-    internal signal void signal_shares_fetched (GLib.List<unowned Share> shares);
+    internal signal void signal_shares_fetched (GLib.List<Share> shares);
     internal signal void signal_server_error (int code, string message);
 
 
@@ -168,7 +168,7 @@ public class ShareManager : GLib.Object {
         var temporary_shares = reply.object ().value ("ocs").to_object ().value ("data").to_array ();
         GLib.debug (this.account.server_version () + " Fetched " + temporary_shares.length + "shares");
 
-        GLib.List<unowned Share> shares;
+        GLib.List<Share> shares;
 
         foreach (var share in temporary_shares) {
             var data = share.to_object ();

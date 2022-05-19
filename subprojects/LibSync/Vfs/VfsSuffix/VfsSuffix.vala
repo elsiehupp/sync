@@ -210,7 +210,7 @@ public class VfsSuffix : Common.Common.AbstractVfs {
     }
 
 
-    private static void record_filter (GLib.List<string> to_wipe, SyncJournalFileRecord record) {
+    private static void record_filter (GLib.List<string> to_wipe, Common.SyncJournalFileRecord record) {
         if (!record.is_virtual_file () && record.path.has_suffix (APPLICATION_DOTVIRTUALFILE_SUFFIX)) {
             to_wipe.append (record.path);
         }

@@ -33,10 +33,10 @@ public class ShareDialog : Gtk.Dialog {
     private AccountState account_state;
     private string share_path;
     private string local_path;
-    private SharePermissions max_sharing_permissions;
+    private Share.Permissions max_sharing_permissions;
     private string numeric_file_id;
     private string private_link_url;
-    private ShareDialogStartPage start_page;
+    private OwncloudGui.ShareDialogStartPage start_page;
     private ShareManager share_manager = null;
 
     /***********************************************************
@@ -56,9 +56,9 @@ public class ShareDialog : Gtk.Dialog {
         AccountState account_state,
         string share_path,
         string local_path,
-        SharePermissions max_sharing_permissions,
+        Share.Permissions max_sharing_permissions,
         string numeric_file_id,
-        ShareDialogStartPage start_page,
+        OwncloudGui.ShareDialogStartPage start_page,
         Gtk.Widget parent = new Gtk.Widget ()
     ) {
         base (parent);
@@ -185,10 +185,10 @@ public class ShareDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_propfind_received (GLib.VariantMap result) {
+    private void on_signal_propfind_received (GLib.HashMap result) {
         GLib.Variant received_permissions = result["share-permissions"];
         if (!received_permissions.to_string () == "") {
-            this.max_sharing_permissions = (SharePermissions)received_permissions.to_int ();
+            this.max_sharing_permissions = (Share.Permissions)received_permissions.to_int ();
             GLib.info ("Received sharing permissions for " + this.share_path + this.max_sharing_permissions.to_string ());
         }
         var private_link_url = result["privatelink"].to_string ();
@@ -252,7 +252,7 @@ public class ShareDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_shares_fetched (GLib.List<unowned Share> shares) {
+    private void on_signal_shares_fetched (GLib.List<Share> shares) {
         signal_toggle_share_link_animation (true);
 
         string version_string = this.account_state.account.server_version ();

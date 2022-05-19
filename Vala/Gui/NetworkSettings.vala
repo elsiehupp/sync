@@ -186,7 +186,7 @@ public class NetworkSettings : Gtk.Widget {
                 this.instance.port_spin_box.value (), needs_auth, user, pass);
         }
 
-        ClientProxy proxy;
+        LibSync.ClientProxy proxy;
         proxy.on_signal_setup_qt_proxy_from_config (); // Refresh the Qt proxy settings as the
         // quota check can happen all the time.
 

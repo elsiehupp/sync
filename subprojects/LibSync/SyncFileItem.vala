@@ -312,8 +312,8 @@ public class SyncFileItem : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Common.SyncJournalFileRecord to_sync_journal_file_record_with_inode (string local_filename) {
-        Common.SyncJournalFileRecord record;
+    public Common.Common.SyncJournalFileRecord to_sync_journal_file_record_with_inode (string local_filename) {
+        Common.Common.SyncJournalFileRecord record;
         record.path = destination ().to_utf8 ();
         record.modtime = this.modtime;
 
@@ -356,7 +356,7 @@ public class SyncFileItem : GLib.Object {
     This is intended in particular for read-update-write cycles that need
     to go through a a SyncFileItem, like PollJob.
     ***********************************************************/
-    public static unowned SyncFileItem from_sync_journal_file_record (Common.SyncJournalFileRecord record) {
+    public static unowned SyncFileItem from_sync_journal_file_record (Common.Common.SyncJournalFileRecord record) {
         var item = new SyncFileItem ();
         item.file = record.path;
         item.inode = record.inode;

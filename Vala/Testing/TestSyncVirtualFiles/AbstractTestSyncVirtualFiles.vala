@@ -24,8 +24,8 @@ public class AbstractTestSyncVirtualFiles : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected static bool has_dehydrated_database_entries (FakeFolder fake_folder, string path) {
-        SyncJournalFileRecord normal;
-        SyncJournalFileRecord suffix;
+        Common.SyncJournalFileRecord normal;
+        Common.SyncJournalFileRecord suffix;
         fake_folder.sync_journal ().get_file_record (path, normal);
         fake_folder.sync_journal ().get_file_record (path + DVSUFFIX, suffix);
         return !normal.is_valid && suffix.is_valid && suffix.type == ItemType.VIRTUAL_FILE;
@@ -49,8 +49,8 @@ public class AbstractTestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected static SyncJournalFileRecord database_record (FakeFolder folder, string path) {
-        SyncJournalFileRecord record;
+    protected static Common.SyncJournalFileRecord database_record (FakeFolder folder, string path) {
+        Common.SyncJournalFileRecord record;
         folder.sync_journal ().get_file_record (path, record);
         return record;
     }
@@ -60,7 +60,7 @@ public class AbstractTestSyncVirtualFiles : GLib.Object {
     ***********************************************************/
     protected static void trigger_download (FakeFolder folder, string path) {
         var journal = folder.sync_journal ();
-        SyncJournalFileRecord record;
+        Common.SyncJournalFileRecord record;
         journal.get_file_record (path + DVSUFFIX, record);
         if (!record.is_valid)
             return;
@@ -74,7 +74,7 @@ public class AbstractTestSyncVirtualFiles : GLib.Object {
     ***********************************************************/
     protected static void mark_for_dehydration (FakeFolder folder, string path) {
         var journal = folder.sync_journal ();
-        SyncJournalFileRecord record;
+        Common.SyncJournalFileRecord record;
         journal.get_file_record (path, record);
         if (!record.is_valid)
             return;

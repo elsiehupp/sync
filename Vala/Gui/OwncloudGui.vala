@@ -221,7 +221,7 @@ public class OwncloudGui : GLib.Object {
         bool all_signed_out = true;
         bool all_paused = true;
         bool all_disconnected = true;
-        GLib.List<unowned AccountState> problem_accounts;
+        GLib.List<AccountState> problem_accounts;
 
         foreach (var account in AccountManager.instance.accounts) {
             if (!account.is_signed_out) {
@@ -376,11 +376,12 @@ public class OwncloudGui : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_update_progress (string folder_connection, ProgressInfo progress) {
+    public void on_signal_update_progress (string folder_connection, LibSync.ProgressInfo
+         progress) {
         //  Q_UNUSED (folder_connection);
 
         // FIXME: Lots of messages computed for nothing in this method, needs revisiting
-        if (progress.status () == ProgressInfo.Status.DISCOVERY) {
+        if (progress.status () == LibSync.ProgressInfo.Status.DISCOVERY) {
     //  #if 0
             if (!progress.current_discovered_remote_folder == "") {
                 this.action_status.on_signal_text (_("Checking for changes in remote \"%1\"")
@@ -390,10 +391,10 @@ public class OwncloudGui : GLib.Object {
                                         .printf (progress.current_discovered_local_folder));
             }
     //  #endif
-        } else if (progress.status () == ProgressInfo.Status.DONE) {
+        } else if (progress.status () == LibSync.ProgressInfo.Status.DONE) {
             GLib.Timeout.add (2000, this.on_signal_compute_overall_sync_status);
         }
-        if (progress.status () != ProgressInfo.Status.PROPAGATION) {
+        if (progress.status () != LibSync.ProgressInfo.Status.PROPAGATION) {
             return;
         }
 
@@ -674,7 +675,7 @@ public class OwncloudGui : GLib.Object {
         var account_state = folder_connection.account_state;
 
         string file = local_path.mid (folder_connection.clean_path.length + 1);
-        SyncJournalFileRecord file_record;
+        Common.SyncJournalFileRecord file_record;
 
         bool resharing_allowed = true; // lets assume the good
         if (folder_connection.journal_database.file_record (file, file_record) && file_record.is_valid) {
@@ -684,7 +685,7 @@ public class OwncloudGui : GLib.Object {
             }
         }
 
-        var max_sharing_permissions = resharing_allowed? SharePermissions (account_state.account.capabilities.share_default_permissions ()) : SharePermissions ({});
+        var max_sharing_permissions = resharing_allowed? Share.Permissions (account_state.account.capabilities.share_default_permissions ()) : Share.Permissions ({});
 
         ShareDialog share_dialog = null;
         if (this.share_dialogs.contains (local_path) && this.share_dialogs[local_path]) {

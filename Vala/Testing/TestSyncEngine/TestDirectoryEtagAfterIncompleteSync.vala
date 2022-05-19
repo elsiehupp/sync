@@ -24,7 +24,7 @@ public class TestDirectoryEtagAfterIncompleteSync : AbstractTestSyncEngine {
         fake_folder.remote_modifier ().insert ("NewFolder/foo");
         GLib.assert_true (!fake_folder.sync_once ());
 
-        SyncJournalFileRecord record;
+        Common.SyncJournalFileRecord record;
         fake_folder.sync_journal ().get_file_record ("NewFolder", record);
         GLib.assert_true (record.is_valid);
         GLib.assert_true (record.etag == "this.invalid_");

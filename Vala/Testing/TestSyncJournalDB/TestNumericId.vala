@@ -12,7 +12,7 @@ public class TestNumericId : AbstractTestSyncJournalDB {
     /***********************************************************
     ***********************************************************/
     private TestNumericId () {
-        SyncJournalFileRecord record;
+        Common.SyncJournalFileRecord record;
 
         // Typical 8-digit padded identifier
         record.file_identifier = "00000001abcd";

@@ -14,7 +14,7 @@ public class TestModifyLocalFileWhileUploading : AbstractTestChunkingNg {
     private TestModifyLocalFileWhileUploading () {
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.VariantMap ({ "chunking", "1.0" }) } });
+        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.HashMap ({ "chunking", "1.0" }) } });
         int size = 10 * 1000 * 1000; // 10 MB
         set_chunk_size (fake_folder.sync_engine, 1 * 1000 * 1000);
 
@@ -47,7 +47,7 @@ public class TestModifyLocalFileWhileUploading : AbstractTestChunkingNg {
     }
 
 
-    private void on_signal_sync_engine_transmission_progress_modify_local_file_while_uploading (ProgressInfo progress) {
+    private void on_signal_sync_engine_transmission_progress_modify_local_file_while_uploading (LibSync.ProgressInfo progress) {
         if (progress.completed_size () > (progress.total_size () / 2 )) {
             fake_folder.local_modifier.set_contents ("A/a0", 'B');
             fake_folder.local_modifier.append_byte ("A/a0");

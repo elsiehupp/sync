@@ -62,7 +62,7 @@ public class ProcessDirectoryJob : GLib.Object {
     ***********************************************************/
     private struct Entries {
         string name_override;
-        SyncJournalFileRecord database_entry;
+        Common.SyncJournalFileRecord database_entry;
         RemoteInfo server_entry;
         LocalInfo local_entry;
     }
@@ -701,7 +701,7 @@ public class ProcessDirectoryJob : GLib.Object {
     private void process_file (PathTuple path,
         LocalInfo local_entry,
         RemoteInfo server_entry,
-        SyncJournalFileRecord database_entry
+        Common.SyncJournalFileRecord database_entry
     ) {
         string has_server = server_entry.is_valid ? "true" : this.query_server == PARENT_NOT_CHANGED ? "database": "false";
         string has_local = local_entry.is_valid ? "true" : this.query_local == PARENT_NOT_CHANGED ? "database": "false";
@@ -800,7 +800,7 @@ public class ProcessDirectoryJob : GLib.Object {
     ***********************************************************/
     private void process_file_analyze_remote_info (
         SyncFileItem item, PathTuple path, LocalInfo local_entry,
-        RemoteInfo server_entry, SyncJournalFileRecord database_entry) {
+        RemoteInfo server_entry, Common.SyncJournalFileRecord database_entry) {
         item.checksum_header = server_entry.checksum_header;
         item.file_id = server_entry.file_identifier;
         item.remote_permissions = server_entry.remote_permissions;
@@ -954,7 +954,7 @@ public class ProcessDirectoryJob : GLib.Object {
     from the placeholder's size and re-create/update a
     placeholder?
     ***********************************************************/
-    private QueryMode server_query_mode (SyncJournalFileRecord database_entry, RemoteInfo server_entry) {
+    private QueryMode server_query_mode (Common.SyncJournalFileRecord database_entry, RemoteInfo server_entry) {
         if (this.discovery_data != null
             && this.discovery_data.sync_options.vfs
             && this.discovery_data.sync_options.vfs.mode () != Common.AbstractVfs.Off
@@ -1019,7 +1019,7 @@ public class ProcessDirectoryJob : GLib.Object {
     }
 
 
-    private void list_files_callback (int64 local_folder_size, SyncJournalFileRecord record) {
+    private void list_files_callback (int64 local_folder_size, Common.SyncJournalFileRecord record) {
         if (record.is_file ()) {
             // add Constants.E2EE_TAG_SIZE so we will know the size of E2EE file on the server
             local_folder_size += record.file_size + Constants.E2EE_TAG_SIZE;
@@ -1030,7 +1030,7 @@ public class ProcessDirectoryJob : GLib.Object {
     }
 
 
-    private void post_process_rename (SyncFileItem item, SyncJournalFileRecord base_record, string original_path, PathTuple path) {
+    private void post_process_rename (SyncFileItem item, Common.SyncJournalFileRecord base_record, string original_path, PathTuple path) {
         var adjusted_original_path = this.discovery_data.adjust_renamed_path (original_path, SyncFileItem.Direction.UP);
         this.discovery_data.renamed_items_remote.insert (original_path, path.target);
         item.modtime = base_record.modtime;
@@ -1069,7 +1069,7 @@ public class ProcessDirectoryJob : GLib.Object {
 
 
     // This function will be executed for every candidate
-    private void rename_candidate_processing (SyncJournalFileRecord base_record) {
+    private void rename_candidate_processing (Common.SyncJournalFileRecord base_record) {
         if (done)
             return;
         if (!base_record.is_valid)
@@ -1174,7 +1174,7 @@ public class ProcessDirectoryJob : GLib.Object {
         PathTuple path,
         LocalInfo local_entry,
         RemoteInfo server_entry,
-        SyncJournalFileRecord database_entry,
+        Common.SyncJournalFileRecord database_entry,
         QueryMode recurse_query_server) {
         bool no_server_entry = (this.query_server != PARENT_NOT_CHANGED && !server_entry.is_valid)
             || (this.query_server == PARENT_NOT_CHANGED && !database_entry.is_valid);
@@ -1376,7 +1376,7 @@ public class ProcessDirectoryJob : GLib.Object {
         this.child_modified = true;
 
         // Check if it is a move
-        SyncJournalFileRecord base_record;
+        Common.SyncJournalFileRecord base_record;
         if (!this.discovery_data.statedatabase.get_file_record_by_inode (local_entry.inode, base_record)) {
             db_error ();
             return;
@@ -1573,7 +1573,7 @@ public class ProcessDirectoryJob : GLib.Object {
     private void process_rename (
         SyncFileItem item,
         string original_path,
-        SyncJournalFileRecord base_record,
+        Common.SyncJournalFileRecord base_record,
         PathTuple path) {
         var adjusted_original_path = this.discovery_data.adjust_renamed_path (original_path, SyncFileItem.Direction.DOWN);
         this.discovery_data.renamed_items_local.insert (original_path, path.target);
@@ -1666,7 +1666,7 @@ public class ProcessDirectoryJob : GLib.Object {
     /***********************************************************
     process_file helper for local/remote conflicts
     ***********************************************************/
-    private void process_file_conflict (SyncFileItem item, ProcessDirectoryJob.PathTuple path, LocalInfo local_entry, RemoteInfo server_entry, SyncJournalFileRecord database_entry) {
+    private void process_file_conflict (SyncFileItem item, ProcessDirectoryJob.PathTuple path, LocalInfo local_entry, RemoteInfo server_entry, Common.SyncJournalFileRecord database_entry) {
         item.previous_size = local_entry.size;
         item.previous_modtime = local_entry.modtime;
 
@@ -1716,7 +1716,7 @@ public class ProcessDirectoryJob : GLib.Object {
             // Update the etag and other server metadata in the journal already
             // (We can't use a typical CSync.SyncInstructions.UPDATE_METADATA because
             // we must not store the size/modtime from the file system)
-            SyncJournalFileRecord record;
+            Common.SyncJournalFileRecord record;
             if (this.discovery_data.statedatabase.get_file_record (path.original, record)) {
                 record.path = path.original.to_utf8 ();
                 record.etag = server_entry.etag;
@@ -1944,7 +1944,7 @@ public class ProcessDirectoryJob : GLib.Object {
     void process_blocklisted (
         PathTuple path,
         LocalInfo local_entry,
-        SyncJournalFileRecord database_entry
+        Common.SyncJournalFileRecord database_entry
     ) {
         if (!local_entry.is_valid) {
             return;
@@ -2220,7 +2220,7 @@ public class ProcessDirectoryJob : GLib.Object {
     state suggests a hydration or dehydration action and changes the
     this.type field accordingly.
     ***********************************************************/
-    private void up_database_pin_state_actions (SyncJournalFileRecord record) {
+    private void up_database_pin_state_actions (Common.SyncJournalFileRecord record) {
         // Only suffix-vfs uses the database for pin states.
         // Other plugins will set local_entry.type according to the file's pin state.
         if (!is_vfs_with_suffix ())

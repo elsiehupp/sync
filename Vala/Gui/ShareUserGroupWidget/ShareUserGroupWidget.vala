@@ -51,7 +51,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
     private LibSync.Account account;
     private string share_path;
     private string local_path;
-    private SharePermissions max_sharing_permissions;
+    private Share.Permissions max_sharing_permissions;
     private string private_link_url;
 
     /***********************************************************
@@ -88,7 +88,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         LibSync.Account account,
         string share_path,
         string local_path,
-        SharePermissions max_sharing_permissions,
+        Share.Permissions max_sharing_permissions,
         string private_link_url,
         Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
@@ -241,7 +241,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_shares_fetched (GLib.List<unowned Share> shares) {
+    private void on_signal_shares_fetched (GLib.List<Share> shares) {
         GLib.Scroll_area scroll_area = this.parent_scroll_area;
 
         var new_view_port = new Gtk.Widget (scroll_area);

@@ -435,7 +435,7 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_add_error (string folder_alias, string message, ErrorCategory category) {
+    public void on_signal_add_error (string folder_alias, string message, LibSync.ErrorCategory category) {
         try {
             var folder_connection = FolderManager.instance.folder_by_alias (folder_alias);
 
@@ -452,7 +452,7 @@ public class User : GLib.Object {
                 activity.acc_name = folder_connection.account_state.account.display_name;
                 activity.folder_connection = folder_alias;
 
-                if (category == ErrorCategory.INSUFFICIENT_REMOTE_STORAGE) {
+                if (category == LibSync.ErrorCategory.INSUFFICIENT_REMOTE_STORAGE) {
                     ActivityLink link;
                     link.label = _("Retry all uploads");
                     link.link = folder_connection.path;
@@ -552,8 +552,8 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_progress_info (string folder_connection_alias, ProgressInfo progress) {
-        if (progress.status () == ProgressInfo.Status.RECONCILE) {
+    public void on_signal_progress_info (string folder_connection_alias, LibSync.ProgressInfo progress) {
+        if (progress.status () == LibSync.ProgressInfo.Status.RECONCILE) {
             try {
                 // Wipe all non-persistent entries - as well as the persistent ones
                 // in cases where a local discovery was done.
@@ -607,7 +607,7 @@ public class User : GLib.Object {
             }
         }
 
-        if (progress.status () == ProgressInfo.Status.DONE) {
+        if (progress.status () == LibSync.ProgressInfo.Status.DONE) {
             // We keep track very well of pending conflicts.
             // Inform other components about them.
             GLib.List<string> conflicts;

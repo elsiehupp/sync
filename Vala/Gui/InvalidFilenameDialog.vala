@@ -120,8 +120,8 @@ public class InvalidFilenameDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_move_job_finished (MoveJob move_job) {
-        var move_job = (MoveJob)sender ();
+    private void on_signal_move_job_finished (LibSync.MoveJob move_job) {
+        var move_job = (LibSync.MoveJob)sender ();
         var error = move_job.input_stream.error;
 
         if (error != GLib.InputStream.NoError) {
@@ -135,7 +135,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_remote_file_already_exists (GLib.VariantMap values) {
+    private void on_signal_remote_file_already_exists (GLib.HashMap values) {
         //  Q_UNUSED (values);
 
         this.instance.error_label.on_signal_text (_("Cannot rename file because a file with the same name does already exist on the server. Please pick another name."));
@@ -151,7 +151,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
         // File does not exist. We can rename it.
         var remote_source = GLib.Dir.clean_path (this.folder_connection.remote_path + this.original_filename);
         var remote_destionation = GLib.Dir.clean_path (this.account.dav_url ().path + this.folder_connection.remote_path + this.new_filename);
-        var move_job = new MoveJob (
+        var move_job = new LibSync.MoveJob (
             this.account,
             remote_source,
             remote_destionation,
@@ -180,7 +180,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_propfind_permission_success (GLib.VariantMap values) {
+    private void on_signal_propfind_permission_success (GLib.HashMap values) {
         if (!values.contains ("permissions")) {
             return;
         }

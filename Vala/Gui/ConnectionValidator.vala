@@ -11,7 +11,7 @@
 //  #include <GLib.XmlStreamReader>
 //  #include <creds/abstractcredentials.h>
 
-//  #include <GLib.VariantMap>
+//  #include <GLib.HashMap>
 
 namespace Occ {
 namespace Ui {
@@ -33,7 +33,7 @@ Here follows the state machine
 *--. on_signal_check_server_and_auth  (check status.php)
         Will asynchronously check for system proxy (if using system proxy)
         And then invoke on_signal_check_server_and_auth
-        CheckServerJob
+        LibSync.CheckServerJob
         |
         +. on_signal_no_status_found -. X
         |
@@ -156,12 +156,12 @@ public class ConnectionValidator : GLib.Object {
         this.is_checking_server_and_auth = true;
 
         // Lookup system proxy in a thread https://github.com/owncloud/client/issues/2993
-        if (ClientProxy.is_using_system_default ()) {
+        if (LibSync.ClientProxy.is_using_system_default ()) {
             GLib.debug ("Trying to look up system proxy.");
-            ClientProxy.lookup_system_proxy_async (this.account.url,
+            LibSync.ClientProxy.lookup_system_proxy_async (this.account.url,
                 this, SLOT (on_signal_system_proxy_lookup_done (Soup.NetworkProxy)));
         } else {
-            // We want to reset the Soup.Session proxy so that the global proxy settings are used (via ClientProxy settings)
+            // We want to reset the Soup.Session proxy so that the global proxy settings are used (via LibSync.ClientProxy settings)
             this.account.network_access_manager.proxy (Soup.NetworkProxy (Soup.NetworkProxy.DefaultProxy));
             // use a queued invocation so we're as asynchronous as with the other code path
             GLib.Object.invoke_method (this, "on_signal_actual_check", GLib.QueuedConnection);
@@ -178,7 +178,7 @@ public class ConnectionValidator : GLib.Object {
         }
 
         if (proxy.type () != Soup.NetworkProxy.NoProxy) {
-            GLib.info ("Setting Soup.Session proxy to be system proxy " + ClientProxy.print_q_network_proxy (proxy));
+            GLib.info ("Setting Soup.Session proxy to be system proxy " + LibSync.ClientProxy.print_q_network_proxy (proxy));
         } else {
             GLib.info ("No system proxy set by OS.");
         }
@@ -222,7 +222,7 @@ public class ConnectionValidator : GLib.Object {
     Formerly the same name as on_signal_check_server_and_auth
     ***********************************************************/
     protected void on_signal_actual_check () {
-        var check_job = new CheckServerJob (this.account, this);
+        var check_job = new LibSync.CheckServerJob (this.account, this);
         check_job.on_signal_timeout (TIMEOUT_TO_USE_MILLISECONDS);
         check_job.ignore_credential_failure (true);
         check_job.signal_instance_found.connect (
@@ -244,12 +244,12 @@ public class ConnectionValidator : GLib.Object {
         // Newer servers don't disclose any version in status.php anymore
         // https://github.com/owncloud/core/pull/27473/files
         // so this string can be empty.
-        string server_version = CheckServerJob.version (info);
+        string server_version = LibSync.CheckServerJob.version (info);
 
         // status.php was found.
         GLib.info ("** Application: ownCloud found: "
                   + url.to_string () + " with version "
-                  + CheckServerJob.version_string (info)
+                  + LibSync.CheckServerJob.version_string (info)
                   + " (" + server_version + ")");
 
         // Update server url in case of redirection
@@ -278,7 +278,7 @@ public class ConnectionValidator : GLib.Object {
     /***********************************************************
     status.php could not be loaded (network or server issue!).
     ***********************************************************/
-    protected void on_signal_no_status_found (CheckServerJob check_server_job, GLib.InputStream reply) {
+    protected void on_signal_no_status_found (LibSync.CheckServerJob check_server_job, GLib.InputStream reply) {
         GLib.warning (reply.error + check_server_job.error_string + reply.peek (1024));
         if (reply.error == GLib.InputStream.SslHandshakeFailedError) {
             report_result (SslError);
@@ -457,7 +457,7 @@ public class ConnectionValidator : GLib.Object {
         // Actual decision if we should use HTTP/2 is done in Soup.ClientContext.create_request
         // Sender doesn't work because this is not actually called
         // by a signal.
-        //  var abstract_network_job = (AbstractNetworkJob) sender ();
+        //  var abstract_network_job = (LibSync.AbstractNetworkJob) sender ();
         //  if (abstract_network_job) {
         //      if (abstract_network_job.input_stream) {
         //          this.account.http2_supported (

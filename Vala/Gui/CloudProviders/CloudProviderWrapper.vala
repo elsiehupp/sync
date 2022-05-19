@@ -272,7 +272,7 @@ public class CloudProviderWrapper : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_update_progress (string folder_connection, ProgressInfo progress) {
+    public void on_signal_update_progress (string folder_connection, LibSync.ProgressInfo progress) {
         // Only update progress for the current folder_connection
         FolderConnection f = FolderManager.instance.folder_connection (folder_connection);
         if (f != this.folder_connection) {

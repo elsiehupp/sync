@@ -58,8 +58,8 @@ public abstract class AbstractTestSyncConflict : GLib.Object {
     }
 
 
-    protected static SyncJournalFileRecord database_record (FakeFolder folder, string path) {
-        SyncJournalFileRecord record;
+    protected static Common.SyncJournalFileRecord database_record (FakeFolder folder, string path) {
+        Common.SyncJournalFileRecord record;
         folder.sync_journal ().get_file_record (path, record);
         return record;
     }

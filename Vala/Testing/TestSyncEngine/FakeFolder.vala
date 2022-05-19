@@ -191,7 +191,7 @@ public class FakeFolder : GLib.Object {
     }
 
 
-    private void database_record_filter (SyncJournalFileRecord record) {
+    private void database_record_filter (Common.SyncJournalFileRecord record) {
         var components = new PathComponents (record.path);
         var parent_directory = find_or_create_directories (result, components.parent_directory_components ());
         var name = components.filename ();

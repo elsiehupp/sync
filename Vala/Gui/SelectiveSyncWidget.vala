@@ -166,7 +166,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
     ***********************************************************/
     public void folder_info (
         string folder_path, string root_name,
-        GLib.List<string> old_block_list = GLib.List<string> ()) {
+        GLib.List<string> old_block_list = new GLib.List<string> ()) {
         this.folder_path = folder_path;
         if (this.folder_path.has_prefix ("/")) {
             // remove leading "/"
@@ -214,7 +214,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
         // Since / cannot be in the blocklist, expand it to the actual
         // list of top-level folders as soon as possible.
-        if (this.old_block_list == GLib.List<string> ("/")) {
+        if (this.old_block_list == new GLib.List<string> ("/")) {
             this.old_block_list = "";
             foreach (string path, list) {
                 path.remove (path_to_remove);
@@ -403,8 +403,9 @@ public class SelectiveSyncWidget : Gtk.Widget {
         this.encrypted_paths = "";
 
         var lscol_job = new LibSync.LscolJob (this.account, this.folder_path, this);
-        var props = GLib.List<string> ("resourcetype"
-                                         + "http://owncloud.org/ns:size";
+        var props = new GLib.List<string> ();
+        props.append ("resourcetype");
+        props.append ("http://owncloud.org/ns:size");
         if (this.account.capabilities.client_side_encryption_available) {
             props + "http://nextcloud.org/ns:is-encrypted";
         }

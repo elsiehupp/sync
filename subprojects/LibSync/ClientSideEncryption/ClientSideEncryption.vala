@@ -272,7 +272,7 @@ public class ClientSideEncryption : GLib.Object {
     ***********************************************************/
     private void on_signal_public_key_fetched (Job incoming) {
         var read_job = (ReadPasswordJob)incoming;
-        var account = read_job.property (ACCOUNT_PROPERTY).value<unowned Account> ();
+        var account = read_job.property (ACCOUNT_PROPERTY).value<Account> ();
         GLib.assert (account);
 
         // Error or no valid public key error out
@@ -313,7 +313,7 @@ public class ClientSideEncryption : GLib.Object {
     ***********************************************************/
     private void on_signal_private_key_fetched (Secret.Collection.Job incoming) {
         var read_job = (ReadPasswordJob)incoming;
-        var account = read_job.property (ACCOUNT_PROPERTY).value<unowned Account> ();
+        var account = read_job.property (ACCOUNT_PROPERTY).value<Account> ();
         GLib.assert (account);
 
         // Error or no valid public key error out
@@ -355,7 +355,7 @@ public class ClientSideEncryption : GLib.Object {
     ***********************************************************/
     private void on_signal_mnemonic_key_fetched (Secret.Collection.Job incoming) {
         var read_job = (ReadPasswordJob)incoming;
-        var account = read_job.property (ACCOUNT_PROPERTY).value<unowned Account> ();
+        var account = read_job.property (ACCOUNT_PROPERTY).value<Account> ();
         GLib.assert (account);
 
         // Error or no valid public key error out

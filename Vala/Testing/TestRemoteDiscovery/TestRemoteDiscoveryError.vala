@@ -36,7 +36,7 @@ public class TestRemoteDiscoveryError : GLib.Object {
         fake_folder.set_server_override (this.override_delegate_remote_error);
 
         // So the test that test timeout finishes fast
-        GLib.ScopedValueRollback<int> set_http_timeout = new GLib.ScopedValueRollback<int> (AbstractNetworkJob.http_timeout, error_kind == Timeout ? 1 : 10000);
+        GLib.ScopedValueRollback<int> set_http_timeout = new GLib.ScopedValueRollback<int> (LibSync.AbstractNetworkJob.http_timeout, error_kind == Timeout ? 1 : 10000);
 
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
         GLib.SignalSpy error_spy = new GLib.SignalSpy (

@@ -58,7 +58,7 @@ public class PropagateLocalRename : AbstractPropagateItemJob {
             }
         }
 
-        SyncJournalFileRecord old_record;
+        Common.SyncJournalFileRecord old_record;
         this.propagator.journal.get_file_record (this.item.original_file, old_record);
         this.propagator.journal.delete_file_record (this.item.original_file);
 

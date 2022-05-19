@@ -11,10 +11,10 @@ public class TestPushNotificationsAvailable_PushNotificationsForFilesAvailableRe
         GLib.List<string> type_list = new GLib.List<string> ();
         type_list.append ("files");
 
-        GLib.VariantMap notify_push_map;
+        GLib.HashMap notify_push_map;
         notify_push_map["type"] = type_list;
 
-        GLib.VariantMap capabilities_map;
+        GLib.HashMap capabilities_map;
         capabilities_map["notify_push"] = notify_push_map;
 
         var capabilities = new LibSync.Capabilities (capabilities_map);

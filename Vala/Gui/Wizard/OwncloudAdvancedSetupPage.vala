@@ -410,7 +410,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_quota_retrieved (GLib.VariantMap result) {
+    private void on_signal_quota_retrieved (GLib.HashMap result) {
         this.r_size = result["size"].to_double ();
         this.instance.l_sync_everything_size_label.on_signal_text (_(" (%1)").printf (Utility.octets_to_string (this.r_size)));
 

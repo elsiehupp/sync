@@ -25,7 +25,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
     /***********************************************************
     Nested files and folders
     ***********************************************************/
-    private GLib.HashTable<string, SyncJournalFileRecord> nested_items;
+    private GLib.HashTable<string, Common.SyncJournalFileRecord> nested_items;
 
     /***********************************************************
     ***********************************************************/
@@ -54,7 +54,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
     }
 
 
-    private void result_list_filter (SyncJournalFileRecord record) {
+    private void result_list_filter (Common.SyncJournalFileRecord record) {
         this.nested_items[record.e2e_mangled_name] = record;
     }
 

@@ -181,7 +181,7 @@ public class ShareLinkWidget : Gtk.Widget {
         } else {
             expire_date = GLib.Date ();
         }
-        SharePermissions share_permissions = this.link_share.permissions;
+        Share.Permissions share_permissions = this.link_share.permissions;
         var checked = false;
         var permissions_group = new GLib.ActionGroup (this);
 
@@ -354,7 +354,7 @@ public class ShareLinkWidget : Gtk.Widget {
         LibSync.Account account,
         string share_path,
         string local_path,
-        SharePermissions max_sharing_permissions,
+        Share.Permissions max_sharing_permissions,
         Gtk.Widget parent = new Gtk.Widget ()
     ) {
         base (parent);
@@ -434,7 +434,7 @@ public class ShareLinkWidget : Gtk.Widget {
     ***********************************************************/
     public void on_signal_link_context_menu_action_triggered (GLib.Action action) {
         var state = action.is_checked ();
-        SharePermissions share_permissions = SharePermissionRead;
+        Share.Permissions share_permissions = SharePermissionRead;
 
         if (action == this.add_another_link_action) {
             signal_create_link_share ();

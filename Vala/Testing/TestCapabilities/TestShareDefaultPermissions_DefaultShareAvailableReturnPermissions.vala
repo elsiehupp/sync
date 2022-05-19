@@ -8,11 +8,11 @@ public class TestShareDefaultPermissions_DefaultShareAvailableReturnPermissions 
     /***********************************************************
     ***********************************************************/
     private TestShareDefaultPermissions_DefaultShareAvailableReturnPermissions () {
-        GLib.VariantMap file_sharing_map;
+        GLib.HashMap file_sharing_map;
         file_sharing_map["api_enabled"] = true;
         file_sharing_map["default_permissions"] = 31;
 
-        GLib.VariantMap capabilities_map;
+        GLib.HashMap capabilities_map;
         capabilities_map["files_sharing"] = file_sharing_map;
 
         Capabilities capabilities = new Capabilities (capabilities_map);

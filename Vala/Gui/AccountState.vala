@@ -449,7 +449,7 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
             // disconnected.
             account.reset_network_access_manager ();
 
-            // If we don't reset the ssl config a second CheckServerJob can produce a
+            // If we don't reset the ssl config a second LibSync.CheckServerJob can produce a
             // ssl config that does not have a sensible certificate chain.
             account.ssl_configuration (GLib.SslConfiguration ());
             //  #endif

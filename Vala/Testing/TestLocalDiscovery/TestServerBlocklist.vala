@@ -17,7 +17,7 @@ public class TestServerBlocklist : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         fake_folder.sync_engine.account.set_capabilities (
-            { { "files", new GLib.VariantMap ( { "blocklisted_files", new GLib.VariantList ( ".foo", "bar" ) } ) } });
+            { { "files", new GLib.HashMap ( { "blocklisted_files", new GLib.VariantList ( ".foo", "bar" ) } ) } });
         fake_folder.local_modifier.insert ("C/.foo");
         fake_folder.local_modifier.insert ("C/bar");
         fake_folder.local_modifier.insert ("C/moo");

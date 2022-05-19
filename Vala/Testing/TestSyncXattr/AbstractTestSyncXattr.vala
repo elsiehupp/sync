@@ -20,8 +20,8 @@ public abstract class AbstractTestSyncXAttr : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected static SyncJournalFileRecord database_record (FakeFolder folder, string path) {
-        SyncJournalFileRecord record;
+    protected static Common.SyncJournalFileRecord database_record (FakeFolder folder, string path) {
+        Common.SyncJournalFileRecord record;
         folder.sync_journal ().get_file_record (path, record);
         return record;
     }
@@ -31,7 +31,7 @@ public abstract class AbstractTestSyncXAttr : GLib.Object {
     ***********************************************************/
     protected static void trigger_download (FakeFolder folder, string path) {
         var journal = folder.sync_journal ();
-        SyncJournalFileRecord record;
+        Common.SyncJournalFileRecord record;
         journal.get_file_record (path, record);
         if (!record.is_valid)
             return;
@@ -45,7 +45,7 @@ public abstract class AbstractTestSyncXAttr : GLib.Object {
     ***********************************************************/
     protected static void mark_for_dehydration (FakeFolder folder, string path) {
         var journal = folder.sync_journal ();
-        SyncJournalFileRecord record;
+        Common.SyncJournalFileRecord record;
         journal.get_file_record (path, record);
         if (!record.is_valid)
             return;

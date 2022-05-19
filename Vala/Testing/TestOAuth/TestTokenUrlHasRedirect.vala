@@ -40,7 +40,7 @@ class TestTokenUrlHasRedirect : AbstractTestOAuth {
             return reply;
         } else {
             // ^^ This is with a custom reply and not actually HTTP, so we're testing the HTTP redirect code
-            // we have in AbstractNetworkJob.on_signal_finished ()
+            // we have in LibSync.AbstractNetworkJob.on_signal_finished ()
             redirects_done++;
             return AbstractTestOAuth.token_reply (operation, request);
         }

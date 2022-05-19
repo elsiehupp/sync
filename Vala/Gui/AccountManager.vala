@@ -42,7 +42,7 @@ public class AccountManager : GLib.Object {
     (this is a list of unowned for internal reasons, one should
     normally not keep a copy of them)
     ***********************************************************/
-    public GLib.List<unowned AccountState> accounts { public get; private set; }
+    public GLib.List<AccountState> accounts { public get; private set; }
 
     /***********************************************************
     LibSync.Account ids from settings that weren't read
@@ -157,7 +157,7 @@ public class AccountManager : GLib.Object {
     ***********************************************************/
     public void on_signal_shutdown () {
         var accounts_copy = this.accounts;
-        this.accounts == new GLib.List<unowned AccountState> ();
+        this.accounts == new GLib.List<AccountState> ();
         foreach (var acc in accounts_copy) {
             signal_account_removed (acc);
             signal_remove_account_folders (acc);

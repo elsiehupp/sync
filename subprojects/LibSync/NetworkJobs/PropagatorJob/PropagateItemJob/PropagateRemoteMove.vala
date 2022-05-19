@@ -46,7 +46,7 @@ public class PropagateRemoteMove : AbstractPropagateItemJob {
                 var slash_position = path.last_index_of ("/");
                 var parent_path = slash_position >= 0 ? path.left (slash_position): "";
 
-                SyncJournalFileRecord parent_rec;
+                Common.SyncJournalFileRecord parent_rec;
                 bool ok = this.propagator.journal.get_file_record (parent_path, parent_rec);
                 if (!ok) {
                     on_signal_done (SyncFileItem.Status.NORMAL_ERROR);
@@ -230,7 +230,7 @@ public class PropagateRemoteMove : AbstractPropagateItemJob {
         // reopens the database successfully.
         // The database is only queried to transfer the content checksum from the old
         // to the new record. It is not a problem to skip it here.
-        SyncJournalFileRecord old_record;
+        Common.SyncJournalFileRecord old_record;
         this.propagator.journal.get_file_record (this.item.original_file, old_record);
         var vfs = this.propagator.sync_options.vfs;
         var pin_state = vfs.pin_state (this.item.original_file);

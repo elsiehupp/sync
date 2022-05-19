@@ -121,7 +121,7 @@ public class SyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_about_to_propagate (GLib.List<unowned SyncFileItem> items) {
+    private void on_signal_about_to_propagate (GLib.List<SyncFileItem> items) {
         //  GLib.assert_true (this.sync_count == "");
 
         ProblemsMap old_problems;
@@ -379,7 +379,7 @@ public class SyncFileStatusTracker : GLib.Object {
             return Common.SyncFileStatus.SyncFileStatusTag.STATUS_SYNC;
 
         // First look it up in the database to know if it's shared
-        SyncJournalFileRecord sync_journal_file_record;
+        Common.SyncJournalFileRecord sync_journal_file_record;
         if (this.sync_engine.journal.get_file_record (relative_path, sync_journal_file_record) && sync_journal_file_record.is_valid) {
             return this.resolve_sync_and_error_status (relative_path, sync_journal_file_record.remote_permissions.has_permission (Common.RemotePermissions.Permissions.IS_SHARED) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED);
         }

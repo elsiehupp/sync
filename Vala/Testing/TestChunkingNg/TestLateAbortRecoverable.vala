@@ -16,7 +16,7 @@ public class TestLateAbortRecoverable : AbstractTestChunkingNg {
     ***********************************************************/
     private TestLateAbortRecoverable () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.VariantMap ( { "chunking", "1.0" } ) }, { "checksums", new GLib.VariantMap ( { "supportedTypes", { "SHA1" } } ) } });
+        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.HashMap ( { "chunking", "1.0" } ) }, { "checksums", new GLib.HashMap ( { "supportedTypes", { "SHA1" } } ) } });
         int size = 15 * 1000 * 1000; // 15 MB
         set_chunk_size (fake_folder.sync_engine, 1 * 1000 * 1000);
 

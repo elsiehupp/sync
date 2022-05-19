@@ -8,7 +8,7 @@ public class TestUserStatus_UserStatusNotInCapabilitiesReturnFalse : GLib.Object
     /***********************************************************
     ***********************************************************/
     private TestUserStatus_UserStatusNotInCapabilitiesReturnFalse () {
-        GLib.VariantMap capabilities_map;
+        GLib.HashMap capabilities_map;
 
         Capabilities capabilities = new Capabilities (capabilities_map);
 

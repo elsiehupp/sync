@@ -12,7 +12,7 @@ public class ShareeModel : GLib.Object {
     /***********************************************************
     FIXME: make it a GLib.List<Sharee> when Sharee can be compared
     ***********************************************************/
-    public class ShareeSet : GLib.List<unowned Sharee> { }
+    public class ShareeSet : GLib.List<Sharee> { }
 
     /***********************************************************
     ***********************************************************/
@@ -41,8 +41,8 @@ public class ShareeModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.List<unowned Sharee> sharees;
-    private GLib.List<unowned Sharee> sharee_blocklist;
+    private GLib.List<Sharee> sharees;
+    private GLib.List<Sharee> sharee_blocklist;
 
     internal signal void signal_sharees_ready ();
     internal signal void signal_display_error_message (int code, string value);
@@ -92,11 +92,11 @@ public class ShareeModel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_sharees_fetched (GLib.JsonDocument reply) {
-        GLib.List<unowned Sharee> new_sharees;
+        GLib.List<Sharee> new_sharees;
         {
             GLib.List<string> sharee_types {"users", "groups", "emails", "remotes", "circles", "rooms"};
 
-            var append_sharees = [this, sharee_types] (Json.Object data, GLib.List<unowned Sharee>& out) {
+            var append_sharees = [this, sharee_types] (Json.Object data, GLib.List<Sharee>& out) {
                 for (var sharee_type : sharee_types) {
                     var category = data.value (sharee_type).to_array ();
                     for (var sharee : category) {
@@ -110,7 +110,7 @@ public class ShareeModel : GLib.Object {
         }
 
         // Filter sharees that we have already shared with
-        GLib.List<unowned Sharee> filtered_sharees;
+        GLib.List<Sharee> filtered_sharees;
         foreach (var sharee, new_sharees) {
             bool found = false;
             foreach (var blocklist_sharee, this.sharee_blocklist) {
@@ -135,10 +135,10 @@ public class ShareeModel : GLib.Object {
 
     Do that while preserving the model index so the selection stays
     ***********************************************************/
-    private void new_sharees (GLib.List<unowned Sharee> new_sharees) {
+    private void new_sharees (GLib.List<Sharee> new_sharees) {
         layout_about_to_be_changed ();
         var persistent = persistent_index_list ();
-        GLib.List<unowned Sharee> old_persistant_sharee;
+        GLib.List<Sharee> old_persistant_sharee;
         old_persistant_sharee.reserve (persistent.size ());
 
         std.transform (persistent.begin (), persistent.end (), std.back_inserter (old_persistant_sharee),
@@ -221,7 +221,7 @@ public class ShareeModel : GLib.Object {
     Helper function for new_sharees (could be a lambda when we can use them)
     ***********************************************************/
     private static unowned Sharee sharee_from_model_index (GLib.ModelIndex index) {
-        return index.data (GLib.USER_ROLE).value<unowned Sharee> ();
+        return index.data (GLib.USER_ROLE).value<Sharee> ();
     }
 
 } // class ShareeModel

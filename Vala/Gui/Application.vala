@@ -136,7 +136,7 @@ public class Application : GLib.Application {
 
     /***********************************************************
     ***********************************************************/
-    private ClientProxy proxy;
+    private LibSync.ClientProxy proxy;
 
     /***********************************************************
     ***********************************************************/
@@ -252,8 +252,8 @@ public class Application : GLib.Application {
 
         LibSync.ConfigFile config;
         // The timeout is initialized with an environment variable, if not, override with the value from the config
-        if (!AbstractNetworkJob.http_timeout) {
-            AbstractNetworkJob.http_timeout = config.timeout ();
+        if (!LibSync.AbstractNetworkJob.http_timeout) {
+            LibSync.AbstractNetworkJob.http_timeout = config.timeout ();
         }
         // Check vfs plugins
         if (LibSync.Theme.show_virtual_files_option && this.best_available_vfs_mode == Common.AbstractVfs.Off) {

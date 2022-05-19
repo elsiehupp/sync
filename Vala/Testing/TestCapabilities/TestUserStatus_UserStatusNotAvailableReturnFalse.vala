@@ -8,10 +8,10 @@ public class TestUserStatus_UserStatusNotAvailableReturnFalse : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private TestUserStatus_UserStatusNotAvailableReturnFalse () {
-        GLib.VariantMap user_status_map;
+        GLib.HashMap user_status_map;
         user_status_map["enabled"] = false;
 
-        GLib.VariantMap capabilities_map;
+        GLib.HashMap capabilities_map;
         capabilities_map["user_status"] = user_status_map;
 
         Capabilities capabilities = new Capabilities (capabilities_map);

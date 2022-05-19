@@ -1213,7 +1213,7 @@ public class AccountSettings : Gtk.Widget {
 
             // It might be an E2EE mangled path, so let's try to demangle it
             var journal = info.folder_connection.journal_database;
-            SyncJournalFileRecord record;
+            Common.SyncJournalFileRecord record;
             journal.file_record_by_e2e_mangled_name (remote_path, record);
 
             string path = record.is_valid ? record.path : remote_path;

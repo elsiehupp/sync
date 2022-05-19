@@ -390,7 +390,7 @@ public class Account : GLib.Object {
         this.http2_supported = false;
         this.push_notifications = null;
         this.is_remote_wipe_requested_HACK = false;
-        //  q_register_meta_type<unowned Account> ("unowned Account");
+        //  q_register_meta_type<Account> ("unowned Account");
         //  q_register_meta_type<Account> ("Account*");
 
         this.push_notifications_reconnect_timer_active = true;

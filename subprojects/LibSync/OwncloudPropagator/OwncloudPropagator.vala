@@ -166,7 +166,7 @@ public class OwncloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void start (GLib.List<unowned SyncFileItem> synced_items) {
+    public void start (GLib.List<SyncFileItem> synced_items) {
         GLib.assert (std.is_sorted (synced_items.begin (), synced_items.end ()));
 
         // This builds all the jobs needed for the propagation.
@@ -299,7 +299,7 @@ public class OwncloudPropagator : GLib.Object {
         GLib.List<GLib.Pair<string, PropagateDirectory>> directories, // should be a LIFO stack
         GLib.List<AbstractPropagatorJob> directories_to_remove,
         string removed_directory,
-        GLib.List<unowned SyncFileItem> synced_items) {
+        GLib.List<SyncFileItem> synced_items) {
         var directory_propagation_job = std.make_unique<PropagateDirectory> (this, item);
 
         if (item.instruction == CSync.SyncInstructions.TYPE_CHANGE
@@ -663,7 +663,7 @@ public class OwncloudPropagator : GLib.Object {
         conflict_record.base_modtime = item.previous_modtime;
         conflict_record.initial_base_path = item.file.to_utf8 ();
 
-        SyncJournalFileRecord base_record;
+        Common.SyncJournalFileRecord base_record;
         if (this.journal.get_file_record (item.original_file, base_record) && base_record.is_valid) {
             conflict_record.base_etag = base_record.etag;
             conflict_record.base_file_id = base_record.file_id;
@@ -757,7 +757,7 @@ public class OwncloudPropagator : GLib.Object {
     /***********************************************************
     Q_REQUIRED_RESULT
     ***********************************************************/
-    public GLib.Deque<unowned SyncFileItem> delayed_tasks () {
+    public GLib.Deque<SyncFileItem> delayed_tasks () {
         return this.delayed_tasks;
     }
 

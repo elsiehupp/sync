@@ -152,12 +152,12 @@ public class OwncloudSetupWizard : GLib.Object {
         account.network_access_manager.clear_access_cache ();
 
         // Lookup system proxy in a thread https://github.com/owncloud/client/issues/2993
-        if (ClientProxy.is_using_system_default ()) {
+        if (LibSync.ClientProxy.is_using_system_default ()) {
             GLib.debug ("Trying to look up system proxy.");
-            ClientProxy.lookup_system_proxy_async (account.url,
+            LibSync.ClientProxy.lookup_system_proxy_async (account.url,
                 this, SLOT (on_signal_system_proxy_lookup_done (Soup.NetworkProxy)));
         } else {
-            // We want to reset the Soup.Session proxy so that the global proxy settings are used (via ClientProxy settings)
+            // We want to reset the Soup.Session proxy so that the global proxy settings are used (via LibSync.ClientProxy settings)
             account.network_access_manager.proxy (Soup.NetworkProxy (Soup.NetworkProxy.DefaultProxy));
             // use a queued invocation so we're as asynchronous as with the other code path
             GLib.Object.invoke_method (this, "on_signal_find_server", GLib.QueuedConnection);
@@ -174,14 +174,14 @@ public class OwncloudSetupWizard : GLib.Object {
         account.credentials (CredentialsFactory.create ("dummy"));
 
         // Determining the actual server URL can be a multi-stage process
-        // 1. Check url/status.php with CheckServerJob
+        // 1. Check url/status.php with LibSync.CheckServerJob
         //    If that works we're done. In that case we don't check the
         //    url directly for redirects, see #5954.
         // 2. Check the url for permanent redirects (like url shorteners)
-        // 3. Check redirected-url/status.php with CheckServerJob
+        // 3. Check redirected-url/status.php with LibSync.CheckServerJob
 
         // Step 1: Check url/status.php
-        var check_server_job = new CheckServerJob (account, this);
+        var check_server_job = new LibSync.CheckServerJob (account, this);
         check_server_job.ignore_credential_failure (true);
         check_server_job.signal_instance_found.connect (
             this.on_signal_found_server
@@ -236,7 +236,7 @@ public class OwncloudSetupWizard : GLib.Object {
 
 
     private void on_redirect_check_job_finished (LibSync.Account account) {
-        var check_server_job = new CheckServerJob (account, this);
+        var check_server_job = new LibSync.CheckServerJob (account, this);
         check_server_job.ignore_credential_failure (true);
         check_server_job.signal_instance_found.connect (
             this.on_signal_found_server
@@ -255,12 +255,12 @@ public class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_found_server (GLib.Uri url, Json.Object info) {
-        var server_version = CheckServerJob.version (info);
+        var server_version = LibSync.CheckServerJob.version (info);
 
         this.oc_wizard.on_signal_append_to_configuration_log (_("<font color=\"green\">Successfully connected to %1 : %2 version %3 (%4)</font><br/><br/>")
                                                 .printf (Utility.escape (url.to_string ()),
                                                     Utility.escape (LibSync.Theme.app_name_gui),
-                                                    Utility.escape (CheckServerJob.version_string (info)),
+                                                    Utility.escape (LibSync.CheckServerJob.version_string (info)),
                                                     Utility.escape (server_version)),
                                                 OwncloudWizard.LogType.LOG_HTML);
 
@@ -281,7 +281,7 @@ public class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_no_server_found (GLib.InputStream reply) {
-        var check_server_job = (CheckServerJob)sender ();
+        var check_server_job = (LibSync.CheckServerJob)sender ();
 
         // Do this early because reply might be deleted in message box event loop
         string message;
@@ -588,7 +588,7 @@ public class OwncloudSetupWizard : GLib.Object {
     ***********************************************************/
     private void on_signal_system_proxy_lookup_done (Soup.NetworkProxy proxy) {
         if (proxy.type () != Soup.NetworkProxy.NoProxy) {
-            GLib.info ("Setting Soup.Session proxy to be system proxy " + ClientProxy.print_q_network_proxy (proxy));
+            GLib.info ("Setting Soup.Session proxy to be system proxy " + LibSync.ClientProxy.print_q_network_proxy (proxy));
         } else {
             GLib.info ("No system proxy set by OS.");
         }

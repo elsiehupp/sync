@@ -100,7 +100,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
         var slash_position = path.last_index_of ("/");
         var parent_path = slash_position >= 0 ? path.left (slash_position): "";
 
-        SyncJournalFileRecord parent_rec;
+        Common.SyncJournalFileRecord parent_rec;
         this.propagator.journal.get_file_record (parent_path, parent_rec);
 
         var account = this.propagator.account;
@@ -952,7 +952,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             // Path of the recalled file in the local folder
             string local_recalled_file = recalled_file.mid (folder_path.size ());
 
-            SyncJournalFileRecord record;
+            Common.SyncJournalFileRecord record;
             if (!journal.get_file_record (local_recalled_file, record) || !record.is_valid) {
                 GLib.warning ("No database entry for recall of " + local_recalled_file);
                 continue;

@@ -6,10 +6,10 @@ public class TestBulkUploadAvailable_UploadAvailableReturnTrue : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private TestBulkUploadAvailable_UploadAvailableReturnTrue () {
-        GLib.VariantMap bulkupload_map;
+        GLib.HashMap bulkupload_map;
         bulkupload_map["bulkupload"] = "1.0";
 
-        GLib.VariantMap capabilities_map;
+        GLib.HashMap capabilities_map;
         capabilities_map["dav"] = bulkupload_map;
 
         var capabilities = Capabilities (capabilities_map);

@@ -13,14 +13,14 @@ public class TestFileRecordChecksum : AbstractTestSyncJournalDB {
     Try with and without a checksum
     ***********************************************************/
     private TestFileRecordChecksum () {
-        SyncJournalFileRecord record = new SyncJournalFileRecord ();
+        Common.SyncJournalFileRecord record = new Common.SyncJournalFileRecord ();
         record.path = "foo-checksum";
         record.remote_permissions = Common.RemotePermissions.from_database_value (" ");
         record.checksum_header = "MD5:mychecksum";
         record.modtime = Utility.date_time_to_time_t (GLib.DateTime.current_date_time_utc ());
         GLib.assert_true (this.database.set_file_record (record));
 
-        SyncJournalFileRecord stored_record = new SyncJournalFileRecord ();
+        Common.SyncJournalFileRecord stored_record = new Common.SyncJournalFileRecord ();
         GLib.assert_true (this.database.get_file_record ("foo-checksum", stored_record));
         GLib.assert_true (stored_record.path == record.path);
         GLib.assert_true (stored_record.remote_permissions == record.remote_permissions);
@@ -33,14 +33,14 @@ public class TestFileRecordChecksum : AbstractTestSyncJournalDB {
         GLib.assert_true (stored_record.modtime == record.modtime);
         GLib.assert_true (stored_record == record);
 
-        record = new SyncJournalFileRecord ()
+        record = new Common.SyncJournalFileRecord ()
         record.path = "foo-nochecksum";
         record.remote_permissions = Common.RemotePermissions.from_database_value ("RW");
         record.modtime = Utility.date_time_to_time_t (GLib.DateTime.current_date_time_utc ());
 
         GLib.assert_true (this.database.set_file_record (record));
 
-        stored_record = new SyncJournalFileRecord ();
+        stored_record = new Common.SyncJournalFileRecord ();
         GLib.assert_true (this.database.get_file_record ("foo-nochecksum", stored_record));
         GLib.assert_true (stored_record == record);
     }

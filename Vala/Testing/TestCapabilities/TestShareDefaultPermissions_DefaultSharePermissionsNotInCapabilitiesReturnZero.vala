@@ -8,10 +8,10 @@ public class TestShareDefaultPermissions_DefaultSharePermissionsNotInCapabilitie
     /***********************************************************
     ***********************************************************/
     private TestShareDefaultPermissions_DefaultSharePermissionsNotInCapabilitiesReturnZero () {
-        GLib.VariantMap file_sharing_map;
+        GLib.HashMap file_sharing_map;
         file_sharing_map["api_enabled"] = false;
 
-        GLib.VariantMap capabilities_map;
+        GLib.HashMap capabilities_map;
         capabilities_map["files_sharing"] = file_sharing_map;
 
         Capabilities capabilities = new Capabilities (capabilities_map);

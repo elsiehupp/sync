@@ -64,9 +64,9 @@ public class TestMoveFailsInAConflict : GLib.Object {
     }
 
 
-    private void on_signal_sync_engine_transmission_progress (ProgressInfo progress_info) {
+    private void on_signal_sync_engine_transmission_progress (LibSync.ProgressInfo progress_info) {
         var propagator = fake_folder.sync_engine.propagator;
-        if (progress_info.status () != ProgressInfo.Status.PROPAGATION || prop_connected || !propagator)
+        if (progress_info.status () != LibSync.ProgressInfo.Status.PROPAGATION || prop_connected || !propagator)
             return;
         prop_connected = true;
         propagator.touched_file.connect (

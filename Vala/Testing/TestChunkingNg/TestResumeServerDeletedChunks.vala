@@ -14,7 +14,7 @@ public class TestResumeServerDeletedChunks : AbstractTestChunkingNg {
     private TestResumeServerDeletedChunks () {
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.VariantMap ({ "chunking", "1.0" }) } });
+        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.HashMap ({ "chunking", "1.0" }) } });
         int size = 30 * 1000 * 1000; // 30 MB
         set_chunk_size (fake_folder.sync_engine, 1 * 1000 * 1000);
         partial_upload (fake_folder, "A/a0", size);
@@ -50,15 +50,15 @@ public class TestResumeServerDeletedChunks : AbstractTestChunkingNg {
     private static void connection_dropped_before_etag_recieved () {
         GLib.FETCH (bool, chunking);
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.VariantMap ( { "chunking", "1.0" } ) }, { "checksums", new GLib.VariantMap ( { "supportedTypes", { "SHA1" } } ) } });
+        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.HashMap ( { "chunking", "1.0" } ) }, { "checksums", new GLib.HashMap ( { "supportedTypes", { "SHA1" } } ) } });
         int size = chunking ? 1 * 1000 * 1000 : 300;
         set_chunk_size (fake_folder.sync_engine, 300 * 1000);
 
         // Make the MOVE never reply, but trigger a client-on_signal_abort and apply the change remotely
         string checksum_header;
         int n_get = 0;
-        GLib.ScopedValueRollback<int> set_http_timeout = new GLib.ScopedValueRollback<int> (AbstractNetworkJob.http_timeout, 1);
-        int response_delay = AbstractNetworkJob.http_timeout * 1000 * 1000; // much bigger than http timeout (so a timeout will occur)
+        GLib.ScopedValueRollback<int> set_http_timeout = new GLib.ScopedValueRollback<int> (LibSync.AbstractNetworkJob.http_timeout, 1);
+        int response_delay = LibSync.AbstractNetworkJob.http_timeout * 1000 * 1000; // much bigger than http timeout (so a timeout will occur)
         // This will perform the operation on the server, but the reply will not come to the client
         fake_folder.set_server_override (this.override_delegate_connection_dropped);
 

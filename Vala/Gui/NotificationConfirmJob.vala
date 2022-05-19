@@ -19,7 +19,7 @@ the server. All the communication logic is handled in this
 public class.
 
 ***********************************************************/
-public class NotificationConfirmJob : AbstractNetworkJob {
+public class NotificationConfirmJob : LibSync.AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
@@ -66,7 +66,7 @@ public class NotificationConfirmJob : AbstractNetworkJob {
 
         send_request (this.verb, this.link, req);
 
-        AbstractNetworkJob.on_signal_start ();
+        LibSync.AbstractNetworkJob.on_signal_start ();
     }
 
 

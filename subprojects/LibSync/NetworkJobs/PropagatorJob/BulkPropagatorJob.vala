@@ -48,7 +48,7 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
     ***********************************************************/
     public BulkPropagatorJob (
         OwncloudPropagator propagator,
-        GLib.Deque<unowned SyncFileItem> items) {
+        GLib.Deque<SyncFileItem> items) {
         base (propagator);
         this.items = items;
         this.files_to_upload.reserve (BATCH_SIZE);

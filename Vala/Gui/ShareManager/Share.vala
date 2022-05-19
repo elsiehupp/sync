@@ -11,7 +11,7 @@ public class Share : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public class Permissions : SharePermissions {}
+    public class Permissions : Share.Permissions {}
 
     /***********************************************************
     Possible share types

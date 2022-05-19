@@ -72,7 +72,7 @@ public class TestForbiddenMoves : AbstractTestPermissions {
         lm.rename ("zallowed/sub2", "nocreatedir/zsub2");
 
         // also hook into discovery!!
-        GLib.List<unowned LibSync.SyncFileItem> discovery;
+        GLib.List<LibSync.SyncFileItem> discovery;
         fake_folder.sync_engine.signal_about_to_propagate.connect (
             this.on_signal_sync_engine_about_to_propagate
         );
@@ -137,7 +137,7 @@ public class TestForbiddenMoves : AbstractTestPermissions {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_sync_engine_about_to_propagate (GLib.List<unowned LibSync.SyncFileItem> *discovery, GLib.List<unowned LibSync.SyncFileItem> v) {
+    private void on_signal_sync_engine_about_to_propagate (GLib.List<LibSync.SyncFileItem> *discovery, GLib.List<LibSync.SyncFileItem> v) {
         discovery = *v;
     }
 

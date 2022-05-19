@@ -32,7 +32,7 @@ public class FakeSearchResultsStorage : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.VariantMap meta_success;
+    private GLib.HashMap meta_success;
 
     public class Provider : GLib.Object {
 
@@ -111,7 +111,7 @@ public class FakeSearchResultsStorage : GLib.Object {
         GLib.List<GLib.Variant> providers_list;
 
         foreach (var fake_provider_init_info in fake_providers_init_info) {
-            providers_list.push_back (new GLib.VariantMap ({
+            providers_list.push_back (new GLib.HashMap ({
                 {
                     "identifier", fake_provider_init_info.id
                 },
@@ -124,7 +124,7 @@ public class FakeSearchResultsStorage : GLib.Object {
             }));
         }
 
-        GLib.VariantMap ocs_map = new GLib.VariantMap (
+        GLib.HashMap ocs_map = new GLib.HashMap (
             {
                 "meta", this.meta_success
             },
@@ -134,7 +134,7 @@ public class FakeSearchResultsStorage : GLib.Object {
         );
 
         this.providers_response = GLib.JsonDocument.from_variant (
-            new GLib.VariantMap ({
+            new GLib.HashMap ({
                 {
                     "ocs", ocs_map
                 }
@@ -182,7 +182,7 @@ public class FakeSearchResultsStorage : GLib.Object {
         }
 
         foreach (var result in results) {
-            list.push_back (new GLib.VariantMap (
+            list.push_back (new GLib.HashMap (
                 {
                     "thumbnail_url", result.thumbnail_url
                 },
@@ -243,7 +243,7 @@ public class FakeSearchResultsStorage : GLib.Object {
         }
 
         if (search_term == "[empty]") {
-            GLib.VariantMap data_map = {
+            GLib.HashMap data_map = {
                 {
                     "name", this.search_results_data[provider_id].name
                 },
@@ -258,7 +258,7 @@ public class FakeSearchResultsStorage : GLib.Object {
                 }
             };
 
-            GLib.VariantMap ocs_map = {
+            GLib.HashMap ocs_map = {
                 {
                     "meta", this.meta_success
                 },
@@ -268,7 +268,7 @@ public class FakeSearchResultsStorage : GLib.Object {
             };
 
             return GLib.JsonDocument.from_variant (
-                new GLib.VariantMap (
+                new GLib.HashMap (
                     {
                         "ocs", ocs_map
                     }
@@ -280,7 +280,7 @@ public class FakeSearchResultsStorage : GLib.Object {
 
         var next_cursor = cursor + page_size;
 
-        GLib.VariantMap data_map = {
+        GLib.HashMap data_map = {
             {
                 "name", this.search_results_data[provider_id].name
             },
@@ -295,7 +295,7 @@ public class FakeSearchResultsStorage : GLib.Object {
             }
         };
 
-        GLib.VariantMap ocs_map = {
+        GLib.HashMap ocs_map = {
             {
                 "meta", this.meta_success
             },
@@ -305,7 +305,7 @@ public class FakeSearchResultsStorage : GLib.Object {
         };
 
         return new GLib.JsonDocument.from_variant (
-            new GLib.VariantMap (
+            new GLib.HashMap (
                 {
                     "ocs", ocs_map
                 }

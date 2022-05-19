@@ -152,14 +152,14 @@ public class FakeWebSocketServer : GLib.Object {
 
         string web_socket_url = "ws://localhost:12345";
 
-        GLib.VariantMap endpoints_map;
+        GLib.HashMap endpoints_map;
         endpoints_map["websocket"] = web_socket_url;
 
-        GLib.VariantMap notify_push_map;
+        GLib.HashMap notify_push_map;
         notify_push_map["type"] = type_list;
         notify_push_map["endpoints"] = endpoints_map;
 
-        GLib.VariantMap capabilities_map;
+        GLib.HashMap capabilities_map;
         capabilities_map["notify_push"] = notify_push_map;
 
         account.set_capabilities (capabilities_map);

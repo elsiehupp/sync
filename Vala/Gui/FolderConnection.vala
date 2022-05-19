@@ -858,7 +858,7 @@ public class FolderConnection : GLib.Object {
     internal signal void signal_sync_state_change ();
     internal signal void signal_sync_started ();
     internal signal void signal_sync_finished (LibSync.SyncResult result);
-    internal signal void signal_progress_info (ProgressInfo progress);
+    internal signal void signal_progress_info (LibSync.ProgressInfo progress);
     /***********************************************************
     A new folder bigger than the threshold was discovered
     ***********************************************************/
@@ -1107,7 +1107,7 @@ public class FolderConnection : GLib.Object {
         }
 
 
-        SyncJournalFileRecord record;
+        Common.SyncJournalFileRecord record;
         this.journal_database.file_record (relative_path_bytes, record);
         if (reason != ChangeReason.ChangeReason.UNLOCK) {
             // Check that the mtime/size actually changed or there was
@@ -1164,7 +1164,7 @@ public class FolderConnection : GLib.Object {
         GLib.info ("Implicitly hydrate virtual file: " + relative_path);
 
         // Set in the database that we should download the file
-        SyncJournalFileRecord record;
+        Common.SyncJournalFileRecord record;
         this.journal_database.file_record (relative_path.to_utf8 (), record);
         if (!record.is_valid) {
             GLib.info ("Did not find file in database.");
@@ -1309,7 +1309,7 @@ public class FolderConnection : GLib.Object {
     /***********************************************************
     Adds a error message that's not tied to a specific item.
     ***********************************************************/
-    private void on_signal_sync_error (string message, ErrorCategory category = ErrorCategory.NORMAL) {
+    private void on_signal_sync_error (string message, LibSync.ErrorCategory category = LibSync.ErrorCategory.NORMAL) {
         this.sync_result.append_error_string (message);
         ProgressDispatcher.instance.signal_sync_erroralias (), message, category);
     }
@@ -1326,7 +1326,7 @@ public class FolderConnection : GLib.Object {
     // the progress comes without a folder_connection and the valid path set. Add that here
     // and hand the result over to the progress dispatcher.
     ***********************************************************/
-    private void on_signal_transmission_progress (ProgressInfo progress_info) {
+    private void on_signal_transmission_progress (LibSync.ProgressInfo progress_info) {
         signal_progress_info (progress_info);
         ProgressDispatcher.instance.signal_progress_info (alias (), progress_info);
     }
@@ -1501,7 +1501,7 @@ public class FolderConnection : GLib.Object {
     /***********************************************************
     Warn users if they create a file or folder_connection that is selective-sync excluded
     ***********************************************************/
-    private void on_signal_warn_on_signal_new_excluded_item (SyncJournalFileRecord record, /* GLib.StringRef */ string path) {
+    private void on_signal_warn_on_signal_new_excluded_item (Common.SyncJournalFileRecord record, /* GLib.StringRef */ string path) {
         // Never warn for items in the database
         if (record.is_valid) {
             return;

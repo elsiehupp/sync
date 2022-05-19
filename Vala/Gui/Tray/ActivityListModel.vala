@@ -296,7 +296,7 @@ public class ActivityListModel : GLib.Object {
                 // If this is an E2EE file or folder_connection, pretend we got no path, this leads to
                 // hiding the share button which is what we want
                 if (folder_connection) {
-                    SyncJournalFileRecord record;
+                    Common.SyncJournalFileRecord record;
                     folder_connection.journal_database.file_record (activity.file.mid (1), record);
                     if (record.is_valid && (record.is_e2e_encrypted || !record.e2e_mangled_name == "")) {
                         return "";

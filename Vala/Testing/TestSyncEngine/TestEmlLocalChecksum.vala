@@ -50,7 +50,7 @@ public class TestEmlLocalChecksum : AbstractTestSyncEngine {
 
 
     private static string get_database_checksum (FakeFolder fake_folder, string path) {
-        SyncJournalFileRecord record;
+        Common.SyncJournalFileRecord record;
         fake_folder.sync_journal ().get_file_record (path, record);
         return record.checksum_header;
     }

@@ -15,7 +15,7 @@ public class TestResume4 : AbstractTestChunkingNg {
     ***********************************************************/
     private TestResume4 () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.VariantMap ({ "chunking", "1.0" }) } });
+        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.HashMap ({ "chunking", "1.0" }) } });
         int size = 30 * 1000 * 1000; // 30 MB
         set_chunk_size (fake_folder.sync_engine, 1 * 1000 * 1000);
 

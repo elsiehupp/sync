@@ -99,7 +99,7 @@ public class SocketUploadJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_sync_engine_sync_error (string error, ErrorCategory category) {
+    private void on_signal_sync_engine_sync_error (string error, LibSync.ErrorCategory category) {
         this.api_job.failure (error);
     }
 

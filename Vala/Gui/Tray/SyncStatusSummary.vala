@@ -188,7 +188,7 @@ public class SyncStatusSummary : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_folder_progress_info (ProgressInfo progress) {
+    private void on_signal_folder_progress_info (LibSync.ProgressInfo progress) {
         int64 completed_size = progress.completed_size ();
         int64 current_file = progress.current_file ();
         int64 completed_file = progress.completed_files ();

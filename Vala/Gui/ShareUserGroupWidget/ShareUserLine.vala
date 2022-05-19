@@ -44,7 +44,7 @@ public class ShareUserLine : Gtk.Widget {
     ***********************************************************/
     public ShareUserLine (LibSync.Account account,
         UserGroupShare Share,
-        SharePermissions max_sharing_permissions,
+        Share.Permissions max_sharing_permissions,
         bool is_file,
         Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);

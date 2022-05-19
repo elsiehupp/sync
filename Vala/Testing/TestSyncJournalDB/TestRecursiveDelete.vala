@@ -44,7 +44,7 @@ public class TestRecursiveDelete : AbstractTestSyncJournalDB {
 
 
     private void make_entry (string path) {
-        SyncJournalFileRecord record;
+        Common.SyncJournalFileRecord record;
         record.path = path;
         record.remote_permissions = Common.RemotePermissions.from_database_value ("RW");
         this.database.set_file_record (record);
@@ -55,7 +55,7 @@ public class TestRecursiveDelete : AbstractTestSyncJournalDB {
     private bool check_elements (GLib.List<string> elements) {
         bool ok = true;
         foreach (var element in elements) {
-            SyncJournalFileRecord record;
+            Common.SyncJournalFileRecord record;
             this.database.get_file_record (element, record);
             if (!record.is_valid) {
                 GLib.warning ("Missing record: " + element);

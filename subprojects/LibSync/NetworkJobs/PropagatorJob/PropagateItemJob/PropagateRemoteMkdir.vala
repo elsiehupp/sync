@@ -37,7 +37,7 @@ public class PropagateRemoteMkdir : AbstractPropagateItemJob {
         var slash_position = path.last_index_of ("/");
         var parent_path = slash_position >= 0 ? path.left (slash_position): "";
 
-        SyncJournalFileRecord parent_rec;
+        Common.SyncJournalFileRecord parent_rec;
         bool ok = propagator.journal.get_file_record (parent_path, parent_rec);
         if (!ok) {
             return;
@@ -104,7 +104,7 @@ public class PropagateRemoteMkdir : AbstractPropagateItemJob {
         var slash_position = path.last_index_of ("/");
         var parent_path = slash_position >= 0 ? path.left (slash_position): "";
 
-        SyncJournalFileRecord parent_rec;
+        Common.SyncJournalFileRecord parent_rec;
         bool ok = this.propagator.journal.get_file_record (parent_path, parent_rec);
         if (!ok) {
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR);

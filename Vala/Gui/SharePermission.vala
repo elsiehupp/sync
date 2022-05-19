@@ -18,8 +18,8 @@ enum Share_permission {
     Share_permission_share    = 1 << 4,
     Share_permission_default  = 1 << 30
 }
-// Q_DECLARE_FLAGS (SharePermissions, Share_permission)
-// Q_DECLARE_OPERATORS_FOR_FLAGS (SharePermissions)
+// Q_DECLARE_FLAGS (Share.Permissions, Share_permission)
+// Q_DECLARE_OPERATORS_FOR_FLAGS (Share.Permissions)
 
 } // namespace Occ
 

@@ -52,7 +52,7 @@ public class TestSyncFileItemProperties : AbstractTestSyncEngine {
     }
 
 
-    private void on_signal_sync_engine_about_to_propagate (GLib.List<unowned LibSync.SyncFileItem> items) {
+    private void on_signal_sync_engine_about_to_propagate (GLib.List<LibSync.SyncFileItem> items) {
         LibSync.SyncFileItem a1, b1, c1;
         foreach (var item in items) {
             if (item.file == "A/a1") {
