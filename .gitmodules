@@ -1,4 +1,0 @@
-[submodule "gpseq"]
-	path = subprojects/gpseq
-	url = git@gitlab.com:kosmospredanie/gpseq.git
-	branch = tag/0.3.3
