@@ -539,7 +539,7 @@ public class Utility : GLib.Object {
     ***********************************************************/
     public static bool fs_case_preserving_override {
         public get {
-            string env = qgetenv ("OWNCLOUD_TEST_CASE_PRESERVING");
+            string env = GLib.Environment.get_variable ("OWNCLOUD_TEST_CASE_PRESERVING");
             if (!env == "") {
                 return env.to_int ();
             }

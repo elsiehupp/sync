@@ -1318,7 +1318,7 @@ public class Theme : GLib.Object {
                     continue;
                 }
                 // HACK, get rid of it by supporting FDO icon themes, this is really just emulating ubuntu-mono
-                if (qgetenv ("DESKTOP_SESSION") == "ubuntu") {
+                if (GLib.Environment.get_variable ("DESKTOP_SESSION") == "ubuntu") {
                     GLib.Bitmap mask = px.create_mask_from_color (GLib.white, GLib.MaskOutColor);
                     GLib.Painter p = new GLib.Painter (px);
                     p.pen (Gdk.RGBA ("#dfdbd2"));

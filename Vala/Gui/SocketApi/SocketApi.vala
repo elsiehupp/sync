@@ -83,7 +83,7 @@ public class SocketApi : GLib.Object {
                 = " (\\.\pipe\)"
                 + Common.Config.APPLICATION_EXECUTABLE
                 + "-"
-                + qgetenv ("USERNAME");
+                + GLib.Environment.get_variable ("USERNAME");
             // TODO: once the windows extension supports multiple
             // client connections, switch back to the theme name
             // See issue #2388

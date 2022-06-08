@@ -180,7 +180,7 @@ public class Capabilities : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool chunking_ng () {
-        var chunkng = qgetenv ("OWNCLOUD_CHUNKING_NG");
+        var chunkng = GLib.Environment.get_variable ("OWNCLOUD_CHUNKING_NG");
         if (chunkng == "0")
             return false;
         if (chunkng == "1")

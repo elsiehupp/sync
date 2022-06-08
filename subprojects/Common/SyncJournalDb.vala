@@ -429,7 +429,7 @@ public class SyncJournalDb : GLib.Object {
         /***********************************************************
         Allow forcing the journal mode for debugging
         ***********************************************************/
-        /*static*/ string env_journal_mode = qgetenv ("OWNCLOUD_Sqlite.JOURNAL_MODE");
+        /*static*/ string env_journal_mode = GLib.Environment.get_variable ("OWNCLOUD_Sqlite.JOURNAL_MODE");
         this.journal_mode = env_journal_mode;
         if (this.journal_mode == "") {
             this.journal_mode = default_journal_mode (this.database_file);
@@ -2731,7 +2731,7 @@ public class SyncJournalDb : GLib.Object {
         /***********************************************************
         Set locking mode to avoid issues with WAL on Windows
         ***********************************************************/
-        string locking_mode_env = qgetenv ("OWNCLOUD_Sqlite.LOCKING_MODE");
+        string locking_mode_env = GLib.Environment.get_variable ("OWNCLOUD_Sqlite.LOCKING_MODE");
         if (locking_mode_env == "") {
             locking_mode_env = "EXCLUSIVE";
         }
@@ -2754,7 +2754,7 @@ public class SyncJournalDb : GLib.Object {
         /***********************************************************
         For debugging purposes, allow temp_store to be set.
         ***********************************************************/
-        string env_temp_store = qgetenv ("OWNCLOUD_Sqlite.TEMP_STORE");
+        string env_temp_store = GLib.Environment.get_variable ("OWNCLOUD_Sqlite.TEMP_STORE");
         if (!env_temp_store == "") {
             pragma1.prepare ("PRAGMA temp_store = " + env_temp_store + ";");
             if (!pragma1.exec ()) {

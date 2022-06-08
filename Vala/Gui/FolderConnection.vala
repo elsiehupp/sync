@@ -1013,7 +1013,7 @@ public class FolderConnection : GLib.Object {
     ***********************************************************/
     private static GLib.TimeSpan full_local_discovery_interval () {
         var interval = LibSync.ConfigFile ().full_local_discovery_interval ();
-        string env = qgetenv ("OWNCLOUD_FULL_LOCAL_DISCOVERY_INTERVAL");
+        string env = GLib.Environment.get_variable ("OWNCLOUD_FULL_LOCAL_DISCOVERY_INTERVAL");
         if (!env == "") {
             interval = env.to_long_long ();
         }

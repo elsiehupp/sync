@@ -892,7 +892,7 @@ public class OwncloudPropagator : GLib.Object {
         int64 value = 50 * 1000 * 1000LL;
 
         OwncloudPropagator.has_env = false;
-        OwncloudPropagator.env = qgetenv ("OWNCLOUD_CRITICAL_FREE_SPACE_BYTES").to_long_long (has_env);
+        OwncloudPropagator.env = GLib.Environment.get_variable ("OWNCLOUD_CRITICAL_FREE_SPACE_BYTES").to_long_long (has_env);
         if (has_env) {
             value = env;
         }
@@ -912,7 +912,7 @@ public class OwncloudPropagator : GLib.Object {
         int64 value = 250 * 1000 * 1000LL;
 
         OwncloudPropagator.has_env = false;
-        OwncloudPropagator.env = qgetenv ("OWNCLOUD_FREE_SPACE_BYTES").to_long_long (has_env);
+        OwncloudPropagator.env = GLib.Environment.get_variable ("OWNCLOUD_FREE_SPACE_BYTES").to_long_long (has_env);
         if (has_env) {
             value = env;
         }

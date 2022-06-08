@@ -200,7 +200,7 @@ public class FileSystem : GLib.Object {
         string trash_path;
         string trash_file_path;
         string trash_info_path;
-        string xdg_data_home = GLib.File.decode_name (qgetenv ("XDG_DATA_HOME"));
+        string xdg_data_home = GLib.File.decode_name (GLib.Environment.get_variable ("XDG_DATA_HOME"));
         if (xdg_data_home == "") {
             /***********************************************************
             Trash path that should exist

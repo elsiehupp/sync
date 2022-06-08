@@ -113,7 +113,7 @@ public class OpenFileManager : GLib.Object {
     public static GLib.List<string> xdg_data_dirs () {
         GLib.List<string> dirs = new GLib.List<string> ();
         // http://standards.freedesktop.org/basedir-spec/latest/
-        string xdg_data_dirs_env = GLib.File.decode_name (qgetenv ("XDG_DATA_DIRS"));
+        string xdg_data_dirs_env = GLib.File.decode_name (GLib.Environment.get_variable ("XDG_DATA_DIRS"));
         if (xdg_data_dirs_env == "") {
             dirs.append ("/usr/local/share");
             dirs.append ("/usr/share");
@@ -121,7 +121,7 @@ public class OpenFileManager : GLib.Object {
             dirs = xdg_data_dirs_env.split (':');
         }
         // local location
-        string xdg_data_home = GLib.File.decode_name (qgetenv ("XDG_DATA_HOME"));
+        string xdg_data_home = GLib.File.decode_name (GLib.Environment.get_variable ("XDG_DATA_HOME"));
         if (xdg_data_home == "") {
             xdg_data_home = GLib.Dir.home_path + "/.local/share";
         }

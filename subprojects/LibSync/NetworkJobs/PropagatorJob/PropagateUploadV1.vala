@@ -229,7 +229,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
             // Server may also disable parallel chunked upload for any higher version
             parallel_chunk_upload = false;
         } else {
-            string env = qgetenv ("OWNCLOUD_PARALLEL_CHUNK");
+            string env = GLib.Environment.get_variable ("OWNCLOUD_PARALLEL_CHUNK");
             if (!env == "") {
                 parallel_chunk_upload = env != "false" && env != "0";
             } else {
