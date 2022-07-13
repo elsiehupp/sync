@@ -17,16 +17,12 @@ deps = [
     # libsecret-1-dev
     # dependency('libsecret-1'),
     # dependency('libsoup-2.4'),
-]
-
-libraries = [
-    subproject('gpseq_lib').get_variable ('gpseq_lib')
+    subproject('gpseq_lib').get_variable ('gpseq_dep')
 ]
 
 library(
-    'Kirigami',
+    meson.project_name(),
     srcs,
-#     dependencies: deps,
-    install: false,
-    link_with: libraries
+    dependencies: deps,
+    install: false
 )

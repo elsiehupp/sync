@@ -2,4 +2,4 @@
 directory = lib_sync
 
 [provide]
-dependency_names = lib_sync
+dependency_names = lib_sync_dep

@@ -2,4 +2,4 @@
 directory = common
 
 [provide]
-dependency_names = common
+dependency_names = common_dep

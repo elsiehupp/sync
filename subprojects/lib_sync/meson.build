@@ -169,25 +169,26 @@ deps = [
     # dependency('gee-0.8'),
     # dependency('json-glib-1.0'),
     dependency('libsoup-2.4'),
-]
-
-libraries = [
-    # subproject('3rd_party').get_variable ('3rd_party'),
-    # subproject('cmd').get_variable ('cmd'),
-    subproject('common').get_variable ('common'),
+    # subproject('3rd_party').get_variable ('3rd_party_dep'),
+    # subproject('cmd').get_variable ('cmd_dep'),
+    subproject('common').get_variable ('common_dep'),
     # 'CrashReporter',
-    subproject('csync').get_variable ('csync'),
+    subproject('csync').get_variable ('csync_dep'),
     # 'Gui',
-    # subproject('lib_sync').get_variable ('lib_sync'),
+    # subproject('lib_sync').get_variable ('lib_sync_dep'),
     # 'ShellIntegration',
     # 'Testing',
-    subproject('gpseq_lib').get_variable ('gpseq_lib')
+    subproject('gpseq_lib').get_variable ('gpseq_dep'),
 ]
 
-lib_sync = library(
-    'lib_sync',
+lib_sync_lib = library(
+    meson.project_name(),
     srcs,
     dependencies: deps,
-    install: false,
-    link_with: libraries
+    install: false
+)
+
+lib_sync_dep = declare_dependency(
+    link_with: lib_sync_lib, 
+    include_directories: include_directories('.')
 )

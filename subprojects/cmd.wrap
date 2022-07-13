@@ -2,4 +2,4 @@
 directory = cmd
 
 [provide]
-dependency_names = cmd
+dependency_names = cmd_dep

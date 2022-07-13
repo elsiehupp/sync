@@ -19,16 +19,24 @@ deps = [
     # libsecret-1-dev
     dependency('libsecret-1'),
     # dependency('libsoup-2.4'),
-]
-
-libraries = [
-    subproject('gpseq_lib').get_variable ('gpseq_lib')
+    subproject('gpseq_lib').get_variable ('gpseq_dep')
 ]
 
 crash_reporter = library(
     'crash_reporter',
     srcs,
     dependencies: deps,
-    install: false,
-    link_with: libraries
+    install: false
+)
+
+cmd_lib = library(
+    meson.project_name(),
+    srcs,
+    dependencies: deps,
+    install: false
+)
+
+cmd_dep = declare_dependency(
+    link_with: cmd_lib, 
+    include_directories: include_directories('.')
 )

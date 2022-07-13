@@ -16,16 +16,12 @@ deps = [
     # libsqlite3-dev
     # dependency('sqlite3'),
     # meson.get_compiler('vala').find_library('readline'),
-]
-
-libraries = [
-    subproject('gpseq_lib').get_variable ('gpseq_lib')
+    subproject('gpseq_lib').get_variable ('gpseq_dep')
 ]
 
 library(
-    'KMessageWidget',
+    meson.project_name(),
     srcs,
-#     dependencies: deps,
-    install: false,
-    link_with: libraries
+    dependencies: deps,
+    install: false
 )

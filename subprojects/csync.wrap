@@ -2,4 +2,4 @@
 directory = csync
 
 [provide]
-dependency_names = csync
+dependency_names = csync_dep

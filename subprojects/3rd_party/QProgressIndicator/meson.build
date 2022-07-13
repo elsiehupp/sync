@@ -2,14 +2,13 @@ srcs = files([
     'QProgressIndicator.vala',
 ])
 
-libraries = [
-    subproject('gpseq_lib').get_variable ('gpseq_lib')
+deps = [
+    subproject('gpseq_lib').get_variable ('gpseq_dep')
 ]
 
 library(
-    'QProgressIndicator',
+    meson.project_name(),
     srcs,
-#     dependencies: deps,
-    install: false,
-    link_with: libraries
+    dependencies: deps,
+    install: false
 )

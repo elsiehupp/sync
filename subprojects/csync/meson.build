@@ -25,16 +25,17 @@ deps = [
     # dependency('gee-0.8'),
     # dependency('json-glib-1.0'),
     # dependency('libsoup-2.4'),
+    subproject('gpseq_lib').get_variable ('gpseq_dep')
 ]
 
-libraries = [
-    subproject('gpseq_lib').get_variable ('gpseq_lib')
-]
-
-csync = library(
-    'csync',
+csync_lib = library(
+    meson.project_name(),
     srcs,
     dependencies: deps,
-    install: false,
-    link_with: libraries
+    install: false
+)
+
+csync_dep = declare_dependency(
+    link_with: csync_lib, 
+    include_directories: include_directories('.')
 )
