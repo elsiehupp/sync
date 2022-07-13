@@ -22,21 +22,14 @@ deps = [
     subproject('gpseq_lib').get_variable ('gpseq_dep')
 ]
 
-crash_reporter = library(
-    'crash_reporter',
-    srcs,
-    dependencies: deps,
-    install: false
-)
-
-cmd_lib = library(
+crash_reporter_lib = library(
     meson.project_name(),
     srcs,
     dependencies: deps,
-    install: false
+    install: true
 )
 
-cmd_dep = declare_dependency(
+crash_reporter_dep = declare_dependency(
     link_with: cmd_lib, 
     include_directories: include_directories('.')
 )

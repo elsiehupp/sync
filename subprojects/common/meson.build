@@ -72,7 +72,7 @@ common_lib = library(
     meson.project_name(),
     srcs,
     dependencies: deps,
-    install: false
+    install: true
 )
 
 common_dep = declare_dependency(

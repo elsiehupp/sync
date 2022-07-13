@@ -185,7 +185,7 @@ lib_sync_lib = library(
     meson.project_name(),
     srcs,
     dependencies: deps,
-    install: false
+    install: true
 )
 
 lib_sync_dep = declare_dependency(

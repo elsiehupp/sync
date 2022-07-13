@@ -9,7 +9,7 @@ subdir('QtSingleApplication')
     meson.project_name(),
     srcs,
     dependencies: deps,
-    install: false
+    install: true
 )
 
 3rd_party_dep = declare_dependency(
