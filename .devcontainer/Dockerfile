@@ -10,7 +10,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends elementary-os-overlay && \
     apt-get update && \
     apt-get -y dist-upgrade && \
-    apt-get install -y elementary-sdk git vala-language-server json-glib-1.0 libsecret-1-dev && \
+    apt-get install -y elementary-sdk git vala-language-server json-glib-1.0 libsecret-1-dev libsoup2.4-dev && \
     apt-get -y autoremove && \
     apt-get autoclean && \
     git config --global --add safe.directory /
