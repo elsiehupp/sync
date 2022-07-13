@@ -7,4 +7,4 @@
 subdir('Gui')
 # subdir('LibSync')
 # subdir('ShellIntegration')
-subdir('Testing')
+# subdir('Testing')

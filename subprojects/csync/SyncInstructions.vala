@@ -83,7 +83,7 @@ public enum SyncInstructions {
     If the etag has been updated and needs to be writen to the
     database, but without any propagation (UPDATE|RECONCILE).
     ***********************************************************/
-    UPDATE_METADATA   = 1 << 10,} // enum SyncInstructions
+    UPDATE_METADATA   = 1 << 10,
 
 } // enum SyncInstructions
 

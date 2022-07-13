@@ -16,7 +16,7 @@ public class TestAccountDavPathUnitializedNoCrash : GLib.Object {
     ***********************************************************/
     private void TestAccountDavPathUnitializedNoCrash () {
         LibSync.Account account = LibSync.Account.create ();
-        account.dav_path;
+        //  account.dav_path;
     }
 
 } // namespace Testing

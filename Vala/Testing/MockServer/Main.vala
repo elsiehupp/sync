@@ -11,3 +11,6 @@ int main (int argc, char* argv[]) {
     HttpServer server;
     return app.exec ();
 }
+
+}
+}

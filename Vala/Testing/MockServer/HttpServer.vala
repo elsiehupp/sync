@@ -29,7 +29,7 @@ public class HttpServer : GLib.TcpServer {
     public void incoming_connection (int socket) {
         if (disabled)
             return;
-        GLib.TcpSocket tcp_socket = new GLib.TcpSocket (this);
+        GLib.Socket tcp_socket = new GLib.Socket (this);
         tcp_socket.signal_ready_read.connect (
             this.on_signal_read_client
         );
@@ -43,7 +43,7 @@ public class HttpServer : GLib.TcpServer {
     /***********************************************************
     ***********************************************************/
     private void on_signal_read_client () {
-        GLib.TcpSocket* socket = (GLib.TcpSocket*)sender ();
+        GLib.Socket socket = (GLib.Socket)sender ();
         if (socket.can_read_line ()) {
             GLib.List<string> tokens = socket.read_line ().split (GLib.Regex ("[ \r\n][ \r\n]*"));
             if (tokens[0] == "GET") {
@@ -58,7 +58,7 @@ public class HttpServer : GLib.TcpServer {
 
                 QtServiceBase.instance.log_message ("Wrote to client");
 
-                if (socket.state == GLib.TcpSocket.UnconnectedState) {
+                if (socket.state == GLib.Socket.UnconnectedState) {
                     delete socket;
                     QtServiceBase.instance.log_message ("Connection closed");
                 }
@@ -68,7 +68,7 @@ public class HttpServer : GLib.TcpServer {
 
 
     private void on_signal_discard_client () {
-        GLib.TcpSocket socket = (GLib.TcpSocket) sender ();
+        GLib.Socket socket = (GLib.Socket) sender ();
         socket.delete_later ();
 
         QtServiceBase.instance.log_message ("Connection closed");

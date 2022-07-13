@@ -194,7 +194,7 @@ public class ExcludedFiles : GLib.Object {
     The client version. Used to evaluate version-dependent excludes,
     see version_directive_keep_next_line ().
     ***********************************************************/
-    private NextcloudVersion client_version { private get; public set; }
+    private Common.NextcloudVersion client_version { private get; public set; }
 
     /***********************************************************
     private friend class AbstractTestCSyncExclude;
@@ -349,7 +349,7 @@ public class ExcludedFiles : GLib.Object {
     Primarily used in tests.
     ***********************************************************/
     public void clear_manual_excludes () {
-        this.manual_excludes = new GLib.HashTable<BasePathString, GLib.List<string>>;
+        this.manual_excludes = new GLib.HashTable<BasePathString, GLib.List<string>> ();
         on_signal_reload_exclude_files ();
     }
 
@@ -1142,7 +1142,7 @@ public class ExcludedFiles : GLib.Object {
 
     string regular_expression;
     int chars_to_escape = 0;
-    int this.iterator = 0;
+    int iterator = 0;
 
 
     /***********************************************************

@@ -37,7 +37,7 @@ class TestRandomConnections : AbstractTestOAuth {
         payloads.append ("GET /?code=éléphant\xa5 HTTP\n");
         payloads.append ("\n\n\n\n");
         foreach (var x in payloads) {
-            var socket = new GLib.TcpSocket (this);
+            var socket = new GLib.Socket (this);
             socket.connect_to_host ("localhost", port);
             GLib.assert_true (socket.wait_for_connected ());
             socket.write (x);

@@ -89,7 +89,7 @@ public class OAuth : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_new_connection () {
-        GLib.TcpSocket socket = this.server.next_pending_connection ();
+        GLib.Socket socket = this.server.next_pending_connection ();
         while (socket) {
             socket.disconnected.connect (
                 socket.delete_later
@@ -103,7 +103,7 @@ public class OAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_ready_read (GLib.TcpSocket socket) {
+    private void on_signal_ready_read (GLib.Socket socket) {
         string peek = socket.peek (int64.min (socket.bytes_available (), 4000LL)); //The code should always be within the first 4K
         if (peek.index_of ("\n") < 0) {
             return; // wait until we find a \n
@@ -145,7 +145,7 @@ public class OAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_simple_network_job_finished (GLib.TcpSocket socket, GLib.InputStream reply) {
+    private void on_signal_simple_network_job_finished (GLib.Socket socket, GLib.InputStream reply) {
         var json_data = reply.read_all ();
         Json.ParserError json_parse_error;
         Json.Object json = GLib.JsonDocument.from_json (json_data, json_parse_error).object ();
@@ -223,7 +223,7 @@ public class OAuth : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private static void http_reply_and_close (
-        GLib.TcpSocket socket,
+        GLib.Socket socket,
         string code,
         string html,
         string more_headers = "") {

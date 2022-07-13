@@ -669,9 +669,9 @@ public class Account : GLib.Object {
                 return false;
             }
             return server_version_int < make_server_version (
-                NextcloudVersion.NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_MAJOR,
-                NextcloudVersion.NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_MINOR,
-                NextcloudVersion.NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_PATCH
+                Common.NextcloudVersion.NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_MAJOR,
+                Common.NextcloudVersion.NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_MINOR,
+                Common.NextcloudVersion.NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_PATCH
             );
         }
     }
