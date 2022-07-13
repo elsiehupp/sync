@@ -1,5 +1,5 @@
 [wrap-file]
-directory = Common
+directory = common
 
 [provide]
 dependency_names = common

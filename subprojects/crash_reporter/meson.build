@@ -22,11 +22,11 @@ deps = [
 ]
 
 libraries = [
-    subproject('Gpseq').get_variable ('gpseq_lib')
+    subproject('gpseq_lib').get_variable ('gpseq_lib')
 ]
 
 crash_reporter = library(
-    'CrashReporter',
+    'crash_reporter',
     srcs,
     dependencies: deps,
     install: false,

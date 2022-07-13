@@ -23,20 +23,20 @@ deps = [
 ]
 
 libraries = [
-    # subproject('3rdParty').get_variable ('3rd_party'),
-    # subproject('Cmd').get_variable ('cmd'),
-    subproject('Common').get_variable ('common'),
+    # subproject('3rd_party').get_variable ('3rd_party'),
+    # subproject('cmd').get_variable ('cmd'),
+    subproject('common').get_variable ('common'),
     # 'CrashReporter',
-    subproject('CSync').get_variable ('csync'),
+    subproject('csync').get_variable ('csync'),
     # 'Gui',
-    subproject('LibSync').get_variable ('lib_sync'),
+    subproject('lib_sync').get_variable ('lib_sync'),
     # 'ShellIntegration',
     # 'Testing',
-    subproject('Gpseq').get_variable ('gpseq_lib')
+    subproject('gpseq_lib').get_variable ('gpseq_lib')
 ]
 
 cmd = library(
-    'Cmd',
+    'cmd',
     srcs,
     dependencies: deps,
     install: false,

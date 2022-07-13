@@ -1,5 +1,5 @@
 [wrap-file]
-directory = CSync
+directory = csync
 
 [provide]
 dependency_names = csync

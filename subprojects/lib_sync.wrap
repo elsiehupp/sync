@@ -1,0 +1,5 @@
+[wrap-file]
+directory = lib_sync
+
+[provide]
+dependency_names = lib_sync

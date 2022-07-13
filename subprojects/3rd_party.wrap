@@ -1,5 +1,5 @@
 [wrap-file]
-directory = 3rdParty
+directory = 3rd_party
 
 [provide]
 dependency_names = 3rd_party

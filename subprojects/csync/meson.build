@@ -28,11 +28,11 @@ deps = [
 ]
 
 libraries = [
-    subproject('Gpseq').get_variable ('gpseq_lib')
+    subproject('gpseq_lib').get_variable ('gpseq_lib')
 ]
 
 csync = library(
-    'CSync',
+    'csync',
     srcs,
     dependencies: deps,
     install: false,

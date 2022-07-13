@@ -5,9 +5,10 @@ subdir('QProgressIndicator')
 subdir('QTokenizer')
 subdir('QtSingleApplication')
 
-executable(
-    meson.project_name(),
+3rd_party = library(
+    '3rd_party',
     srcs,
-#     dependencies: deps,
-    install: false
+    dependencies: deps,
+    install: false,
+    link_with: libraries
 )

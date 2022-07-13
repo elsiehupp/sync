@@ -1,9 +1,9 @@
 
-# subdir('3rdParty')
-# subdir('Cmd')
-# subdir('Common')
+# subdir('3rd_party')
+# subdir('cmd')
+# subdir('common')
 # subdir('CrashReporter')
-# subdir('CSync')
+# subdir('csync')
 subdir('Gui')
 # subdir('LibSync')
 # subdir('ShellIntegration')

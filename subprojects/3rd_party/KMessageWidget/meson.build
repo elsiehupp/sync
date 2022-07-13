@@ -1,8 +1,6 @@
 srcs = files([
-    'GlobalWheelFilter.vala',
-    'GlobalWheelFilterSingleton.vala',
-    'KirigamiWheelEvent.vala',
-    'WheelHandler.vala',
+    'KMessageWidget.vala',
+    'KMessageWidgetPrivate.vala',
 ])
 
 # Dependences
@@ -14,17 +12,18 @@ deps = [
     # dependency('gee-0.8'),
     # libjson-glib-dev
     # dependency('json-glib-1.0'),
-    # libsecret-1-dev
-    # dependency('libsecret-1'),
     # dependency('libsoup-2.4'),
+    # libsqlite3-dev
+    # dependency('sqlite3'),
+    # meson.get_compiler('vala').find_library('readline'),
 ]
 
 libraries = [
-    subproject('Gpseq').get_variable ('gpseq_lib')
+    subproject('gpseq_lib').get_variable ('gpseq_lib')
 ]
 
 library(
-    'Kirigami',
+    'KMessageWidget',
     srcs,
 #     dependencies: deps,
     install: false,
