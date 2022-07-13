@@ -12,4 +12,5 @@ RUN apt-get update && \
     apt-get -y dist-upgrade && \
     apt-get install -y elementary-sdk git vala-language-server json-glib-1.0 libsecret-1-dev libsoup2.4-dev libgnutls28-dev && \
     apt-get -y autoremove && \
-    apt-get autoclean
+    apt-get autoclean && \
+    ln -s /bin/gpg /usr/local/bin/gpg
