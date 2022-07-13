@@ -180,7 +180,10 @@ public class SqlQuery : GLib.Object {
             do {
                 rc = this.sqlite_statement.step ();
                 if (rc == Sqlite.LOCKED) {
-                    rc = this.sqlite_statement.reset (); // This will also return Sqlite.LOCKED
+                    /***********************************************************
+                    This will also return Sqlite.LOCKED
+                    ***********************************************************/
+                    rc = this.sqlite_statement.reset ();
                     n++;
                     Utility.usleep (Sqlite.SLEEP_TIME_USEC);
                 } else if (rc == Sqlite.BUSY) {
@@ -226,7 +229,10 @@ public class SqlQuery : GLib.Object {
         while (true) {
             this.error_id = this.sqlite_statement.step ();
             if (n < Sqlite.REPEAT_COUNT && first_step && (this.error_id == Sqlite.LOCKED || this.error_id == Sqlite.BUSY)) {
-                this.sqlite_statement.reset (); // not necessary after sqlite version 3.6.23.1
+                /***********************************************************
+                reset () is not necessary after sqlite version 3.6.23.1
+                ***********************************************************/
+                this.sqlite_statement.reset ();
                 n++;
                 Utility.usleep (Sqlite.SLEEP_TIME_USEC);
             } else {

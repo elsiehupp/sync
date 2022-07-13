@@ -17,13 +17,17 @@ public class Result<T> : GLib.Object {
 
     T result {
         public get {
-            //  GLib.assert_true (!this.is_error)
+            /***********************************************************
+            GLib.assert_true (!this.is_error)
+            ***********************************************************/
             return this.result;
         }
     }
     Error error {
         public get {
-            //  GLib.assert_true (this.is_error);
+            /***********************************************************
+            GLib.assert_true (this.is_error);
+            ***********************************************************/
             return this.error;
         }
     }
@@ -49,14 +53,16 @@ public class Result<T> : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    //  public Result.from_other (Result other) {
-    //      this.is_error = other.is_error;
-    //      if (this.is_error) {
-    //          new (this.error) Error (std.move (other.error));
-    //      } else {
-    //          new (this.result) T (std.move (other.result));
-    //      }
-    //  }
+    /***********************************************************
+    public Result.from_other (Result other) {
+        this.is_error = other.is_error;
+        if (this.is_error) {
+            new (this.error) Error (std.move (other.error));
+        } else {
+            new (this.result) T (std.move (other.result));
+        }
+    }
+    ***********************************************************/
 
 
     /***********************************************************
@@ -73,32 +79,36 @@ public class Result<T> : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    //  public Result operator= (Result &&other) {
-    //      if (other != this) {
-    //          this.is_error = other.is_error;
-    //          if (this.is_error) {
-    //              new (this.error) Error (std.move (other.error));
-    //          } else {
-    //              new (this.result) T (std.move (other.result));
-    //          }
-    //      }
-    //      return this;
-    //  }
+    /***********************************************************
+    public Result operator= (Result &&other) {
+        if (other != this) {
+            this.is_error = other.is_error;
+            if (this.is_error) {
+                new (this.error) Error (std.move (other.error));
+            } else {
+                new (this.result) T (std.move (other.result));
+            }
+        }
+        return this;
+    }
+    ***********************************************************/
 
 
     /***********************************************************
     ***********************************************************/
-    //  public Result operator= (Result other) {
-    //      if (other != this) {
-    //          this.is_error = other.is_error;
-    //          if (this.is_error) {
-    //              new (this.error) Error (other.error);
-    //          } else {
-    //              new (this.result) T (other.result);
-    //          }
-    //      }
-    //      return this;
-    //  }
+    /***********************************************************
+    public Result operator= (Result other) {
+        if (other != this) {
+            this.is_error = other.is_error;
+            if (this.is_error) {
+                new (this.error) Error (other.error);
+            } else {
+                new (this.result) T (other.result);
+            }
+        }
+        return this;
+    }
+    ***********************************************************/
 
 
     ~Result () {
@@ -127,44 +137,44 @@ public class Result<T> : GLib.Object {
 
 
     /***********************************************************
+    public const T operator* () & {
+        GLib.assert_true (!this.is_error);
+        return this.result;
+    }
     ***********************************************************/
-    //  public const T operator* () & {
-    //      //  GLib.assert_true (!this.is_error);
-    //      return this.result;
-    //  }
 
 
     /***********************************************************
+    public T operator* () && {
+        GLib.assert_true (!this.is_error);
+        return std.move (this.result);
+    }
     ***********************************************************/
-    //  public T operator* () && {
-    //      //  GLib.assert_true (!this.is_error);
-    //      return std.move (this.result);
-    //  }
 
 
     /***********************************************************
+    public const T *operator-> () {
+        GLib.assert_true (!this.is_error);
+        return this.result;
+    }
     ***********************************************************/
-    //  public const T *operator-> () {
-    //      //  GLib.assert_true (!this.is_error);
-    //      return this.result;
-    //  }
 
     /***********************************************************
+    public Error error () && {
+        GLib.assert_true (this.is_error);
+        return std.move (this.error);
+    }
     ***********************************************************/
-    //  public Error error () && {
-    //      //  GLib.assert_true (this.is_error);
-    //      return std.move (this.error);
-    //  }
 
 } // class Result<T>
 
-//  class Result<void, Error> : Result<detail.NoResultData, Error> {
-//
-//      /***********************************************************
-//      ***********************************************************/
-//      public using Result<detail.NoResultData, Error>.Result;
-//      public Result () : Result (detail.NoResultData{}) {}
-//  }
+/***********************************************************
+class Result<void, Error> : Result<detail.NoResultData, Error> {
+
+    public using Result<detail.NoResultData, Error>.Result;
+    public Result () : Result (detail.NoResultData{}) {}
+}
+***********************************************************/
 
 } // class Result
 

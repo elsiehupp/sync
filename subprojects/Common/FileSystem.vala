@@ -241,13 +241,19 @@ public class FileSystem : GLib.Object {
             while (file.exists (path + string.number (suffix_number))) {
                 suffix_number++;
             }
-            if (!file.rename (file_info.absolute_file_path, path + string.number (suffix_number))) { // rename (file old path, file trash path)
+            /***********************************************************
+            rename (file old path, file trash path)
+            ***********************************************************/
+            if (!file.rename (file_info.absolute_file_path, path + string.number (suffix_number))) {
                 error_string = _("FileSystem", " (Could not move \"%1\" to \"%2\")")
                                    .printf (file_info.absolute_file_path, path + string.number (suffix_number));
                 return false;
             }
         } else {
-            if (!file.rename (file_info.absolute_file_path, trash_file_path + file_info.filename ())) { // rename (file old path, file trash path)
+            /***********************************************************
+            rename (file old path, file trash path)
+            ***********************************************************/
+            if (!file.rename (file_info.absolute_file_path, trash_file_path + file_info.filename ())) {
                 error_string = _("FileSystem", " (Could not move \"%1\" to \"%2\")")
                                    .printf (file_info.absolute_file_path, trash_file_path + file_info.filename ());
                 return false;

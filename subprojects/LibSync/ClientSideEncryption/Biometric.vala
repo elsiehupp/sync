@@ -9,7 +9,9 @@ data structures
 ***********************************************************/
 public class Biometric : GLib.Object {
 
-    //  private Q_DISABLE_COPY (Biometric)
+    /***********************************************************
+    private Q_DISABLE_COPY (Biometric)
+    ***********************************************************/
 
     private BIO bio;
 
@@ -23,9 +25,11 @@ public class Biometric : GLib.Object {
     }
 
 
-    //  public operator BIO* () {
-    //      return this.bio;
-    //  }
+    /***********************************************************
+    public operator BIO* () {
+        return this.bio;
+    }
+    ***********************************************************/
 
 } // class Biometric
 

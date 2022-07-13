@@ -611,7 +611,10 @@ public class Utility : GLib.Object {
             parameters.append ("--version");
             GLib.Process process;
             process.on_signal_start (binary, parameters);
-            process.wait_for_finished (); // sets current thread to sleep and waits for ping_process end
+            /***********************************************************
+            Set current thread to sleep and wait for ping_process end
+            ***********************************************************/
+            process.wait_for_finished ();
             re = process.read_all_standard_output ();
             int newline = re.index_of ("\n");
             if (newline > 0) {
@@ -808,8 +811,9 @@ public class Utility : GLib.Object {
                 path += "/";
             }
             /***********************************************************
+            Put the complete path together
             ***********************************************************/
-            path += concat_path; // put the complete path together
+            path += concat_path;
         }
 
         GLib.Uri temporary_url = url;

@@ -81,7 +81,7 @@ public class FakeFolder : GLib.Object {
     delegate void Callback (bool value);
 
 
-    void on_signal_sync_engine_about_to_remove_all_files (LibSync.LibSync.SyncFileItem.Direction direction, Callback callback) {
+    void on_signal_sync_engine_about_to_remove_all_files (LibSync.SyncFileItem.Direction direction, Callback callback) {
         GLib.Timeout.add (
             1 * 1000,
             this.sync_engine.get ().on_timer_finished

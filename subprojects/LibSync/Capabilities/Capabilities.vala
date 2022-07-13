@@ -1,10 +1,3 @@
-/***********************************************************
-***********************************************************/
-
-//  #include <GLib.HashTable<string, GLib.Variant>>
-//  #include <GLib.Debug>
-//  #include <GLib.HashTable<string, GLib.Variant>>
-//  #include <GLib.MimeDatabase>
 
 namespace Occ {
 namespace LibSync {

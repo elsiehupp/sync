@@ -1068,7 +1068,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
                + DataRole.WARNING_COUNT
                + GLib.ToolTipRole;
 
-        if (progress.status () == LibSync.LibSync.ProgressInfo.Status.DISCOVERY) {
+        if (progress.status () == LibSync.ProgressInfo.Status.DISCOVERY) {
             if (!progress.current_discovered_remote_folder == "") {
                 pi.overall_sync_string = _("Checking for changes in remote \"%1\"").printf (progress.current_discovered_remote_folder);
                 signal_data_changed (index (folder_index), index (folder_index), roles);
@@ -1080,7 +1080,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
             }
         }
 
-        if (progress.status () == LibSync.LibSync.ProgressInfo.Status.RECONCILE) {
+        if (progress.status () == LibSync.ProgressInfo.Status.RECONCILE) {
             pi.overall_sync_string = _("Reconciling changes");
             signal_data_changed (index (folder_index), index (folder_index), roles);
             return;
@@ -1101,8 +1101,8 @@ public class FolderStatusModel : GLib.AbstractItemModel {
         uint64 estimated_up_bandwidth = 0;
         uint64 estimated_down_bandwidth = 0;
         string all_filenames;
-        foreach (LibSync.LibSync.ProgressInfo.ProgressItem current_item in progress.current_items) {
-            if (cur_item_progress == -1 || (LibSync.LibSync.ProgressInfo.is_size_dependent (current_item.item)
+        foreach (LibSync.ProgressInfo.ProgressItem current_item in progress.current_items) {
+            if (cur_item_progress == -1 || (LibSync.ProgressInfo.is_size_dependent (current_item.item)
                                             && bigger_item_size < current_item.item.size)) {
                 cur_item_progress = current_item.progress.completed ();
                 cur_item = current_item.item;
@@ -1130,7 +1130,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
         string kind_string = Progress.as_action_string (cur_item);
 
         string file_progress_string;
-        if (LibSync.LibSync.ProgressInfo.is_size_dependent (cur_item)) {
+        if (LibSync.ProgressInfo.is_size_dependent (cur_item)) {
             string s1 = Utility.octets_to_string (cur_item_progress);
             string s2 = Utility.octets_to_string (cur_item.size);
             //  uint64 estimated_bw = progress.file_progress (cur_item).estimated_bandwidth;

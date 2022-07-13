@@ -82,7 +82,10 @@ public class ValidateChecksumHeader : AbstractComputeChecksum {
     /***********************************************************
     ***********************************************************/
     private ComputeChecksum prepare_start (string checksum_header) {
-        // If the incoming header is empty no validation can happen. Just continue.
+        /***********************************************************
+        If the incoming header is empty no validation can happen.
+        Just continue.
+        ***********************************************************/
         if (checksum_header == "") {
             signal_validated ("", "");
             return null;

@@ -37,8 +37,8 @@ public class CommandLine : GLib.Application {
     const string BINARY_NAME = Common.Config.APPLICATION_EXECUTABLE + "cmd";
 
     /***********************************************************
-    We can't use csync_userdata because the LibSync.SyncEngine sets it
-    already, so we have to use a global variable.
+    We can't use csync_userdata because the LibSync.SyncEngine
+    sets it already, so we have to use a global variable.
     ***********************************************************/
     CmdOptions opts;
 

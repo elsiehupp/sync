@@ -100,9 +100,13 @@ public class ComputeChecksum : AbstractComputeChecksum {
     will compute the checksum. It must not have a parent.
     ***********************************************************/
     public void start_for_device (GLib.OutputStream device) {
-        //  ENFORCE (device);
+        /***********************************************************
+        ENFORCE (device);
+        ***********************************************************/
         GLib.info ("Computing " + this.checksum_type + " checksum of device " + device.get () + " in a thread.");
-        //  GLib.assert_true (!device.parent ());
+        /***********************************************************
+        GLib.assert_true (!device.parent ());
+        ***********************************************************/
 
         start_impl (std.move (device));
     }
@@ -124,17 +128,27 @@ public class ComputeChecksum : AbstractComputeChecksum {
         } else if (checksum_type == CHECKSUM_SHA2C) {
             return calc_crypto_hash (device, GLib.CryptographicHash.Sha256);
         }
-    //  #if GLib.T_VERSION >= GLib.T_VERSION_CHECK (5, 9, 0)
+        /***********************************************************
+        #if GLib.T_VERSION >= GLib.T_VERSION_CHECK (5, 9, 0)
+        ***********************************************************/
         else if (checksum_type == CHECKSUM_SHA3C) {
             return calc_crypto_hash (device, GLib.CryptographicHash.Sha3_256);
         }
-    //  #endif
-    //  #ifdef ZLIB_FOUND
+        /***********************************************************
+        #endif
+        ***********************************************************/
+        /***********************************************************
+        #ifdef ZLIB_FOUND
+        ***********************************************************/
         else if (checksum_type == CHECKSUM_ADLER_C) {
             return calc_adler32 (device);
         }
-    //  #endif
-        // for an unknown checksum or no checksum, we're done right now
+        /***********************************************************
+        #endif
+        ***********************************************************/
+        /***********************************************************
+        For an unknown checksum or no checksum, we're done right now
+        ***********************************************************/
         if (checksum_type != "") {
             GLib.warning ("Unknown checksum type: " + checksum_type);
         }
@@ -143,7 +157,8 @@ public class ComputeChecksum : AbstractComputeChecksum {
 
 
     /***********************************************************
-    Computes the checksum synchronously on file. Convenience wrapper for compute_now ().
+    Computes the checksum synchronously on file. Convenience
+    wrapper for compute_now ().
     ***********************************************************/
     public static string compute_now_on_signal_file (string file_path, string checksum_type) {
         GLib.File file = GLib.File.new_for_path (file_path);
@@ -174,15 +189,22 @@ public class ComputeChecksum : AbstractComputeChecksum {
     /***********************************************************
     ***********************************************************/
     private void start_impl (GLib.OutputStream device) {
+        /***********************************************************
+        GLib.UniqueConnection
+        ***********************************************************/
         this.watcher.signal_finished.connect (
             this.on_signal_calculation_done
-        ); // GLib.UniqueConnection
+        );
 
-        // We'd prefer to move the unique_ptr into the lambda, but that's
-        // awkward with the C++ standard we're on
+        /***********************************************************
+        We'd prefer to move the unique_ptr into the lambda, but
+        that's awkward with the C++ standard we're on.
+        ***********************************************************/
         var shared_device = new unowned GLib.OutputStream  (device.release ());
 
-        // Bug: The thread will keep running even if ComputeChecksum is deleted.
+        /***********************************************************
+        Bug: The thread will keep running even if ComputeChecksum is deleted.
+        ***********************************************************/
         string type = this.checksum_type;
         this.watcher.future (QtConcurrent.run (
             ComputeChecksum.on_watcher_run

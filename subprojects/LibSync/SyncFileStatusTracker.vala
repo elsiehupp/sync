@@ -1,7 +1,3 @@
-/***********************************************************
-***********************************************************/
-
-//  #include <map>
 
 namespace Occ {
 namespace LibSync {
@@ -102,6 +98,8 @@ public class SyncFileStatusTracker : GLib.Object {
     public void on_signal_path_touched (string filename) {
         string folder_path = this.sync_engine.local_path;
 
+        /***********************************************************
+        ***********************************************************/
         //  GLib.assert_true (filename.has_prefix (folder_path));
         string local_path = filename.mid (folder_path.size ());
         this.dirty_paths.insert (local_path);
@@ -122,6 +120,8 @@ public class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_about_to_propagate (GLib.List<SyncFileItem> items) {
+        /***********************************************************
+        ***********************************************************/
         //  GLib.assert_true (this.sync_count == "");
 
         ProblemsMap old_problems;
@@ -261,6 +261,8 @@ public class SyncFileStatusTracker : GLib.Object {
         if (this.sync_count.value (relative_path)) {
             status.set (Common.SyncFileStatus.SyncFileStatusTag.STATUS_SYNC);
         } else {
+            /***********************************************************
+            ***********************************************************/
             // After a sync on_signal_finished, we need to show the users issues from that last sync like the activity list does.
             // Also used for parent directories showing a warning for an error child.
             Common.SyncFileStatus.SyncFileStatusTag problem_status = lookup_problem (relative_path, this.sync_problems);
@@ -268,6 +270,8 @@ public class SyncFileStatusTracker : GLib.Object {
                 status.set (problem_status);
         }
 
+        /***********************************************************
+        ***********************************************************/
         //  GLib.assert_true (shared_flag != SharedFlag.UNKNOWN_SHARED,
         //      "The shared status needs to have been fetched from a SyncFileItem or the DB at this point.");
         if (shared_flag == SharedFlag.SHARED)
@@ -304,6 +308,8 @@ public class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void inc_sync_count_and_emit_status_changed (string relative_path, SharedFlag shared_state) {
+        /***********************************************************
+        ***********************************************************/
         // Will return 0 (and increase to 1) if the path wasn't in the map yet
         int count = this.sync_count[relative_path]++;
         if (!count) {
@@ -312,8 +318,12 @@ public class SyncFileStatusTracker : GLib.Object {
                 : resolve_sync_and_error_status (relative_path, shared_flag);
             signal_file_status_changed (get_system_destination (relative_path), status);
 
+            /***********************************************************
+            ***********************************************************/
             // We passed from OK to SYNC, increment the parent to keep it marked as
             // SYNC while we propagate ourselves and our own children.
+            /***********************************************************
+            ***********************************************************/
             //  GLib.assert_true (!relative_path.has_suffix ("/"));
             int last_slash_index = relative_path.last_index_of ("/");
             if (last_slash_index != -1)
@@ -329,6 +339,8 @@ public class SyncFileStatusTracker : GLib.Object {
     private void dec_sync_count_and_emit_status_changed (string relative_path, SharedFlag shared_state) {
         int count = --this.sync_count[relative_path];
         if (!count) {
+            /***********************************************************
+            ***********************************************************/
             // Remove from the map, same as 0
             this.sync_count.remove (relative_path);
 
@@ -337,7 +349,11 @@ public class SyncFileStatusTracker : GLib.Object {
                 : resolve_sync_and_error_status (relative_path, shared_flag);
             signal_file_status_changed (get_system_destination (relative_path), status);
 
+            /***********************************************************
+            ***********************************************************/
             // We passed from SYNC to OK, decrement our parent.
+            /***********************************************************
+            ***********************************************************/
             //  GLib.assert_true (!relative_path.has_suffix ("/"));
             int last_slash_index = relative_path.last_index_of ("/");
             if (last_slash_index != -1) {
@@ -352,20 +368,26 @@ public class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private Common.SyncFileStatus file_status (string relative_path) {
+        /***********************************************************
+        ***********************************************************/
         //  GLib.assert_true (!relative_path.has_suffix ("/"));
 
         if (relative_path == "") {
+            /***********************************************************
+            ***********************************************************/
             // This is the root sync folder, it doesn't have an entry in the database and won't be walked by csync, so resolve manually.
             return resolve_sync_and_error_status ("", SharedFlag.NOT_SHARED);
         }
 
+        /***********************************************************
+        ***********************************************************/
         // The SyncEngine won't notify us at all for CSync.CSync.ExcludedFiles.Type.EXCLUDE_SILENT
         // and CSync.CSync.ExcludedFiles.Type.EXCLUDE_AND_REMOVE excludes. Even though it's possible
         // that the status of CSync.CSync.ExcludedFiles.Type.LIST excludes will change if the user
         // update the exclude list at runtime and doing it statically here removes
         // our ability to notify changes through the signal_file_status_changed signal,
         // it's an acceptable compromize to treat all exclude types the same.
-        // Update : This extra check shouldn't hurt even though silently excluded files
+        // Update: This extra check shouldn't hurt even though silently excluded files
         // are now available via on_signal_add_silently_excluded ().
         if (this.sync_engine.excluded_files.is_excluded (
             this.sync_engine.local_path + relative_path,
@@ -378,12 +400,16 @@ public class SyncFileStatusTracker : GLib.Object {
         if (this.dirty_paths.contains (relative_path))
             return Common.SyncFileStatus.SyncFileStatusTag.STATUS_SYNC;
 
+        /***********************************************************
+        ***********************************************************/
         // First look it up in the database to know if it's shared
         Common.SyncJournalFileRecord sync_journal_file_record;
         if (this.sync_engine.journal.get_file_record (relative_path, sync_journal_file_record) && sync_journal_file_record.is_valid) {
             return this.resolve_sync_and_error_status (relative_path, sync_journal_file_record.remote_permissions.has_permission (Common.RemotePermissions.Permissions.IS_SHARED) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED);
         }
 
+        /***********************************************************
+        ***********************************************************/
         // Must be a new file not yet in the database, check if it's syncing or has an error.
         return this.resolve_sync_and_error_status (relative_path, SharedFlag.NOT_SHARED, PathKnownFlag.PATH_UNKNOWN);
     }
@@ -392,6 +418,8 @@ public class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private static int path_compare (string lhs, string rhs) {
+        /***********************************************************
+        ***********************************************************/
         // Should match Utility.fs_case_preserving, we want don't want to pay for the runtime check on every comparison.
         return lhs.compare (rhs, GLib.CaseSensitive);
     }

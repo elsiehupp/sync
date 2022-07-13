@@ -45,7 +45,7 @@ public class TestResetServer : AbstractTestAllFilesDeleted {
 
 
     protected void on_signal_about_to_remove_all_files_reset_server (
-        LibSync.LibSync.SyncFileItem.Direction directory,
+        LibSync.SyncFileItem.Direction directory,
         Callback callback
     ) {
         GLib.assert_true (
@@ -55,7 +55,7 @@ public class TestResetServer : AbstractTestAllFilesDeleted {
         about_to_remove_all_files_called++;
         GLib.assert_true (
             directory ==
-            LibSync.LibSync.SyncFileItem.Direction.DOWN
+            LibSync.SyncFileItem.Direction.DOWN
         );
         callback (false);
     }

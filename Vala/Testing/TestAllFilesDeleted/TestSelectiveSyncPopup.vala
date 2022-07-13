@@ -12,7 +12,9 @@ public class TestSelectiveSyncPopup : AbstractTestAllFilesDeleted {
     /***********************************************************
     ***********************************************************/
     private TestSelectiveSyncPopup () {
-        // Unselecting all folder should not cause the popup to be shown
+        /***********************************************************
+        Unselecting all folder should not cause the popup to be shown
+        ***********************************************************/
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         int about_to_remove_all_files_called = 0;
@@ -39,7 +41,7 @@ public class TestSelectiveSyncPopup : AbstractTestAllFilesDeleted {
 
 
     protected void on_signal_about_to_remove_all_files_selective_sync_o_popup (
-        LibSync.LibSync.SyncFileItem.Direction direction,
+        LibSync.SyncFileItem.Direction direction,
         Callback callback
     ) {
         about_to_remove_all_files_called++;

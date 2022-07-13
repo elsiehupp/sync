@@ -55,8 +55,9 @@ public class Config : GLib.Object {
     public const bool WITH_CRASHREPORTER = false;
 
     /***********************************************************
+    CACHE STRING "URL for crash reporter";
     ***********************************************************/
-    public const string CRASHREPORTER_SUBMIT_URL = "https://crash-reports.owncloud.com/submit"; // CACHE STRING "URL for crash reporter";
+    public const string CRASHREPORTER_SUBMIT_URL = "https://crash-reports.owncloud.com/submit";
     public const string RASHREPORTER_ICON = ":/owncloud-icon.png";
 
     /***********************************************************

@@ -68,7 +68,7 @@ public class TestAllFilesDeletedKeep : AbstractTestAllFilesDeleted {
     }
 
 
-    protected void on_signal_about_to_remove_all_files_all_files_deleted_keep (LibSync.LibSync.SyncFileItem.Direction directory, Callback callback) {
+    protected void on_signal_about_to_remove_all_files_all_files_deleted_keep (LibSync.SyncFileItem.Direction directory, Callback callback) {
         GLib.assert_true (
             about_to_remove_all_files_called ==
             0
@@ -76,7 +76,7 @@ public class TestAllFilesDeletedKeep : AbstractTestAllFilesDeleted {
         about_to_remove_all_files_called++;
         GLib.assert_true (
             directory ==
-            delete_on_remote ? LibSync.LibSync.SyncFileItem.Direction.DOWN : LibSync.LibSync.SyncFileItem.Direction.UP
+            delete_on_remote ? LibSync.SyncFileItem.Direction.DOWN : LibSync.SyncFileItem.Direction.UP
         );
         callback (true);
         fake_folder.sync_engine.journal.clear_file_table (); // That's what FolderConnection is doing

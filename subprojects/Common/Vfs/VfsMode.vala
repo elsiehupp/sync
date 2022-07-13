@@ -44,8 +44,9 @@ public enum VfsMode {
     /***********************************************************
     ***********************************************************/
     public static VfsMode from_string (string string_value) throws InvalidParameterError {
-        // Note: Strings are used for config and must be stable
-
+        /***********************************************************
+        Note: Strings are used for config and must be stable
+        ***********************************************************/
         if (string_value == "off") {
             return VfsMode.OFF;
         } else if (string_value == "suffix") {

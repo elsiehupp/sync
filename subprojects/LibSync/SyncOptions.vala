@@ -1,10 +1,3 @@
-/***********************************************************
-***********************************************************/
-
-//  #include <GLib.Regex>
-//  #includeonce
-//  #include <GLib.Regex>
-//  #include <chrono>
 
 namespace Occ {
 namespace LibSync {

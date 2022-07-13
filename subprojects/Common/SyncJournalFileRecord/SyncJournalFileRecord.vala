@@ -46,7 +46,9 @@ public class SyncJournalFileRecord : GLib.Object {
     It is used in the construction of private links.
     ***********************************************************/
     public string numeric_file_id () {
-        // Use the identifier up until the first non-numeric character
+        /***********************************************************
+        Use the identifier up until the first non-numeric character
+        ***********************************************************/
         for (int i = 0; i < this.file_id.length; ++i) {
             if (this.file_id[i] < '0' || this.file_id[i] > '9') {
                 return this.file_id.left (i);
@@ -84,20 +86,23 @@ public class SyncJournalFileRecord : GLib.Object {
     }
 
 
-    //  OCSYNC_EXPORT
-    //  bool operator== (SyncJournalFileRecord lhs,
-    //      SyncJournalFileRecord rhs) {
-    //      return lhs.path == rhs.path
-    //          && lhs.inode == rhs.inode
-    //          && lhs.modtime == rhs.modtime
-    //          && lhs.type == rhs.type
-    //          && lhs.etag == rhs.etag
-    //          && lhs.file_id == rhs.file_id
-    //          && lhs.file_size == rhs.file_size
-    //          && lhs.remote_permissions == rhs.remote_permissions
-    //          && lhs.server_has_ignored_files == rhs.server_has_ignored_files
-    //          && lhs.checksum_header == rhs.checksum_header;
-    //  }
+    /***********************************************************
+    ***********************************************************/
+    internal bool equals (
+        SyncJournalFileRecord lhs,
+        SyncJournalFileRecord rhs
+    ) {
+        return lhs.path == rhs.path
+            && lhs.inode == rhs.inode
+            && lhs.modtime == rhs.modtime
+            && lhs.type == rhs.type
+            && lhs.etag == rhs.etag
+            && lhs.file_id == rhs.file_id
+            && lhs.file_size == rhs.file_size
+            && lhs.remote_permissions == rhs.remote_permissions
+            && lhs.server_has_ignored_files == rhs.server_has_ignored_files
+            && lhs.checksum_header == rhs.checksum_header;
+    }
 
 } // class SyncJournalFileRecord
 

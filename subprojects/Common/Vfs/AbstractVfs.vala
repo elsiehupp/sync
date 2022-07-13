@@ -57,8 +57,6 @@ public abstract class AbstractVfs : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static Result<bool, string> check_availability (string path) {
-        //  Q_UNUSED (mode)
-        //  Q_UNUSED (path)
         return new Result<bool, string> (true, VfsMode.to_string (this.best_available_vfs_mode));
     }
 
@@ -313,7 +311,9 @@ public abstract class AbstractVfs : GLib.Object {
     protected AvailabilityResult availability_in_database (string folder_path) {
         var path = folder_path.to_utf8 ();
         var pin = this.setup_params.journal.internal_pin_states.effective_for_path_recursive (path);
-        // not being able to retrieve the pin state isn't too bad
+        /***********************************************************
+        Not being able to retrieve the pin state isn't too bad
+        ***********************************************************/
         var hydration_status = this.setup_params.journal.has_hydrated_or_dehydrated_files (path);
         if (!hydration_status) {
             return AvailabilityError.DATABASE_ERROR;

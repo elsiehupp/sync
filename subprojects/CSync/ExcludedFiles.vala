@@ -43,7 +43,9 @@ public class ExcludedFiles : GLib.Object {
             base ();
 
             this.string_value = string_value;
-            //  GLib.assert_true (has_suffix ("/"));
+            /***********************************************************
+            GLib.assert_true (has_suffix ("/"));
+            ***********************************************************/
         }
 
 
@@ -80,9 +82,12 @@ public class ExcludedFiles : GLib.Object {
     }
 
 
-    // See http://support.microsoft.com/kb/74496 and
-    // https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247 (v=vs.85).aspx
-    // Additionally, we ignore '$Recycle.Bin', see https://github.com/owncloud/client/issues/2955
+    /***********************************************************
+    See http://support.microsoft.com/kb/74496 and
+    https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx
+    Additionally, we ignore '$Recycle.Bin';
+    see https://github.com/owncloud/client/issues/2955
+    ***********************************************************/
     const string win_reserved_words_3[] = {
         "CON",
         "PRN",
@@ -192,8 +197,8 @@ public class ExcludedFiles : GLib.Object {
     private NextcloudVersion client_version { private get; public set; }
 
     /***********************************************************
+    private friend class AbstractTestCSyncExclude;
     ***********************************************************/
-    //  private friend class AbstractTestCSyncExclude;
 
     /***********************************************************
     ***********************************************************/
@@ -204,13 +209,19 @@ public class ExcludedFiles : GLib.Object {
             MIRALL_VERSION_MINOR,
             MIRALL_VERSION_PATCH
         );
-        //  GLib.assert_true (this.local_path.has_suffix ("/"));
+        /***********************************************************
+        GLib.assert_true (this.local_path.has_suffix ("/"));
+        ***********************************************************/
 
         this.exclude_conflict_files = true;
-        // Windows used to use PathMatchSpec which allows foo to match abc/deffoo.
+        /***********************************************************
+        Windows used to use PathMatchSpec which allows foo to match abc/deffoo.
+        ***********************************************************/
         this.wildcards_match_slash = Utility.is_windows ();
 
-        // We're in a detached exclude probably coming from a partial sync or test
+        /***********************************************************
+        We're in a detached exclude probably coming from a partial sync or test
+        ***********************************************************/
         if (this.local_path == "") {
             return;
         }
@@ -233,7 +244,8 @@ public class ExcludedFiles : GLib.Object {
     /***********************************************************
     Adds a new path to a file containing exclude patterns.
 
-    Does not load the file. Use on_signal_reload_exclude_files () afterwards.
+    Does not load the file. Use on_signal_reload_exclude_files ()
+    afterwards.
     ***********************************************************/
     public void add_exclude_file_path (string path) {
         GLib.FileInfo exclude_file_info = new GLib.FileInfo (path);
@@ -261,15 +273,22 @@ public class ExcludedFiles : GLib.Object {
         string base_path,
         bool exclude_hidden) {
         if (!file_path.has_prefix (base_path, Utility.fs_case_preserving ? GLib.CaseInsensitive : GLib.CaseSensitive)) {
-            // Mark paths we're not responsible for as excluded...
+            /***********************************************************
+            Mark paths we're not responsible for as excluded...
+            ***********************************************************/
             return true;
         }
 
-        //  TODO this seems a waste, hidden files are ignored before hitting this function it seems
+        /***********************************************************
+        TODO this seems a waste, hidden files are ignored before
+        hitting this function it seems
+        ***********************************************************/
         if (exclude_hidden) {
             string path = file_path;
-            // Check all path subcomponents, but to not* check the base path:
-            // We do want to be able to sync with a hidden folder as the target.
+            /***********************************************************
+            Check all path subcomponents, but to *not* check the base path:
+            We do want to be able to sync with a hidden folder as the target.
+            ***********************************************************/
             while (path.length > base_path.length) {
                 GLib.FileInfo file_info = new GLib.FileInfo (path);
                 if (file_info.filename () != ".sync-exclude.lst"
@@ -277,7 +296,9 @@ public class ExcludedFiles : GLib.Object {
                     return true;
                 }
 
-                // Get the parent path
+                /***********************************************************
+                Get the parent path
+                ***********************************************************/
                 path = file_info.absolute_path;
             }
         }
@@ -311,7 +332,9 @@ public class ExcludedFiles : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void add_manual_exclude_with_base_path (string expr, string base_path) {
-        //  GLib.assert_true (base_path.has_suffix ("/"));
+        /***********************************************************
+        GLib.assert_true (base_path.has_suffix ("/"));
+        ***********************************************************/
 
         var key = base_path;
         this.manual_excludes[key].append (expr);
@@ -355,7 +378,9 @@ public class ExcludedFiles : GLib.Object {
             return CSync.ExcludedFiles.Type.NOT_EXCLUDED;
         }
 
-        // Directories are guaranteed to be visited before their files
+        /***********************************************************
+        Directories are guaranteed to be visited before their files
+        ***********************************************************/
         if (filetype == ItemType.DIRECTORY) {
             string base_path = this.local_path + path + "/";
             string absolute_path = base_path + ".sync-exclude.lst";
@@ -369,8 +394,10 @@ public class ExcludedFiles : GLib.Object {
             }
         }
 
-        // Check the bname part of the path to see whether the full
-        // regular_expression should be run.
+        /***********************************************************
+        Check the bname part of the path to see whether the full
+        regular expression should be run.
+        ***********************************************************/
         /* GLib.StringRef */ string bname_str = new /* GLib.StringRef */ string (path);
         int last_slash = path.last_index_of ("/");
         if (last_slash >= 0) {
@@ -400,7 +427,9 @@ public class ExcludedFiles : GLib.Object {
             }
         }
 
-        // third capture: full path matching is triggered
+        /***********************************************************
+        Third capture: full path matching is triggered
+        ***********************************************************/
         base_path = this.local_path + path;
         while (base_path.length > this.local_path.length) {
             base_path = left_include_last (base_path, "/");
@@ -432,7 +461,9 @@ public class ExcludedFiles : GLib.Object {
     ***********************************************************/
     public bool on_signal_reload_exclude_files () {
         this.all_excludes = "";
-        // clear all regular_expression
+        /***********************************************************
+        Clear all regular expressions.
+        ***********************************************************/
         this.bname_traversal_regex_file = "";
         this.bname_traversal_regex_dir = "";
         this.full_traversal_regex_file = "";
@@ -482,7 +513,9 @@ public class ExcludedFiles : GLib.Object {
         }
         this.all_excludes[base_path].append (patterns);
 
-        // nothing to prepare if the user decided to not exclude anything
+        /***********************************************************
+        Nothing to prepare if the user decided to not exclude anything
+        ***********************************************************/
         if (!this.all_excludes.value (base_path) == "") {
             prepare (base_path);
         }
@@ -554,8 +587,13 @@ public class ExcludedFiles : GLib.Object {
             return CSync.ExcludedFiles.Type.NOT_EXCLUDED;
         }
 
-        // `path` seems to always be relative to `this.local_path`, the tests however have not been
-        // written that way... this makes the tests happy for now. TODO Fix the tests at some point
+        /***********************************************************
+        `path` seems to always be relative to `this.local_path`.
+        However, the tests have not been written that way... this
+        makes the tests happy for now.
+        
+        TODO Fix the tests at some point/
+        ***********************************************************/
         string path = path_1;
         if (path.has_prefix (this.local_path)) {
             path = path.mid (this.local_path.length);
@@ -618,28 +656,38 @@ public class ExcludedFiles : GLib.Object {
     returns not-excluded because "c" isn't a bname activation pattern.
     ***********************************************************/
     private void prepare_with_base_path (BasePathString base_path) {
-        //  GLib.assert_true (this.all_excludes.contains (base_path));
+        /***********************************************************
+        GLib.assert_true (this.all_excludes.contains (base_path));
+        ***********************************************************/
 
-        // Build regular expressions for the different cases.
-        //  
-        // To compose the this.bname_traversal_regex, this.full_traversal_regex and this.full_regex
-        // patterns we collect several subgroups of patterns here.
-        //  
-        // * The "full" group will contain all patterns that contain a non-trailing
-        //   slash. They only make sense in the full_regex and full_traversal_regex.
-        // * The "bname" group contains all patterns without a non-trailing slash.
-        //   These need separate handling in the this.full_regex (slash-containing
-        //   patterns must be anchored to the front, these don't need it)
-        // * The "bname_trigger" group contains the bname part of all patterns in the
-        //   "full" group. These and the "bname" group become this.bname_traversal_regex.
-        //  
-        // To complicate matters, the exclude patterns have two binary attributes
-        // meaning we'll end up with 4 variants:
-        // * "]" patterns mean "EXCLUDE_AND_REMOVE", they get collected in the
-        //   pattern strings ending in "Remove". The others go to "Keep".
-        // * trailing-slash patterns match directories only. They get collected
-        //   in the pattern strings saying "Dir", the others go into "FileDir"
-        //   because they match files and directories.
+        /***********************************************************
+        Build regular expressions for the different cases.
+        
+        To compose the this.bname_traversal_regex, this.full_traversal_regex and this.full_regex
+        patterns we collect several subgroups of patterns here.
+        
+        *   The "full" group will contain all patterns that contain a
+            non-trailing slash. They only make sense in the full_regex
+            and full_traversal_regex.
+        *   The "bname" group contains all patterns without a non-
+            trailing slash. These need separate handling in the
+            this.full_regex (slash-containing patterns must be
+            anchored to the front, these don't need it)
+        *   The "bname_trigger" group contains the bname part of all
+            patterns in the "full" group. These and the "bname"
+            group become this.bname_traversal_regex.
+        
+        To complicate matters, the exclude patterns have two binary
+        attributes meaning we'll end up with 4 variants:
+
+        *   "]" patterns mean "EXCLUDE_AND_REMOVE", they get
+            collected in the pattern strings ending in "Remove". The
+            others go to "Keep".
+        *   Trailing-slash patterns match directories only. They get
+            collected in the pattern strings saying "Dir", the
+            others go into "FileDir" because they match files and
+            directories.
+        ***********************************************************/
 
         string full_file_dir_keep;
         string full_file_dir_remove;
@@ -656,10 +704,16 @@ public class ExcludedFiles : GLib.Object {
 
         foreach (var exclude in this.all_excludes.value (base_path)) {
             if (exclude[0] == "\n") {
-                continue; // empty line
+                /***********************************************************
+                Empty line
+                ***********************************************************/
+                continue;
             }
             if (exclude[0] == '\r') {
-                continue; // empty line
+                /***********************************************************
+                Empty line
+                ***********************************************************/
+                continue;
             }
 
             bool match_dir_only = exclude.has_suffix ("/");
@@ -674,19 +728,27 @@ public class ExcludedFiles : GLib.Object {
 
             bool full_path = exclude.contains ("/");
 
-            /* Use GLib.Regex, append to the right pattern */
+            /***********************************************************
+            Use GLib.Regex, append to the right pattern.
+            ***********************************************************/
             var bname_file_dir = remove_excluded ? bname_file_dir_remove : bname_file_dir_keep;
             var bname_dir = remove_excluded ? bname_dir_remove : bname_dir_keep;
             var full_file_dir = remove_excluded ? full_file_dir_remove : full_file_dir_keep;
             var full_dir = remove_excluded ? full_dir_remove : full_dir_keep;
 
             if (full_path) {
-                // The full pattern is matched against a path relative to this.local_path, however exclude is
-                // relative to base_path at this point.
-                // We know for sure that both this.local_path and base_path are absolute and that base_path is
-                // contained in this.local_path. So we can simply remove it from the begining.
+                /***********************************************************
+                The full pattern is matched against a path relative to
+                this.local_path, however exclude is relative to base_path at
+                this point. We know for sure that both this.local_path and
+                base_path are absolute and that base_path is contained in
+                this.local_path. So we can simply remove it from the
+                begining.
+                ***********************************************************/
                 var rel_path = base_path.mid (this.local_path.length);
-                // Make exclude relative to this.local_path
+                /***********************************************************
+                Makes exclude relative to this.local_path
+                ***********************************************************/
                 exclude.prepend (rel_path);
             }
             var regex_exclude = convert_to_regexp_syntax (exclude, this.wildcards_match_slash);
@@ -695,7 +757,10 @@ public class ExcludedFiles : GLib.Object {
             } else {
                 regex_append (full_file_dir, full_dir, regex_exclude, match_dir_only);
 
-                // For activation, trigger on the 'bname' part of the full pattern.
+                /***********************************************************
+                For activation, triggers on the 'bname' part of the full
+                pattern.
+                ***********************************************************/
                 string bname_exclude = extract_bname_trigger (exclude, this.wildcards_match_slash);
                 var regex_bname = convert_to_regexp_syntax (bname_exclude, true);
                 regex_append (bname_trigger_file_dir, bname_trigger_dir, regex_bname, match_dir_only);
@@ -715,11 +780,16 @@ public class ExcludedFiles : GLib.Object {
         empty_match_nothing (bname_trigger_file_dir);
         empty_match_nothing (bname_trigger_dir);
 
-        // The bname regular_expression is applied to the bname only, so it must be
-        // anchored in the beginning and in the end. It has the structure:
-        // (exclude)| (excluderemove)| (bname triggers).
-        // If the third group matches, the full_activated_regex needs to be applied
-        // to the full path.
+        /***********************************************************
+        The bname regular expression is applied to the bname only,
+        so it must be anchored in the beginning and in the end. It
+        has the structure:
+
+        (exclude)|(excluderemove)|(bname triggers).
+
+        If the third group matches, the full_activated_regex needs
+        to be applied to the full path.
+        ***********************************************************/
         this.bname_traversal_regex_file[base_path].pattern (
             "^ (?P<exclude>%1)$|"
             + "^ (?P<excluderemove>%2)$|"
@@ -731,12 +801,18 @@ public class ExcludedFiles : GLib.Object {
             + "^ (?P<trigger>%5|%6)$"
                 .printf (bname_file_dir_keep, bname_dir_keep, bname_file_dir_remove, bname_dir_remove, bname_trigger_file_dir, bname_trigger_dir));
 
-        // The full traveral regular_expression is applied to the full path if the trigger capture of
-        // the bname regular_expression matches. Its basic form is (exclude)| (excluderemove)".
-        // This pattern can be much simpler than full_regex since we can assume a traversal
-        // situation and doesn't need to look for bname patterns in parent paths.
+        /***********************************************************
+        The full traveral regular_expression is applied to the full
+        path if the trigger capture of the bname regular_expression
+        matches. Its basic form is (exclude)|(excluderemove). This
+        pattern can be much simpler than full_regex since we can
+        assume a traversal situation and doesn't need to look for
+        bname patterns in parent paths.
+        ***********************************************************/
         this.full_traversal_regex_file[base_path].pattern (
-            // Full patterns are anchored to the beginning
+            /***********************************************************
+            Full patterns are anchored to the beginning.
+            ***********************************************************/
             "^ (?P<exclude>%1) (?:$|/)"
             + "|"
             + "^ (?P<excluderemove>%2) (?:$|/)"
@@ -747,16 +823,25 @@ public class ExcludedFiles : GLib.Object {
             + "^ (?P<excluderemove>%3|%4) (?:$|/)"
                 .printf (full_file_dir_keep, full_dir_keep, full_file_dir_remove, full_dir_remove));
 
-        // The full regular_expression is applied to the full path and incorporates both bname and
-        // full-path patterns. It has the form " (exclude)| (excluderemove)".
+        /***********************************************************
+        The full regular_expression is applied to the full path and
+        incorporates both bname and full-path patterns. It has the
+        form "(exclude)|(excluderemove)".
+        ***********************************************************/
         this.full_regex_file[base_path].pattern (
             " (?P<exclude>"
-            // Full patterns are anchored to the beginning
+            /***********************************************************
+            Full patterns are anchored to the beginning.
+            ***********************************************************/
             + "^ (?:%1) (?:$|/)|"
-            // Simple bname patterns can be any path component
+            /***********************************************************
+            Simple bname patterns can be any path component.
+            ***********************************************************/
             + " (?:^|/) (?:%2) (?:$|/)|"
-            // When checking a file for exclusion we must check all parent paths
-            // against the directory-only patterns as well.
+            /***********************************************************
+            When checking a file for exclusion we must check all parent
+            paths against the directory-only patterns as well.
+            ***********************************************************/
             + " (?:^|/) (?:%3)/)"
             + "|"
             + " (?P<excluderemove>"
@@ -796,7 +881,9 @@ public class ExcludedFiles : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void prepare () {
-        // clear all regular_expression
+        /***********************************************************
+        Clear all regular expressions.
+        ***********************************************************/
         this.bname_traversal_regex_file = "";
         this.bname_traversal_regex_dir = "";
         this.full_traversal_regex_file = "";
@@ -814,31 +901,45 @@ public class ExcludedFiles : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private static string extract_bname_trigger (string exclude, bool wildcards_match_slash) {
-        // We can definitely drop everything to the left of a / - that will never match
-        // any bname.
+        /***********************************************************
+        We can definitely drop everything to the left of a / as it
+        will never match any bname.
+        ***********************************************************/
         string pattern = exclude.mid (exclude.last_index_of ("/") + 1);
-        // Easy case, nothing else can match a slash, so that's it.
+        /***********************************************************
+        Easy case, nothing else can match a slash, so that's it.
+        ***********************************************************/
         if (!wildcards_match_slash) {
             return pattern;
         }
-        // Otherwise it's more complicated. Examples:
-        // - "foo*bar" can match "foo_x/Xbar", pattern is "*bar"
-        // - "foo*bar*" can match "foo_x/XbarX", pattern is "*bar*"
-        // - "foo?bar" can match "foo/bar" but also "foo_xbar", pattern is "*bar"
+        /***********************************************************
+        Otherwise it's more complicated. Examples:
+        - "foo*bar" can match "foo_x/Xbar", pattern is "*bar"
+        - "foo*bar*" can match "foo_x/XbarX", pattern is "*bar*"
+        - "foo?bar" can match "foo/bar" but also "foo_xbar", pattern is "*bar"
+        ***********************************************************/
 
-        // First, skip wildcards on the very right of the pattern
+        /***********************************************************
+        First, skip wildcards on the very right of the pattern
+        ***********************************************************/
         ExcludedFiles.iterator = pattern.length - 1;
         while (ExcludedFiles.iterator >= 0 && is_wildcard (pattern[this.iterator]))
             --ExcludedFiles.iterator;
 
-        // Then scan further until the next wildcard that could match a /
+        /***********************************************************
+        Then scan further until the next wildcard that could match a /
+        ***********************************************************/
         while (ExcludedFiles.iterator >= 0 && !is_wildcard (pattern[this.iterator]))
             --ExcludedFiles.iterator;
 
-        // Everything to the right is part of the pattern
+        /***********************************************************
+        Everything to the right is part of the pattern
+        ***********************************************************/
         pattern = pattern.mid (this.iterator + 1);
 
-        // And if there was a wildcard, it starts with a *
+        /***********************************************************
+        And if there was a wildcard, it starts with a *
+        ***********************************************************/
         if (ExcludedFiles.iterator >= 0) {
             pattern.prepend ('*');
         }
@@ -889,7 +990,9 @@ public class ExcludedFiles : GLib.Object {
         char *line = input;
         for (ExcludedFiles.iterator = 0; ExcludedFiles.iterator < input.length; ++ExcludedFiles.iterator) {
             if (line[ExcludedFiles.iterator] == '\\') {
-                // at worst input[ExcludedFiles.iterator+1] is \0
+                /***********************************************************
+                At worst, input[ExcludedFiles.iterator+1] is \0
+                ***********************************************************/
                 switch (line[ExcludedFiles.iterator+1]) {
                 case "'" : line[o++] = "'"; break;
                 case "\\" : line[o++] = "\\"; break;
@@ -903,9 +1006,12 @@ public class ExcludedFiles : GLib.Object {
                 case 't' : line[o++] = '\t'; break;
                 case 'v' : line[o++] = '\v'; break;
                 default:
-                    // '\*' '\?' '\[' '\\' will be processed during regular_expression translation
-                    // '\\' is intentionally not expanded here (to avoid '\\*' and '\*'
-                    // ending up meaning the same thing)
+                    /***********************************************************
+                    '\*' '\?' '\[' '\\' will be processed during regular
+                    expression translation. '\\' is intentionally not expanded
+                    here (to avoid '\\*' and '\*' ending up meaning the same
+                    thing).
+                    ***********************************************************/
                     line[o++] = line[this.iterator];
                     line[o++] = line[this.iterator + 1];
                     break;
@@ -926,7 +1032,9 @@ public class ExcludedFiles : GLib.Object {
     ***********************************************************/
     private static bool csync_is_windows_reserved_word (/* GLib.StringRef */ string filename) {
 
-        // Drive letters
+        /***********************************************************
+        Drive letters
+        ***********************************************************/
         if (filename.length == 2 && filename[1] == ':') {
             if (filename.at (0) >= 'a' && filename.at (0) <= 'z') {
                 return true;
@@ -963,6 +1071,8 @@ public class ExcludedFiles : GLib.Object {
 
 
     private static CSync.ExcludedFiles.Type csync_excluded_common (string path, bool exclude_conflict_files) {
+        /***********************************************************
+        ***********************************************************/
         /* split up the path */
         /* GLib.StringRef */ string bname = new /* GLib.StringRef */ string (path);
         int last_slash = path.last_index_of ("/");
@@ -971,27 +1081,46 @@ public class ExcludedFiles : GLib.Object {
         }
 
         size_t blen = bname.length;
-        // 9 = strlen (".sync_.db")
+        /***********************************************************
+        9 = strlen (".sync_.db")
+        ***********************************************************/
         if (blen >= 9 && bname.at (0) == '.') {
             if (bname.contains (".db")) {
-                if (bname.has_prefix (".sync_", GLib.CaseInsensitive)  // ".sync_*.db*"
-                    || bname.has_prefix (".sync_", GLib.CaseInsensitive) // ".sync_*.db*"
-                    || bname.has_prefix (".csync_journal.db", GLib.CaseInsensitive)) { // ".csync_journal.db*"
+                /***********************************************************
+                ".sync_*.db*"
+                ***********************************************************/
+                if (bname.has_prefix (".sync_", GLib.CaseInsensitive)
+                    /***********************************************************
+                    ".sync_*.db*"
+                    ***********************************************************/
+                    || bname.has_prefix (".sync_", GLib.CaseInsensitive)
+                    /***********************************************************
+                    ".csync_journal.db*"
+                    ***********************************************************/
+                    || bname.has_prefix (".csync_journal.db", GLib.CaseInsensitive)) {
                     return CSync.ExcludedFiles.Type.EXCLUDE_SILENT;
                 }
             }
-            if (bname.has_prefix (".owncloudsync.log", GLib.CaseInsensitive)) { // ".owncloudsync.log*"
+            /***********************************************************
+            ".owncloudsync.log*"
+            ***********************************************************/
+            if (bname.has_prefix (".owncloudsync.log", GLib.CaseInsensitive)) {
                 return CSync.ExcludedFiles.Type.EXCLUDE_SILENT;
             }
         }
 
-        // check the strlen and ignore the file if its name is longer than 254 chars.
-        // whenever changing this also check create_download_temporary_filename
+        /***********************************************************
+        Check the strlen and ignore the file if its name is longer
+        than 254 chars. Whenever changing this also check
+        create_download_temporary_filename.
+        ***********************************************************/
         if (blen > 254) {
             return CSync.ExcludedFiles.Type.LONG_FILENAME;
         }
 
-        /* Do not sync desktop.ini files anywhere in the tree. */
+        /***********************************************************
+        Do not sync desktop.ini files anywhere in the tree.
+        ***********************************************************/
         string desktop_ini_file = "desktop.ini";
         if (blen == (size_t)desktop_ini_file.length && bname.compare (desktop_ini_file, GLib.CaseInsensitive) == 0) {
             return CSync.ExcludedFiles.Type.EXCLUDE_SILENT;
@@ -1005,7 +1134,9 @@ public class ExcludedFiles : GLib.Object {
 
 
     private static string left_include_last (string arr, char c) {
-        // left up to and including `c`
+        /***********************************************************
+        Left up to and including `c`
+        ***********************************************************/
         return arr.left (arr.last_index_of (c, arr.length - 2) + 1);
     }
 
@@ -1015,21 +1146,24 @@ public class ExcludedFiles : GLib.Object {
 
 
     /***********************************************************
-    On linux we used to use fnmatch with FNM_PATHNAME, but the windows function we used
-    didn't have that behavior. wildcards_match_slash can be used to control which behavior
+    On Winux we used to use fnmatch with FNM_PATHNAME, but the
+    Windows function we used didn't have that behavior.
+    wildcards_match_slash can be used to control which behavior
     the resulting regular_expression shall use.
     ***********************************************************/
     private string convert_to_regexp_syntax (string exclude, bool wildcards_match_slash) {
-        // Translate *, ?, [...] to their regular_expression variants.
-        // The escape sequences \*, \?, \[. \\ have a special meaning,
-        // the other ones have already been expanded before
-        // (like "\\n" being replaced by "\n").
-        //  
-        // string being UTF-16 makes unicode-correct escaping tricky.
-        // If we escaped each UTF-16 code unit we'd end up splitting 4-byte
-        // code points. To avoid problems we delegate as much work as possible to
-        // GLib.Regex.escape () : It always receives as long a sequence
-        // as code units as possible.
+        /***********************************************************
+        Translate *, ?, [...] to their regular_expression variants.
+        The escape sequences \*, \?, \[. \\ have a special meaning,
+        the other ones have already been expanded before
+        (like "\\n" being replaced by "\n").
+        
+        string being UTF-16 makes unicode-correct escaping tricky.
+        If we escaped each UTF-16 code unit we'd end up splitting
+        4-byte code points. To avoid problems we delegate as much
+        work as possible to GLib.Regex.escape () : It always
+        receives as long a sequence as code units as possible.
+        ***********************************************************/
         this.regular_expression = "";
         this.chars_to_escape = 0;
         this.iterator = 0;
@@ -1053,7 +1187,9 @@ public class ExcludedFiles : GLib.Object {
                 break;
             case '[': {
                 flush ();
-                // Find the end of the bracket expression
+                /***********************************************************
+                Find the end of the bracket expression.
+                ***********************************************************/
                 var j = this.iterator + 1;
                 for (; j < exclude.length; ++j) {
                     if (exclude[j] == ']') {
@@ -1064,11 +1200,15 @@ public class ExcludedFiles : GLib.Object {
                     }
                 }
                 if (j == exclude.length) {
-                    // no matching ], just insert the escaped [
-                        this.regular_expression.append ("\\[");
+                    /***********************************************************
+                    Wo matching ], just insert the escaped [
+                    ***********************************************************/
+                    this.regular_expression.append ("\\[");
                     break;
                 }
-                // Translate [! to [^
+                /***********************************************************
+                Translate [! to [^
+                ***********************************************************/
                 string bracket_expr = exclude.mid (this.iterator, j - this.iterator + 1);
                 if (bracket_expr.has_prefix ("[!")) {
                     bracket_expr[1] = '^';
@@ -1083,7 +1223,9 @@ public class ExcludedFiles : GLib.Object {
                     this.regular_expression.append ("\\\\");
                     break;
                 }
-                // '\*' . '\*', but '\z' . '\\z'
+                /***********************************************************
+                '\*' -> '\*', but '\z' -> '\\z'
+                ***********************************************************/
                 switch (exclude[this.iterator + 1].unicode ()) {
                 case '*':
                 case '?':

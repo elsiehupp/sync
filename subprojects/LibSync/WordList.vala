@@ -2082,19 +2082,21 @@ public class WordList : GLib.Object {
     }
 
 
-    //  public static int get_random_number (uint max) {
-    //      uchar d[8];
-    //      RAND_bytes (d, 8);
+    /***********************************************************
+    public static int get_random_number (uint max) {
+        uchar d[8];
+        RAND_bytes (d, 8);
 
-    //      uint32 num = 0;
+        uint32 num = 0;
 
-    //      foreach (uchar c in d) {
-    //          num = num << 8;
-    //          num += c;
-    //      }
+        foreach (uchar c in d) {
+            num = num << 8;
+            num += c;
+        }
 
-    //      return (int) (num % max);
-    //  }
+        return (int) (num % max);
+    }
+    ***********************************************************/
 
 } // class WordList
 

@@ -50,7 +50,7 @@ public class UpdaterScheduler : GLib.Object {
         Re-set the check interval if it changed in the config file
         meanwhile.
         ***********************************************************/
-        uint check_interval = LibSync.LibSync.ConfigFile.update_check_interval;
+        uint check_interval = LibSync.ConfigFile.update_check_interval;
         if (check_interval != this.update_check_timer_interval) {
             this.update_check_timer_interval = check_interval;
             GLib.info ("Setting new update check interval " + check_interval);
@@ -64,7 +64,7 @@ public class UpdaterScheduler : GLib.Object {
         Consider the skip_update_check and !auto_update_check flags
         in the config.
         ***********************************************************/
-        if (LibSync.LibSync.ConfigFile.skip_update_check || !LibSync.LibSync.ConfigFile.auto_update_check) {
+        if (LibSync.ConfigFile.skip_update_check || !LibSync.ConfigFile.auto_update_check) {
             GLib.info ("Skipping update check because of config file.");
             return false; // only run once
         }

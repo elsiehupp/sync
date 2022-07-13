@@ -15,15 +15,17 @@ libcsync -- a library to sync a directory with another
 ***********************************************************/
 public class FileStat : GLib.Object {
 
-    //  #if defined (Q_CC_GNU) && !defined (Q_CC_INTEL) && !defined (Q_CC_CLANG) && (__GNUC__ * 100 + __GNUC_MINOR__ < 408)
-    // open_suse 12.3 didn't like enum bitfields.
-    //  const int BITFIELD (size)
-    //  #elif defined (Q_CC_MSVC)
-    // MSVC stores enum and bool as signed, so we need to add a bit for the sign
-    //  const int BITFIELD (size) : (size+1)
-    //  #else
-    //  const int BITFIELD (size) : size
-    //  #endif
+    /***********************************************************
+    #if defined (Q_CC_GNU) && !defined (Q_CC_INTEL) && !defined (Q_CC_CLANG) && (__GNUC__ * 100 + __GNUC_MINOR__ < 408)
+    open_suse 12.3 didn't like enum bitfields.
+    const int BITFIELD (size)
+    #elif defined (Q_CC_MSVC)
+    MSVC stores enum and bool as signed, so we need to add a bit for the sign
+    const int BITFIELD (size) : (size+1)
+    #else
+    const int BITFIELD (size) : size
+    #endif
+    ***********************************************************/
 
     public time_t modtime = 0;
     public int64 size = 0;

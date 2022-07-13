@@ -9,7 +9,9 @@ data structures
 ***********************************************************/
 public class CipherContext : GLib.Object {
 
-    //  Q_DISABLE_COPY (CipherContext)
+    /***********************************************************
+    Q_DISABLE_COPY (CipherContext)
+    ***********************************************************/
     private EVP_CIPHER_CTX context;
 
     /***********************************************************
@@ -23,9 +25,11 @@ public class CipherContext : GLib.Object {
     }
 
 
-    //  public operator EVP_CIPHER_CTX* () {
-    //      return this.context;
-    //  }
+    /***********************************************************
+    public operator EVP_CIPHER_CTX* () {
+        return this.context;
+    }
+    ***********************************************************/
 
 } // class CipherContext
 

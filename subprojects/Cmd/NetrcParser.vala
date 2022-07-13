@@ -52,7 +52,10 @@ public class NetrcParser : GLib.Object {
             if (key == DEFAULT_KEYWORD) {
                 try_add_entry_and_clear (machine, pair, is_default);
                 is_default = true;
-                continue; // don't read a value
+                /***********************************************************
+                Don't read a value
+                ***********************************************************/
+                continue;
             }
 
             if (!tokenizer.has_next ()) {
@@ -68,7 +71,10 @@ public class NetrcParser : GLib.Object {
                 pair.first = value;
             } else if (key == PASSWORD_KEYWORD) {
                 pair.second = value;
-            } // ignore unsupported tokens
+            }
+            /***********************************************************
+            Ignore unsupported tokens
+            ***********************************************************/
         }
         try_add_entry_and_clear (machine, pair, is_default);
 

@@ -892,14 +892,14 @@ public class FolderConnection : GLib.Object {
     /***********************************************************
     Connected to the corresponding signals in the LibSync.SyncEngine
     ***********************************************************/
-    public void on_signal_about_to_remove_all_files (LibSync.LibSync.SyncFileItem.Direction directory, Callback callback) {
+    public void on_signal_about_to_remove_all_files (LibSync.SyncFileItem.Direction directory, Callback callback) {
         LibSync.ConfigFile config_file;
         if (!LibSync.ConfigFile.prompt_delete_files ()) {
             callback (false);
             return;
         }
 
-        string message = directory == LibSync.LibSync.SyncFileItem.Direction.DOWN
+        string message = directory == LibSync.SyncFileItem.Direction.DOWN
             ? _("All files in the sync folder_connection \"%1\" folder_connection were deleted on the server.\n"
               + "These deletes will be synchronized to your local sync folder_connection, making such files "
               + "unavailable unless you have a right to restore. \n"
@@ -1317,7 +1317,7 @@ public class FolderConnection : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_add_error_to_gui (LibSync.LibSync.SyncFileItem.Status status, string error_message, string subject = "") {
+    private void on_signal_add_error_to_gui (LibSync.SyncFileItem.Status status, string error_message, string subject = "") {
         ProgressDispatcher.instance.signal_add_error_to_gui (alias (), status, error_message, subject);
     }
 

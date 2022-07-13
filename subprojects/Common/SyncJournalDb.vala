@@ -1489,8 +1489,9 @@ public class SyncJournalDb : GLib.Object {
 
         while (query.next ().has_data) {
             /***********************************************************
+            Path
             ***********************************************************/
-            string file = query.string_value (3); // path
+            string file = query.string_value (3);
             if (!keep.contains (file)) {
                 superfluous_paths.append (file);
                 DownloadInfo info;
@@ -2822,7 +2823,8 @@ public class SyncJournalDb : GLib.Object {
                              + "mode INTEGER,"
                              + "modtime INTEGER (8),"
                              + "type INTEGER,"
-                             /*********************************************************** // This is the etag.  Called md5 for compatibility
+                             /***********************************************************
+                             This is the etag. Called md5 for compatibility
                              update_database_structure () will add:
 
                              fileid
@@ -2833,8 +2835,8 @@ public class SyncJournalDb : GLib.Object {
                              content_checksum_type_id
                              ***********************************************************/
                              + "md5 VARCHAR (32),"
-                            + "PRIMARY KEY (phash)"
-                            + ");");
+                             + "PRIMARY KEY (phash)"
+                             + ");");
 
         if (!create_query.exec ()) {
             /***********************************************************

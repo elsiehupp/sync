@@ -22,7 +22,10 @@ public abstract class AbstractComputeChecksum : GLib.Object {
     protected const string CHECKSUM_SHA3C = "SHA3-256";
     protected const string CHECKSUM_ADLER_C = "Adler32";
 
-    protected const int64 BUFSIZE = 500 * 1024; // 500 KiB
+    /***********************************************************
+    500 KiB
+    ***********************************************************/
+    protected const int64 BUFSIZE = 500 * 1024;
 
     protected static bool enabled;
 
@@ -43,16 +46,22 @@ public abstract class AbstractComputeChecksum : GLib.Object {
             return "";
         }
         int i = 0;
-        // The order of the searches here defines the preference ordering.
+        /***********************************************************
+        The order of the searches here defines the preference ordering.
+        ***********************************************************/
         if (-1 != (i = checksums.index_of ("SHA3-256:", 0, GLib.CaseInsensitive))
             || -1 != (i = checksums.index_of ("SHA256:", 0, GLib.CaseInsensitive))
             || -1 != (i = checksums.index_of ("SHA1:", 0, GLib.CaseInsensitive))
             || -1 != (i = checksums.index_of ("MD5:", 0, GLib.CaseInsensitive))
             || -1 != (i = checksums.index_of ("ADLER32:", 0, GLib.CaseInsensitive))) {
-            // Now i is the on_signal_start of the best checksum
-            // Grab it until the next space or end of xml or end of string.
+            /***********************************************************
+            Now i is the start of the best checksum
+            Grab it until the next space or end of xml or end of string.
+            ***********************************************************/
             int end = checksums.index_of (' ', i);
-            // workaround for https://github.com/owncloud/core/pull/38304
+            /***********************************************************
+            Workaround for https://github.com/owncloud/core/pull/38304
+            ***********************************************************/
             if (end == -1) {
                 end = checksums.index_of ('<', i);
             }

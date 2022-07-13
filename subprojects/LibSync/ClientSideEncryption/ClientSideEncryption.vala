@@ -62,8 +62,8 @@ public class ClientSideEncryption : GLib.Object {
 
 
     /***********************************************************
+    public ClientSideEncryption () = default;
     ***********************************************************/
-    //  public ClientSideEncryption () = default;
 
     /***********************************************************
     ***********************************************************/
@@ -117,7 +117,9 @@ public class ClientSideEncryption : GLib.Object {
             return;
         }
         string key = BIO2Byte_array (private_key);
-        //  this.private_key = GLib.ByteArray (key, GLib.Ssl.Rsa, GLib.Ssl.Pem, GLib.Ssl.PrivateKey);
+        /***********************************************************
+        this.private_key = GLib.ByteArray (key, GLib.Ssl.Rsa, GLib.Ssl.Pem, GLib.Ssl.PrivateKey);
+        ***********************************************************/
         this.private_key = key;
 
         GLib.info ("Keys generated correctly, sending to server.");
@@ -220,7 +222,6 @@ public class ClientSideEncryption : GLib.Object {
         store_private_key_api_job.private_key = crypted_text;
         StorePrivateKeyApiJob.signal_json_received.connect (
             (store_private_key_api_job, doc, return_code) => {
-                //  Q_UNUSED (doc);
                 switch (return_code) {
                     case 200:
                         GLib.info ("Private key stored encrypted on server.");
@@ -275,7 +276,9 @@ public class ClientSideEncryption : GLib.Object {
         var account = read_job.property (ACCOUNT_PROPERTY).value<Account> ();
         GLib.assert (account);
 
-        // Error or no valid public key error out
+        /***********************************************************
+        Error or no valid public key error out
+        ***********************************************************/
         if (read_job.error != NoError || read_job.binary_data ().length == 0) {
             get_public_key_from_server (account);
             return;
@@ -316,7 +319,9 @@ public class ClientSideEncryption : GLib.Object {
         var account = read_job.property (ACCOUNT_PROPERTY).value<Account> ();
         GLib.assert (account);
 
-        // Error or no valid public key error out
+        /***********************************************************
+        Error or no valid public key error out
+        ***********************************************************/
         if (read_job.error != NoError || read_job.binary_data ().length == 0) {
             this.certificate = new GLib.TlsCertificate ();
             this.public_key = GLib.ByteArray ();
@@ -324,7 +329,9 @@ public class ClientSideEncryption : GLib.Object {
             return;
         }
 
-        //  this.private_key = GLib.ByteArray (read_job.binary_data (), GLib.Ssl.Rsa, GLib.Ssl.Pem, GLib.Ssl.PrivateKey);
+        /***********************************************************
+        this.private_key = GLib.ByteArray (read_job.binary_data (), GLib.Ssl.Rsa, GLib.Ssl.Pem, GLib.Ssl.PrivateKey);
+        ***********************************************************/
         this.private_key = read_job.binary_data ();
 
         if (this.private_key == null) {
@@ -462,8 +469,8 @@ public class ClientSideEncryption : GLib.Object {
     private void decrypt_private_key.for_account (Account account, string key) {
         string message = _("Please enter your end to end encryption passphrase:<br>"
                         + "<br>"
-                        + "User : %2<br>"
-                        + "Account : %3<br>")
+                        + "User: %2<br>"
+                        + "Account: %3<br>")
                         .printf (Utility.escape (account.credentials.user),
                             Utility.escape (account.display_name));
 
@@ -488,14 +495,18 @@ public class ClientSideEncryption : GLib.Object {
                 string mnemonic = string.joinv ("", split).down ();
                 GLib.info ("Mnemonic: " + mnemonic);
 
-                // split off salt
+                /***********************************************************
+                split off salt
+                ***********************************************************/
                 var salt = EncryptionHelper.extract_private_key_salt (key);
 
                 var pass = EncryptionHelper.generate_password (mnemonic, salt);
                 GLib.info ("Generated key: " + pass);
 
                 string private_key = EncryptionHelper.decrypt_private_key (pass, key);
-                //  this.private_key = GLib.ByteArray (private_key, GLib.Ssl.Rsa, GLib.Ssl.Pem, GLib.Ssl.PrivateKey);
+                /***********************************************************
+                this.private_key = GLib.ByteArray (private_key, GLib.Ssl.Rsa, GLib.Ssl.Pem, GLib.Ssl.PrivateKey);
+                ***********************************************************/
                 this.private_key = private_key;
 
                 GLib.info ("Private key: " + this.private_key.to_string ());
@@ -605,9 +616,8 @@ public class ClientSideEncryption : GLib.Object {
         write_password_job.insecure_fallback (false);
         write_password_job.key (keychain_key);
         write_password_job.binary_data (this.private_key);
-        WritePasswordJob.on_signal_finished.
+        WritePasswordJob.on_signal_finished.connect (
             (write_password_job, incoming) => {
-                //  Q_UNUSED (incoming);
                 GLib.info ("Private key stored in keychain.");
             }
         );
@@ -630,7 +640,6 @@ public class ClientSideEncryption : GLib.Object {
         write_password_job.binary_data (this.certificate.to_pem ());
         WritePasswordJob.on_signal_finished.connect (
             (write_password_job, incoming) => {
-                //  Q_UNUSED (incoming);
                 GLib.info ("Certificate stored in keychain.");
             }
         );
@@ -653,7 +662,6 @@ public class ClientSideEncryption : GLib.Object {
         write_password_job.text_data (this.mnemonic);
         WritePasswordJob.on_signal_finished.connect (
             (write_password_job, incoming) => {
-                //  Q_UNUSED (incoming);
                 GLib.info ("Mnemonic stored in keychain.");
             }
         );
@@ -661,7 +669,10 @@ public class ClientSideEncryption : GLib.Object {
     }
 
     GLib.List<string> old_cipher_format_split (string cipher) {
-        var separator = "f_a=="; // BASE64 encoded '|'
+        /***********************************************************
+        BASE64 encoded '|'
+        ***********************************************************/
+        var separator = "f_a==";
         var result = new GLib.List<string> ();
 
         var data = cipher;
@@ -687,10 +698,10 @@ public class ClientSideEncryption : GLib.Object {
         return (uchar)array;
     }
 
-    //  
-    // Simple classes for safe (RAII) handling of OpenSSL
-    // data structures
-    //  
+    /***********************************************************
+    Simple classes for safe (RAII) handling of OpenSSL data
+    structures
+    ***********************************************************/
 
     string BIO2Byte_array (Biometric b) {
         var pending = (int)BIO_ctrl_pending (b);
@@ -701,7 +712,10 @@ public class ClientSideEncryption : GLib.Object {
 
     string handle_errors () {
         Biometric bio_errors;
-        ERR_print_errors (bio_errors); // This line is not printing anything.
+        /***********************************************************
+        This line is not printing anything.
+        ***********************************************************/
+        ERR_print_errors (bio_errors);
         return BIO2Byte_array (bio_errors);
     }
 

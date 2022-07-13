@@ -23,7 +23,6 @@ srcs = files([
     'PreparedSqlQueryManager.vala',
     'RemotePermissions.vala',
 
-    'Result/Optional.vala',
     'Result/Result.vala',
 
     'SqlDatabase.vala',

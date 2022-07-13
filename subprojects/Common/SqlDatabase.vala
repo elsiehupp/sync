@@ -35,7 +35,10 @@ public class SqliteDatabase : GLib.Object {
     public string error {
         public get {
             unowned string last_error = this.error;
-            this.error = ""; // was commented out
+            /***********************************************************
+            Was commented out
+            ***********************************************************/
+            this.error = "";
             return last_error;
         }
         private set {
