@@ -1633,7 +1633,7 @@ public class SyncJournalDb : GLib.Object {
             return ids;
         }
 
-        GLib.List<string> superfluous_paths = new GLib.List<string> ()
+        GLib.List<string> superfluous_paths = new GLib.List<string> ();
 
         while (query.next ().has_data) {
             string file = query.string_value (0);
@@ -1699,7 +1699,7 @@ public class SyncJournalDb : GLib.Object {
             return false;
         }
 
-        GLib.List<string> superfluous_paths = new GLib.List<string> ()
+        GLib.List<string> superfluous_paths = new GLib.List<string> ();
 
         while (query.next ().has_data) {
             string file = query.string_value (0);
@@ -2259,7 +2259,7 @@ public class SyncJournalDb : GLib.Object {
         var conflict = conflict_record (conflict_name);
         string result;
         if (conflict.is_valid) {
-            get_file_records_by_file_id (conflict.base_file_id, [&result] (SyncJournalFileRecord record) => {
+            get_file_records_by_file_id (conflict.base_file_id, [result] (record) => {
                 if (!record.path == "") {
                     result = record.path;
                 }
@@ -2790,8 +2790,8 @@ public class SyncJournalDb : GLib.Object {
             1,
             Sqlite.UTF8 | Sqlite.DETERMINISTIC,
             null,
-            [] (sqlite3_context context, int, sqlite3_value **argv) {
-                var text = (const char)sqlite3_value_text (argv[0]);
+            [] (sqlite3_context context, int, argv) {
+                var text = (char[])sqlite3_value_text (argv[0]);
                 string end = std.strrchr (text, "/");
                 if (!end) {
                     end = text;
@@ -2799,7 +2799,7 @@ public class SyncJournalDb : GLib.Object {
                 sqlite3_result_int64 (
                     context,
                     c_jhash64 (
-                        (const uint8)text,
+                        (uint8[])text,
                         end - text,
                         0
                     )

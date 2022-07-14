@@ -94,7 +94,7 @@ public class SqlQuery : GLib.Object {
 
             if (this.error_id != Sqlite.OK) {
                 this.error = this.sqlite_database.errmsg ();
-                GLib.warning ("Sqlite prepare sqlite_statement error:" + this.error + "in" + this.sql;
+                GLib.warning ("Sqlite prepare sqlite_statement error:" + this.error + "in" + this.sql);
                 /***********************************************************
                 ENFORCE (allow_failure, "SQLITE Prepare error");
                 ***********************************************************/

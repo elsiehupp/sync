@@ -655,7 +655,7 @@ public class Utility : GLib.Object {
         /***********************************************************
         Strip normal quotes.
         ***********************************************************/
-        if (etag.has_prefix ("\"") && etag.has_suffix ("\"") {
+        if (etag.has_prefix ("\"") && etag.has_suffix ("\"")) {
             etag.chop (1);
             etag.remove (0, 1);
         }
