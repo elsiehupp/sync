@@ -25,6 +25,7 @@ deps = [
     # dependency('gee-0.8'),
     # dependency('json-glib-1.0'),
     # dependency('libsoup-2.4'),
+    subproject('common').get_variable ('common_dep'),
     subproject('gpseq_lib').get_variable ('gpseq_dep')
 ]
 

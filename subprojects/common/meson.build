@@ -60,7 +60,7 @@ deps = [
     # subproject('cmd').get_variable ('cmd_dep'),
     # subproject('common').get_variable ('common_dep'),
     # 'CrashReporter',
-    subproject('csync').get_variable ('csync_dep'),
+    # subproject('csync').get_variable ('csync_dep'),
     # 'Gui',
     # subproject('lib_sync').get_variable ('lib_sync_dep'),
     # 'ShellIntegration',
