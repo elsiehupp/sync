@@ -17,7 +17,7 @@ public class SyncJournalFileRecord : GLib.Object {
     public string path;
     public uint64 inode = 0;
     public int64 modtime = 0;
-    public CSync.ItemTypetype = CSync.ItemType.SKIP;
+    public CSync.ItemType type = CSync.ItemType.SKIP;
     public string etag;
     public string file_id;
     public int64 file_size = 0;
