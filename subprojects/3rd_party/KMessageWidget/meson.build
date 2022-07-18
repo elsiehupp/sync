@@ -16,7 +16,7 @@ deps = [
     # libsqlite3-dev
     # dependency('sqlite3'),
     # meson.get_compiler('vala').find_library('readline'),
-    subproject('gpseq_lib').get_variable ('gpseq_dep')
+    # subproject('gpseq_lib').get_variable ('gpseq_dep')
 ]
 
 library(

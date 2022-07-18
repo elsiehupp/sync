@@ -17,7 +17,7 @@ deps = [
     # libsecret-1-dev
     # dependency('libsecret-1'),
     # dependency('libsoup-2.4'),
-    subproject('gpseq_lib').get_variable ('gpseq_dep')
+    # subproject('gpseq_lib').get_variable ('gpseq_dep')
 ]
 
 library(

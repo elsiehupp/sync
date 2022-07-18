@@ -178,7 +178,7 @@ deps = [
     # subproject('lib_sync').get_variable ('lib_sync_dep'),
     # 'ShellIntegration',
     # 'Testing',
-    subproject('gpseq_lib').get_variable ('gpseq_dep'),
+    # subproject('gpseq_lib').get_variable ('gpseq_dep'),
 ]
 
 lib_sync_lib = library(

@@ -5,7 +5,7 @@ srcs = files([
 ])
 
 deps = [
-    subproject('gpseq_lib').get_variable ('gpseq_dep')
+    # subproject('gpseq_lib').get_variable ('gpseq_dep')
 ]
 
 library(
