@@ -18,8 +18,8 @@ about credentials, SSL errors and certificates.
 @brief Reimplement this to handle SSL errors from libsync
 @ingroup libsync
 ***********************************************************/
-public abstract class AbstractSslErrorHandler : GLib.Object {
-    public abstract bool handle_errors (GLib.List<GnuTLS.ErrorCode> error_list, GLib.SslConfiguration conf, GLib.List<GLib.TlsCertificate> cert_list, Account account);
+public abstract class AbstractSslErrorHandler { //: GLib.Object {
+//    public abstract bool handle_errors (GLib.List<GnuTLS.ErrorCode> error_list, GLib.SslConfiguration conf, GLib.List<GLib.TlsCertificate> cert_list, Account account);
 
 } // class AbstractSslErrorHandler
 

@@ -9,28 +9,28 @@ namespace Testing {
 
 public class TestUploadChecksummingSha1 : AbstractTestChecksumValidator {
 
-    private TestUploadChecksummingSha1 () {
-        var compute_checksum = new ComputeChecksum (this);
-        this.expected_type = CheckSumSHA1C;
-        compute_checksum.set_checksum_type (this.expected_type);
-        compute_checksum.signal_finished.connect (
-            this.on_signal_up_validated
-        );
+//    private TestUploadChecksummingSha1 () {
+//        var compute_checksum = new ComputeChecksum (this);
+//        this.expected_type = CheckSumSHA1C;
+//        compute_checksum.set_checksum_type (this.expected_type);
+//        compute_checksum.signal_finished.connect (
+//            this.on_signal_up_validated
+//        );
 
-        var file = GLib.File.new_for_path (this.testfile, compute_checksum);
-        file.open (GLib.IODevice.ReadOnly);
-        this.expected = calc_sha1 (file);
+//        var file = GLib.File.new_for_path (this.testfile, compute_checksum);
+//        file.open (GLib.IODevice.ReadOnly);
+//        this.expected = calc_sha1 (file);
 
-        compute_checksum.on_signal_start (this.testfile);
+//        compute_checksum.on_signal_start (this.testfile);
 
-        GLib.MainLoop loop;
-        compute_checksum.signal_finished.connect (
-            loop.quit // GLib.QueuedConnection
-        );
-        loop.exec ();
+//        GLib.MainLoop loop;
+//        compute_checksum.signal_finished.connect (
+//            loop.quit // GLib.QueuedConnection
+//        );
+//        loop.exec ();
 
-        delete compute_checksum;
-    }
+//        delete compute_checksum;
+//    }
 
 } // class TestUploadChecksummingSha1
 

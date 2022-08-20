@@ -19,13 +19,13 @@ namespace Ui {
 Allows to fetch Unified Search result icon from the server
 or used a local resource
 ***********************************************************/
-public class UnifiedSearchResultImageProvider : GLib.QuickAsyncImageProvider {
+public class UnifiedSearchResultImageProvider { //: GLib.QuickAsyncImageProvider {
 
-    /***********************************************************
-    ***********************************************************/
-    public GLib.QuickImageResponse request_image_response (string identifier, Gdk.Rectangle requested_size) {
-        return new AsyncImageResponse (identifier, requested_size);
-    }
+//    /***********************************************************
+//    ***********************************************************/
+//    public GLib.QuickImageResponse request_image_response (string identifier, Gdk.Rectangle requested_size) {
+//        return new AsyncImageResponse (identifier, requested_size);
+//    }
 
 } // class UnifiedSearchResultImageProvider
 

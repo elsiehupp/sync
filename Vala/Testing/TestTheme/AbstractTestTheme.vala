@@ -8,14 +8,14 @@ namespace Testing {
 
 @copyright GPLv??? or later
 ***********************************************************/
-public abstract class AbstractTestTheme : GLib.Object {
+public abstract class AbstractTestTheme { //: GLib.Object {
 
-    /***********************************************************
-    ***********************************************************/
-    protected AbstractTestTheme () {
-        Q_INIT_RESOURCE (resources);
-        Q_INIT_RESOURCE (theme);
-    }
+//    /***********************************************************
+//    ***********************************************************/
+//    protected AbstractTestTheme () {
+//        Q_INIT_RESOURCE (resources);
+//        Q_INIT_RESOURCE (theme);
+//    }
 
 } // class AbstractTestTheme
 

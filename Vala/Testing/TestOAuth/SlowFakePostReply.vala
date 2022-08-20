@@ -10,13 +10,13 @@ namespace Testing {
 // Reply with a small delay
 public class SlowFakePostReply : FakePostReply {
 
-    /***********************************************************
-    ***********************************************************/
-    public override void respond () {
-        // override of FakePostReply.respond, will call the real one with a delay.
-        GLib.Timeout.add (
-            100,
-            base.respond ()
-        );
-    }
+//    /***********************************************************
+//    ***********************************************************/
+//    public override void respond () {
+//        // override of FakePostReply.respond, will call the real one with a delay.
+//        GLib.Timeout.add (
+//            100,
+//            base.respond ()
+//        );
+//    }
 }

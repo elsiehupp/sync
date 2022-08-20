@@ -10,14 +10,14 @@ implied, as to its usefulness for any purpose.
 namespace Occ {
 namespace Testing {
 
-public class TestAccountDavPathUnitializedNoCrash : GLib.Object {
+public class TestAccountDavPathUnitializedNoCrash { //: GLib.Object {
 
-    /***********************************************************
-    ***********************************************************/
-    private void TestAccountDavPathUnitializedNoCrash () {
-        LibSync.Account account = LibSync.Account.create ();
-        //  account.dav_path;
-    }
+//    /***********************************************************
+//    ***********************************************************/
+//    private void TestAccountDavPathUnitializedNoCrash () {
+//        LibSync.Account account = LibSync.Account.create ();
+//        //  account.dav_path;
+//    }
 
 } // namespace Testing
 } // class TestAccount

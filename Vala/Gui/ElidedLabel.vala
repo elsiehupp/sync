@@ -12,51 +12,51 @@ namespace Ui {
 /***********************************************************
 Label that can elide its text
 ***********************************************************/
-public class ElidedLabel : Gtk.Label {
+public class ElidedLabel { //: Gtk.Label {
 
-    /***********************************************************
-    ***********************************************************/
-    string text {
-        public get {
-            return this.text;
-        }
-        public set {
-            this.text = value;
-            Gtk.Label.on_signal_text (this.text);
-            update ();
-        }
-    }
-
-
-    GLib.TextElideMode elide_mode {
-        public get {
-            return this.elide_mode;
-        }
-        public set {
-            this.elide_mode = value;
-            update ();
-        }
-    }
+//    /***********************************************************
+//    ***********************************************************/
+//    string text {
+//        public get {
+//            return this.text;
+//        }
+//        public set {
+//            this.text = value;
+//            Gtk.Label.on_signal_text (this.text);
+//            update ();
+//        }
+//    }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public ElidedLabel (string text = "", GLib.TextElideMode elide_mode = GLib.ElideNone, Gtk.Widget parent) {
-        base (text, parent);
-        this.elide_mode = elide_mode;
-        this.text = text;
-    }
+//    GLib.TextElideMode elide_mode {
+//        public get {
+//            return this.elide_mode;
+//        }
+//        public set {
+//            this.elide_mode = value;
+//            update ();
+//        }
+//    }
 
 
-    /***********************************************************
-    ***********************************************************/
-    protected override void resize_event (GLib.ResizeEvent event) {
-        Gtk.Label.resize_event (event);
+//    /***********************************************************
+//    ***********************************************************/
+//    public ElidedLabel (string text = "", GLib.TextElideMode elide_mode = GLib.ElideNone, Gtk.Widget parent) {
+//        base (text, parent);
+//        this.elide_mode = elide_mode;
+//        this.text = text;
+//    }
 
-        Cairo.FontOptions font_options = font_options ();
-        string elided = font_options.elided_text (this.text, this.elide_mode, event.size ().width ());
-        Gtk.Label.on_signal_text (elided);
-    }
+
+//    /***********************************************************
+//    ***********************************************************/
+//    protected override void resize_event (GLib.ResizeEvent event) {
+//        Gtk.Label.resize_event (event);
+
+//        Cairo.FontOptions font_options = font_options ();
+//        string elided = font_options.elided_text (this.text, this.elide_mode, event.size ().width ());
+//        Gtk.Label.on_signal_text (elided);
+//    }
 
 } // class ElidedLabel
 

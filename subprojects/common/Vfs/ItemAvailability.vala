@@ -73,29 +73,29 @@ public enum ItemAvailability {
     This will be used in context menus to describe the current
     state.
     ***********************************************************/
-    public static string to_string (ItemAvailability availability) {
-        switch (availability) {
-        case ItemAvailability.ALWAYS_LOCAL:
-            return _("Always available locally");
-        case ItemAvailability.ALL_HYDRATED:
-            return _("Currently available locally");
-        case ItemAvailability.MIXED:
-            return _("Some available online only");
-        case ItemAvailability.ALL_DEHYDRATED:
-        case ItemAvailability.ONLINE_ONLY:
-            return _("Available online only");
-        }
-        GLib.assert_not_reached ();
-    }
+    //  public static string to_string (ItemAvailability availability) {
+    //      switch (availability) {
+    //      case ItemAvailability.ALWAYS_LOCAL:
+    //          return _("Always available locally");
+    //      case ItemAvailability.ALL_HYDRATED:
+    //          return _("Currently available locally");
+    //      case ItemAvailability.MIXED:
+    //          return _("Some available online only");
+    //      case ItemAvailability.ALL_DEHYDRATED:
+    //      case ItemAvailability.ONLINE_ONLY:
+    //          return _("Available online only");
+    //      }
+    //      GLib.assert_not_reached ();
+    //  }
 
 
-    /***********************************************************
-    Translated text for "free up local space" (and unpinning the
-    item)
-    ***********************************************************/
-    public static string vfs_free_space_action_text () {
-        return _("Free up local space");
-    }
+    //  /***********************************************************
+    //  Translated text for "free up local space" (and unpinning the
+    //  item)
+    //  ***********************************************************/
+    //  public static string vfs_free_space_action_text () {
+    //      return _("Free up local space");
+    //  }
 
 } // enum ItemAvailability
 

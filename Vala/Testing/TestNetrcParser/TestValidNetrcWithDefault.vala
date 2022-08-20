@@ -10,20 +10,20 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public class TestValidNetrcWithDefault : AbstractTestNetrcParser {
 
-    private const string TESTFILE = "netrctest_default";
+//    private const string TESTFILE = "netrctest_default";
 
-    /***********************************************************
-    ***********************************************************/
-    private TestValidNetrcWithDefault () {
-        base ();
+//    /***********************************************************
+//    ***********************************************************/
+//    private TestValidNetrcWithDefault () {
+//        base ();
 
-        NetrcParser parser = new NetrcParser (TESTFILE);
-        GLib.assert_true (parser.parse ());
-        GLib.assert_true (parser.find ("foo") == new Pair<string, string> ("bar", "baz"));
-        GLib.assert_true (parser.find ("dontknow") == new Pair<string, string> ("user", "pass"));
+//        NetrcParser parser = new NetrcParser (TESTFILE);
+//        GLib.assert_true (parser.parse ());
+//        GLib.assert_true (parser.find ("foo") == new Pair<string, string> ("bar", "baz"));
+//        GLib.assert_true (parser.find ("dontknow") == new Pair<string, string> ("user", "pass"));
 
-        //  delete (this);
-    }
+//        //  delete (this);
+//    }
 
 } // class TestValidNetrcWithDefault
 

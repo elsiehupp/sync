@@ -7,23 +7,23 @@ implied, as to its usefulness for any purpose.
 namespace Occ {
 namespace Testing {
 
-public abstract class AbstractFileModifier : GLib.Object {
+public abstract class AbstractFileModifier { //: GLib.Object {
 
-    /***********************************************************
-    ***********************************************************/
-    public abstract void remove (string relative_path);
+//    /***********************************************************
+//    ***********************************************************/
+//    public abstract void remove (string relative_path);
 
-    public abstract void insert (string relative_path, int64 size = 64, char content_char = 'W');
+//    public abstract void insert (string relative_path, int64 size = 64, char content_char = 'W');
 
-    public abstract void set_contents (string relative_path, char content_char);
+//    public abstract void set_contents (string relative_path, char content_char);
 
-    public abstract void append_byte (string relative_path);
+//    public abstract void append_byte (string relative_path);
 
-    public abstract void mkdir (string relative_path);
+//    public abstract void mkdir (string relative_path);
 
-    public abstract void rename (string relative_path, string relative_destination_directory);
+//    public abstract void rename (string relative_path, string relative_destination_directory);
 
-    public abstract void set_modification_time (string relative_path, GLib.DateTime modification_time);
+//    public abstract void set_modification_time (string relative_path, GLib.DateTime modification_time);
 
 }
 

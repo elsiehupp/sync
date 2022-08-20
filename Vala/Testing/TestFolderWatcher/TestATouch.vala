@@ -10,18 +10,18 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public class TestATouch : AbstractTestFolderWatcher {
 
-    /***********************************************************
-    Touch an existing file.
-    ***********************************************************/
-    private TestATouch () {
-        base ();
+//    /***********************************************************
+//    Touch an existing file.
+//    ***********************************************************/
+//    private TestATouch () {
+//        base ();
 
-        string file = this.root_path + "/a1/random.bin";
-        touch (file);
-        GLib.assert_true (wait_for_path_changed (file));
+//        string file = this.root_path + "/a1/random.bin";
+//        touch (file);
+//        GLib.assert_true (wait_for_path_changed (file));
 
-        delete (this);
-    }
+//        delete (this);
+//    }
 
 } // class TestATouch
 

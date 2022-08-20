@@ -10,20 +10,20 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public class TestRemoveAFile : AbstractTestFolderWatcher {
 
-    /***********************************************************
-    ***********************************************************/
-    private TestRemoveAFile () {
-        base ();
+//    /***********************************************************
+//    ***********************************************************/
+//    private TestRemoveAFile () {
+//        base ();
 
-        string file = this.root_path + "/a1/b2/todelete.bin";
-        GLib.assert_true (GLib.File.exists (file));
-        rm (file);
-        GLib.assert_true (!GLib.File.exists (file));
+//        string file = this.root_path + "/a1/b2/todelete.bin";
+//        GLib.assert_true (GLib.File.exists (file));
+//        rm (file);
+//        GLib.assert_true (!GLib.File.exists (file));
 
-        GLib.assert_true (wait_for_path_changed (file));
+//        GLib.assert_true (wait_for_path_changed (file));
 
-        delete (this);
-    }
+//        delete (this);
+//    }
 
 } // class TestRemoveAFile
 

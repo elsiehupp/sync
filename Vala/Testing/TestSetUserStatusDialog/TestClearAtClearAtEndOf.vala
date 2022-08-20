@@ -7,14 +7,14 @@
 namespace Occ {
 namespace Testing {
 
-public class TestClearAtClearAtEndOf : GLib.Object {
+public class TestClearAtClearAtEndOf { //: GLib.Object {
 
-    /***********************************************************
-    ***********************************************************/
-    private TestClearAtClearAtEndOf () {
-        new TestClearAtClearAtEndOf1 ();
-        new TestClearAtClearAtEndOf3 ();
-    }
+//    /***********************************************************
+//    ***********************************************************/
+//    private TestClearAtClearAtEndOf () {
+//        new TestClearAtClearAtEndOf1 ();
+//        new TestClearAtClearAtEndOf3 ();
+//    }
 
 } // class TestClearAtClearAtEndOf
 

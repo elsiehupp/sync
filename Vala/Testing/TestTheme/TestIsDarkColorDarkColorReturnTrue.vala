@@ -10,15 +10,15 @@ namespace Testing {
 ***********************************************************/
 public class TestIsDarkColorDarkColorReturnTrue : AbstractTestTheme {
 
-    /***********************************************************
-    ***********************************************************/
-    private TestIsDarkColorDarkColorReturnTrue () {
-        Gdk.RGBA color = Gdk.RGBA (0, 0, 0);
+//    /***********************************************************
+//    ***********************************************************/
+//    private TestIsDarkColorDarkColorReturnTrue () {
+//        Gdk.RGBA color = Gdk.RGBA (0, 0, 0);
 
-        var result = LibSync.Theme.is_dark_color (color);
+//        var result = LibSync.Theme.is_dark_color (color);
 
-        GLib.assert_true (result == true);
-    }
+//        GLib.assert_true (result == true);
+//    }
 
 } // class TestIsDarkColorDarkColorReturnTrue
 

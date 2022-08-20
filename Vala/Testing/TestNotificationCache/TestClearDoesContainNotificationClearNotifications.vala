@@ -1,19 +1,19 @@
 namespace Occ {
 namespace Testing {
 
-public class TestClearDoesContainNotificationClearNotifications : GLib.Object {
+public class TestClearDoesContainNotificationClearNotifications { //: GLib.Object {
 
-    /***********************************************************
-    ***********************************************************/
-    private TestClearDoesContainNotificationClearNotifications () {
-        Gui.NotificationCache notification_cache;
-        Gui.NotificationCache.Notification notification = new Gui.NotificationCache.Notification ("Title", "message");
+//    /***********************************************************
+//    ***********************************************************/
+//    private TestClearDoesContainNotificationClearNotifications () {
+//        Gui.NotificationCache notification_cache;
+//        Gui.NotificationCache.Notification notification = new Gui.NotificationCache.Notification ("Title", "message");
 
-        notification_cache.insert (notification);
-        notification_cache = "";
+//        notification_cache.insert (notification);
+//        notification_cache = "";
 
-        GLib.assert_true (!notification_cache.contains (notification));
-    }
+//        GLib.assert_true (!notification_cache.contains (notification));
+//    }
 
 } // class TestClearDoesContainNotificationClearNotifications
 

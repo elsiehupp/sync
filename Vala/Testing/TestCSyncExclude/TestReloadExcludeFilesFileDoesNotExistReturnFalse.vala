@@ -10,15 +10,15 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public class TestReloadExcludeFilesFileDoesNotExistReturnFalse : AbstractTestCSyncExclude {
 
-    /***********************************************************
-    ***********************************************************/
-    private TestReloadExcludeFilesFileDoesNotExistReturnFalse () {
-        excluded_files.reset (new CSync.ExcludedFiles ());
-        string non_existing_file = "directory/.sync-exclude.lst";
-        excluded_files.add_exclude_file_path (non_existing_file);
-        GLib.assert_true (excluded_files.reload_exclude_files () == false);
-        GLib.assert_true (excluded_files.all_excludes.size () == 0);
-    }
+//    /***********************************************************
+//    ***********************************************************/
+//    private TestReloadExcludeFilesFileDoesNotExistReturnFalse () {
+//        excluded_files.reset (new CSync.ExcludedFiles ());
+//        string non_existing_file = "directory/.sync-exclude.lst";
+//        excluded_files.add_exclude_file_path (non_existing_file);
+//        GLib.assert_true (excluded_files.reload_exclude_files () == false);
+//        GLib.assert_true (excluded_files.all_excludes.size () == 0);
+//    }
 
 } // class TestReloadExcludeFilesFileDoesNotExistReturnFalse
 

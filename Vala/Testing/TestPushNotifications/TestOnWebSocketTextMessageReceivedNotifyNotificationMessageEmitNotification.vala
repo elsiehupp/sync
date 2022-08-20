@@ -10,23 +10,23 @@ namespace Testing {
 ***********************************************************/
 public class TestOnWebSocketTextMessageReceivedNotifyNotificationMessageEmitNotification : AbstractTestPushNotifications {
 
-    /***********************************************************
-    ***********************************************************/
-    private TestOnWebSocketTextMessageReceivedNotifyNotificationMessageEmitNotification () {
-        FakeWebSocketServer fake_server;
-        var account = FakeWebSocketServer.create_account ();
-        var socket = fake_server.authenticate_account (account);
-        GLib.assert_true (socket);
-        GLib.SignalSpy notification_spy = new GLib.SignalSpy (account.push_notifications (), PushNotificationManager.notifications_changed);
-        GLib.assert_true (notification_spy.is_valid);
+//    /***********************************************************
+//    ***********************************************************/
+//    private TestOnWebSocketTextMessageReceivedNotifyNotificationMessageEmitNotification () {
+//        FakeWebSocketServer fake_server;
+//        var account = FakeWebSocketServer.create_account ();
+//        var socket = fake_server.authenticate_account (account);
+//        GLib.assert_true (socket);
+//        GLib.SignalSpy notification_spy = new GLib.SignalSpy (account.push_notifications (), PushNotificationManager.notifications_changed);
+//        GLib.assert_true (notification_spy.is_valid);
 
-        // Send notify_file push notification
-        socket.send_text_message ("notify_notification");
+//        // Send notify_file push notification
+//        socket.send_text_message ("notify_notification");
 
-        // notification signal should be emitted
-        GLib.assert_true (notification_spy.wait ());
-        GLib.assert_true (verify_called_once_with_account (notification_spy, account));
-    }
+//        // notification signal should be emitted
+//        GLib.assert_true (notification_spy.wait ());
+//        GLib.assert_true (verify_called_once_with_account (notification_spy, account));
+//    }
 
 } // class TestOnWebSocketTextMessageReceivedNotifyNotificationMessageEmitNotification
 

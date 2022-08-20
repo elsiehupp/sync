@@ -10,25 +10,25 @@ namespace Cmd {
 
 @copyright GPLv3 or Later
 ***********************************************************/
-public class EchoDisabler : GLib.Object {
+public class EchoDisabler { //: GLib.Object {
 
-    /***********************************************************
-    ***********************************************************/
-    public EchoDisabler () {
-        tcgetattr (STDIN_FILENO, tios);
-        termios tios_new = tios;
-        tios_new.c_lflag &= ~ECHO;
-        tcsetattr (STDIN_FILENO, TCSANOW, tios_new);
-    }
+//    /***********************************************************
+//    ***********************************************************/
+//    public EchoDisabler () {
+//        tcgetattr (STDIN_FILENO, tios);
+//        termios tios_new = tios;
+//        tios_new.c_lflag &= ~ECHO;
+//        tcsetattr (STDIN_FILENO, TCSANOW, tios_new);
+//    }
 
-    ~EchoDisabler () {
-        tcsetattr (STDIN_FILENO, TCSANOW, tios);
-    }
+//    ~EchoDisabler () {
+//        tcsetattr (STDIN_FILENO, TCSANOW, tios);
+//    }
 
 
-    /***********************************************************
-    ***********************************************************/
-    private termios tios;
+//    /***********************************************************
+//    ***********************************************************/
+//    private termios tios;
 
 } // class EchoDisabler
 

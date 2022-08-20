@@ -10,19 +10,19 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public class TestAddExcludeFilePathAddDifferentFilePathsListSizeDoesIncrease : AbstractTestCSyncExclude {
 
-    /***********************************************************
-    ***********************************************************/
-    private TestAddExcludeFilePathAddDifferentFilePathsListSizeDoesIncrease () {
-        excluded_files.reset (new CSync.ExcludedFiles ());
+//    /***********************************************************
+//    ***********************************************************/
+//    private TestAddExcludeFilePathAddDifferentFilePathsListSizeDoesIncrease () {
+//        excluded_files.reset (new CSync.ExcludedFiles ());
 
-        var file_path1 = "exclude1/.sync-exclude.lst";
-        var file_path2 = "exclude2/.sync-exclude.lst";
+//        var file_path1 = "exclude1/.sync-exclude.lst";
+//        var file_path2 = "exclude2/.sync-exclude.lst";
 
-        excluded_files.add_exclude_file_path (file_path1);
-        excluded_files.add_exclude_file_path (file_path2);
+//        excluded_files.add_exclude_file_path (file_path1);
+//        excluded_files.add_exclude_file_path (file_path2);
 
-        GLib.assert_true (excluded_files.exclude_files.size () == 2);
-    }
+//        GLib.assert_true (excluded_files.exclude_files.size () == 2);
+//    }
 
 } // class TestAddExcludeFilePathAddDifferentFilePathsListSizeDoesIncrease
 

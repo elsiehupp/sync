@@ -10,18 +10,18 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public class TestSelect1 : AbstractTestOwnSql {
 
-    /***********************************************************
-    ***********************************************************/
-    private TestSelect1 () {
-        base ();
+//    /***********************************************************
+//    ***********************************************************/
+//    private TestSelect1 () {
+//        base ();
 
-        SqlQuery query = new SqlQuery (this.database);
-        query.prepare ("SELECT identifier FROM addresses;");
-        GLib.assert_true (query.is_select ());
+//        SqlQuery query = new SqlQuery (this.database);
+//        query.prepare ("SELECT identifier FROM addresses;");
+//        GLib.assert_true (query.is_select ());
 
-        query.prepare ("UPDATE addresses SET identifier = 1;");
-        GLib.assert_true (!query.is_select ());
-    }
+//        query.prepare ("UPDATE addresses SET identifier = 1;");
+//        GLib.assert_true (!query.is_select ());
+//    }
 
 } // class TestSelect1
 

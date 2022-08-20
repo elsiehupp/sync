@@ -14,58 +14,58 @@ namespace Ui {
 
 Used by ProxyAuthHandler.
 ***********************************************************/
-public class ProxyAuthDialog : Gtk.Dialog {
+public class ProxyAuthDialog { //: Gtk.Dialog {
 
-    /***********************************************************
-    ***********************************************************/
-    private ProxyAuthDialog instance;
+//    /***********************************************************
+//    ***********************************************************/
+//    private ProxyAuthDialog instance;
 
-    /***********************************************************
-    ***********************************************************/
-    public ProxyAuthDialog (Gtk.Widget parent = new Gtk.Widget ()) {
-        base (parent);
-        this.instance = new ProxyAuthDialog ();
-        instance.up_ui (this);
-    }
-
-
-    ~ProxyAuthDialog () {
-        //  delete this.instance;
-    }
+//    /***********************************************************
+//    ***********************************************************/
+//    public ProxyAuthDialog (Gtk.Widget parent = new Gtk.Widget ()) {
+//        base (parent);
+//        this.instance = new ProxyAuthDialog ();
+//        instance.up_ui (this);
+//    }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public void proxy_address (string address) {
-        instance.proxy_address.on_signal_text (address);
-    }
+//    ~ProxyAuthDialog () {
+//        //  delete this.instance;
+//    }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public string username () {
-        return instance.username_edit.text ();
-    }
+//    /***********************************************************
+//    ***********************************************************/
+//    public void proxy_address (string address) {
+//        instance.proxy_address.on_signal_text (address);
+//    }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public string password () {
-        return instance.password_edit.text ();
-    }
+//    /***********************************************************
+//    ***********************************************************/
+//    public string username () {
+//        return instance.username_edit.text ();
+//    }
 
 
-    /***********************************************************
-    Resets the dialog for new credential entry.
-    ***********************************************************/
-    public void reset () {
-        instance.username_edit.focus ();
-        instance.username_edit = "";
-        instance.password_edit = "";
-    }
+//    /***********************************************************
+//    ***********************************************************/
+//    public string password () {
+//        return instance.password_edit.text ();
+//    }
+
+
+//    /***********************************************************
+//    Resets the dialog for new credential entry.
+//    ***********************************************************/
+//    public void reset () {
+//        instance.username_edit.focus ();
+//        instance.username_edit = "";
+//        instance.password_edit = "";
+//    }
 
 } // class ProxyAuthDialog
 
 } // namespace Ui
 } // namespace Occ
-    
+//    

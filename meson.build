@@ -18,6 +18,9 @@ deps = [
     # 'ShellIntegration',
     # 'Testing',
     # subproject('gpseq_lib').get_variable ('gpseq_dep')
+    # libglib2.0-dev
+    dependency('glib-2.0'),
+    dependency('gtk+-3.0')
 ]
 
 executable(

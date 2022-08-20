@@ -9,10 +9,10 @@ namespace LibSync {
 
 @copyright GPLv3 or Later
 ***********************************************************/
-public class ExtraFolderInfo : GLib.Object {
+public class ExtraFolderInfo { //: GLib.Object {
 
-    public string file_identifier;
-    public int64 size = -1;
+//    public string file_identifier;
+//    public int64 size = -1;
 
 } // class ExtraFolderInfo
 

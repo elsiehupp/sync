@@ -9,14 +9,14 @@ namespace LibSync {
 
 @copyright GPLv3 or Later
 ***********************************************************/
-public class HttpError : GLib.Object {
+public class HttpError { //: GLib.Object {
 
-    /***********************************************************
-    HTTP error code
-    ***********************************************************/
-    public int code;
+//    /***********************************************************
+//    HTTP error code
+//    ***********************************************************/
+//    public int code;
 
-    public string message;
+//    public string message;
 
 } // class HttpError
 

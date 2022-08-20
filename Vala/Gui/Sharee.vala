@@ -14,58 +14,58 @@
 namespace Occ {
 namespace Ui {
 
-public class Sharee : GLib.Object {
+public class Sharee { //: GLib.Object {
 
-    /***********************************************************
-    Keep in sync with Share.Type
-    ***********************************************************/
-    public enum Type {
-        USER = 0,
-        GROUP = 1,
-        EMAIL = 4,
-        FEDERATED = 6,
-        CIRCLE = 7,
-        ROOM = 10
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public string share_with { public get; internal set; }
-    public string display_name { public get; internal set; }
-    public Type type { public get; internal set; }
+//    /***********************************************************
+//    Keep in sync with Share.Type
+//    ***********************************************************/
+//    public enum Type {
+//        USER = 0,
+//        GROUP = 1,
+//        EMAIL = 4,
+//        FEDERATED = 6,
+//        CIRCLE = 7,
+//        ROOM = 10
+//    }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public Sharee (string share_with,
-        string display_name,
-        Type type) {
-        this.share_with = share_with;
-        this.display_name = display_name;
-        this.type = type;
-    }
+//    /***********************************************************
+//    ***********************************************************/
+//    public string share_with { public get; internal set; }
+//    public string display_name { public get; internal set; }
+//    public Type type { public get; internal set; }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public string to_string () {
-        string formatted = this.display_name;
+//    /***********************************************************
+//    ***********************************************************/
+//    public Sharee (string share_with,
+//        string display_name,
+//        Type type) {
+//        this.share_with = share_with;
+//        this.display_name = display_name;
+//        this.type = type;
+//    }
 
-        if (this.type == Type.GROUP) {
-            formatted += " (group)";
-        } else if (this.type == Type.EMAIL) {
-            formatted += " (email)";
-        } else if (this.type == Type.FEDERATED) {
-            formatted += " (remote)";
-        } else if (this.type == Type.CIRCLE) {
-            formatted += " (circle)";
-        } else if (this.type == Type.ROOM) {
-            formatted += " (conversation)";
-        }
 
-        return formatted;
-    }
+//    /***********************************************************
+//    ***********************************************************/
+//    public string to_string () {
+//        string formatted = this.display_name;
+
+//        if (this.type == Type.GROUP) {
+//            formatted += " (group)";
+//        } else if (this.type == Type.EMAIL) {
+//            formatted += " (email)";
+//        } else if (this.type == Type.FEDERATED) {
+//            formatted += " (remote)";
+//        } else if (this.type == Type.CIRCLE) {
+//            formatted += " (circle)";
+//        } else if (this.type == Type.ROOM) {
+//            formatted += " (conversation)";
+//        }
+
+//        return formatted;
+//    }
 
 } // class Sharee
 

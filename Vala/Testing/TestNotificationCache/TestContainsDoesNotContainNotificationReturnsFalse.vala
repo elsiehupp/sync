@@ -1,15 +1,15 @@
 namespace Occ {
 namespace Testing {
 
-public class TestContainsDoesNotContainNotificationReturnsFalse : GLib.Object {
+public class TestContainsDoesNotContainNotificationReturnsFalse { //: GLib.Object {
 
-    /***********************************************************
-    ***********************************************************/
-    private TestContainsDoesNotContainNotificationReturnsFalse () {
-        NotificationCache notification_cache;
+//    /***********************************************************
+//    ***********************************************************/
+//    private TestContainsDoesNotContainNotificationReturnsFalse () {
+//        NotificationCache notification_cache;
 
-        GLib.assert_true (!notification_cache.contains ({ "Title", { "Message" } }));
-    }
+//        GLib.assert_true (!notification_cache.contains ({ "Title", { "Message" } }));
+//    }
 
 } // class TestContainsDoesNotContainNotificationReturnsFalse
 

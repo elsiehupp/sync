@@ -10,32 +10,32 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public class TestRenameDirectorySameBase : AbstractTestFolderWatcher {
 
-    /***********************************************************
-    ***********************************************************/
-    private TestRenameDirectorySameBase () {
-        base ();
+//    /***********************************************************
+//    ***********************************************************/
+//    private TestRenameDirectorySameBase () {
+//        base ();
 
-        string old_file = this.root_path + "/a1/b1";
-        string new_file = this.root_path + "/a1/brename";
-        GLib.assert_true (GLib.File.exists (old_file));
-        mv (old_file, new_file);
-        GLib.assert_true (GLib.File.exists (new_file));
+//        string old_file = this.root_path + "/a1/b1";
+//        string new_file = this.root_path + "/a1/brename";
+//        GLib.assert_true (GLib.File.exists (old_file));
+//        mv (old_file, new_file);
+//        GLib.assert_true (GLib.File.exists (new_file));
 
-        GLib.assert_true (wait_for_path_changed (old_file));
-        GLib.assert_true (wait_for_path_changed (new_file));
+//        GLib.assert_true (wait_for_path_changed (old_file));
+//        GLib.assert_true (wait_for_path_changed (new_file));
 
-        // Verify that further notifications end up with the correct paths
+//        // Verify that further notifications end up with the correct paths
 
-        string file = this.root_path + "/a1/brename/c1/random.bin";
-        touch (file);
-        GLib.assert_true (wait_for_path_changed (file));
+//        string file = this.root_path + "/a1/brename/c1/random.bin";
+//        touch (file);
+//        GLib.assert_true (wait_for_path_changed (file));
 
-        string directory = this.root_path + "/a1/brename/newfolder";
-        mkdir (directory);
-        GLib.assert_true (wait_for_path_changed (directory));
+//        string directory = this.root_path + "/a1/brename/newfolder";
+//        mkdir (directory);
+//        GLib.assert_true (wait_for_path_changed (directory));
 
-        delete (this);
-    }
+//        delete (this);
+//    }
 
 } // class TestRenameDirectorySameBase
 

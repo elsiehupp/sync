@@ -9,11 +9,11 @@
 namespace Occ {
 namespace Ui {
 
-public class CloudProvidersProviderExporter : GLib.Object {
+public class CloudProvidersProviderExporter { //: GLib.Object {
 
 } // class CloudProvidersProviderExporter
 
-public class CloudProvidersAccountExporter : GLib.Object {
+public class CloudProvidersAccountExporter { //: GLib.Object {
 
 } // class CloudProvidersAccountExporter
 

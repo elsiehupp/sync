@@ -7,17 +7,17 @@
 namespace Occ {
 namespace Testing {
 
-public class TestCtorNoStatusSetShowSensibleDefaults : GLib.Object {
+public class TestCtorNoStatusSetShowSensibleDefaults { //: GLib.Object {
 
-    /***********************************************************
-    ***********************************************************/
-    private TestCtorNoStatusSetShowSensibleDefaults () {
-        UserStatusSelectorModel model = new UserStatusSelectorModel (null, null);
+//    /***********************************************************
+//    ***********************************************************/
+//    private TestCtorNoStatusSetShowSensibleDefaults () {
+//        UserStatusSelectorModel model = new UserStatusSelectorModel (null, null);
 
-        GLib.assert_true (model.user_status_message () == "");
-        GLib.assert_true (model.user_status_emoji () == "😀");
-        GLib.assert_true (model.clear_at () == _("Don't clear"));
-    }
+//        GLib.assert_true (model.user_status_message () == "");
+//        GLib.assert_true (model.user_status_emoji () == "😀");
+//        GLib.assert_true (model.clear_at () == _("Don't clear"));
+//    }
 
 } // class TestCtorNoStatusSetShowSensibleDefaults
 

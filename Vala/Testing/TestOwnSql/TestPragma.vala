@@ -10,21 +10,21 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public class TestPragma : AbstractTestOwnSql {
 
-    /***********************************************************
-    ***********************************************************/
-    private TestPragma () {
-        base ();
+//    /***********************************************************
+//    ***********************************************************/
+//    private TestPragma () {
+//        base ();
 
-        string sql = "PRAGMA table_info (addresses)";
+//        string sql = "PRAGMA table_info (addresses)";
 
-        SqlQuery query = new SqlQuery (this.database);
-        int rc = query.prepare (sql);
-        GLib.debug ("Pragma: " + rc);
-        query.exec ();
-        if (query.next ().has_data) {
-            GLib.debug ("P: " + query.string_value (1));
-        }
-    }
+//        SqlQuery query = new SqlQuery (this.database);
+//        int rc = query.prepare (sql);
+//        GLib.debug ("Pragma: " + rc);
+//        query.exec ();
+//        if (query.next ().has_data) {
+//            GLib.debug ("P: " + query.string_value (1));
+//        }
+//    }
 
 } // class TestPragma
 

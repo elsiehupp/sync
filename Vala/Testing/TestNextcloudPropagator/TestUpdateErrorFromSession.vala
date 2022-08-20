@@ -8,14 +8,14 @@ implied, as to its usefulness for any purpose.
 namespace Occ {
 namespace Testing {
 
-public class TestUpdateErrorFromSession : GLib.Object {
+public class TestUpdateErrorFromSession { //: GLib.Object {
 
-    /***********************************************************
-    ***********************************************************/
-    private TestUpdateErrorFromSession () {
-        //  OwncloudPropagator propagator (null, "test1", "test2", new ProgressDatabase);
-        GLib.assert_true ( true );
-    }
+//    /***********************************************************
+//    ***********************************************************/
+//    private TestUpdateErrorFromSession () {
+//        //  OwncloudPropagator propagator (null, "test1", "test2", new ProgressDatabase);
+//        GLib.assert_true ( true );
+//    }
 
 } // class TestUpdateErrorFromSession
 

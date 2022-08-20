@@ -10,17 +10,16 @@ namespace Ui {
 /***********************************************************
 Possible permissions, must match the server permission constants
 ***********************************************************/
-enum Share_permission {
-    SharePermissionRead     = 1 << 0,
-    Share_permission_update   = 1 << 1,
-    Share_permission_create   = 1 << 2,
-    Share_permission_delete   = 1 << 3,
-    Share_permission_share    = 1 << 4,
-    Share_permission_default  = 1 << 30
-}
-// Q_DECLARE_FLAGS (Share.Permissions, Share_permission)
-// Q_DECLARE_OPERATORS_FOR_FLAGS (Share.Permissions)
+internal enum SharePermission {
+    READ     = 1 << 0,
+    UPDATE   = 1 << 1,
+    CREATE   = 1 << 2,
+    DELETE   = 1 << 3,
+    SHARE    = 1 << 4,
+    DEFAULT  = 1 << 30
+} // enum SharePermission
 
+} // namespace Ui
 } // namespace Occ
 
 //  #endif

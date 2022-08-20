@@ -7,65 +7,65 @@ implied, as to its usefulness for any purpose.
 namespace Occ {
 namespace Testing {
 
-public class PathComponents : GLib.Object {
+public class PathComponents { //: GLib.Object {
 
-    private GLib.List<string> components;
+//    private GLib.List<string> components;
 
-    /***********************************************************
-    ***********************************************************/
-    public PathComponents.from_char (char path) {
-        this.components = path.to_string ().split ("/", GLib.SkipEmptyParts);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public PathComponents.from_string (string path) {
-        this.components = path.split ("/", GLib.SkipEmptyParts);
-    }
+//    /***********************************************************
+//    ***********************************************************/
+//    public PathComponents.from_char (char path) {
+//        this.components = path.to_string ().split ("/", GLib.SkipEmptyParts);
+//    }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public PathComponents (GLib.List<string> path_components) {
-        this.components = path_components;
-    }
+//    /***********************************************************
+//    ***********************************************************/
+//    public PathComponents.from_string (string path) {
+//        this.components = path.split ("/", GLib.SkipEmptyParts);
+//    }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public PathComponents parent_directory_components () {
-        return new PathComponents (mid (0, size () - 1));
-    }
+//    /***********************************************************
+//    ***********************************************************/
+//    public PathComponents (GLib.List<string> path_components) {
+//        this.components = path_components;
+//    }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public PathComponents sub_components () {
-        return new PathComponents (mid (1));
-    }
+//    /***********************************************************
+//    ***********************************************************/
+//    public PathComponents parent_directory_components () {
+//        return new PathComponents (mid (0, size () - 1));
+//    }
 
 
-    /***********************************************************
-    ***********************************************************/
-    //  public PathComponents sub_components () {
-    //      remove_first ();
-    //      return std.move (this);
-    //  }
+//    /***********************************************************
+//    ***********************************************************/
+//    public PathComponents sub_components () {
+//        return new PathComponents (mid (1));
+//    }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public string path_root () {
-        return nth_data (0);
-    }
+//    /***********************************************************
+//    ***********************************************************/
+//    //  public PathComponents sub_components () {
+//    //      remove_first ();
+//    //      return std.move (this);
+//    //  }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public string filename () {
-        return last ();
-    }
+//    /***********************************************************
+//    ***********************************************************/
+//    public string path_root () {
+//        return nth_data (0);
+//    }
+
+
+//    /***********************************************************
+//    ***********************************************************/
+//    public string filename () {
+//        return last ();
+//    }
 
 } // class PathComponents
 } // namespace Testing

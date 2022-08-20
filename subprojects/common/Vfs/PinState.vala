@@ -79,9 +79,9 @@ public enum PinState {
     /***********************************************************
     Translated text for "making items always available locally"
     ***********************************************************/
-    public static string vfs_pin_action_text () {
-        return _("Make always available locally");
-    }
+    //  public static string vfs_pin_action_text () {
+    //      return _("Make always available locally");
+    //  }
 
 } // enum PinState
 
