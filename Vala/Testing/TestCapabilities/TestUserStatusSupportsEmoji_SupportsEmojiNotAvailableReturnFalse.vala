@@ -5,20 +5,20 @@ namespace Testing {
 
 public class TestUserStatusSupportsEmoji_SupportsEmojiNotAvailableReturnFalse { //: GLib.Object {
 
-//    /***********************************************************
-//    ***********************************************************/
-//    private TestUserStatusSupportsEmoji_SupportsEmojiNotAvailableReturnFalse () {
-//        GLib.HashMap user_status_map;
-//        user_status_map["enabled"] = true;
-//        user_status_map["supports_emoji"] = false;
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  private TestUserStatusSupportsEmoji_SupportsEmojiNotAvailableReturnFalse () {
+    //      GLib.HashMap user_status_map;
+    //      user_status_map["enabled"] = true;
+    //      user_status_map["supports_emoji"] = false;
 
-//        GLib.HashMap capabilities_map;
-//        capabilities_map["user_status"] = user_status_map;
+    //      GLib.HashMap capabilities_map;
+    //      capabilities_map["user_status"] = user_status_map;
 
-//        Capabilities capabilities = new Capabilities (capabilities_map);
+    //      Capabilities capabilities = new Capabilities (capabilities_map);
 
-//        GLib.assert_true (!capabilities.user_status_supports_emoji ());
-//    }
+    //      GLib.assert_true (!capabilities.user_status_supports_emoji ());
+    //  }
 
 } // class TestUserStatusSupportsEmoji_SupportsEmojiNotAvailableReturnFalse
 

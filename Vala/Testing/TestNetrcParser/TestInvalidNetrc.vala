@@ -10,18 +10,18 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public class TestInvalidNetrc : AbstractTestNetrcParser {
 
-//    private const string TESTFILE = "/invalid";
+    //  private const string TESTFILE = "/invalid";
 
-//    /***********************************************************
-//    ***********************************************************/
-//    private TestInvalidNetrc () {
-//        base ();
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  private TestInvalidNetrc () {
+    //      base ();
 
-//        NetrcParser parser = new NetrcParser (TESTFILE);
-//        GLib.assert_true (!parser.parse ());
+    //      NetrcParser parser = new NetrcParser (TESTFILE);
+    //      GLib.assert_true (!parser.parse ());
 
-//        //  delete (this);
-//    }
+    //      //  delete (this);
+    //  }
 
 } // class TestInvalidNetrc
 

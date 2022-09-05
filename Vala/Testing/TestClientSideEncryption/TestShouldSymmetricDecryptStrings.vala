@@ -10,20 +10,20 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public class TestShouldSymmetricDecryptStrings : AbstractTestClientSideEncryption {
 
-//    /***********************************************************
-//    ***********************************************************/
-//    private TestShouldSymmetricDecryptStrings () {
-//        // GIVEN
-//        var encryption_key = "foo";
-//        var original_data = "bar";
-//        var cipher = EncryptionHelper.encrypt_string_symmetric (encryption_key, original_data);
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  private TestShouldSymmetricDecryptStrings () {
+    //      // GIVEN
+    //      var encryption_key = "foo";
+    //      var original_data = "bar";
+    //      var cipher = EncryptionHelper.encrypt_string_symmetric (encryption_key, original_data);
 
-//        // WHEN
-//        var data = EncryptionHelper.decrypt_string_symmetric (encryption_key, cipher);
+    //      // WHEN
+    //      var data = EncryptionHelper.decrypt_string_symmetric (encryption_key, cipher);
 
-//        // THEN
-//        GLib.assert_true (data == original_data);
-//    }
+    //      // THEN
+    //      GLib.assert_true (data == original_data);
+    //  }
 
 } // class TestShouldSymmetricDecryptStrings
 

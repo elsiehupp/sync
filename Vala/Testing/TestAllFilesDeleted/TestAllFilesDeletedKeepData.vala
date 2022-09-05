@@ -9,13 +9,13 @@ namespace Testing {
 
 public class TestAllFilesDeletedKeepData : AbstractTestAllFilesDeleted {
 
-//    /***********************************************************
-//    ***********************************************************/
-//    private TestAllFilesDeletedKeepData () {
-//        GLib.Test.add_column<bool> ("delete_on_remote");
-//        GLib.Test.new_row ("local") + false;
-//        GLib.Test.new_row ("remote") + true;
-//    }
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  private TestAllFilesDeletedKeepData () {
+    //      GLib.Test.add_column<bool> ("delete_on_remote");
+    //      GLib.Test.new_row ("local") + false;
+    //      GLib.Test.new_row ("remote") + true;
+    //  }
 
 }
 

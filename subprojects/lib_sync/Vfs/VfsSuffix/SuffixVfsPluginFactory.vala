@@ -10,10 +10,10 @@ namespace LibSync {
 ***********************************************************/
 public class SuffixVfsPluginFactory : Common.DefaultPluginFactory<VfsSuffix> {
 
-//    construct {
-//        Q_PLUGIN_METADATA (IID + "org.owncloud.AbstractPluginFactory" + FILE + "vfspluginmetadata.json");
-//        Q_INTERFACES (AbstractPluginFactory);
-//    }
+    //  construct {
+    //      Q_PLUGIN_METADATA (IID + "org.owncloud.AbstractPluginFactory" + FILE + "vfspluginmetadata.json");
+    //      Q_INTERFACES (AbstractPluginFactory);
+    //  }
 
 }
 

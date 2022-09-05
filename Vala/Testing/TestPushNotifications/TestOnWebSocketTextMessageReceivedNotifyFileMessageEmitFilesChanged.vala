@@ -10,21 +10,21 @@ namespace Testing {
 ***********************************************************/
 public class TestOnWebSocketTextMessageReceivedNotifyFileMessageEmitFilesChanged : AbstractTestPushNotifications {
 
-//    /***********************************************************
-//    ***********************************************************/
-//    private TestOnWebSocketTextMessageReceivedNotifyFileMessageEmitFilesChanged () {
-//        FakeWebSocketServer fake_server;
-//        var account = FakeWebSocketServer.create_account ();
-//        var socket = fake_server.authenticate_account (account);
-//        GLib.assert_true (socket);
-//        GLib.SignalSpy files_changed_spy = new GLib.SignalSpy (account.push_notifications (), PushNotificationManager.files_changed);
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  private TestOnWebSocketTextMessageReceivedNotifyFileMessageEmitFilesChanged () {
+    //      FakeWebSocketServer fake_server;
+    //      var account = FakeWebSocketServer.create_account ();
+    //      var socket = fake_server.authenticate_account (account);
+    //      GLib.assert_true (socket);
+    //      GLib.SignalSpy files_changed_spy = new GLib.SignalSpy (account.push_notifications (), PushNotificationManager.files_changed);
 
-//        socket.send_text_message ("notify_file");
+    //      socket.send_text_message ("notify_file");
 
-//        // files_changed signal should be emitted
-//        GLib.assert_true (files_changed_spy.wait ());
-//        GLib.assert_true (verify_called_once_with_account (files_changed_spy, account));
-//    }
+    //      // files_changed signal should be emitted
+    //      GLib.assert_true (files_changed_spy.wait ());
+    //      GLib.assert_true (verify_called_once_with_account (files_changed_spy, account));
+    //  }
 
 } // class TestOnWebSocketTextMessageReceivedNotifyFileMessageEmitFilesChanged
 

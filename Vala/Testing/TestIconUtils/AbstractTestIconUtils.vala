@@ -10,12 +10,12 @@ namespace Testing {
 ***********************************************************/
 public class AbstractTestIconUtils { //: GLib.Object {
 
-//    /***********************************************************
-//    ***********************************************************/
-//    public AbstractTestIconUtils () {
-//        Q_INIT_RESOURCE (resources);
-//        Q_INIT_RESOURCE (theme);
-//    }
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  public AbstractTestIconUtils () {
+    //      Q_INIT_RESOURCE (resources);
+    //      Q_INIT_RESOURCE (theme);
+    //  }
 
 } // class AbstractTestIconUtils
 

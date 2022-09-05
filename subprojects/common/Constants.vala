@@ -10,7 +10,7 @@ namespace Common {
 ***********************************************************/
 public class Constants { //: GLib.Object {
 
-//    public const int32 E2EE_TAG_SIZE = 16;
+    public const int32 E2EE_TAG_SIZE = 16;
 
 } // class Constants
 

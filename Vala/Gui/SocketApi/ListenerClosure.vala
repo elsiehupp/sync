@@ -11,21 +11,21 @@ namespace Ui {
 
 public class ListenerClosure { //: GLib.Object {
 
-//    public delegate void CallbackFunction ();
+    //  public delegate void CallbackFunction ();
 
-//    private CallbackFunction callback;
+    //  private CallbackFunction callback;
 
-//    public ListenerClosure (CallbackFunction callback) {
-//        this.callback = callback;
-//    }
+    //  public ListenerClosure (CallbackFunction callback) {
+    //      this.callback = callback;
+    //  }
 
 
-//    /***********************************************************
-//    ***********************************************************/
-//    public void on_signal_closure () {
-//        this.callback ();
-//        delete_later ();
-//    }
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  public void on_signal_closure () {
+    //      this.callback ();
+    //      delete_later ();
+    //  }
 
 } // class ListenerClosure
 

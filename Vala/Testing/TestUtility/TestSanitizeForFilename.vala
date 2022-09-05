@@ -10,13 +10,13 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public class TestSanitizeForFilename : AbstractTestUtility {
 
-//    /***********************************************************
-//    ***********************************************************/
-//    private TestSanitizeForFilename () {
-//        GLib.FETCH (string, input);
-//        GLib.FETCH (string, output);
-//        GLib.assert_true (sanitize_for_filename (input), output);
-//    }
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  private TestSanitizeForFilename () {
+    //      GLib.FETCH (string, input);
+    //      GLib.FETCH (string, output);
+    //      GLib.assert_true (sanitize_for_filename (input), output);
+    //  }
 
 } // class TestSanitizeForFilename
 

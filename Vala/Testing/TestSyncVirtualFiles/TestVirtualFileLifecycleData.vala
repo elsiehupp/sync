@@ -10,14 +10,14 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public class TestVirtualFileLifecycleData : AbstractTestSyncVirtualFiles {
 
-//    /***********************************************************
-//    ***********************************************************/
-//    private TestVirtualFileLifecycleData () {
-//        GLib.Test.add_column<bool> ("do_local_discovery");
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  private TestVirtualFileLifecycleData () {
+    //      GLib.Test.add_column<bool> ("do_local_discovery");
 
-//        GLib.Test.new_row ("full local discovery") + true;
-//        GLib.Test.new_row ("skip local discovery") + false;
-//    }
+    //      GLib.Test.new_row ("full local discovery") + true;
+    //      GLib.Test.new_row ("skip local discovery") + false;
+    //  }
 
 } // class TestVirtualFileLifecycleData
 

@@ -10,20 +10,20 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public class TestLaunchOnStartup : AbstractTestUtility {
 
-//    /***********************************************************
-//    ***********************************************************/
-//    private TestLaunchOnStartup () {
-//        string postfix = Utility.rand ().to_string ();
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  private TestLaunchOnStartup () {
+    //      string postfix = Utility.rand ().to_string ();
 
-//        string app_name = "TestLaunchOnStartup.%1".printf (postfix);
-//        string gui_name = "LaunchOnStartup GUI Name";
+    //      string app_name = "TestLaunchOnStartup.%1".printf (postfix);
+    //      string gui_name = "LaunchOnStartup GUI Name";
 
-//        GLib.assert_true (has_launch_on_startup (app_name) == false);
-//        set_launch_on_startup (app_name, gui_name, true);
-//        GLib.assert_true (has_launch_on_startup (app_name) == true);
-//        set_launch_on_startup (app_name, gui_name, false);
-//        GLib.assert_true (has_launch_on_startup (app_name) == false);
-//    }
+    //      GLib.assert_true (has_launch_on_startup (app_name) == false);
+    //      set_launch_on_startup (app_name, gui_name, true);
+    //      GLib.assert_true (has_launch_on_startup (app_name) == true);
+    //      set_launch_on_startup (app_name, gui_name, false);
+    //      GLib.assert_true (has_launch_on_startup (app_name) == false);
+    //  }
 
 } // class TestLaunchOnStartup
 

@@ -9,53 +9,53 @@ namespace Ui {
 
 public class LinkLabel { //: Gtk.Label {
 
-//    /***********************************************************
-//    ***********************************************************/
-//    GLib.Uri url { private get; public set; }
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  GLib.Uri url { private get; public set; }
 
-//    internal signal void signal_clicked ();
+    //  internal signal void signal_clicked ();
 
-//    /***********************************************************
-//    ***********************************************************/
-//    public LinkLabel (Gtk.Widget parent = new Gtk.Widget ()) {
-//        base (parent);
-//    }
-
-
-//    /***********************************************************
-//    ***********************************************************/
-//    protected void enter_event (Gdk.Event event) {
-//        font_underline (true);
-//        cursor (GLib.PointingHandCursor);
-//    }
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  public LinkLabel (Gtk.Widget parent = new Gtk.Widget ()) {
+    //      base (parent);
+    //  }
 
 
-//    /***********************************************************
-//    ***********************************************************/
-//    protected void leave_event (Gdk.Event event) {
-//        font_underline (false);
-//        cursor (GLib.ArrowCursor);
-//    }
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  protected void enter_event (Gdk.Event event) {
+    //      font_underline (true);
+    //      cursor (GLib.PointingHandCursor);
+    //  }
 
 
-//    /***********************************************************
-//    ***********************************************************/
-//    protected void mouse_release_event (GLib.MouseEvent event) {
-//        if (GLib.Uri.is_valid (url)) {
-//            OpenExternal.open_browser (url);
-//        }
-
-//        signal_clicked ();
-//    }
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  protected void leave_event (Gdk.Event event) {
+    //      font_underline (false);
+    //      cursor (GLib.ArrowCursor);
+    //  }
 
 
-//    /***********************************************************
-//    ***********************************************************/
-//    private void font_underline (bool value) {
-//        var label_font = font ();
-//        label_font.underline (value);
-//        font (label_font);
-//    }
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  protected void mouse_release_event (GLib.MouseEvent event) {
+    //      if (GLib.Uri.is_valid (url)) {
+    //          OpenExternal.open_browser (url);
+    //      }
+
+    //      signal_clicked ();
+    //  }
+
+
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  private void font_underline (bool value) {
+    //      var label_font = font ();
+    //      label_font.underline (value);
+    //      font (label_font);
+    //  }
 
 } // class LinkLabel
 

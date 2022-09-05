@@ -13,41 +13,41 @@ ContentLength has the corect size
 ***********************************************************/
 public class BrokenFakeGetReply : FakeGetReply {
 
-//    //  using FakeGetReply.FakeGetReply;
-//    public int fake_size = STOP_AFTER;
+    //  //  using FakeGetReply.FakeGetReply;
+    //  public int fake_size = STOP_AFTER;
 
-//    /***********************************************************
-//    ***********************************************************/
-//    public override int64 bytes_available () {
-//        if (aborted) {
-//            return 0;
-//        }
-//        return std.min (size, fake_size) + GLib.IODevice.bytes_available (); // NOLINT : This is intended to simulare the brokeness
-//    }
-
-
-//    /***********************************************************
-//    ***********************************************************/
-//    public override int64 read_data (char *data, int64 maxlen) {
-//        int64 len = std.min ((int64) fake_size, maxlen);
-//        std.fill_n (data, len, payload);
-//        size -= len;
-//        fake_size -= len;
-//        return len;
-//    }
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  public override int64 bytes_available () {
+    //      if (aborted) {
+    //          return 0;
+    //      }
+    //      return std.min (size, fake_size) + GLib.IODevice.bytes_available (); // NOLINT : This is intended to simulare the brokeness
+    //  }
 
 
-//    /***********************************************************
-//    ***********************************************************/
-//    LibSync.SyncFileItem get_item (GLib.SignalSpy spy, string path) {
-//        foreach (GLib.List<GLib.Variant> args in spy) {
-//            var item = args[0].value<LibSync.SyncFileItem> ();
-//            if (item.destination () == path) {
-//                return item;
-//            }
-//        }
-//        return {};
-//    }
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  public override int64 read_data (char *data, int64 maxlen) {
+    //      int64 len = std.min ((int64) fake_size, maxlen);
+    //      std.fill_n (data, len, payload);
+    //      size -= len;
+    //      fake_size -= len;
+    //      return len;
+    //  }
+
+
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  LibSync.SyncFileItem get_item (GLib.SignalSpy spy, string path) {
+    //      foreach (GLib.List<GLib.Variant> args in spy) {
+    //          var item = args[0].value<LibSync.SyncFileItem> ();
+    //          if (item.destination () == path) {
+    //              return item;
+    //          }
+    //      }
+    //      return {};
+    //  }
 
 } // class BrokenFakeGetReply
 } // namespace Testing

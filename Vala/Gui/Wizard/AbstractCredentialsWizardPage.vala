@@ -17,24 +17,24 @@ namespace Ui {
 ***********************************************************/
 public class AbstractCredentialsWizardPage { //: GLib.WizardPage {
 
-//    /***********************************************************
-//    ***********************************************************/
-//    public void clean_up_page () {
-//        // Reset the credentials when the 'Back' button is used.
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  public void clean_up_page () {
+    //      // Reset the credentials when the 'Back' button is used.
 
-//        LibSync.Account account = ((OwncloudWizard)wizard ()).account;
-//        AbstractCredentials creds = account.credentials ();
-//        if (creds) {
-//            if (!creds.inherits ("DummyCredentials")) {
-//                account.credentials (CredentialsFactory.create ("dummy"));
-//            }
-//        }
-//    }
+    //      LibSync.Account account = ((OwncloudWizard)wizard ()).account;
+    //      AbstractCredentials creds = account.credentials ();
+    //      if (creds) {
+    //          if (!creds.inherits ("DummyCredentials")) {
+    //              account.credentials (CredentialsFactory.create ("dummy"));
+    //          }
+    //      }
+    //  }
 
 
-//    /***********************************************************
-//    ***********************************************************/
-//    public abstract AbstractCredentials credentials;
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  public abstract AbstractCredentials credentials;
 
 } // class AbstractCredentialsWizardPage
 

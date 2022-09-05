@@ -9,34 +9,34 @@ namespace Testing {
 
 public class TestVeryBigFiles : AbstractTestChunkingNg {
 
-//    /***********************************************************
-//    Test uploading large files (2.5GiB)
-//    ***********************************************************/
-//    private TestVeryBigFiles () {
-//        FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-//        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.HashMap ({ "chunking", "1.0" }) } });
-//        int64 size = 2.5 * 1024 * 1024 * 1024; // 2.5 GiB
+    //  /***********************************************************
+    //  Test uploading large files (2.5GiB)
+    //  ***********************************************************/
+    //  private TestVeryBigFiles () {
+    //      FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
+    //      fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.HashMap ({ "chunking", "1.0" }) } });
+    //      int64 size = 2.5 * 1024 * 1024 * 1024; // 2.5 GiB
 
-//        // Partial upload of big files
-//        partial_upload (fake_folder, "A/a0", size);
-//        GLib.assert_true (fake_folder.upload_state ().children.length == 1);
-//        var chunking_identifier = fake_folder.upload_state ().children.nth_data (0).name;
+    //      // Partial upload of big files
+    //      partial_upload (fake_folder, "A/a0", size);
+    //      GLib.assert_true (fake_folder.upload_state ().children.length == 1);
+    //      var chunking_identifier = fake_folder.upload_state ().children.nth_data (0).name;
 
-//        // Now resume
-//        GLib.assert_true (fake_folder.sync_once ());
-//        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
-//        GLib.assert_true (fake_folder.current_remote_state ().find ("A/a0").size == size);
+    //      // Now resume
+    //      GLib.assert_true (fake_folder.sync_once ());
+    //      GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+    //      GLib.assert_true (fake_folder.current_remote_state ().find ("A/a0").size == size);
 
-//        // The same chunk identifier was re-used
-//        GLib.assert_true (fake_folder.upload_state ().children.length == 1);
-//        GLib.assert_true (fake_folder.upload_state ().children.nth_data (0).name == chunking_identifier);
+    //      // The same chunk identifier was re-used
+    //      GLib.assert_true (fake_folder.upload_state ().children.length == 1);
+    //      GLib.assert_true (fake_folder.upload_state ().children.nth_data (0).name == chunking_identifier);
 
-//        // Upload another file again, this time without interruption
-//        fake_folder.local_modifier.append_byte ("A/a0");
-//        GLib.assert_true (fake_folder.sync_once ());
-//        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
-//        GLib.assert_true (fake_folder.current_remote_state ().find ("A/a0").size == size + 1);
-//    }
+    //      // Upload another file again, this time without interruption
+    //      fake_folder.local_modifier.append_byte ("A/a0");
+    //      GLib.assert_true (fake_folder.sync_once ());
+    //      GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+    //      GLib.assert_true (fake_folder.current_remote_state ().find ("A/a0").size == size + 1);
+    //  }
 
 } // class TestVeryBigFiles
 

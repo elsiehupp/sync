@@ -10,17 +10,17 @@ namespace Testing {
 ***********************************************************/
 public class TestHidpiFilenameDarkBackgroundReturnPathPathToWhiteIcon : AbstractTestTheme {
 
-//    /***********************************************************
-//    ***********************************************************/
-//    private TestHidpiFilenameDarkBackgroundReturnPathPathToWhiteIcon () {
-//        FakePaintDevice paint_device;
-//        Gdk.RGBA background_color = Gdk.RGBA ("#000000");
-//        string icon_name = "icon-name";
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  private TestHidpiFilenameDarkBackgroundReturnPathPathToWhiteIcon () {
+    //      FakePaintDevice paint_device;
+    //      Gdk.RGBA background_color = Gdk.RGBA ("#000000");
+    //      string icon_name = "icon-name";
 
-//        string icon_path = LibSync.Theme.hidpi_filename (icon_name + ".png", background_color, paint_device);
+    //      string icon_path = LibSync.Theme.hidpi_filename (icon_name + ".png", background_color, paint_device);
 
-//        GLib.assert_true (icon_path == ":/client/theme/white/" + icon_name + ".png");
-//    }
+    //      GLib.assert_true (icon_path == ":/client/theme/white/" + icon_name + ".png");
+    //  }
 
 } // class TestHidpiFilenameDarkBackgroundReturnPathPathToWhiteIcon
 

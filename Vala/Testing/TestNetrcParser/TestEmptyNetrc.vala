@@ -10,19 +10,19 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public class TestEmptyNetrc : AbstractTestNetrcParser {
 
-//    private const string TESTFILE = "netrctest_empty";
+    //  private const string TESTFILE = "netrctest_empty";
 
-//    /***********************************************************
-//    ***********************************************************/
-//    private TestEmptyNetrc () {
-//        base ();
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  private TestEmptyNetrc () {
+    //      base ();
 
-//        NetrcParser parser = new NetrcParser (TESTFILE);
-//        GLib.assert_true (!parser.parse ());
-//        GLib.assert_true (parser.find ("foo") == new Pair<string, string> ("", ""));
+    //      NetrcParser parser = new NetrcParser (TESTFILE);
+    //      GLib.assert_true (!parser.parse ());
+    //      GLib.assert_true (parser.find ("foo") == new Pair<string, string> ("", ""));
 
-//        //  delete (this);
-//    }
+    //      //  delete (this);
+    //  }
 
 } // class TestEmptyNetrc
 

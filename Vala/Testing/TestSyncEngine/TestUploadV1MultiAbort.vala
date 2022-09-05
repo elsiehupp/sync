@@ -9,36 +9,36 @@ namespace Testing {
 
 public class TestUploadV1MultiAbort : AbstractTestSyncEngine {
 
-//    /***********************************************************
-//    Aborting has had bugs when there are parallel upload jobs
-//    ***********************************************************/
-//    private TestUploadV1MultiAbort () {
-//        FakeFolder fake_folder = new FakeFolder (new FileInfo ());
-//        LibSync.SyncOptions options;
-//        options.initial_chunk_size = 10;
-//        options.max_chunk_size = 10;
-//        options.min_chunk_size = 10;
-//        fake_folder.sync_engine.set_sync_options (options);
+    //  /***********************************************************
+    //  Aborting has had bugs when there are parallel upload jobs
+    //  ***********************************************************/
+    //  private TestUploadV1MultiAbort () {
+    //      FakeFolder fake_folder = new FakeFolder (new FileInfo ());
+    //      LibSync.SyncOptions options;
+    //      options.initial_chunk_size = 10;
+    //      options.max_chunk_size = 10;
+    //      options.min_chunk_size = 10;
+    //      fake_folder.sync_engine.set_sync_options (options);
 
-//        GLib.Object parent;
-//        int number_of_put = 0;
-//        fake_folder.set_server_override (this.override_delegate);
+    //      GLib.Object parent;
+    //      int number_of_put = 0;
+    //      fake_folder.set_server_override (this.override_delegate);
 
-//        fake_folder.local_modifier.insert ("file", 100, 'W');
-//        GLib.Timeout.add (100, fake_folder.sync_engine.on_signal_abort);
-//        GLib.assert_true (!fake_folder.sync_once ());
+    //      fake_folder.local_modifier.insert ("file", 100, 'W');
+    //      GLib.Timeout.add (100, fake_folder.sync_engine.on_signal_abort);
+    //      GLib.assert_true (!fake_folder.sync_once ());
 
-//        GLib.assert_true (number_of_put == 3);
-//    }
+    //      GLib.assert_true (number_of_put == 3);
+    //  }
 
 
-//    private GLib.InputStream override_delegate (Soup.Operation operation, Soup.Request request, GLib.OutputStream device) {
-//        if (operation == Soup.PutOperation) {
-//            ++number_of_put;
-//            return new FakeHangingReply (operation, request, parent);
-//        }
-//        return null;
-//    }
+    //  private GLib.InputStream override_delegate (Soup.Operation operation, Soup.Request request, GLib.OutputStream device) {
+    //      if (operation == Soup.PutOperation) {
+    //          ++number_of_put;
+    //          return new FakeHangingReply (operation, request, parent);
+    //      }
+    //      return null;
+    //  }
 
 } // class TestUploadV1MultiAbort
 

@@ -10,14 +10,14 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public class TestIsPathWindowsDrivePartitionRoot : AbstractTestUtility {
 
-//    /***********************************************************
-//    ***********************************************************/
-//    private TestIsPathWindowsDrivePartitionRoot () {
-//        // should always return false on non-Windows
-//        GLib.assert_true (!is_path_windows_drive_partition_root ("c:"));
-//        GLib.assert_true (!is_path_windows_drive_partition_root ("c:/"));
-//        GLib.assert_true (!is_path_windows_drive_partition_root ("c:\\"));
-//    }
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  private TestIsPathWindowsDrivePartitionRoot () {
+    //      // should always return false on non-Windows
+    //      GLib.assert_true (!is_path_windows_drive_partition_root ("c:"));
+    //      GLib.assert_true (!is_path_windows_drive_partition_root ("c:/"));
+    //      GLib.assert_true (!is_path_windows_drive_partition_root ("c:\\"));
+    //  }
 
 } // class TestIsPathWindowsDrivePartitionRoot
 

@@ -13,14 +13,14 @@ overrides GLib.DesktopServices.open_url
 ***********************************************************/
 public class FakeDesktopServicesUrlHandler { //: GLib.Object {
 
-//    /***********************************************************
-//    ***********************************************************/
-//    public FakeDesktopServicesUrlHandler (GLib.Object parent = new GLib.Object ()) {
-//        base (parent);
-//    }
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  public FakeDesktopServicesUrlHandler (GLib.Object parent = new GLib.Object ()) {
+    //      base (parent);
+    //  }
 
 
-//    internal signal void signal_result_clicked (GLib.Uri url);
+    //  internal signal void signal_result_clicked (GLib.Uri url);
 
 }
 

@@ -9,22 +9,22 @@ namespace Testing {
 
 public class TestSetClearSetClearAtStage3EmitClearAtChangedAndClearAtSet { //: GLib.Object {
 
-//    /***********************************************************
-//    ***********************************************************/
-//    private TestSetClearSetClearAtStage3EmitClearAtChangedAndClearAtSet () {
-//        var fake_user_status_job = new FakeUserStatusConnector ();
-//        UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
-//        GLib.SignalSpy clear_at_changed_spy = new GLib.SignalSpy (
-//            model,
-//            UserStatusSelectorModel.signal_clear_at_changed
-//        );
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  private TestSetClearSetClearAtStage3EmitClearAtChangedAndClearAtSet () {
+    //      var fake_user_status_job = new FakeUserStatusConnector ();
+    //      UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
+    //      GLib.SignalSpy clear_at_changed_spy = new GLib.SignalSpy (
+    //          model,
+    //          UserStatusSelectorModel.signal_clear_at_changed
+    //      );
 
-//        var clear_at_index = 3;
-//        model.set_clear_at (clear_at_index);
+    //      var clear_at_index = 3;
+    //      model.set_clear_at (clear_at_index);
 
-//        GLib.assert_true (clear_at_changed_spy.length == 1);
-//        GLib.assert_true (model.clear_at () == _("4 hours"));
-//    }
+    //      GLib.assert_true (clear_at_changed_spy.length == 1);
+    //      GLib.assert_true (model.clear_at () == _("4 hours"));
+    //  }
 
 } // class TestSetClearSetClearAtStage3EmitClearAtChangedAndClearAtSet
 

@@ -9,16 +9,16 @@ namespace Testing {
 
 public class FakeJsonErrorReply : FakeErrorReply {
 
-//    /***********************************************************
-//    ***********************************************************/
-//    public FakeJsonErrorReply (
-//        Soup.Operation operation,
-//        Soup.Request request,
-//        GLib.Object parent,
-//        int http_error_code,
-//        GLib.JsonDocument reply = GLib.JsonDocument ()) {
-//        base (operation, request, parent, http_error_code, reply.to_json ());
-//    }
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  public FakeJsonErrorReply (
+    //      Soup.Operation operation,
+    //      Soup.Request request,
+    //      GLib.Object parent,
+    //      int http_error_code,
+    //      GLib.JsonDocument reply = GLib.JsonDocument ()) {
+    //      base (operation, request, parent, http_error_code, reply.to_json ());
+    //  }
 
 }
 

@@ -18,12 +18,12 @@ These are part of notifications which are mapped into activities.
 ***********************************************************/
 public class ActivityLink { //: GLib.Object {
 
-//    /***********************************************************
-//    ***********************************************************/
-//    public string label;
-//    public string link;
-//    public string verb;
-//    public bool primary;
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  public string label;
+    //  public string link;
+    //  public string verb;
+    //  public bool primary;
 
 } // class ActivityLink
 

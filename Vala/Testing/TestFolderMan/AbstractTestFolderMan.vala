@@ -10,21 +10,21 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public class AbstractTestFolderMan { //: GLib.Object {
 
-//    LibSync.Account account
-//    AccountState account_state;
-//    FolderManager folder_manager;
-//    GLib.Uri url
+    //  LibSync.Account account
+    //  AccountState account_state;
+    //  FolderManager folder_manager;
+    //  GLib.Uri url
 
-//    protected AbstractTestFolderMan () {
-//        this.account = LibSync.Account.create ();
-//        this.url = new GLib.Uri ("http://example.de");
-//        this.var credentials = new HttpCredentialsTest ("testuser", "secret");
-//        this.account.set_credentials (this.credentials);
-//        this.account.set_url (this.url);
-//        this.url.set_user_name (this.credentials.user ());
-//        this.account_state = new AccountState (this.account);
-//        this.folder_manager = FolderManager.instance;
-//    }
+    //  protected AbstractTestFolderMan () {
+    //      this.account = LibSync.Account.create ();
+    //      this.url = new GLib.Uri ("http://example.de");
+    //      this.var credentials = new HttpCredentialsTest ("testuser", "secret");
+    //      this.account.set_credentials (this.credentials);
+    //      this.account.set_url (this.url);
+    //      this.url.set_user_name (this.credentials.user ());
+    //      this.account_state = new AccountState (this.account);
+    //      this.folder_manager = FolderManager.instance;
+    //  }
 
 } // class AbstractTestFolderMan
 

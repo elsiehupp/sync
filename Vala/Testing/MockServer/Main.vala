@@ -7,9 +7,9 @@ namespace Testing {
 @copyright GPLv??? or later
 ***********************************************************/
 int main (int argc, char* argv[]) {
-//    GLib.Application app = new GLib.Application (argc, argv);
-//    HttpServer server;
-//    return app.exec ();
+    //  GLib.Application app = new GLib.Application (argc, argv);
+    //  HttpServer server;
+    //  return app.exec ();
 }
 
 }
