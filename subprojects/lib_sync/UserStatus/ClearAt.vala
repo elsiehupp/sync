@@ -12,17 +12,17 @@ namespace LibSync {
 ***********************************************************/
 public class ClearAt { //: GLib.Object {
 
-    //  public enum ClearAtType {
-    //      PERIOD,
-    //      END_OF,
-    //      TIMESTAMP
-    //  }
+    public enum ClearAtType {
+        PERIOD,
+        END_OF,
+        TIMESTAMP
+    }
 
-    //  public ClearAtType type = ClearAtType.PERIOD;
+    public ClearAtType type = ClearAtType.PERIOD;
 
-    //  public uint64 timestamp;
-    //  public int period;
-    //  public string endof;
+    public uint64 timestamp;
+    public int period;
+    public string endof;
 
 } // class ClearAt
 

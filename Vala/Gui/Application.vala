@@ -39,20 +39,20 @@ public class Application { //: GLib.Application {
     //  /***********************************************************
     //  ***********************************************************/
     //  string option_list =
-    //      "Options:\n" +
-    //      "  --help, -h           : show this help screen.\n" +
-    //      "  --version, -v        : show version information.\n" +
-    //      "  -q --quit            : quit the running instance\n" +
-    //      "  --logwindow, -l      : open a window to show log output.\n" +
-    //      "  --logfile <filename> : write log output to file <filename>.\n" +
-    //      "  --logdir <name>      : write each sync log output in a new file\n" +
-    //      "                         in folder_connection <name>.\n" +
-    //      "  --logexpire <hours>  : removes logs older than <hours> hours.\n" +
-    //      "                         (to be used with --logdir)\n" +
-    //      "  --logflush           : flush the log file after every write.\n" +
-    //      "  --logdebug           : also output debug-level messages in the log.\n" +
-    //      "  --confdir <dirname>  : Use the given configuration folder_connection.\n" +
-    //      "  --background         : launch the application in the background.\n";
+        //  "Options:\n" +
+        //  "  --help, -h           : show this help screen.\n" +
+        //  "  --version, -v        : show version information.\n" +
+        //  "  -q --quit            : quit the running instance\n" +
+        //  "  --logwindow, -l      : open a window to show log output.\n" +
+        //  "  --logfile <filename> : write log output to file <filename>.\n" +
+        //  "  --logdir <name>      : write each sync log output in a new file\n" +
+        //  "                         in folder_connection <name>.\n" +
+        //  "  --logexpire <hours>  : removes logs older than <hours> hours.\n" +
+        //  "                         (to be used with --logdir)\n" +
+        //  "  --logflush           : flush the log file after every write.\n" +
+        //  "  --logdebug           : also output debug-level messages in the log.\n" +
+        //  "  --confdir <dirname>  : Use the given configuration folder_connection.\n" +
+        //  "  --background         : launch the application in the background.\n";
 
     //  /***********************************************************
     //  ***********************************************************/
@@ -114,24 +114,24 @@ public class Application { //: GLib.Application {
     //  Option from command line
     //  ***********************************************************/
     //  bool debug_mode {
-    //      /***********************************************************
-    //      Helper for displaying messages. Note that there is no
-    //      console on Windows.
-    //      ***********************************************************/
-    //      public get;
-    //      private set;
+        //  /***********************************************************
+        //  Helper for displaying messages. Note that there is no
+        //  console on Windows.
+        //  ***********************************************************/
+        //  public get;
+        //  private set;
     //  }
 
     //  /***********************************************************
     //  Option from command line
     //  ***********************************************************/
     //  bool background_mode {
-    //      /***********************************************************
-    //      Helper for displaying messages. Note that there is no
-    //      console on Windows.
-    //      ***********************************************************/
-    //      public get;
-    //      private set;
+        //  /***********************************************************
+        //  Helper for displaying messages. Note that there is no
+        //  console on Windows.
+        //  ***********************************************************/
+        //  public get;
+        //  private set;
     //  }
 
     //  /***********************************************************
@@ -159,226 +159,226 @@ public class Application { //: GLib.Application {
     //  /***********************************************************
     //  ***********************************************************/
     //  public Application (int argc, char **argv) {
-    //      base (LibSync.Theme.app_name, argc, argv);
-    //      this.gui = null;
-    //      this.theme = LibSync.Theme.instance;
-    //      this.help_only = false;
-    //      this.version_only = false;
-    //      this.show_log_window = false;
-    //      this.log_expire = 0;
-    //      this.log_flush = false;
-    //      this.log_debug = true;
-    //      this.user_triggered_connect = false;
-    //      this.debug_mode = false;
-    //      this.background_mode = false;
-    //      this.started_at.on_signal_start ();
+        //  base (LibSync.Theme.app_name, argc, argv);
+        //  this.gui = null;
+        //  this.theme = LibSync.Theme.instance;
+        //  this.help_only = false;
+        //  this.version_only = false;
+        //  this.show_log_window = false;
+        //  this.log_expire = 0;
+        //  this.log_flush = false;
+        //  this.log_debug = true;
+        //  this.user_triggered_connect = false;
+        //  this.debug_mode = false;
+        //  this.background_mode = false;
+        //  this.started_at.on_signal_start ();
 
-    //      qsrand (std.random_device () ());
+        //  qsrand (std.random_device () ());
 
-    //      // TODO: Can't set this without breaking current config paths
-    //      //    organization_name (APPLICATION_VENDOR);
-    //      organization_domain (APPLICATION_REV_DOMAIN);
+        //  // TODO: Can't set this without breaking current config paths
+        //  //    organization_name (APPLICATION_VENDOR);
+        //  organization_domain (APPLICATION_REV_DOMAIN);
 
-    //      // desktop_filename to provide wayland compatibility (in general: conformance with naming standards)
-    //      // but only on Qt >= 5.7, where desktop_filename was introduced
-    //      string desktop_filename = Common.Config.LINUX_APPLICATION_ID + ".desktop";
-    //      desktop_filename (desktop_filename);
+        //  // desktop_filename to provide wayland compatibility (in general: conformance with naming standards)
+        //  // but only on Qt >= 5.7, where desktop_filename was introduced
+        //  string desktop_filename = Common.Config.LINUX_APPLICATION_ID + ".desktop";
+        //  desktop_filename (desktop_filename);
 
-    //      application_name (this.theme.app_name);
-    //      window_icon (this.theme.application_icon);
+        //  application_name (this.theme.app_name);
+        //  window_icon (this.theme.application_icon);
 
-    //      if (!LibSync.ConfigFile ().exists ()) {
-    //          // Migrate from version <= 2.4
-    //          application_name (this.theme.app_name_gui);
-    //          // We need to use the deprecated GLib.DesktopServices.storage_location because of its Qt4
-    //          // behavior of adding "data" to the path
-    //          string old_dir = GLib.DesktopServices.storage_location (GLib.DesktopServices.DataLocation);
-    //          if (old_dir.has_suffix ("/")) {
-    //              // macOS 10.11.x does not like trailing slash for rename/move.
-    //              old_dir.chop (1);
-    //          }
-    //          //  GLib.T_WARNING_POP
-    //          application_name (this.theme.app_name);
-    //          if (new GLib.FileInfo (old_dir).is_dir ()) {
-    //              var configuration_directory = LibSync.ConfigFile ().config_path;
-    //              if (configuration_directory.has_suffix ("/")) {
-    //                  // macOS 10.11.x does not like trailing slash for rename/move.
-    //                  configuration_directory.chop (1);
-    //              }
-    //              GLib.info ("Migrating old config from " + old_dir + " to " + configuration_directory);
+        //  if (!LibSync.ConfigFile ().exists ()) {
+        //      // Migrate from version <= 2.4
+        //      application_name (this.theme.app_name_gui);
+        //      // We need to use the deprecated GLib.DesktopServices.storage_location because of its Qt4
+        //      // behavior of adding "data" to the path
+        //      string old_dir = GLib.DesktopServices.storage_location (GLib.DesktopServices.DataLocation);
+        //      if (old_dir.has_suffix ("/")) {
+        //          // macOS 10.11.x does not like trailing slash for rename/move.
+        //          old_dir.chop (1);
+        //      }
+        //      //  GLib.T_WARNING_POP
+        //      application_name (this.theme.app_name);
+        //      if (new GLib.FileInfo (old_dir).is_dir ()) {
+        //          var configuration_directory = LibSync.ConfigFile ().config_path;
+        //          if (configuration_directory.has_suffix ("/")) {
+        //              // macOS 10.11.x does not like trailing slash for rename/move.
+        //              configuration_directory.chop (1);
+        //          }
+        //          GLib.info ("Migrating old config from " + old_dir + " to " + configuration_directory);
 
-    //              if (!new GLib.File.rename (old_dir, configuration_directory)) {
-    //                  GLib.warning ("Failed to move the old config directory to its new location (" + old_dir + " to " + configuration_directory + ")");
+        //          if (!new GLib.File.rename (old_dir, configuration_directory)) {
+        //              GLib.warning ("Failed to move the old config directory to its new location (" + old_dir + " to " + configuration_directory + ")");
 
-    //                  // Try to move the files one by one
-    //                  if (new GLib.FileInfo (configuration_directory).is_dir () || new GLib.Dir ().mkdir (configuration_directory)) {
-    //                      GLib.List<string> files_list = new GLib.Dir (old_dir).entry_list (GLib.Dir.Files);
-    //                      GLib.info ("Will move the individual files " + files_list);
-    //                      foreach (var name in files_list) {
-    //                          if (!GLib.File.rename (old_dir + "/" + name, configuration_directory + "/" + name)) {
-    //                              GLib.warning ("Fallback move of " + name + " also failed");
-    //                          }
-    //                      }
-    //                  }
-    //              }
-    //          }
-    //      }
+        //              // Try to move the files one by one
+        //              if (new GLib.FileInfo (configuration_directory).is_dir () || new GLib.Dir ().mkdir (configuration_directory)) {
+        //                  GLib.List<string> files_list = new GLib.Dir (old_dir).entry_list (GLib.Dir.Files);
+        //                  GLib.info ("Will move the individual files " + files_list);
+        //                  foreach (var name in files_list) {
+        //                      if (!GLib.File.rename (old_dir + "/" + name, configuration_directory + "/" + name)) {
+        //                          GLib.warning ("Fallback move of " + name + " also failed");
+        //                      }
+        //                  }
+        //              }
+        //          }
+        //      }
+        //  }
 
-    //      parse_options (arguments ());
-    //      //  no need to waste time;
-    //      if (this.help_only || this.version_only) {
-    //          return;
-    //      }
-    //      if (this.quit_instance) {
-    //          GLib.Timeout.add (0, this.on_timeout_quit);
-    //          return;
-    //      }
-    //      if (is_running ()) {
-    //          return;
-    //      }
+        //  parse_options (arguments ());
+        //  //  no need to waste time;
+        //  if (this.help_only || this.version_only) {
+        //      return;
+        //  }
+        //  if (this.quit_instance) {
+        //      GLib.Timeout.add (0, this.on_timeout_quit);
+        //      return;
+        //  }
+        //  if (is_running ()) {
+        //      return;
+        //  }
     //  //  #if defined (WITH_CRASHREPORTER)
-    //      if (LibSync.ConfigFile ().crash_reporter ()) {
-    //          var reporter = CRASHREPORTER_EXECUTABLE;
-    //          this.crash_handler.reset (new CrashReporter.Handler (GLib.Dir.temp_path, true, reporter));
-    //      }
+        //  if (LibSync.ConfigFile ().crash_reporter ()) {
+        //      var reporter = CRASHREPORTER_EXECUTABLE;
+        //      this.crash_handler.reset (new CrashReporter.Handler (GLib.Dir.temp_path, true, reporter));
+        //  }
     //  //  #endif
 
-    //      setup_logging ();
-    //      setup_translations ();
+        //  setup_logging ();
+        //  setup_translations ();
 
-    //      if (!config_version_migration ()) {
-    //          return;
-    //      }
+        //  if (!config_version_migration ()) {
+        //      return;
+        //  }
 
-    //      LibSync.ConfigFile config;
-    //      // The timeout is initialized with an environment variable, if not, override with the value from the config
-    //      if (!LibSync.AbstractNetworkJob.http_timeout) {
-    //          LibSync.AbstractNetworkJob.http_timeout = config.timeout ();
-    //      }
-    //      // Check vfs plugins
-    //      if (LibSync.Theme.show_virtual_files_option && this.best_available_vfs_mode == Common.AbstractVfs.Off) {
-    //          GLib.warning ("Theme wants to show vfs mode, but no vfs plugins are available.");
-    //      }
-    //      if (is_vfs_plugin_available (Common.AbstractVfs.WindowsCfApi)) {
-    //          GLib.info ("VFS windows plugin is available");
-    //      }
-    //      if (is_vfs_plugin_available (Common.AbstractVfs.WithSuffix)) {
-    //          GLib.info ("VFS suffix plugin is available");
-    //      }
+        //  LibSync.ConfigFile config;
+        //  // The timeout is initialized with an environment variable, if not, override with the value from the config
+        //  if (!LibSync.AbstractNetworkJob.http_timeout) {
+        //      LibSync.AbstractNetworkJob.http_timeout = config.timeout ();
+        //  }
+        //  // Check vfs plugins
+        //  if (LibSync.Theme.show_virtual_files_option && this.best_available_vfs_mode == Common.AbstractVfs.Off) {
+        //      GLib.warning ("Theme wants to show vfs mode, but no vfs plugins are available.");
+        //  }
+        //  if (is_vfs_plugin_available (Common.AbstractVfs.WindowsCfApi)) {
+        //      GLib.info ("VFS windows plugin is available");
+        //  }
+        //  if (is_vfs_plugin_available (Common.AbstractVfs.WithSuffix)) {
+        //      GLib.info ("VFS suffix plugin is available");
+        //  }
 
-    //      this.folder_manager.reset (new FolderManager ());
+        //  this.folder_manager.reset (new FolderManager ());
 
-    //      this.signal_message_received.connect (
-    //          this.on_signal_parse_message
-    //      );
+        //  this.signal_message_received.connect (
+        //      this.on_signal_parse_message
+        //  );
 
-    //      if (!AccountManager.instance.restore ()) {
-    //          // If there is an error reading the account settings, try again
-    //          // after a couple of seconds, if that fails, give up.
-    //          // (non-existence is not an error)
-    //          Utility.sleep (5);
-    //          if (!AccountManager.instance.restore ()) {
-    //              GLib.critical ("Could not read the account settings; quitting.");
-    //              Gtk.MessageBox.critical (
-    //                  null,
-    //                  _("Error accessing the configuration file"),
-    //                  _("There was an error while accessing the configuration "
-    //                  "file at %1. Please make sure the file can be accessed by your user.")
-    //                      .printf (LibSync.ConfigFile ().config_file ()),
-    //                  _("Quit %1").printf (LibSync.Theme.app_name_gui));
-    //              GLib.Timeout.add (0, this.on_timeout_quit);
-    //              return;
-    //          }
-    //      }
+        //  if (!AccountManager.instance.restore ()) {
+        //      // If there is an error reading the account settings, try again
+        //      // after a couple of seconds, if that fails, give up.
+        //      // (non-existence is not an error)
+        //      Utility.sleep (5);
+        //      if (!AccountManager.instance.restore ()) {
+        //          GLib.critical ("Could not read the account settings; quitting.");
+        //          Gtk.MessageBox.critical (
+        //              null,
+        //              _("Error accessing the configuration file"),
+        //              _("There was an error while accessing the configuration "
+        //              "file at %1. Please make sure the file can be accessed by your user.")
+        //                  .printf (LibSync.ConfigFile ().config_file ()),
+        //              _("Quit %1").printf (LibSync.Theme.app_name_gui));
+        //          GLib.Timeout.add (0, this.on_timeout_quit);
+        //          return;
+        //      }
+        //  }
 
-    //      FolderManager.instance.sync_enabled = true;
+        //  FolderManager.instance.sync_enabled = true;
 
-    //      quit_on_signal_last_window_closed (false);
+        //  quit_on_signal_last_window_closed (false);
 
-    //      this.theme.systray_use_mono_icons (config.mono_icons ());
-    //      this.theme.signal_systray_use_mono_icons_changed.connect (
-    //          this.on_signal_use_mono_icons_changed
-    //      );
+        //  this.theme.systray_use_mono_icons (config.mono_icons ());
+        //  this.theme.signal_systray_use_mono_icons_changed.connect (
+        //      this.on_signal_use_mono_icons_changed
+        //  );
 
-    //      // Setting up the gui class will allow tray notifications for the
-    //      // setup that follows, like folder_connection setup
-    //      this.gui = new OwncloudGui (this);
-    //      if (this.show_log_window) {
-    //          this.gui.on_signal_toggle_log_browser (); // this.show_log_window is set in parse_options.
-    //      }
+        //  // Setting up the gui class will allow tray notifications for the
+        //  // setup that follows, like folder_connection setup
+        //  this.gui = new OwncloudGui (this);
+        //  if (this.show_log_window) {
+        //      this.gui.on_signal_toggle_log_browser (); // this.show_log_window is set in parse_options.
+        //  }
     //  //  #if WITH_LIBCLOUDPROVIDERS
-    //      this.gui.setup_cloud_providers ();
+        //  this.gui.setup_cloud_providers ();
     //  //  #endif
 
-    //      FolderManager.instance.set_up_folders ();
-    //      this.proxy.on_signal_setup_qt_proxy_from_config (); // folders have to be defined first, than we set up the Qt proxy.
+        //  FolderManager.instance.set_up_folders ();
+        //  this.proxy.on_signal_setup_qt_proxy_from_config (); // folders have to be defined first, than we set up the Qt proxy.
 
-    //      AccountManager.instance.signal_account_added.connect (
-    //          this.on_signal_account_state_added
-    //      );
-    //      AccountManager.instance.signal_account_removed.connect (
-    //          this.on_signal_account_state_removed
-    //      );
-    //      foreach (var account_instance in AccountManager.instance.accounts) {
-    //          on_signal_account_state_added (account_instance);
-    //      }
-    //      FolderManager.instance.socket_api.signal_share_command_received.connect (
-    //          this.gui.on_signal_show_share_dialog
-    //      );
-    //      FolderManager.instance.socket_api.signal_file_activity_command_received.connect (
-    //          Systray.instance.show_file_activity_dialog
-    //      );
+        //  AccountManager.instance.signal_account_added.connect (
+        //      this.on_signal_account_state_added
+        //  );
+        //  AccountManager.instance.signal_account_removed.connect (
+        //      this.on_signal_account_state_removed
+        //  );
+        //  foreach (var account_instance in AccountManager.instance.accounts) {
+        //      on_signal_account_state_added (account_instance);
+        //  }
+        //  FolderManager.instance.socket_api.signal_share_command_received.connect (
+        //      this.gui.on_signal_show_share_dialog
+        //  );
+        //  FolderManager.instance.socket_api.signal_file_activity_command_received.connect (
+        //      Systray.instance.show_file_activity_dialog
+        //  );
 
-    //      // startup procedure.
-    //      GLib.Timeout.add (
-    //          ConnectionValidator.DEFAULT_CALLING_INTERVAL_MILLISECONDS, // check for connection every 32 seconds.
-    //          this.on_signal_check_connection
-    //      );
-    //      // Also check immediately
-    //      GLib.Timeout.add (0, this.on_signal_check_connection);
+        //  // startup procedure.
+        //  GLib.Timeout.add (
+        //      ConnectionValidator.DEFAULT_CALLING_INTERVAL_MILLISECONDS, // check for connection every 32 seconds.
+        //      this.on_signal_check_connection
+        //  );
+        //  // Also check immediately
+        //  GLib.Timeout.add (0, this.on_signal_check_connection);
 
-    //      // Can't use online_state_changed because it is always true on modern systems because of many interfaces
-    //      this.network_configuration_manager.configuration_changed.connect (
-    //          this.on_signal_system_online_configuration_changed
-    //      );
+        //  // Can't use online_state_changed because it is always true on modern systems because of many interfaces
+        //  this.network_configuration_manager.configuration_changed.connect (
+        //      this.on_signal_system_online_configuration_changed
+        //  );
 
     //  //  #if defined (BUILD_UPDATER)
-    //      // Update checks
-    //      var updater_scheduler = new UpdaterScheduler (this);
-    //      updater_scheduler.signal_updater_announcement.connect (
-    //          this.gui.on_signal_show_tray_message
-    //      );
-    //      updater_scheduler.signal_request_restart.connect (
-    //          this.folder_manager.on_signal_schedule_app_restart
-    //      );
+        //  // Update checks
+        //  var updater_scheduler = new UpdaterScheduler (this);
+        //  updater_scheduler.signal_updater_announcement.connect (
+        //      this.gui.on_signal_show_tray_message
+        //  );
+        //  updater_scheduler.signal_request_restart.connect (
+        //      this.folder_manager.on_signal_schedule_app_restart
+        //  );
     //  //  #endif
 
-    //      // Cleanup at Quit.
-    //      this.about_to_quit.connect (
-    //          this.clean_up
-    //      );
+        //  // Cleanup at Quit.
+        //  this.about_to_quit.connect (
+        //      this.clean_up
+        //  );
 
-    //      // Allow other classes to hook into signal_is_showing_settings_dialog () signals (re-auth widgets, for example)
-    //      this.gui.signal_is_showing_settings_dialog.connect (
-    //          this.on_signal_gui_is_showing_settings
-    //      );
+        //  // Allow other classes to hook into signal_is_showing_settings_dialog () signals (re-auth widgets, for example)
+        //  this.gui.signal_is_showing_settings_dialog.connect (
+        //      this.on_signal_gui_is_showing_settings
+        //  );
 
-    //      this.gui.create_tray ();
+        //  this.gui.create_tray ();
     //  }
 
 
     //  ~Application () {
-    //      // Make sure all folders are gone, otherwise removing the
-    //      // accounts will remove the associated folders from the settings.
-    //      if (this.folder_manager != null) {
-    //          this.folder_manager.unload_and_delete_all_folders ();
-    //      }
+        //  // Make sure all folders are gone, otherwise removing the
+        //  // accounts will remove the associated folders from the settings.
+        //  if (this.folder_manager != null) {
+        //      this.folder_manager.unload_and_delete_all_folders ();
+        //  }
 
-    //      // Remove the account from the account manager so it can be deleted.
-    //      AccountManager.instance.on_account_removed.disconnect (
-    //          this.on_signal_account_state_removed
-    //      );
-    //      AccountManager.instance.on_signal_shutdown ();
+        //  // Remove the account from the account manager so it can be deleted.
+        //  AccountManager.instance.on_account_removed.disconnect (
+        //      this.on_signal_account_state_removed
+        //  );
+        //  AccountManager.instance.on_signal_shutdown ();
     //  }
 
 
@@ -387,30 +387,30 @@ public class Application { //: GLib.Application {
     //  console on Windows.
     //  ***********************************************************/
     //  public void show_help () {
-    //      help ();
-    //      string help_text;
-    //      GLib.OutputStream stream = new GLib.OutputStream (help_text);
-    //      stream +=  this.theme.app_name
-    //          " version "
-    //          this.theme.version + endl;
+        //  help ();
+        //  string help_text;
+        //  GLib.OutputStream stream = new GLib.OutputStream (help_text);
+        //  stream +=  this.theme.app_name
+        //      " version "
+        //      this.theme.version + endl;
 
-    //      stream += "File synchronisation desktop utility." + endl
-    //          endl
-    //          option_list;
+        //  stream += "File synchronisation desktop utility." + endl
+        //      endl
+        //      option_list;
 
-    //      if (this.theme.app_name == "own_cloud") {
-    //          stream += endl
-    //              "For more information, see http://www.owncloud.org" + endl
-    //              endl;
-    //      }
+        //  if (this.theme.app_name == "own_cloud") {
+        //      stream += endl
+        //          "For more information, see http://www.owncloud.org" + endl
+        //          endl;
+        //  }
 
-    //      display_help_text (help_text);
+        //  display_help_text (help_text);
     //  }
 
 
     //  private bool on_timeout_quit () {
-    //      this.quit ();
-    //      return false;
+        //  this.quit ();
+        //  return false;
     //  }
 
 
@@ -419,9 +419,9 @@ public class Application { //: GLib.Application {
     //  console on Windows.
     //  ***********************************************************/
     //  public void show_hint (string error_hint) {
-    //      std.cerr += error_hint + std.endl;
-    //      std.cerr += "Try '" + Application.GLib.FileInfo (GLib.Application.application_file_path).filename ().to_std_string () + " --help' for more information" + std.endl;
-    //      std.GLib.Application.quit (1);
+        //  std.cerr += error_hint + std.endl;
+        //  std.cerr += "Try '" + Application.GLib.FileInfo (GLib.Application.application_file_path).filename ().to_std_string () + " --help' for more information" + std.endl;
+        //  std.GLib.Application.quit (1);
     //  }
 
 
@@ -432,7 +432,7 @@ public class Application { //: GLib.Application {
     //  /***********************************************************
     //  ***********************************************************/
     //  public bool give_help () {
-    //      return this.help_only;
+        //  return this.help_only;
     //  }
 
 
@@ -441,7 +441,7 @@ public class Application { //: GLib.Application {
     //  Cnly display the version?
     //  ***********************************************************/
     //  public bool version_only () {
-    //      return this.version_only;
+        //  return this.version_only;
     //  }
 
 
@@ -451,14 +451,14 @@ public class Application { //: GLib.Application {
     //  console on Windows.
     //  ***********************************************************/
     //  public void show_version () {
-    //      display_help_text (LibSync.Theme.version_switch_output);
+        //  display_help_text (LibSync.Theme.version_switch_output);
     //  }
 
 
     //  /***********************************************************
     //  ***********************************************************/
     //  public void show_main_dialog () {
-    //      this.gui.on_signal_open_main_dialog ();
+        //  this.gui.on_signal_open_main_dialog ();
     //  }
 
 
@@ -468,35 +468,35 @@ public class Application { //: GLib.Application {
     //  TODO: this should not be public
     //  ***********************************************************/
     //  public void on_signal_owncloud_wizard_done (int res) {
-    //      FolderManager folder_man = FolderManager.instance;
+        //  FolderManager folder_man = FolderManager.instance;
 
-    //      // During the wizard, scheduling of new syncs is disabled
-    //      folder_man.sync_enabled = true;
+        //  // During the wizard, scheduling of new syncs is disabled
+        //  folder_man.sync_enabled = true;
 
-    //      if (res == Gtk.Dialog.Accepted) {
-    //          // Check connectivity of the newly created account
-    //          this.check_connection_timer.on_signal_start ();
-    //          on_signal_check_connection ();
+        //  if (res == Gtk.Dialog.Accepted) {
+        //      // Check connectivity of the newly created account
+        //      this.check_connection_timer.on_signal_start ();
+        //      on_signal_check_connection ();
 
-    //          // If one account is configured : enable autostart
+        //      // If one account is configured : enable autostart
     //  //  #ifndef GLib.T_DEBUG
-    //          bool should_auto_start = AccountManager.instance.accounts.length () == 1;
+        //      bool should_auto_start = AccountManager.instance.accounts.length () == 1;
     //  //  #else
-    //          //  bool should_auto_start = false;
+        //      //  bool should_auto_start = false;
     //  //  #endif
-    //          if (should_auto_start) {
-    //              Utility.launch_on_signal_startup (this.theme.app_name, this.theme.app_name_gui, true);
-    //          }
+        //      if (should_auto_start) {
+        //          Utility.launch_on_signal_startup (this.theme.app_name, this.theme.app_name_gui, true);
+        //      }
 
-    //          Systray.instance.signal_show_window ();
-    //      }
+        //      Systray.instance.signal_show_window ();
+        //  }
     //  }
 
 
     //  /***********************************************************
     //  ***********************************************************/
     //  public void on_signal_crash () {
-    //      Utility.crash ();
+        //  Utility.crash ();
     //  }
 
 
@@ -506,34 +506,34 @@ public class Application { //: GLib.Application {
     //  the extension)
     //  ***********************************************************/
     //  public bool on_signal_open_virtual_file (string filename) {
-    //      string virtual_file_ext = Common.Config.APPLICATION_DOTVIRTUALFILE_SUFFIX;
-    //      if (!filename.has_suffix (virtual_file_ext)) {
-    //          GLib.warning ("Can only handle file ending in .owncloud. Unable to open " + filename);
-    //          return false; // only run once
-    //      }
-    //      var folder_connection = FolderManager.instance.folder_for_path (filename);
-    //      if (folder_connection == null) {
-    //          GLib.warning ("Can't find sync folder_connection for " + filename);
-    //          // TODO: show a Gtk.MessageBox for errors
-    //          return false; // only run once
-    //      }
-    //      string relative_path = GLib.Dir.clean_path (filename).mid (folder_connection.clean_path.length + 1);
-    //      folder_connection.on_signal_implicitly_hydrate_file (relative_path);
-    //      string normal_name = filename.left (filename.length - virtual_file_ext.length);
-    //      folder_connection.signal_sync_finished.connect (
-    //          this.on_signal_sync_finished
-    //      );
-    //      return false; // only run once
+        //  string virtual_file_ext = Common.Config.APPLICATION_DOTVIRTUALFILE_SUFFIX;
+        //  if (!filename.has_suffix (virtual_file_ext)) {
+        //      GLib.warning ("Can only handle file ending in .owncloud. Unable to open " + filename);
+        //      return false; // only run once
+        //  }
+        //  var folder_connection = FolderManager.instance.folder_for_path (filename);
+        //  if (folder_connection == null) {
+        //      GLib.warning ("Can't find sync folder_connection for " + filename);
+        //      // TODO: show a Gtk.MessageBox for errors
+        //      return false; // only run once
+        //  }
+        //  string relative_path = GLib.Dir.clean_path (filename).mid (folder_connection.clean_path.length + 1);
+        //  folder_connection.on_signal_implicitly_hydrate_file (relative_path);
+        //  string normal_name = filename.left (filename.length - virtual_file_ext.length);
+        //  folder_connection.signal_sync_finished.connect (
+        //      this.on_signal_sync_finished
+        //  );
+        //  return false; // only run once
     //  }
 
 
     //  /***********************************************************
     //  ***********************************************************/
     //  private void on_signal_sync_finished (FolderConnection folder_connection, GLib.Object con, string normal_name) {
-    //      folder_connection.disconnect (con);
-    //      if (GLib.File.exists (normal_name)) {
-    //          GLib.DesktopServices.open_url (GLib.Uri.from_local_file (normal_name));
-    //      }
+        //  folder_connection.disconnect (con);
+        //  if (GLib.File.exists (normal_name)) {
+        //      GLib.DesktopServices.open_url (GLib.Uri.from_local_file (normal_name));
+        //  }
     //  }
 
 
@@ -542,301 +542,301 @@ public class Application { //: GLib.Application {
     //  was available initially.
     //  ***********************************************************/
     //  public bool on_signal_try_tray_again () {
-    //      GLib.info ("Trying tray icon, tray available: " + GLib.SystemTrayIcon.is_system_tray_available ());
-    //      this.gui.hide_and_show_tray ();
+        //  GLib.info ("Trying tray icon, tray available: " + GLib.SystemTrayIcon.is_system_tray_available ());
+        //  this.gui.hide_and_show_tray ();
 
-    //      return false; // only run once
+        //  return false; // only run once
     //  }
 
 
     //  /***********************************************************
     //  ***********************************************************/
     //  protected void parse_options (GLib.List<string> options) {
-    //      GLib.StringListIterator iterator = new GLib.StringListIterator (options);
-    //      // skip file name;
-    //      if (iterator.has_next ()) {
-    //          iterator.next ();
-    //      }
+        //  GLib.StringListIterator iterator = new GLib.StringListIterator (options);
+        //  // skip file name;
+        //  if (iterator.has_next ()) {
+        //      iterator.next ();
+        //  }
 
-    //      //  parse options; if help or bad option exit
-    //      while (iterator.has_next ()) {
-    //          string option = iterator.next ();
-    //          if (option == "--help" || option == "-h") {
-    //              help ();
-    //              break;
-    //          } else if (option == "--quit" || option == "-q") {
-    //              this.quit_instance = true;
-    //          } else if (option == "--logwindow" || option == "-l") {
-    //              this.show_log_window = true;
-    //          } else if (option == "--logfile") {
-    //              if (iterator.has_next () && !iterator.peek_next ().has_prefix ("--")) {
-    //                  this.log_file = iterator.next ();
-    //              } else {
-    //                  show_hint ("Log file not specified");
-    //              }
-    //          } else if (option == "--logdir") {
-    //              if (iterator.has_next () && !iterator.peek_next ().has_prefix ("--")) {
-    //                  this.log_directory = iterator.next ();
-    //              } else {
-    //                  show_hint ("Log directory not specified");
-    //              }
-    //          } else if (option == "--logexpire") {
-    //              if (iterator.has_next () && !iterator.peek_next ().has_prefix ("--")) {
-    //                  this.log_expire = iterator.next ().to_int ();
-    //              } else {
-    //                  show_hint ("Log expiration not specified");
-    //              }
-    //          } else if (option == "--logflush") {
-    //              this.log_flush = true;
-    //          } else if (option == "--logdebug") {
-    //              this.log_debug = true;
-    //          } else if (option == "--confdir") {
-    //              if (iterator.has_next () && !iterator.peek_next ().has_prefix ("--")) {
-    //                  string configuration_directory = iterator.next ();
-    //                  if (!LibSync.ConfigFile.configuration_directory (configuration_directory)) {
-    //                      show_hint ("Invalid path passed to --confdir");
-    //                  }
-    //              } else {
-    //                  show_hint ("Path for confdir not specified");
-    //              }
-    //          } else if (option == "--debug") {
-    //              this.log_debug = true;
-    //              this.debug_mode = true;
-    //          } else if (option == "--background") {
-    //              this.background_mode = true;
-    //          } else if (option == "--version" || option == "-v") {
-    //              this.version_only = true;
-    //          } else if (option.has_suffix (APPLICATION_DOTVIRTUALFILE_SUFFIX)) {
-    //              // virtual file, open iterator after the FolderConnection were created (if the app is not terminated)
-    //              GLib.Timeout.add (
-    //                  0,
-    //                  this.on_signal_open_virtual_file (option)
-    //              );
-    //          } else {
-    //              show_hint ("Unrecognized option '" + option + "'");
-    //          }
-    //      }
+        //  //  parse options; if help or bad option exit
+        //  while (iterator.has_next ()) {
+        //      string option = iterator.next ();
+        //      if (option == "--help" || option == "-h") {
+        //          help ();
+        //          break;
+        //      } else if (option == "--quit" || option == "-q") {
+        //          this.quit_instance = true;
+        //      } else if (option == "--logwindow" || option == "-l") {
+        //          this.show_log_window = true;
+        //      } else if (option == "--logfile") {
+        //          if (iterator.has_next () && !iterator.peek_next ().has_prefix ("--")) {
+        //              this.log_file = iterator.next ();
+        //          } else {
+        //              show_hint ("Log file not specified");
+        //          }
+        //      } else if (option == "--logdir") {
+        //          if (iterator.has_next () && !iterator.peek_next ().has_prefix ("--")) {
+        //              this.log_directory = iterator.next ();
+        //          } else {
+        //              show_hint ("Log directory not specified");
+        //          }
+        //      } else if (option == "--logexpire") {
+        //          if (iterator.has_next () && !iterator.peek_next ().has_prefix ("--")) {
+        //              this.log_expire = iterator.next ().to_int ();
+        //          } else {
+        //              show_hint ("Log expiration not specified");
+        //          }
+        //      } else if (option == "--logflush") {
+        //          this.log_flush = true;
+        //      } else if (option == "--logdebug") {
+        //          this.log_debug = true;
+        //      } else if (option == "--confdir") {
+        //          if (iterator.has_next () && !iterator.peek_next ().has_prefix ("--")) {
+        //              string configuration_directory = iterator.next ();
+        //              if (!LibSync.ConfigFile.configuration_directory (configuration_directory)) {
+        //                  show_hint ("Invalid path passed to --confdir");
+        //              }
+        //          } else {
+        //              show_hint ("Path for confdir not specified");
+        //          }
+        //      } else if (option == "--debug") {
+        //          this.log_debug = true;
+        //          this.debug_mode = true;
+        //      } else if (option == "--background") {
+        //          this.background_mode = true;
+        //      } else if (option == "--version" || option == "-v") {
+        //          this.version_only = true;
+        //      } else if (option.has_suffix (APPLICATION_DOTVIRTUALFILE_SUFFIX)) {
+        //          // virtual file, open iterator after the FolderConnection were created (if the app is not terminated)
+        //          GLib.Timeout.add (
+        //              0,
+        //              this.on_signal_open_virtual_file (option)
+        //          );
+        //      } else {
+        //          show_hint ("Unrecognized option '" + option + "'");
+        //      }
+        //  }
     //  }
 
 
     //  /***********************************************************
     //  ***********************************************************/
     //  protected void setup_translations () {
-    //      GLib.List<string> ui_languages;
-    //      ui_languages = GLib.Locale.system ().ui_languages ();
-    //      string enforced_locale = LibSync.Theme.enforced_locale;
-    //      if (!enforced_locale == "") {
-    //          ui_languages.prepend (enforced_locale);
-    //      }
-    //      var translator = new GLib.Translator (this);
-    //      var qt_translator = new GLib.Translator (this);
-    //      var qtkeychain_translator = new GLib.Translator (this);
+        //  GLib.List<string> ui_languages;
+        //  ui_languages = GLib.Locale.system ().ui_languages ();
+        //  string enforced_locale = LibSync.Theme.enforced_locale;
+        //  if (!enforced_locale == "") {
+        //      ui_languages.prepend (enforced_locale);
+        //  }
+        //  var translator = new GLib.Translator (this);
+        //  var qt_translator = new GLib.Translator (this);
+        //  var qtkeychain_translator = new GLib.Translator (this);
 
-    //      foreach (string lang in ui_languages) {
-    //          lang.replace ('-', '_'); // work around GLib.TBUG-25973
-    //          lang = subst_lang (lang);
-    //          string tr_path = application_tr_path;
-    //          string tr_file = "client_" + lang;
-    //          if (translator.on_signal_load (tr_file, tr_path) || lang.has_prefix ("en")) {
-    //              // Permissive approach : Qt and keychain translations
-    //              // may be missing, but Qt translations must be there in order
-    //              // for us to accept the language. Otherwise, we try with the next.
-    //              // "en" is an exception as it is the default language and may not
-    //              // have a translation file provided.
-    //              GLib.info ("Using " + lang + " translation");
-    //              property ("ui_lang", lang);
-    //              string qt_tr_path = GLib.LibraryInfo.location (GLib.LibraryInfo.TranslationsPath);
-    //              string qt_tr_file = "qt_" + lang;
-    //              string qt_base_tr_file = "qtbase_" + lang;
-    //              if (!qt_translator.on_signal_load (qt_tr_file, qt_tr_path)) {
-    //                  if (!qt_translator.on_signal_load (qt_tr_file, tr_path)) {
-    //                      if (!qt_translator.on_signal_load (qt_base_tr_file, qt_tr_path)) {
-    //                          qt_translator.on_signal_load (qt_base_tr_file, tr_path);
-    //                      }
-    //                  }
-    //              }
-    //              string qtkeychain_tr_file = "qtkeychain_" + lang;
-    //              if (!qtkeychain_translator.on_signal_load (qtkeychain_tr_file, qt_tr_path)) {
-    //                  qtkeychain_translator.on_signal_load (qtkeychain_tr_file, tr_path);
-    //              }
-    //              if (!translator == "") {
-    //                  install_translator (translator);
-    //              }
-    //              if (!qt_translator == "") {
-    //                  install_translator (qt_translator);
-    //              }
-    //              if (!qtkeychain_translator == "") {
-    //                  install_translator (qtkeychain_translator);
-    //              }
-    //              break;
-    //          }
-    //          if (property ("ui_lang") == null) {
-    //              property ("ui_lang", "C");
-    //          }
-    //      }
+        //  foreach (string lang in ui_languages) {
+        //      lang.replace ('-', '_'); // work around GLib.TBUG-25973
+        //      lang = subst_lang (lang);
+        //      string tr_path = application_tr_path;
+        //      string tr_file = "client_" + lang;
+        //      if (translator.on_signal_load (tr_file, tr_path) || lang.has_prefix ("en")) {
+        //          // Permissive approach : Qt and keychain translations
+        //          // may be missing, but Qt translations must be there in order
+        //          // for us to accept the language. Otherwise, we try with the next.
+        //          // "en" is an exception as it is the default language and may not
+        //          // have a translation file provided.
+        //          GLib.info ("Using " + lang + " translation");
+        //          property ("ui_lang", lang);
+        //          string qt_tr_path = GLib.LibraryInfo.location (GLib.LibraryInfo.TranslationsPath);
+        //          string qt_tr_file = "qt_" + lang;
+        //          string qt_base_tr_file = "qtbase_" + lang;
+        //          if (!qt_translator.on_signal_load (qt_tr_file, qt_tr_path)) {
+        //              if (!qt_translator.on_signal_load (qt_tr_file, tr_path)) {
+        //                  if (!qt_translator.on_signal_load (qt_base_tr_file, qt_tr_path)) {
+        //                      qt_translator.on_signal_load (qt_base_tr_file, tr_path);
+        //                  }
+        //              }
+        //          }
+        //          string qtkeychain_tr_file = "qtkeychain_" + lang;
+        //          if (!qtkeychain_translator.on_signal_load (qtkeychain_tr_file, qt_tr_path)) {
+        //              qtkeychain_translator.on_signal_load (qtkeychain_tr_file, tr_path);
+        //          }
+        //          if (!translator == "") {
+        //              install_translator (translator);
+        //          }
+        //          if (!qt_translator == "") {
+        //              install_translator (qt_translator);
+        //          }
+        //          if (!qtkeychain_translator == "") {
+        //              install_translator (qtkeychain_translator);
+        //          }
+        //          break;
+        //      }
+        //      if (property ("ui_lang") == null) {
+        //          property ("ui_lang", "C");
+        //      }
+        //  }
     //  }
 
 
     //  /***********************************************************
     //  ***********************************************************/
     //  protected void setup_logging () {
-    //      // might be called from second instance
-    //      LibSync.Logger.log_file = this.log_file;
-    //      if (this.log_file == "") {
-    //          LibSync.Logger.log_directory = this.log_directory == "" ? LibSync.ConfigFile ().log_directory () : this.log_directory;
-    //      }
-    //      LibSync.Logger.log_expire = this.log_expire > 0 ? this.log_expire : LibSync.ConfigFile ().log_expire ();
-    //      LibSync.Logger.log_flush = this.log_flush || LibSync.ConfigFile ().log_flush ();
-    //      LibSync.Logger.log_debug = this.log_debug || LibSync.ConfigFile ().log_debug ();
-    //      if (!LibSync.Logger.is_logging_to_file && LibSync.ConfigFile ().automatic_log_dir ()) {
-    //          LibSync.Logger.setup_temporary_folder_log_dir ();
-    //      }
+        //  // might be called from second instance
+        //  LibSync.Logger.log_file = this.log_file;
+        //  if (this.log_file == "") {
+        //      LibSync.Logger.log_directory = this.log_directory == "" ? LibSync.ConfigFile ().log_directory () : this.log_directory;
+        //  }
+        //  LibSync.Logger.log_expire = this.log_expire > 0 ? this.log_expire : LibSync.ConfigFile ().log_expire ();
+        //  LibSync.Logger.log_flush = this.log_flush || LibSync.ConfigFile ().log_flush ();
+        //  LibSync.Logger.log_debug = this.log_debug || LibSync.ConfigFile ().log_debug ();
+        //  if (!LibSync.Logger.is_logging_to_file && LibSync.ConfigFile ().automatic_log_dir ()) {
+        //      LibSync.Logger.setup_temporary_folder_log_dir ();
+        //  }
 
-    //      LibSync.Logger.on_signal_enter_next_log_file ();
+        //  LibSync.Logger.on_signal_enter_next_log_file ();
 
-    //      GLib.info ("##################"
-    //          this.theme.app_name
-    //          "locale:" + GLib.Locale.system ().name ()
-    //          "ui_lang:" + property ("ui_lang")
-    //          "version:" + this.theme.version
-    //          "os:" + Utility.platform_name ()
-    //      );
-    //      GLib.info ("Arguments: " + GLib.Application.arguments ());
+        //  GLib.info ("##################"
+        //      this.theme.app_name
+        //      "locale:" + GLib.Locale.system ().name ()
+        //      "ui_lang:" + property ("ui_lang")
+        //      "version:" + this.theme.version
+        //      "os:" + Utility.platform_name ()
+        //  );
+        //  GLib.info ("Arguments: " + GLib.Application.arguments ());
     //  }
 
 
     //  /***********************************************************
     //  ***********************************************************/
     //  protected override bool event (Gdk.Event event) {
-    //      return SharedTools.SingleApplication.event (event);
+        //  return SharedTools.SingleApplication.event (event);
     //  }
 
 
     //  /***********************************************************
     //  ***********************************************************/
     //  protected void on_signal_parse_message (string message, GLib.Object object) {
-    //      if (message.has_prefix ("MSG_PARSEOPTIONS:")) {
-    //          int length_of_msg_prefix = 17;
-    //          GLib.List<string> options = message.mid (length_of_msg_prefix).split ('|');
-    //          this.show_log_window = false;
-    //          parse_options (options);
-    //          setup_logging ();
-    //          if (this.show_log_window) {
-    //              this.gui.on_signal_toggle_log_browser (); // this.show_log_window is set in parse_options.
-    //          }
-    //          if (this.quit_instance) {
-    //              this.quit ();
-    //          }
+        //  if (message.has_prefix ("MSG_PARSEOPTIONS:")) {
+        //      int length_of_msg_prefix = 17;
+        //      GLib.List<string> options = message.mid (length_of_msg_prefix).split ('|');
+        //      this.show_log_window = false;
+        //      parse_options (options);
+        //      setup_logging ();
+        //      if (this.show_log_window) {
+        //          this.gui.on_signal_toggle_log_browser (); // this.show_log_window is set in parse_options.
+        //      }
+        //      if (this.quit_instance) {
+        //          this.quit ();
+        //      }
 
-    //      } else if (message.has_prefix ("MSG_SHOWMAINDIALOG")) {
-    //          GLib.info ("Running for" + (this.started_at.elapsed () / 1000.0).to_string () + " sec.");
-    //          if (this.started_at.elapsed () < 10 * 1000) {
-    //              // This call is mirrored with the one in int main ()
-    //              GLib.warning ("Ignoring MSG_SHOWMAINDIALOG, possibly double-invocation of client via session restore and var on_signal_start.");
-    //              return;
-    //          }
+        //  } else if (message.has_prefix ("MSG_SHOWMAINDIALOG")) {
+        //      GLib.info ("Running for" + (this.started_at.elapsed () / 1000.0).to_string () + " sec.");
+        //      if (this.started_at.elapsed () < 10 * 1000) {
+        //          // This call is mirrored with the one in int main ()
+        //          GLib.warning ("Ignoring MSG_SHOWMAINDIALOG, possibly double-invocation of client via session restore and var on_signal_start.");
+        //          return;
+        //      }
 
-    //          // Show the main dialog only if there is at least one account configured
-    //          if (AccountManager.instance.accounts.length () > 0) {
-    //              this.show_main_dialog ();
-    //          } else {
-    //              this.gui.on_signal_new_account_wizard ();
-    //          }
-    //      }
+        //      // Show the main dialog only if there is at least one account configured
+        //      if (AccountManager.instance.accounts.length () > 0) {
+        //          this.show_main_dialog ();
+        //      } else {
+        //          this.gui.on_signal_new_account_wizard ();
+        //      }
+        //  }
     //  }
 
 
     //  /***********************************************************
     //  ***********************************************************/
     //  protected bool on_signal_check_connection () {
-    //      foreach (var account_state in AccountManager.instance.accounts) {
-    //          AccountState.State state = account_state.state;
+        //  foreach (var account_state in AccountManager.instance.accounts) {
+        //      AccountState.State state = account_state.state;
 
-    //          // Don't check if we're manually signed out or
-    //          // when the error is permanent.
-    //          if (state != AccountState.State.SIGNED_OUT && state != AccountState.State.CONFIGURATION_ERROR
-    //              && state != AccountState.State.ASKING_CREDENTIALS
-    //              && !(
-    //                  account_state.account.push_notifications ()
-    //                  && account_state.account.push_notifications ().is_ready ()
-    //              )) {
-    //              account_state.on_signal_check_connectivity ();
-    //          }
-    //      }
+        //      // Don't check if we're manually signed out or
+        //      // when the error is permanent.
+        //      if (state != AccountState.State.SIGNED_OUT && state != AccountState.State.CONFIGURATION_ERROR
+        //          && state != AccountState.State.ASKING_CREDENTIALS
+        //          && !(
+        //              account_state.account.push_notifications ()
+        //              && account_state.account.push_notifications ().is_ready ()
+        //          )) {
+        //          account_state.on_signal_check_connectivity ();
+        //      }
+        //  }
 
-    //      if (AccountManager.instance.accounts.length () == 0) {
-    //          // let gui open the setup wizard
-    //          this.gui.on_signal_open_settings_dialog ();
+        //  if (AccountManager.instance.accounts.length () == 0) {
+        //      // let gui open the setup wizard
+        //      this.gui.on_signal_open_settings_dialog ();
 
-    //          this.check_connection_timer.stop (); // don't popup the wizard on interval;
-    //      }
+        //      this.check_connection_timer.stop (); // don't popup the wizard on interval;
+        //  }
 
-    //      return false; // only run once
+        //  return false; // only run once
     //  }
 
 
     //  /***********************************************************
     //  ***********************************************************/
     //  protected void on_signal_use_mono_icons_changed (bool value) {
-    //      this.gui.on_signal_compute_overall_sync_status ();
+        //  this.gui.on_signal_compute_overall_sync_status ();
     //  }
 
 
     //  /***********************************************************
     //  ***********************************************************/
     //  protected void clean_up () {
-    //      AccountManager.instance.save ();
-    //      FolderManager.instance.unload_and_delete_all_folders ();
+        //  AccountManager.instance.save ();
+        //  FolderManager.instance.unload_and_delete_all_folders ();
 
-    //      this.gui.on_signal_shutdown ();
-    //      this.gui.delete_later ();
+        //  this.gui.on_signal_shutdown ();
+        //  this.gui.delete_later ();
     //  }
 
 
     //  /***********************************************************
     //  ***********************************************************/
     //  protected void on_signal_account_state_added (AccountState account_state) {
-    //      account_state.signal_state_changed.connect (
-    //          this.gui.on_signal_account_state_changed
-    //      );
-    //      account_state.account.server_version_changed.connect (
-    //          this.gui.on_signal_tray_message_if_server_unsupported
-    //      );
-    //      account_state.signal_state_changed.connect (
-    //          this.folder_manager.on_signal_account_state_changed
-    //      );
-    //      account_state.account.server_version_changed.connect (
-    //          this.folder_manager.on_signal_server_version_changed
-    //      );
+        //  account_state.signal_state_changed.connect (
+        //      this.gui.on_signal_account_state_changed
+        //  );
+        //  account_state.account.server_version_changed.connect (
+        //      this.gui.on_signal_tray_message_if_server_unsupported
+        //  );
+        //  account_state.signal_state_changed.connect (
+        //      this.folder_manager.on_signal_account_state_changed
+        //  );
+        //  account_state.account.server_version_changed.connect (
+        //      this.folder_manager.on_signal_server_version_changed
+        //  );
 
-    //      this.gui.on_signal_tray_message_if_server_unsupported (account_state.account);
+        //  this.gui.on_signal_tray_message_if_server_unsupported (account_state.account);
     //  }
 
 
     //  /***********************************************************
     //  ***********************************************************/
     //  protected void on_signal_account_state_removed (AccountState account_state) {
-    //      if (this.gui != null) {
-    //          disconnect (account_state.signal_state_changed,
-    //              this.gui.on_signal_account_state_changed);
-    //          disconnect (account_state.account.server_version_changed,
-    //              this.gui.on_signal_tray_message_if_server_unsupported);
-    //      }
-    //      if (this.folder_manager != null) {
-    //          account_state.signal_state_changed.disconnect (
-    //              this.folder_manager.on_signal_account_state_changed
-    //          );
-    //          account_state.account.signal_server_version_changed.disconnect (
-    //              this.folder_manager.on_signal_server_version_changed
-    //          );
-    //      }
+        //  if (this.gui != null) {
+        //      disconnect (account_state.signal_state_changed,
+        //          this.gui.on_signal_account_state_changed);
+        //      disconnect (account_state.account.server_version_changed,
+        //          this.gui.on_signal_tray_message_if_server_unsupported);
+        //  }
+        //  if (this.folder_manager != null) {
+        //      account_state.signal_state_changed.disconnect (
+        //          this.folder_manager.on_signal_account_state_changed
+        //      );
+        //      account_state.account.signal_server_version_changed.disconnect (
+        //          this.folder_manager.on_signal_server_version_changed
+        //      );
+        //  }
 
-    //      // if there is no more account, show the wizard.
-    //      if (this.gui != null && AccountManager.instance.accounts.length () == 0) {
-    //          // allow to add a new account if there is non any more. Always think
-    //          // about single account theming!
-    //          OwncloudSetupWizard.run_wizard (this, SLOT (on_signal_owncloud_wizard_done (int)));
-    //      }
+        //  // if there is no more account, show the wizard.
+        //  if (this.gui != null && AccountManager.instance.accounts.length () == 0) {
+        //      // allow to add a new account if there is non any more. Always think
+        //      // about single account theming!
+        //      OwncloudSetupWizard.run_wizard (this, SLOT (on_signal_owncloud_wizard_done (int)));
+        //  }
     //  }
 
 
@@ -847,16 +847,16 @@ public class Application { //: GLib.Application {
     //  timer, one by network configuration changes?
     //  ***********************************************************/
     //  protected void on_signal_system_online_configuration_changed (GLib.NetworkConfiguration cnf) {
-    //      if (cnf.state & GLib.NetworkConfiguration.Active) {
-    //          GLib.Object.invoke_method (this, "on_signal_check_connection", GLib.QueuedConnection);
-    //      }
+        //  if (cnf.state & GLib.NetworkConfiguration.Active) {
+        //      GLib.Object.invoke_method (this, "on_signal_check_connection", GLib.QueuedConnection);
+        //  }
     //  }
 
 
     //  /***********************************************************
     //  ***********************************************************/
     //  protected void on_signal_gui_is_showing_settings () {
-    //      signal_is_showing_settings_dialog ();
+        //  signal_is_showing_settings_dialog ();
     //  }
 
 
@@ -865,7 +865,7 @@ public class Application { //: GLib.Application {
     //  console on Windows.
     //  ***********************************************************/
     //  private void help () {
-    //      this.help_only = true;
+        //  this.help_only = true;
     //  }
 
 
@@ -875,77 +875,77 @@ public class Application { //: GLib.Application {
     //  the config that can't be read.
     //  ***********************************************************/
     //  private bool config_version_migration () {
-    //      GLib.List<string> delete_keys = new GLib.List<string> ();
-    //      GLib.List<string> ignore_keys = new GLib.List<string> ();
-    //      AccountManager.backward_migration_settings_keys (delete_keys, ignore_keys);
-    //      FolderManager.backward_migration_settings_keys (delete_keys, ignore_keys);
+        //  GLib.List<string> delete_keys = new GLib.List<string> ();
+        //  GLib.List<string> ignore_keys = new GLib.List<string> ();
+        //  AccountManager.backward_migration_settings_keys (delete_keys, ignore_keys);
+        //  FolderManager.backward_migration_settings_keys (delete_keys, ignore_keys);
 
-    //      LibSync.ConfigFile config_file;
+        //  LibSync.ConfigFile config_file;
 
-    //      // Did the client version change?
-    //      // (The client version is adjusted further down)
-    //      bool version_changed = LibSync.ConfigFile.client_version_string != Common.NextcloudVersion.MIRALL_VERSION_STRING;
+        //  // Did the client version change?
+        //  // (The client version is adjusted further down)
+        //  bool version_changed = LibSync.ConfigFile.client_version_string != Common.NextcloudVersion.MIRALL_VERSION_STRING;
 
-    //      // We want to message the user either for destructive changes,
-    //      // or if we're ignoring something and the client version changed.
-    //      bool warning_message = delete_keys != null || (ignore_keys != null && version_changed);
+        //  // We want to message the user either for destructive changes,
+        //  // or if we're ignoring something and the client version changed.
+        //  bool warning_message = delete_keys != null || (ignore_keys != null && version_changed);
 
-    //      if (!version_changed && !warning_message) {
-    //          return true;
-    //      }
-    //      var backup_file = LibSync.ConfigFile.create_backup ();
+        //  if (!version_changed && !warning_message) {
+        //      return true;
+        //  }
+        //  var backup_file = LibSync.ConfigFile.create_backup ();
 
-    //      if (warning_message) {
-    //          string bold_message;
-    //          if (delete_keys != null) {
-    //              bold_message = _("Continuing will mean <b>deleting these settings</b>.");
-    //          } else {
-    //              bold_message = _("Continuing will mean <b>ignoring these settings</b>.");
-    //          }
+        //  if (warning_message) {
+        //      string bold_message;
+        //      if (delete_keys != null) {
+        //          bold_message = _("Continuing will mean <b>deleting these settings</b>.");
+        //      } else {
+        //          bold_message = _("Continuing will mean <b>ignoring these settings</b>.");
+        //      }
 
-    //          Gtk.MessageBox box = new Gtk.MessageBox (
-    //              Gtk.MessageBox.Warning,
-    //              APPLICATION_SHORTNAME,
-    //              _("Some settings were configured in newer versions of this client and "
-    //              "use features that are not available in this version.<br>"
-    //              "<br>"
-    //              "%1<br>"
-    //              "<br>"
-    //              "The current configuration file was already backed up to <i>%2</i>.")
-    //                  .printf (bold_message, backup_file));
-    //          box.add_button (_("Quit"), Gtk.MessageBox.AcceptRole);
-    //          var continue_btn = box.add_button (_("Continue"), Gtk.MessageBox.DestructiveRole);
+        //      Gtk.MessageBox box = new Gtk.MessageBox (
+        //          Gtk.MessageBox.Warning,
+        //          APPLICATION_SHORTNAME,
+        //          _("Some settings were configured in newer versions of this client and "
+        //          "use features that are not available in this version.<br>"
+        //          "<br>"
+        //          "%1<br>"
+        //          "<br>"
+        //          "The current configuration file was already backed up to <i>%2</i>.")
+        //              .printf (bold_message, backup_file));
+        //      box.add_button (_("Quit"), Gtk.MessageBox.AcceptRole);
+        //      var continue_btn = box.add_button (_("Continue"), Gtk.MessageBox.DestructiveRole);
 
-    //          box.exec ();
-    //          if (box.clicked_button () != continue_btn) {
-    //              GLib.Timeout.add (0, this.on_timeout_quit);
-    //              return false;
-    //          }
+        //      box.exec ();
+        //      if (box.clicked_button () != continue_btn) {
+        //          GLib.Timeout.add (0, this.on_timeout_quit);
+        //          return false;
+        //      }
 
-    //          var settings = LibSync.ConfigFile.settings_with_group ("foo");
-    //          settings.end_group ();
+        //      var settings = LibSync.ConfigFile.settings_with_group ("foo");
+        //      settings.end_group ();
 
-    //          // Wipe confusing keys from the future, ignore the others
-    //          foreach (var bad_key in delete_keys)
-    //              settings.remove (bad_key);
-    //      }
+        //      // Wipe confusing keys from the future, ignore the others
+        //      foreach (var bad_key in delete_keys)
+        //          settings.remove (bad_key);
+        //  }
 
-    //      LibSync.ConfigFile.client_version_string (MIRALL_VERSION_STRING);
-    //      return true;
+        //  LibSync.ConfigFile.client_version_string (MIRALL_VERSION_STRING);
+        //  return true;
     //  }
 
 
     //  /***********************************************************
     //  ***********************************************************/
     //  private static string application_tr_path {
-    //      string dev_tr_path = GLib.Application.application_dir_path + "/../src/gui/";
-    //      if (GLib.Dir (dev_tr_path).exists ()) {
-    //          // might miss Qt, QtKeyChain, etc.
-    //          GLib.warning ("Running from build location! Translations may be incomplete!");
-    //          return dev_tr_path;
-    //      }
+        //  string dev_tr_path = GLib.Application.application_dir_path + "/../src/gui/";
+        //  if (GLib.Dir (dev_tr_path).exists ()) {
+        //      // might miss Qt, QtKeyChain, etc.
+        //      GLib.warning ("Running from build location! Translations may be incomplete!");
+        //      return dev_tr_path;
+        //  }
 //  #if defined (Q_OS_UNIX)
-    //      return SHAREDIR + "/" + APPLICATION_EXECUTABLE + "/i18n/";
+        //  return SHAREDIR + "/" + APPLICATION_EXECUTABLE + "/i18n/";
 //  #endif
     //  }
 
@@ -955,7 +955,7 @@ public class Application { //: GLib.Application {
     //  console on Windows.
     //  ***********************************************************/
     //  private static void display_help_text (string t) {
-    //      std.cout += t.to_string ();
+        //  std.cout += t.to_string ();
     //  }
 
 
@@ -964,19 +964,19 @@ public class Application { //: GLib.Application {
     //  console on Windows.
     //  ***********************************************************/
     //  private static string subst_lang (string lang) {
-    //      // Map the more appropriate script codes
-    //      // to country codes as used by Qt and
-    //      // transifex translation conventions.
+        //  // Map the more appropriate script codes
+        //  // to country codes as used by Qt and
+        //  // transifex translation conventions.
 
-    //      // Simplified Chinese
-    //      if (lang == "zh_Hans") {
-    //          return "zh_CN";
-    //      }
-    //      // Traditional Chinese
-    //      if (lang == "zh_Hant") {
-    //          return "zh_TW";
-    //      }
-    //      return lang;
+        //  // Simplified Chinese
+        //  if (lang == "zh_Hans") {
+        //      return "zh_CN";
+        //  }
+        //  // Traditional Chinese
+        //  if (lang == "zh_Hant") {
+        //      return "zh_TW";
+        //  }
+        //  return lang;
     //  }
 
 } // class Application

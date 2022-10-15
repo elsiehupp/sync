@@ -58,11 +58,11 @@ public class OcsJob : LibSync.AbstractNetworkJob {
     //  /***********************************************************
     //  ***********************************************************/
     //  protected OcsJob (LibSync.Account account) {
-    //      base (account, "");
-    //      this.pass_status_codes.append (OCS_SUCCESS_STATUS_CODE);
-    //      this.pass_status_codes.append (OCS_SUCCESS_STATUS_CODE_V2);
-    //      this.pass_status_codes.append (OCS_NOT_MODIFIED_STATUS_CODE_V2);
-    //      ignore_credential_failure (true);
+        //  base (account, "");
+        //  this.pass_status_codes.append (OCS_SUCCESS_STATUS_CODE);
+        //  this.pass_status_codes.append (OCS_SUCCESS_STATUS_CODE_V2);
+        //  this.pass_status_codes.append (OCS_NOT_MODIFIED_STATUS_CODE_V2);
+        //  ignore_credential_failure (true);
     //  }
 
 
@@ -74,7 +74,7 @@ public class OcsJob : LibSync.AbstractNetworkJob {
     //  @param value The value of the parameter
     //  ***********************************************************/
     //  protected void add_param (string name, string value) {
-    //      this.params.append (q_make_pair (name, value));
+        //  this.params.append (q_make_pair (name, value));
     //  }
 
 
@@ -95,7 +95,7 @@ public class OcsJob : LibSync.AbstractNetworkJob {
     //  @param code Accepted status code
     //  ***********************************************************/
     //  protected void add_pass_status_code (int code) {
-    //      this.pass_status_codes.append (code);
+        //  this.pass_status_codes.append (code);
     //  }
 
 
@@ -106,7 +106,7 @@ public class OcsJob : LibSync.AbstractNetworkJob {
     //  This function appends the common identifier. so <PATH>/<ID>
     //  ***********************************************************/
     //  protected void append_path (string identifier) {
-    //      path (path + "/" + identifier);
+        //  path (path + "/" + identifier);
     //  }
 
 
@@ -119,12 +119,12 @@ public class OcsJob : LibSync.AbstractNetworkJob {
     //  @return The statuscode of the OCS response
     //  ***********************************************************/
     //  public static int json_return_code (GLib.JsonDocument json, string message) {
-    //      // TODO proper checking
-    //      var meta = json.object ().value ("ocs").to_object ().value ("meta").to_object ();
-    //      int code = meta.value ("statuscode").to_int ();
-    //      message = meta.value ("message").to_string ();
+        //  // TODO proper checking
+        //  var meta = json.object ().value ("ocs").to_object ().value ("meta").to_object ();
+        //  int code = meta.value ("statuscode").to_int ();
+        //  message = meta.value ("message").to_string ();
 
-    //      return code;
+        //  return code;
     //  }
 
 
@@ -134,7 +134,7 @@ public class OcsJob : LibSync.AbstractNetworkJob {
     //  @param value a string with the value
     //  ***********************************************************/
     //  public void add_raw_header (string header_name, string value) {
-    //      this.request.raw_header (header_name, value);
+        //  this.request.raw_header (header_name, value);
     //  }
 
 
@@ -142,31 +142,31 @@ public class OcsJob : LibSync.AbstractNetworkJob {
     //  Start the OCS request
     //  ***********************************************************/
     //  protected override void on_signal_start () {
-    //      add_raw_header ("Ocs-APIREQUEST", "true");
-    //      add_raw_header ("Content-Type", "application/x-www-form-urlencoded");
+        //  add_raw_header ("Ocs-APIREQUEST", "true");
+        //  add_raw_header ("Content-Type", "application/x-www-form-urlencoded");
 
-    //      var buffer = new GLib.OutputStream ();
+        //  var buffer = new GLib.OutputStream ();
 
-    //      GLib.UrlQuery query_items;
-    //      if (this.verb == "GET") {
-    //          query_items = percent_encode_query_items (this.params);
-    //      } else if (this.verb == "POST" || this.verb == "PUT") {
-    //          // Url encode the this.post_params and put them in a buffer.
-    //          string post_data;
-    //          foreach (var temporary in this.params) {
-    //              if (!post_data == "") {
-    //                  post_data.append ("&");
-    //              }
-    //              post_data.append (GLib.Uri.to_percent_encoding (temporary.first));
-    //              post_data.append ("=");
-    //              post_data.append (GLib.Uri.to_percent_encoding (temporary.second));
-    //          }
-    //          buffer.data (post_data);
-    //      }
-    //      query_items.add_query_item ("format", "json");
-    //      GLib.Uri url = Utility.concat_url_path (account.url, this.path, query_items);
-    //      send_request (this.verb, url, this.request, buffer);
-    //      LibSync.AbstractNetworkJob.on_signal_start ();
+        //  GLib.UrlQuery query_items;
+        //  if (this.verb == "GET") {
+        //      query_items = percent_encode_query_items (this.params);
+        //  } else if (this.verb == "POST" || this.verb == "PUT") {
+        //      // Url encode the this.post_params and put them in a buffer.
+        //      string post_data;
+        //      foreach (var temporary in this.params) {
+        //          if (!post_data == "") {
+        //              post_data.append ("&");
+        //          }
+        //          post_data.append (GLib.Uri.to_percent_encoding (temporary.first));
+        //          post_data.append ("=");
+        //          post_data.append (GLib.Uri.to_percent_encoding (temporary.second));
+        //      }
+        //      buffer.data (post_data);
+        //  }
+        //  query_items.add_query_item ("format", "json");
+        //  GLib.Uri url = Utility.concat_url_path (account.url, this.path, query_items);
+        //  send_request (this.verb, url, this.request, buffer);
+        //  LibSync.AbstractNetworkJob.on_signal_start ();
     //  }
 
 
@@ -192,61 +192,61 @@ public class OcsJob : LibSync.AbstractNetworkJob {
     //  /***********************************************************
     //  ***********************************************************/
     //  private override bool on_signal_finished () {
-    //      string reply_data = this.reply.read_all ();
+        //  string reply_data = this.reply.read_all ();
 
-    //      Json.ParserError error;
-    //      string message;
-    //      int status_code = 0;
-    //      var json = GLib.JsonDocument.from_json (reply_data, error);
+        //  Json.ParserError error;
+        //  string message;
+        //  int status_code = 0;
+        //  var json = GLib.JsonDocument.from_json (reply_data, error);
 
-    //      // when it is null we might have a 304 so get status code from this.reply and gives a warning...
-    //      if (error.error != Json.ParserError.NoError) {
-    //          status_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-    //          GLib.warning ("Could not parse reply to "
-    //                      + this.verb
-    //                      + Utility.concat_url_path (account.url, this.path)
-    //                      + this.params
-    //                      + error.error_string
-    //                      + ":" + reply_data);
-    //      } else {
-    //          status_code  = json_return_code (json, message);
-    //      }
+        //  // when it is null we might have a 304 so get status code from this.reply and gives a warning...
+        //  if (error.error != Json.ParserError.NoError) {
+        //      status_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        //      GLib.warning ("Could not parse reply to "
+        //                  + this.verb
+        //                  + Utility.concat_url_path (account.url, this.path)
+        //                  + this.params
+        //                  + error.error_string
+        //                  + ":" + reply_data);
+        //  } else {
+        //      status_code  = json_return_code (json, message);
+        //  }
 
-    //      //  ... then it checks for the status_code
-    //      if (!this.pass_status_codes.contains (status_code)) {
-    //          GLib.warning ("Reply to"
-    //                      + this.verb
-    //                      + Utility.concat_url_path (account.url, this.path)
-    //                      + this.params
-    //                      + " has unexpected status code: " + status_code + reply_data);
-    //          signal_error (status_code, message);
+        //  //  ... then it checks for the status_code
+        //  if (!this.pass_status_codes.contains (status_code)) {
+        //      GLib.warning ("Reply to"
+        //                  + this.verb
+        //                  + Utility.concat_url_path (account.url, this.path)
+        //                  + this.params
+        //                  + " has unexpected status code: " + status_code + reply_data);
+        //      signal_error (status_code, message);
 
-    //      } else {
-    //          // save new ETag value
-    //          if (this.reply.raw_header_list ().contains ("ETag")) {
-    //              signal_etag_response_header_received (this.reply.raw_header ("ETag"), status_code);
-    //          }
+        //  } else {
+        //      // save new ETag value
+        //      if (this.reply.raw_header_list ().contains ("ETag")) {
+        //          signal_etag_response_header_received (this.reply.raw_header ("ETag"), status_code);
+        //      }
 
-    //          signal_job_finished (json, status_code);
-    //      }
-    //      return true;
+        //      signal_job_finished (json, status_code);
+        //  }
+        //  return true;
     //  }
 
 
     //  /***********************************************************
     //  ***********************************************************/
     //  private static GLib.UrlQuery percent_encode_query_items (
-    //      GLib.List<GLib.Pair<string, string>> items) {
-    //      GLib.UrlQuery result;
-    //      // Note{ //: GLib.UrlQuery.query_items () does not fully percent encode
-    //      // the query items, see #5042
-    //      foreach (var item in items) {
-    //          result.add_query_item (
-    //              GLib.Uri.to_percent_encoding (item.first),
-    //              GLib.Uri.to_percent_encoding (item.second)
-    //          );
-    //      }
-    //      return result;
+        //  GLib.List<GLib.Pair<string, string>> items) {
+        //  GLib.UrlQuery result;
+        //  // Note{ //: GLib.UrlQuery.query_items () does not fully percent encode
+        //  // the query items, see #5042
+        //  foreach (var item in items) {
+        //      result.add_query_item (
+        //          GLib.Uri.to_percent_encoding (item.first),
+        //          GLib.Uri.to_percent_encoding (item.second)
+        //      );
+        //  }
+        //  return result;
     //  }
 
 } // class OcsJob

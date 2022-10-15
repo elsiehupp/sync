@@ -9,13 +9,13 @@ namespace Testing {
 
 public class DesktopServiceHook { //: GLib.Object {
 
-    //  internal signal void signal_hooked (GLib.Uri uri);
+    internal signal void signal_hooked (GLib.Uri uri);
 
-    //  /***********************************************************
-    //  ***********************************************************/
-    //  public DesktopServiceHook () {
-    //      GLib.DesktopServices.set_url_handler ("oauthtest", this, "signal_hooked");
-    //  }
+    /***********************************************************
+    ***********************************************************/
+    public DesktopServiceHook () {
+        //  GLib.DesktopServices.set_url_handler ("oauthtest", this, "signal_hooked");
+    }
 
 } // class DesktopServiceHook
 } // namespace Testing

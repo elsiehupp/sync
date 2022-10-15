@@ -10,17 +10,17 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public class TestCSyncExcludedTraversalPerDirectory : AbstractTestCSyncExclude {
 
-    //  /***********************************************************
-    //  ***********************************************************/
-    //  private TestCSyncExcludedTraversalPerDirectory () {
-    //      base ();
-    //      GLib.assert_true (check_file_traversal ("/") == CSync.CSync.ExcludedFiles.Type.NOT_EXCLUDED);
+    /***********************************************************
+    ***********************************************************/
+    private TestCSyncExcludedTraversalPerDirectory () {
+        //  base ();
+        //  GLib.assert_true (check_file_traversal ("/") == CSync.CSync.ExcludedFiles.Type.NOT_EXCLUDED);
 
-    //      /* path wildcards */
-    //      excluded_files.add_manual_exclude ("*/*.tex.temporary", "/latex/");
-    //      GLib.assert_true (check_file_traversal ("latex/my_manuscript.tex.temporary") == CSync.CSync.ExcludedFiles.Type.NOT_EXCLUDED);
-    //      GLib.assert_true (check_file_traversal ("latex/songbook/my_manuscript.tex.temporary") == CSync.CSync.ExcludedFiles.Type.LIST);
-    //  }
+        //  /* path wildcards */
+        //  excluded_files.add_manual_exclude ("*/*.tex.temporary", "/latex/");
+        //  GLib.assert_true (check_file_traversal ("latex/my_manuscript.tex.temporary") == CSync.CSync.ExcludedFiles.Type.NOT_EXCLUDED);
+        //  GLib.assert_true (check_file_traversal ("latex/songbook/my_manuscript.tex.temporary") == CSync.CSync.ExcludedFiles.Type.LIST);
+    }
 
 } // class TestCSyncExcludedTraversalPerDirectory
 

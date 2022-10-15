@@ -18,103 +18,103 @@ every individual file or the overall sync progress.
 ***********************************************************/
 public class ProgressDispatcher { //: GLib.Object {
 
-    //  //  friend class FolderConnection; // only allow FolderConnection class to access the setting slots.
+    //  friend class FolderConnection; // only allow FolderConnection class to access the setting slots.
 
-    //  /***********************************************************
-    //  ***********************************************************/
-    //  private GLib.Timer timer;
-    //  static ProgressDispatcher instance {
-    //      public get {
-    //          if (ProgressDispatcher.instance == null) {
-    //              ProgressDispatcher.instance = new ProgressDispatcher ();
-    //          }
-    //          return ProgressDispatcher.instance;
-    //      }
-    //      private set {
-    //          ProgressDispatcher.instance = value;
-    //      }
-    //  }
-    //  //  this.instance = null;
-
-
-    //  /***********************************************************
-    //  @brief Signals the progress of data transmission.
-
-    //  @param[out]  folder The folder which is being processed
-    //  @param[out]  progress   A class with all progress info.
-    //  ***********************************************************/
-    //  internal signal void signal_progress_info (string folder, ProgressInfo progress);
+    /***********************************************************
+    ***********************************************************/
+    private GLib.Timer timer;
+    static ProgressDispatcher instance {
+        //  public get {
+        //      if (ProgressDispatcher.instance == null) {
+        //          ProgressDispatcher.instance = new ProgressDispatcher ();
+        //      }
+        //      return ProgressDispatcher.instance;
+        //  }
+        //  private set {
+        //      ProgressDispatcher.instance = value;
+        //  }
+    }
+    //  this.instance = null;
 
 
-    //  /***********************************************************
-    //  @brief the item was completed by a job
-    //  ***********************************************************/
-    //  internal signal void signal_item_completed (string folder, SyncFileItem item);
+    /***********************************************************
+    @brief Signals the progress of data transmission.
+
+    @param[out]  folder The folder which is being processed
+    @param[out]  progress   A class with all progress info.
+    ***********************************************************/
+    internal signal void signal_progress_info (string folder, ProgressInfo progress);
 
 
-    //  /***********************************************************
-    //  @brief A new folder-wide sync error was seen.
-    //  ***********************************************************/
-    //  internal signal void signal_sync_error (string folder, string message, ErrorCategory category);
+    /***********************************************************
+    @brief the item was completed by a job
+    ***********************************************************/
+    internal signal void signal_item_completed (string folder, SyncFileItem item);
 
 
-    //  /***********************************************************
-    //  @brief Emitted when an error needs to be added into GUI
-    //  @param[out] folder The folder which is being processed
-    //  @param[out] status of the error
-    //  @param[out] full error message
-    //  @param[out] subject (optional)
-    //  ***********************************************************/
-    //  internal signal void signal_add_error_to_gui (string folder, SyncFileItem.Status status, string error_message, string subject);
+    /***********************************************************
+    @brief A new folder-wide sync error was seen.
+    ***********************************************************/
+    internal signal void signal_sync_error (string folder, string message, ErrorCategory category);
 
 
-    //  /***********************************************************
-    //  @brief Emitted for a folder when a sync is done, listing all pending conflicts
-    //  ***********************************************************/
-    //  internal signal void signal_folder_conflicts (string folder, GLib.List<string> conflict_paths);
+    /***********************************************************
+    @brief Emitted when an error needs to be added into GUI
+    @param[out] folder The folder which is being processed
+    @param[out] status of the error
+    @param[out] full error message
+    @param[out] subject (optional)
+    ***********************************************************/
+    internal signal void signal_add_error_to_gui (string folder, SyncFileItem.Status status, string error_message, string subject);
 
 
-    //  /***********************************************************
-    //  ***********************************************************/
-    //  private ProgressDispatcher (GLib.Object parent = new GLib.Object ()) {
-    //      base (parent);
-    //  }
+    /***********************************************************
+    @brief Emitted for a folder when a sync is done, listing all pending conflicts
+    ***********************************************************/
+    internal signal void signal_folder_conflicts (string folder, GLib.List<string> conflict_paths);
+
+
+    /***********************************************************
+    ***********************************************************/
+    private ProgressDispatcher (GLib.Object parent = new GLib.Object ()) {
+        //  base (parent);
+    }
 
 
 
 
-    //  /***********************************************************
-    //  ***********************************************************/
-    //  protected void progress_info (string folder, ProgressInfo progress) {
-    //      if (folder == "") {
-    //      // The update phase now also has progress
-    //      //            (progress.current_items.size () == 0
-    //      //             && progress.total_file_count == 0) ) {
-    //          return;
-    //      }
-    //      signal_progress_info (folder, progress);
-    //  }
+    /***********************************************************
+    ***********************************************************/
+    protected void progress_info (string folder, ProgressInfo progress) {
+        //  if (folder == "") {
+        //  // The update phase now also has progress
+        //  //            (progress.current_items.size () == 0
+        //  //             && progress.total_file_count == 0) ) {
+        //      return;
+        //  }
+        //  signal_progress_info (folder, progress);
+    }
 
 
-    //  /***********************************************************
-    //  ***********************************************************/
-    //  private static bool should_count_progress (SyncFileItem item) {
-    //      var instruction = item.instruction;
+    /***********************************************************
+    ***********************************************************/
+    private static bool should_count_progress (SyncFileItem item) {
+        //  var instruction = item.instruction;
 
-    //      // Skip any ignored, error or non-propagated files and directories.
-    //      if (instruction == CSync.SyncInstructions.NONE
-    //          || instruction == CSync.SyncInstructions.UPDATE_METADATA
-    //          || instruction == CSync.SyncInstructions.IGNORE
-    //          || instruction == CSync.SyncInstructions.ERROR) {
-    //          return false;
-    //      }
+        //  // Skip any ignored, error or non-propagated files and directories.
+        //  if (instruction == CSync.SyncInstructions.NONE
+        //      || instruction == CSync.SyncInstructions.UPDATE_METADATA
+        //      || instruction == CSync.SyncInstructions.IGNORE
+        //      || instruction == CSync.SyncInstructions.ERROR) {
+        //      return false;
+        //  }
 
-    //      return true;
-    //  }
+        //  return true;
+    }
 
 } // class ProgressDispatcher
 
 } // namespace Progress
 } // namespace LibSync
 } // namespace Occ
-    //  
+    

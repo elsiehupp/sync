@@ -27,11 +27,11 @@ public class OcsShareeJob : OcsJob {
     //  /***********************************************************
     //  ***********************************************************/
     //  public OcsShareeJob (LibSync.Account account) {
-    //      base (account);
-    //      path ("ocs/v2.php/apps/files_sharing/api/v1/sharees");
-    //      this.signal_job_finished.connect (
-    //          this.on_signal_job_finished
-    //      );
+        //  base (account);
+        //  path ("ocs/v2.php/apps/files_sharing/api/v1/sharees");
+        //  this.signal_job_finished.connect (
+        //      this.on_signal_job_finished
+        //  );
     //  }
 
 
@@ -41,15 +41,15 @@ public class OcsShareeJob : OcsJob {
     //  @param path Path to request shares for (default all shares)
     //  ***********************************************************/
     //  public void sharees (string search, string item_type, int page = 1, int per_page = 50, bool lookup = false) {
-    //      verb ("GET");
+        //  verb ("GET");
 
-    //      add_param ("search", search);
-    //      add_param ("item_type", item_type);
-    //      add_param ("page", string.number (page));
-    //      add_param ("per_page", string.number (per_page));
-    //      add_param ("lookup", GLib.Variant (lookup).to_string ());
+        //  add_param ("search", search);
+        //  add_param ("item_type", item_type);
+        //  add_param ("page", string.number (page));
+        //  add_param ("per_page", string.number (per_page));
+        //  add_param ("lookup", GLib.Variant (lookup).to_string ());
 
-    //      on_signal_start ();
+        //  on_signal_start ();
     //  }
 
 
@@ -57,7 +57,7 @@ public class OcsShareeJob : OcsJob {
     //  /***********************************************************
     //  ***********************************************************/
     //  private void on_signal_job_finished (GLib.JsonDocument reply) {
-    //      signal_sharee_job_finished (reply);
+        //  signal_sharee_job_finished (reply);
     //  }
 
 } // class OcsShareeJob

@@ -9,27 +9,27 @@ data structures
 ***********************************************************/
 public class Biometric { //: GLib.Object {
 
-    //  /***********************************************************
-    //  private Q_DISABLE_COPY (Biometric)
-    //  ***********************************************************/
+    /***********************************************************
+    private Q_DISABLE_COPY (Biometric)
+    ***********************************************************/
 
-    //  private BIO bio;
+    private BIO bio;
 
-    //  public Biometric () {
-    //      this.bio = new BIO_new (BIO_s_mem ());
-    //  }
-
-
-    //  ~Biometric () {
-    //      BIO_free_all (this.bio);
-    //  }
+    public Biometric () {
+        //  this.bio = new BIO_new (BIO_s_mem ());
+    }
 
 
-    //  /***********************************************************
-    //  public operator BIO* () {
-    //      return this.bio;
-    //  }
-    //  ***********************************************************/
+    ~Biometric () {
+        //  BIO_free_all (this.bio);
+    }
+
+
+    /***********************************************************
+    public operator BIO* () {
+        //  return this.bio;
+    }
+    ***********************************************************/
 
 } // class Biometric
 

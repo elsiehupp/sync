@@ -17,36 +17,36 @@ const int OC_ASSERT_SELECT1 (NAME, COUNT) OC_ASSERT_SELECT2 (NAME, COUNT)
 const int OC_ASSERT_SELECT (NAME, COUNT) OC_ASSERT_SELECT1 (NAME, COUNT)
 
 const int OC_ASSERT_OVERLOAD (NAME, ...) OC_ASSERT_GLUE (OC_ASSERT_SELECT (NAME, OC_ASSERT_VA_SIZE (__VA_ARGS__)),
-    //  (__VA_ARGS__))
+    (__VA_ARGS__))
 
 Default assert: If the condition is false in debug builds, terminate.
 
 Prints a message on failure, even in release builds.
 const int ASSERT1 (cond)
-    //  if (! (cond)) {
-    //      OC_ASSERT_MSG ("ASSERT : \"%s\" in file %s, line %d", #cond, __FILE__, __LINE__);
-    //  } else {
-    //  }
+    if (! (cond)) {
+        //      OC_ASSERT_MSG ("ASSERT : \"%s\" in file %s, line %d", #cond, __FILE__, __LINE__);
+    } else {
+    }
 const int ASSERT2 (cond, message)
-    //  if (! (cond)) {
-    //      OC_ASSERT_MSG ("ASSERT : \"%s\" in file %s, line %d with message : %s", #cond, __FILE__, __LINE__, message);
-    //  } else {
-    //  }
+    if (! (cond)) {
+        //      OC_ASSERT_MSG ("ASSERT : \"%s\" in file %s, line %d with message : %s", #cond, __FILE__, __LINE__, message);
+    } else {
+    }
 const int GLib.assert_true (...) OC_ASSERT_OVERLOAD (ASSERT, __VA_ARGS__)
 
 Enforce condition to be true, even in release builds.
 
 Prints 'message' and aborts execution if 'cond' is false.
 const int ENFORCE1 (cond)
-    //  if (! (cond)) {
-    //      GLib.fatal ("ENFORCE : \"%s\" in file %s, line %d", #cond, __FILE__, __LINE__);
-    //  } else {
-    //  }
+    if (! (cond)) {
+        //      GLib.fatal ("ENFORCE : \"%s\" in file %s, line %d", #cond, __FILE__, __LINE__);
+    } else {
+    }
 const int ENFORCE2 (cond, message)
-    //  if (! (cond)) {
-    //      GLib.fatal ("ENFORCE : \"%s\" in file %s, line %d with message : %s", #cond, __FILE__, __LINE__, message);
-    //  } else {
-    //  }
+    if (! (cond)) {
+        //      GLib.fatal ("ENFORCE : \"%s\" in file %s, line %d with message : %s", #cond, __FILE__, __LINE__, message);
+    } else {
+    }
 const int ENFORCE (...) OC_ASSERT_OVERLOAD (ENFORCE, __VA_ARGS__)
 
 An assert that is only present in debug builds: typically used for

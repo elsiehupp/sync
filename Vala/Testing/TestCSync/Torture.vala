@@ -22,37 +22,37 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ***********************************************************/
 public class Torture { //: GLib.Object {
 
-    //  /***********************************************************
-    //  Used by main to communicate with parse_opt.
-    //  ***********************************************************/
-    //  class Arguments {
-    //      char args[2];
-    //      int verbose;
-    //  }
+    /***********************************************************
+    Used by main to communicate with parse_opt.
+    ***********************************************************/
+    class Arguments {
+        //  char args[2];
+        //  int verbose;
+    }
 
-    //  static int verbosity;
+    static int verbosity;
 
-    //  void torture_cmdline_parse (int argc, char **argv, Arguments arguments);
+    void torture_cmdline_parse (int argc, char **argv, Arguments arguments);
 
-    //  int torture_csync_verbosity () {
-    //      return verbosity;
-    //  }
+    int torture_csync_verbosity () {
+        //  return verbosity;
+    }
 
 
-    //  /***********************************************************
-    //  This function must be defined in every unit test file.
-    //  ***********************************************************/
-    //  int torture_run_tests ();
+    /***********************************************************
+    This function must be defined in every unit test file.
+    ***********************************************************/
+    int torture_run_tests ();
 
-    //  int main (int argc, char **argv) {
-    //      Arguments arguments;
+    int main (int argc, char **argv) {
+        //  Arguments arguments;
 
-    //      arguments.verbose = 0;
-    //      torture_cmdline_parse (argc, argv, arguments);
-    //      verbosity = arguments.verbose;
+        //  arguments.verbose = 0;
+        //  torture_cmdline_parse (argc, argv, arguments);
+        //  verbosity = arguments.verbose;
 
-    //      return torture_run_tests ();
-    //  }
+        //  return torture_run_tests ();
+    }
 
 } // class Torture
 } // namespace Testing

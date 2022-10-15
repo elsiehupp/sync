@@ -10,21 +10,21 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public class TestACreate : AbstractTestFolderWatcher {
 
-    //  /***********************************************************
-    //  Create a new file
-    //  ***********************************************************/
-    //  private TestACreate () {
-    //      base ();
+    /***********************************************************
+    Create a new file
+    ***********************************************************/
+    private TestACreate () {
+        //  base ();
 
-    //      string file = this.root_path + "/foo.txt";
-    //      string command = "echo \"xyz\" > %1".printf (file);
-    //      GLib.debug ("Command: " + command);
-    //      system (command.to_local_8_bit ());
+        //  string file = this.root_path + "/foo.txt";
+        //  string command = "echo \"xyz\" > %1".printf (file);
+        //  GLib.debug ("Command: " + command);
+        //  system (command.to_local_8_bit ());
 
-    //      GLib.assert_true (wait_for_path_changed (file));
+        //  GLib.assert_true (wait_for_path_changed (file));
 
-    //      delete (this);
-    //  }
+        //  delete (this);
+    }
 
 } // class TestACreate
 

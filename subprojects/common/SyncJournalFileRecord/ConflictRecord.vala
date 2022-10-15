@@ -18,53 +18,53 @@ the base file, its conflict file could be
 ***********************************************************/
 public class ConflictRecord { //: GLib.Object {
 
-    //  /***********************************************************
-    //  Path to the file with the conflict tag in the name
+    /***********************************************************
+    Path to the file with the conflict tag in the name
 
-    //  The path is sync-folder relative.
-    //  ***********************************************************/
-    //  public string path;
-
-
-    //  /***********************************************************
-    //  File identifier of the base file
-    //  ***********************************************************/
-    //  public string base_file_id;
+    The path is sync-folder relative.
+    ***********************************************************/
+    public string path;
 
 
-    //  /***********************************************************
-    //  Modtime of the base file
-
-    //  may not be available and be -1
-    //  ***********************************************************/
-    //  public int64 base_modtime = -1;
+    /***********************************************************
+    File identifier of the base file
+    ***********************************************************/
+    public string base_file_id;
 
 
-    //  /***********************************************************
-    //  Etag of the base file
+    /***********************************************************
+    Modtime of the base file
 
-    //  may not be available and empty
-    //  ***********************************************************/
-    //  public string base_etag;
+    may not be available and be -1
+    ***********************************************************/
+    public int64 base_modtime = -1;
 
 
-    //  /***********************************************************
-    //  The path of the original file at the time the conflict was created
+    /***********************************************************
+    Etag of the base file
 
-    //  Note that in nearly all cases one should query
-    //  thus retrieve the current* base path instead!
+    may not be available and empty
+    ***********************************************************/
+    public string base_etag;
 
-    //  maybe be empty if not available
-    //  ***********************************************************/
-    //  public string initial_base_path;
 
-    //  /***********************************************************
-    //  ***********************************************************/
-    //  public bool is_valid {
-    //      public get {
-    //          return path != "";
-    //      }
-    //  }
+    /***********************************************************
+    The path of the original file at the time the conflict was created
+
+    Note that in nearly all cases one should query
+    thus retrieve the current* base path instead!
+
+    maybe be empty if not available
+    ***********************************************************/
+    public string initial_base_path;
+
+    /***********************************************************
+    ***********************************************************/
+    public bool is_valid {
+        //  public get {
+        //      return path != "";
+        //  }
+    }
 
 } // class ConflictRecord
 

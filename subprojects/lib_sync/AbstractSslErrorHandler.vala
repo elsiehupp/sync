@@ -19,8 +19,12 @@ about credentials, SSL errors and certificates.
 @ingroup libsync
 ***********************************************************/
 public abstract class AbstractSslErrorHandler { //: GLib.Object {
-    //  public abstract bool handle_errors (GLib.List<GnuTLS.ErrorCode> error_list, GLib.SslConfiguration conf, GLib.List<GLib.TlsCertificate> cert_list, Account account);
-
+    public abstract bool handle_errors (
+        GLib.List<GnuTLS.ErrorCode> error_list,
+        GLib.TlsConfiguration conf,
+        GLib.List<GLib.TlsCertificate> cert_list,
+        Account account
+    );
 } // class AbstractSslErrorHandler
 
 } // namespace LibSync

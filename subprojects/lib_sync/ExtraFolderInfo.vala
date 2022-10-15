@@ -11,8 +11,8 @@ namespace LibSync {
 ***********************************************************/
 public class ExtraFolderInfo { //: GLib.Object {
 
-    //  public string file_identifier;
-    //  public int64 size = -1;
+    public string file_identifier;
+    public int64 size = -1;
 
 } // class ExtraFolderInfo
 

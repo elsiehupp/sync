@@ -9,49 +9,49 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public abstract class AbstractTestXmlParse { //: GLib.Object {
 
-    //  /***********************************************************
-    //  ***********************************************************/
-    //  protected bool success;
-    //  protected GLib.List<string> subdirectories = new GLib.List<string> ();
-    //  protected GLib.List<string> items = new GLib.List<string> ()
+    /***********************************************************
+    ***********************************************************/
+    protected bool success;
+    protected GLib.List<string> subdirectories = new GLib.List<string> ();
+    protected GLib.List<string> items = new GLib.List<string> ()
 
 
-    //  /***********************************************************
-    //  ***********************************************************/
-    //  protected void on_signal_directory_listing_sub_folders (GLib.List<string> list) {
-    //      GLib.debug ("subfolders: " + list.join ("/n"));
-    //      this.subdirectories.append (list);
-    //  }
+    /***********************************************************
+    ***********************************************************/
+    protected void on_signal_directory_listing_sub_folders (GLib.List<string> list) {
+        //  GLib.debug ("subfolders: " + list.join ("/n"));
+        //  this.subdirectories.append (list);
+    }
 
 
-    //  /***********************************************************
-    //  ***********************************************************/
-    //  protected void on_signal_directory_listing_iterated (string item, GLib.HashTable<string,string> map) {
-    //      GLib.debug ("     item: " + item);
-    //      this.items.append (item);
-    //  }
+    /***********************************************************
+    ***********************************************************/
+    protected void on_signal_directory_listing_iterated (string item, GLib.HashTable<string,string> map) {
+        //  GLib.debug ("     item: " + item);
+        //  this.items.append (item);
+    }
 
 
-    //  /***********************************************************
-    //  ***********************************************************/
-    //  protected void on_signal_finished_successfully () {
-    //      this.success = true;
-    //  }
+    /***********************************************************
+    ***********************************************************/
+    protected void on_signal_finished_successfully () {
+        //  this.success = true;
+    }
 
 
-    //  /***********************************************************
-    //  ***********************************************************/
-    //  protected void on_signal_init () {
-    //      GLib.debug (Q_FUNC_INFO);
-    //      this.success = false;
-    //      this.subdirectories = null;
-    //      this.items = null;
-    //  }
+    /***********************************************************
+    ***********************************************************/
+    protected void on_signal_init () {
+        //  GLib.debug (Q_FUNC_INFO);
+        //  this.success = false;
+        //  this.subdirectories = null;
+        //  this.items = null;
+    }
 
 
-    //  /***********************************************************
-    //  ***********************************************************/
-    //  protected void clean_up () {}
+    /***********************************************************
+    ***********************************************************/
+    protected void clean_up () {}
 
 } // class TestXmlParse
 

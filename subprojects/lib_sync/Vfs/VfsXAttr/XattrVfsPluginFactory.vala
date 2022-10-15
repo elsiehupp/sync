@@ -10,10 +10,10 @@ namespace LibSync {
 ***********************************************************/
 public class XattrVfsPluginFactory : Common.DefaultPluginFactory<VfsXAttr> {
 
-    //  construct {
-    //      Q_PLUGIN_METADATA (IID + "org.owncloud.AbstractPluginFactory" + FILE + "vfspluginmetadata.json");
-    //      Q_INTERFACES (AbstractPluginFactory);
-    //  }
+    construct {
+        //  Q_PLUGIN_METADATA (IID + "org.owncloud.AbstractPluginFactory" + FILE + "vfspluginmetadata.json");
+        //  Q_INTERFACES (AbstractPluginFactory);
+    }
 
 } // class XattrVfsPluginFactory
 

@@ -10,31 +10,31 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public class TestFun : AbstractTestCSyncExclude {
 
-    //  /***********************************************************
-    //  ***********************************************************/
-    //  private TestFun () {
-    //      CSync.ExcludedFiles excluded;
-    //      bool exclude_hidden = true;
-    //      bool keep_hidden = false;
+    /***********************************************************
+    ***********************************************************/
+    private TestFun () {
+        //  CSync.ExcludedFiles excluded;
+        //  bool exclude_hidden = true;
+        //  bool keep_hidden = false;
 
-    //      GLib.assert_true (!excluded.is_excluded ("/a/b", "/a", keep_hidden));
-    //      GLib.assert_true (!excluded.is_excluded ("/a/b~", "/a", keep_hidden));
-    //      GLib.assert_true (!excluded.is_excluded ("/a/.b", "/a", keep_hidden));
-    //      GLib.assert_true (excluded.is_excluded ("/a/.b", "/a", exclude_hidden));
+        //  GLib.assert_true (!excluded.is_excluded ("/a/b", "/a", keep_hidden));
+        //  GLib.assert_true (!excluded.is_excluded ("/a/b~", "/a", keep_hidden));
+        //  GLib.assert_true (!excluded.is_excluded ("/a/.b", "/a", keep_hidden));
+        //  GLib.assert_true (excluded.is_excluded ("/a/.b", "/a", exclude_hidden));
 
-    //      excluded.add_exclude_file_path (EXCLUDE_LIST_FILE);
-    //      excluded.reload_exclude_files ();
+        //  excluded.add_exclude_file_path (EXCLUDE_LIST_FILE);
+        //  excluded.reload_exclude_files ();
 
-    //      GLib.assert_true (!excluded.is_excluded ("/a/b", "/a", keep_hidden));
-    //      GLib.assert_true (excluded.is_excluded ("/a/b~", "/a", keep_hidden));
-    //      GLib.assert_true (!excluded.is_excluded ("/a/.b", "/a", keep_hidden));
-    //      GLib.assert_true (excluded.is_excluded ("/a/.Trashes", "/a", keep_hidden));
-    //      GLib.assert_true (excluded.is_excluded ("/a/foo_conflict-bar", "/a", keep_hidden));
-    //      GLib.assert_true (excluded.is_excluded ("/a/foo (conflicted copy bar)", "/a", keep_hidden));
-    //      GLib.assert_true (excluded.is_excluded ("/a/.b", "/a", exclude_hidden));
+        //  GLib.assert_true (!excluded.is_excluded ("/a/b", "/a", keep_hidden));
+        //  GLib.assert_true (excluded.is_excluded ("/a/b~", "/a", keep_hidden));
+        //  GLib.assert_true (!excluded.is_excluded ("/a/.b", "/a", keep_hidden));
+        //  GLib.assert_true (excluded.is_excluded ("/a/.Trashes", "/a", keep_hidden));
+        //  GLib.assert_true (excluded.is_excluded ("/a/foo_conflict-bar", "/a", keep_hidden));
+        //  GLib.assert_true (excluded.is_excluded ("/a/foo (conflicted copy bar)", "/a", keep_hidden));
+        //  GLib.assert_true (excluded.is_excluded ("/a/.b", "/a", exclude_hidden));
 
-    //      GLib.assert_true (excluded.is_excluded ("/a/#b#", "/a", keep_hidden));
-    //  }
+        //  GLib.assert_true (excluded.is_excluded ("/a/#b#", "/a", keep_hidden));
+    }
 
 } // class TestFun
 

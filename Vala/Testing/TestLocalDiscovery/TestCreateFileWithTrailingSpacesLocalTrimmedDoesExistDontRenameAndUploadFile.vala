@@ -10,24 +10,24 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public class TestCreateFileWithTrailingSpacesLocalTrimmedDoesExistDontRenameAndUploadFile { //: GLib.Object {
 
-    //  /***********************************************************
-    //  ***********************************************************/
-    //  private TestCreateFileWithTrailingSpacesLocalTrimmedDoesExistDontRenameAndUploadFile () {
-    //      FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-    //      GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
-    //      string file_with_spaces = " foo";
-    //      string file_trimmed = "foo";
+    /***********************************************************
+    ***********************************************************/
+    private TestCreateFileWithTrailingSpacesLocalTrimmedDoesExistDontRenameAndUploadFile () {
+        //  FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
+        //  GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+        //  string file_with_spaces = " foo";
+        //  string file_trimmed = "foo";
 
-    //      fake_folder.local_modifier.insert (file_trimmed);
-    //      GLib.assert_true (fake_folder.sync_once ());
-    //      fake_folder.local_modifier.insert (file_with_spaces);
-    //      GLib.assert_true (!fake_folder.sync_once ());
+        //  fake_folder.local_modifier.insert (file_trimmed);
+        //  GLib.assert_true (fake_folder.sync_once ());
+        //  fake_folder.local_modifier.insert (file_with_spaces);
+        //  GLib.assert_true (!fake_folder.sync_once ());
 
-    //      GLib.assert_true (fake_folder.current_remote_state ().find (file_trimmed));
-    //      GLib.assert_true (!fake_folder.current_remote_state ().find (file_with_spaces));
-    //      GLib.assert_true (fake_folder.current_local_state ().find (file_with_spaces));
-    //      GLib.assert_true (fake_folder.current_local_state ().find (file_trimmed));
-    //  }
+        //  GLib.assert_true (fake_folder.current_remote_state ().find (file_trimmed));
+        //  GLib.assert_true (!fake_folder.current_remote_state ().find (file_with_spaces));
+        //  GLib.assert_true (fake_folder.current_local_state ().find (file_with_spaces));
+        //  GLib.assert_true (fake_folder.current_local_state ().find (file_trimmed));
+    }
 
 } // class TestCreateFileWithTrailingSpacesLocalTrimmedDoesExistDontRenameAndUploadFile
 

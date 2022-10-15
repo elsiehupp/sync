@@ -9,22 +9,22 @@ namespace Testing {
 
 public class TestAbortAfterFailedMkdir : AbstractTestSyncEngine {
 
-    //  /***********************************************************
-    //  ***********************************************************/
-    //  private TestAbortAfterFailedMkdir () {
-    //      FakeFolder fake_folder = new FakeFolder (new FileInfo ());
-    //      GLib.SignalSpy finished_spy = new GLib.SignalSpy (
-    //          fake_folder.sync_engine,
-    //          SIGNAL (on_signal_finished (bool))
-    //      );
-    //      fake_folder.server_error_paths ().append ("NewFolder");
-    //      fake_folder.local_modifier.mkdir ("NewFolder");
-    //      // This should be aborted and would otherwise fail in FileInfo.create.
-    //      fake_folder.local_modifier.insert ("NewFolder/NewFile");
-    //      fake_folder.sync_once ();
-    //      GLib.assert_true (finished_spy.size () == 1);
-    //      GLib.assert_true (finished_spy.nth_data (0).nth_data (0).to_bool () == false);
-    //  }
+    /***********************************************************
+    ***********************************************************/
+    private TestAbortAfterFailedMkdir () {
+        //  FakeFolder fake_folder = new FakeFolder (new FileInfo ());
+        //  GLib.SignalSpy finished_spy = new GLib.SignalSpy (
+        //      fake_folder.sync_engine,
+        //      SIGNAL (on_signal_finished (bool))
+        //  );
+        //  fake_folder.server_error_paths ().append ("NewFolder");
+        //  fake_folder.local_modifier.mkdir ("NewFolder");
+        //  // This should be aborted and would otherwise fail in FileInfo.create.
+        //  fake_folder.local_modifier.insert ("NewFolder/NewFile");
+        //  fake_folder.sync_once ();
+        //  GLib.assert_true (finished_spy.size () == 1);
+        //  GLib.assert_true (finished_spy.nth_data (0).nth_data (0).to_bool () == false);
+    }
 
 } // class TestAbortAfterFailedMkdir
 

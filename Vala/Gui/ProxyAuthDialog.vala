@@ -23,35 +23,35 @@ public class ProxyAuthDialog { //: Gtk.Dialog {
     //  /***********************************************************
     //  ***********************************************************/
     //  public ProxyAuthDialog (Gtk.Widget parent = new Gtk.Widget ()) {
-    //      base (parent);
-    //      this.instance = new ProxyAuthDialog ();
-    //      instance.up_ui (this);
+        //  base (parent);
+        //  this.instance = new ProxyAuthDialog ();
+        //  instance.up_ui (this);
     //  }
 
 
     //  ~ProxyAuthDialog () {
-    //      //  delete this.instance;
+        //  //  delete this.instance;
     //  }
 
 
     //  /***********************************************************
     //  ***********************************************************/
     //  public void proxy_address (string address) {
-    //      instance.proxy_address.on_signal_text (address);
+        //  instance.proxy_address.on_signal_text (address);
     //  }
 
 
     //  /***********************************************************
     //  ***********************************************************/
     //  public string username () {
-    //      return instance.username_edit.text ();
+        //  return instance.username_edit.text ();
     //  }
 
 
     //  /***********************************************************
     //  ***********************************************************/
     //  public string password () {
-    //      return instance.password_edit.text ();
+        //  return instance.password_edit.text ();
     //  }
 
 
@@ -59,9 +59,9 @@ public class ProxyAuthDialog { //: Gtk.Dialog {
     //  Resets the dialog for new credential entry.
     //  ***********************************************************/
     //  public void reset () {
-    //      instance.username_edit.focus ();
-    //      instance.username_edit = "";
-    //      instance.password_edit = "";
+        //  instance.username_edit.focus ();
+        //  instance.username_edit = "";
+        //  instance.password_edit = "";
     //  }
 
 } // class ProxyAuthDialog

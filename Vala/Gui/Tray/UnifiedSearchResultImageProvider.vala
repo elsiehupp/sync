@@ -21,11 +21,11 @@ or used a local resource
 ***********************************************************/
 public class UnifiedSearchResultImageProvider { //: GLib.QuickAsyncImageProvider {
 
-    //  /***********************************************************
-    //  ***********************************************************/
-    //  public GLib.QuickImageResponse request_image_response (string identifier, Gdk.Rectangle requested_size) {
-    //      return new AsyncImageResponse (identifier, requested_size);
-    //  }
+    /***********************************************************
+    ***********************************************************/
+    public GLib.QuickImageResponse request_image_response (string identifier, Gdk.Rectangle requested_size) {
+        //  return new AsyncImageResponse (identifier, requested_size);
+    }
 
 } // class UnifiedSearchResultImageProvider
 

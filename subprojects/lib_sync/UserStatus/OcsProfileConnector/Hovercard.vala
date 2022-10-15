@@ -6,7 +6,7 @@ namespace LibSync {
 ***********************************************************/
 public class Hovercard { //: GLib.Object {
 
-    //  public GLib.List<HovercardAction> actions;
+    public GLib.List<HovercardAction> actions;
 
 } // class Hovercard
 

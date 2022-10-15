@@ -9,13 +9,13 @@ namespace Testing {
 
 public class TestDeepHierarchyData : AbstractTestSyncMove {
 
-    //  /***********************************************************
-    //  ***********************************************************/
-    //  private TestDeepHierarchyData () {
-    //      GLib.Test.add_column<bool> ("local");
-    //      GLib.Test.new_row ("remote") + false;
-    //      GLib.Test.new_row ("local") + true;
-    //  }
+    /***********************************************************
+    ***********************************************************/
+    private TestDeepHierarchyData () {
+        //  GLib.Test.add_column<bool> ("local");
+        //  GLib.Test.new_row ("remote") + false;
+        //  GLib.Test.new_row ("local") + true;
+    }
 
 } // class TestDeepHierarchyData
 

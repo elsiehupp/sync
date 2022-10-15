@@ -9,35 +9,35 @@ namespace Testing {
 
 public class TestParentsGetSyncStatusNewDirectoryDownload : AbstractTestSyncFileStatusTracker {
 
-    //  /***********************************************************
-    //  ***********************************************************/
-    //  private TestParentsGetSyncStatusNewDirectoryDownload () {
-    //      FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-    //      fake_folder.remote_modifier ().mkdir ("D");
-    //      fake_folder.remote_modifier ().insert ("D/d0");
-    //      StatusPushSpy status_spy = new StatusPushSpy (fake_folder.sync_engine);
+    /***********************************************************
+    ***********************************************************/
+    private TestParentsGetSyncStatusNewDirectoryDownload () {
+        //  FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
+        //  fake_folder.remote_modifier ().mkdir ("D");
+        //  fake_folder.remote_modifier ().insert ("D/d0");
+        //  StatusPushSpy status_spy = new StatusPushSpy (fake_folder.sync_engine);
 
-    //      fake_folder.schedule_sync ();
-    //      fake_folder.exec_until_before_propagation ();
-    //      verify_that_push_matches_pull (fake_folder, status_spy);
-    //      GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusSync);
-    //      GLib.assert_true (status_spy.status_of ("D") == SyncFileStatus.StatusSync);
-    //      GLib.assert_true (status_spy.status_of ("D/d0") == SyncFileStatus.StatusSync);
+        //  fake_folder.schedule_sync ();
+        //  fake_folder.exec_until_before_propagation ();
+        //  verify_that_push_matches_pull (fake_folder, status_spy);
+        //  GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusSync);
+        //  GLib.assert_true (status_spy.status_of ("D") == SyncFileStatus.StatusSync);
+        //  GLib.assert_true (status_spy.status_of ("D/d0") == SyncFileStatus.StatusSync);
 
-    //      fake_folder.exec_until_item_completed ("D");
-    //      verify_that_push_matches_pull (fake_folder, status_spy);
-    //      GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusSync);
-    //      GLib.assert_true (status_spy.status_of ("D") == SyncFileStatus.StatusSync);
-    //      GLib.assert_true (status_spy.status_of ("D/d0") == SyncFileStatus.StatusSync);
+        //  fake_folder.exec_until_item_completed ("D");
+        //  verify_that_push_matches_pull (fake_folder, status_spy);
+        //  GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusSync);
+        //  GLib.assert_true (status_spy.status_of ("D") == SyncFileStatus.StatusSync);
+        //  GLib.assert_true (status_spy.status_of ("D/d0") == SyncFileStatus.StatusSync);
 
-    //      fake_folder.exec_until_finished ();
-    //      verify_that_push_matches_pull (fake_folder, status_spy);
-    //      GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusUpToDate);
-    //      GLib.assert_true (status_spy.status_of ("D") == SyncFileStatus.StatusUpToDate);
-    //      GLib.assert_true (status_spy.status_of ("D/d0") == SyncFileStatus.StatusUpToDate);
+        //  fake_folder.exec_until_finished ();
+        //  verify_that_push_matches_pull (fake_folder, status_spy);
+        //  GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusUpToDate);
+        //  GLib.assert_true (status_spy.status_of ("D") == SyncFileStatus.StatusUpToDate);
+        //  GLib.assert_true (status_spy.status_of ("D/d0") == SyncFileStatus.StatusUpToDate);
 
-    //      GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
-    //  }
+        //  GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+    }
 
 } // class TestParentsGetSyncStatusNewDirectoryDownload
 

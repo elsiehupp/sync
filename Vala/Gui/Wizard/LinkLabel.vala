@@ -18,43 +18,43 @@ public class LinkLabel { //: Gtk.Label {
     //  /***********************************************************
     //  ***********************************************************/
     //  public LinkLabel (Gtk.Widget parent = new Gtk.Widget ()) {
-    //      base (parent);
+        //  base (parent);
     //  }
 
 
     //  /***********************************************************
     //  ***********************************************************/
     //  protected void enter_event (Gdk.Event event) {
-    //      font_underline (true);
-    //      cursor (GLib.PointingHandCursor);
+        //  font_underline (true);
+        //  cursor (GLib.PointingHandCursor);
     //  }
 
 
     //  /***********************************************************
     //  ***********************************************************/
     //  protected void leave_event (Gdk.Event event) {
-    //      font_underline (false);
-    //      cursor (GLib.ArrowCursor);
+        //  font_underline (false);
+        //  cursor (GLib.ArrowCursor);
     //  }
 
 
     //  /***********************************************************
     //  ***********************************************************/
     //  protected void mouse_release_event (GLib.MouseEvent event) {
-    //      if (GLib.Uri.is_valid (url)) {
-    //          OpenExternal.open_browser (url);
-    //      }
+        //  if (GLib.Uri.is_valid (url)) {
+        //      OpenExternal.open_browser (url);
+        //  }
 
-    //      signal_clicked ();
+        //  signal_clicked ();
     //  }
 
 
     //  /***********************************************************
     //  ***********************************************************/
     //  private void font_underline (bool value) {
-    //      var label_font = font ();
-    //      label_font.underline (value);
-    //      font (label_font);
+        //  var label_font = font ();
+        //  label_font.underline (value);
+        //  font (label_font);
     //  }
 
 } // class LinkLabel

@@ -10,22 +10,22 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public class TestUnicodeRead : AbstractTestOwnSql {
 
-    //  /***********************************************************
-    //  ***********************************************************/
-    //  private TestUnicodeRead () {
-    //      base ();
+    /***********************************************************
+    ***********************************************************/
+    private TestUnicodeRead () {
+        //  base ();
 
-    //      string sql = "SELECT * FROM addresses WHERE identifier=3;";
-    //      SqlQuery query = new SqlQuery (this.database);
-    //      query.prepare (sql);
+        //  string sql = "SELECT * FROM addresses WHERE identifier=3;";
+        //  SqlQuery query = new SqlQuery (this.database);
+        //  query.prepare (sql);
 
-    //      if (query.next ().has_data) {
-    //          string name = query.string_value (1);
-    //          string address = query.string_value (2);
-    //          GLib.assert_true (name == "пятницы");
-    //          GLib.assert_true (address == "проспект");
-    //      }
-    //  }
+        //  if (query.next ().has_data) {
+        //      string name = query.string_value (1);
+        //      string address = query.string_value (2);
+        //      GLib.assert_true (name == "пятницы");
+        //      GLib.assert_true (address == "проспект");
+        //  }
+    }
 
 } // class TestUnicodeRead
 

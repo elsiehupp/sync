@@ -10,65 +10,65 @@ namespace Testing {
 ***********************************************************/
 public class TestSearchTermResultTickled : AbstractTestUnifiedSearchListmodel {
 
-    //  /***********************************************************
-    //  ***********************************************************/
-    //  private TestSearchTermResultTickled () {
-    //      // make sure the model is empty
-    //      model.set_search_term ("");
-    //      GLib.assert_true (model.row_count () == 0);
+    /***********************************************************
+    ***********************************************************/
+    private TestSearchTermResultTickled () {
+        //  // make sure the model is empty
+        //  model.set_search_term ("");
+        //  GLib.assert_true (model.row_count () == 0);
 
-    //      // test that search term gets set, search gets started and enough results get returned
-    //      model.set_search_term (model.search_term () + "discuss");
+        //  // test that search term gets set, search gets started and enough results get returned
+        //  model.set_search_term (model.search_term () + "discuss");
 
-    //      GLib.SignalSpy search_in_progress_changed = new GLib.SignalSpy (
-    //          model, UnifiedSearchResultsListModel.is_search_in_progress_changed);
+        //  GLib.SignalSpy search_in_progress_changed = new GLib.SignalSpy (
+        //      model, UnifiedSearchResultsListModel.is_search_in_progress_changed);
 
-    //      GLib.assert_true (search_in_progress_changed.wait ());
+        //  GLib.assert_true (search_in_progress_changed.wait ());
 
-    //      // make sure search has started
-    //      GLib.assert_true (search_in_progress_changed.length == 1);
-    //      GLib.assert_true (model.is_search_in_progress ());
+        //  // make sure search has started
+        //  GLib.assert_true (search_in_progress_changed.length == 1);
+        //  GLib.assert_true (model.is_search_in_progress ());
 
-    //      GLib.assert_true (search_in_progress_changed.wait ());
+        //  GLib.assert_true (search_in_progress_changed.wait ());
 
-    //      // make sure search has finished and some results has been received
-    //      GLib.assert_true (!model.is_search_in_progress ());
+        //  // make sure search has finished and some results has been received
+        //  GLib.assert_true (!model.is_search_in_progress ());
 
-    //      GLib.assert_true (model.row_count () != 0);
+        //  GLib.assert_true (model.row_count () != 0);
 
-    //      GLib.DesktopServices.set_url_handler ("http", fake_desktop_services_url_handler, "signal_result_clicked");
-    //      GLib.DesktopServices.set_url_handler ("https", fake_desktop_services_url_handler, "signal_result_clicked");
+        //  GLib.DesktopServices.set_url_handler ("http", fake_desktop_services_url_handler, "signal_result_clicked");
+        //  GLib.DesktopServices.set_url_handler ("https", fake_desktop_services_url_handler, "signal_result_clicked");
 
-    //      GLib.SignalSpy signal_result_clicked = new GLib.SignalSpy (fake_desktop_services_url_handler, FakeDesktopServicesUrlHandler.signal_result_clicked);
+        //  GLib.SignalSpy signal_result_clicked = new GLib.SignalSpy (fake_desktop_services_url_handler, FakeDesktopServicesUrlHandler.signal_result_clicked);
 
-    //      //  test click on a result item
-    //      string url_for_clicked_result;
+        //  //  test click on a result item
+        //  string url_for_clicked_result;
 
-    //      for (int i = 0; i < model.row_count (); ++i) {
-    //          var type = model.data (model.index (i), UnifiedSearchResultsListModel.DataRole.TypeRole);
+        //  for (int i = 0; i < model.row_count (); ++i) {
+        //      var type = model.data (model.index (i), UnifiedSearchResultsListModel.DataRole.TypeRole);
 
-    //          if (type == UnifiedSearchResult.Type.DEFAULT) {
-    //              var provider_id =
-    //                  model.data (model.index (i), UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
-    //                      .to_string ();
-    //              url_for_clicked_result = model.data (model.index (i), UnifiedSearchResultsListModel.DataRole.ResourceUrlRole).to_string ();
+        //      if (type == UnifiedSearchResult.Type.DEFAULT) {
+        //          var provider_id =
+        //              model.data (model.index (i), UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
+        //                  .to_string ();
+        //          url_for_clicked_result = model.data (model.index (i), UnifiedSearchResultsListModel.DataRole.ResourceUrlRole).to_string ();
 
-    //              if (provider_id != "" && url_for_clicked_result != "") {
-    //                  model.signal_result_clicked (provider_id, GLib.Uri (url_for_clicked_result));
-    //                  break;
-    //              }
-    //          }
-    //      }
+        //          if (provider_id != "" && url_for_clicked_result != "") {
+        //              model.signal_result_clicked (provider_id, GLib.Uri (url_for_clicked_result));
+        //              break;
+        //          }
+        //      }
+        //  }
 
-    //      GLib.assert_true (signal_result_clicked.length == 1);
+        //  GLib.assert_true (signal_result_clicked.length == 1);
 
-    //      var arguments = signal_result_clicked.nth_data (0);
-    //      signal_result_clicked.remove (signal_result_clicked.nth_data (0));
+        //  var arguments = signal_result_clicked.nth_data (0);
+        //  signal_result_clicked.remove (signal_result_clicked.nth_data (0));
 
-    //      var url_open_triggered_via_desktop_services = arguments.at (0).to_string ();
+        //  var url_open_triggered_via_desktop_services = arguments.at (0).to_string ();
 
-    //      GLib.assert_true (url_open_triggered_via_desktop_services == url_for_clicked_result);
-    //  }
+        //  GLib.assert_true (url_open_triggered_via_desktop_services == url_for_clicked_result);
+    }
 
 } // class TestSearchTermResultTickled
 
