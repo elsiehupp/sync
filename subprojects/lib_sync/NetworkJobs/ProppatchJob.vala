@@ -23,20 +23,20 @@ public class ProppatchJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     GLib.HashTable<string, string> properties {
-        //  public get {
-        //      return this.properties;
-        //  }
-        //  /***********************************************************
-        //  Used to specify which properties shall be set.
+        public get {
+            return this.properties;
+        }
+        /***********************************************************
+        Used to specify which properties shall be set.
 
-        //  The property keys can
-        //  - contain no colon : they refer to a property in the DAV :
-        //  - contain a colon : and thus specify an explicit namespace,
-        //  e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
-        //  ***********************************************************/
-        //  public set {
-        //      this.properties = value;
-        //  }
+        The property keys can
+        - contain no colon : they refer to a property in the DAV :
+        - contain a colon : and thus specify an explicit namespace,
+        e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
+        ***********************************************************/
+        public set {
+            this.properties = value;
+        }
     }
 
     internal signal void signal_success ();

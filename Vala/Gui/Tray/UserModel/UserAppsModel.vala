@@ -16,15 +16,15 @@ public class UserAppsModel { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     static UserAppsModel instance {
-        //  public get {
-        //      if (!this.instance) {
-        //          this.instance = new UserAppsModel ();
-        //      }
-        //      return this.instance;
-        //  }
-        //  private set {
-        //      this.instance = value;
-        //  }
+        public get {
+            if (!this.instance) {
+                this.instance = new UserAppsModel ();
+            }
+            return this.instance;
+        }
+        private set {
+            this.instance = value;
+        }
     }
 
 

@@ -538,13 +538,13 @@ public class Utility { //: GLib.Object {
     This can be overriden from the tests
     ***********************************************************/
     public static bool fs_case_preserving_override {
-        //  public get {
-        //      string env = GLib.Environment.get_variable ("OWNCLOUD_TEST_CASE_PRESERVING");
-        //      if (!env == "") {
-        //          return env.to_int ();
-        //      }
-        //      return Utility.is_windows () || Utility.is_mac ();
-        //  }
+        public get {
+            string env = GLib.Environment.get_variable ("OWNCLOUD_TEST_CASE_PRESERVING");
+            if (!env == "") {
+                return env.to_int ();
+            }
+            return Utility.is_windows () || Utility.is_mac ();
+        }
     }
 
 
@@ -555,9 +555,9 @@ public class Utility { //: GLib.Object {
     if false, the two cases are two different files.
     ***********************************************************/
     public static bool fs_case_preserving {
-        //  public get {
-        //      return fs_case_preserving_override;
-        //  }
+        public get {
+            return fs_case_preserving_override;
+        }
     }
 
 
@@ -1011,7 +1011,7 @@ public class Utility { //: GLib.Object {
     @param path is unused
     ***********************************************************/
     public static bool is_path_windows_drive_partition_root (string path) {
-        //  return false;
+        return false;
     }
 
 
@@ -1019,15 +1019,15 @@ public class Utility { //: GLib.Object {
     @brief Retrieves current logged-in user name from the OS
     ***********************************************************/
     public string get_current_user_name {
-        //  public get {
-        //      return "";
-        //  }
+        public get {
+            return "";
+        }
     }
 
 
     class Period {
-        //  string name;
-        //  uint64 msec;
+        string name;
+        uint64 msec;
 
         //  string description (uint64 value) {
         //      return _(name, null, value);

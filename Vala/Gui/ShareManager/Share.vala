@@ -41,28 +41,28 @@ public class Share { //: GLib.Object {
     public Sharee share_with { public get; protected set; }
 
     public Permissions permissions {
-        //  /***********************************************************
-        //  Get permissions
-        //  ***********************************************************/
-        //  public get {
-        //      return this.permissions;
-        //  }
-        //  /***********************************************************
-        //  Set the permissions of a share
+        /***********************************************************
+        Get permissions
+        ***********************************************************/
+        public get {
+            return this.permissions;
+        }
+        /***********************************************************
+        Set the permissions of a share
 
-        //  On on_signal_success the signal_permissions_set signal is emitted
-        //  In case of a server error the on_signal_server_error signal is emitted.
-        //  ***********************************************************/
-        //  public set {
-        //      OcsShareJob ocs_share_job = new OcsShareJob (this.account);
-        //      ocs_share_job.signal_finished.connect (
-        //          this.on_signal_permissions_set
-        //      );
-        //      ocs_share_job.signal_error.connect (
-        //          this.on_signal_ocs_share_job_error
-        //      );
-        //      ocs_share_job.permissions (identifier, value);
-        //  }
+        On on_signal_success the signal_permissions_set signal is emitted
+        In case of a server error the on_signal_server_error signal is emitted.
+        ***********************************************************/
+        public set {
+            OcsShareJob ocs_share_job = new OcsShareJob (this.account);
+            ocs_share_job.signal_finished.connect (
+                this.on_signal_permissions_set
+            );
+            ocs_share_job.signal_error.connect (
+                this.on_signal_ocs_share_job_error
+            );
+            ocs_share_job.permissions (identifier, value);
+        }
     }
 
     internal signal void signal_permissions_set ();

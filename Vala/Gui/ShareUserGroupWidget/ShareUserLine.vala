@@ -720,17 +720,17 @@ public class ShareUserLine { //: Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void disable_progess_indicator_animation () {
-        //  this.enable_progess_indicator_animation false;
+        //  this.enable_progess_indicator_animation = false;
     }
 
 
     /***********************************************************
     ***********************************************************/
     private string note {
-        //  private set {
-        //      this.enable_progess_indicator_animation = true;
-        //      this.share.note = value;
-        //  }
+        private set {
+            this.enable_progess_indicator_animation = true;
+            this.share.note = value;
+        }
     }
 
 

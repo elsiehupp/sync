@@ -193,44 +193,44 @@ public class VfsOff : AbstractVfs {
     /***********************************************************
     Return the best available VFS mode.
     ***********************************************************/
-    override VfsMode best_available_vfs_mode {
-        //  get {
-        //      if (is_vfs_plugin_available (VfsMode.WINDOWS_CF_API)) {
-        //          return VfsMode.WINDOWS_CF_API;
-        //      }
+    new VfsMode best_available_vfs_mode {
+        get {
+            if (is_vfs_plugin_available (VfsMode.WINDOWS_CF_API)) {
+                return VfsMode.WINDOWS_CF_API;
+            }
 
-        //      if (is_vfs_plugin_available (VfsMode.WITH_SUFFIX)) {
-        //          return VfsMode.WITH_SUFFIX;
-        //      }
+            if (is_vfs_plugin_available (VfsMode.WITH_SUFFIX)) {
+                return VfsMode.WITH_SUFFIX;
+            }
 
-        //      /***********************************************************
-        //      For now the "suffix" backend has still precedence over the
-        //      "xattr" backend. Ultimately the order of those ifs will
-        //      change when xattr will be more mature. But what does "more
-        //      mature" means here?
-        //      
-        //      *   On Mac when it properly reads and writes
-        //          com.apple.LaunchServices.OpenWith. This will require
-        //          reverse engineering to see what they stuff in there.
-        //          Maybe a good starting point:
-        //          https://eclecticlight.co/2017/12/20/xattr-com-apple-launchservices-openwith-sets-a-custom-app-to-open-a-file/
-        //      
-        //      *   On Linux when our user.nextcloud.hydrate_exec is
-        //          adopted by at least KDE and Gnome the "user.nextcloud"
-        //          prefix might turn into "user.xdg" in the process since
-        //          it would be best to have a freedesktop.org spec for it.
-        //          When that time comes, it might still require detecting
-        //          at runtime if that's indeed supported in the user
-        //          session or even per sync folder (in case user would pick
-        //          a folder which wouldn't support xattr for some reason)
-        //      ***********************************************************/
+            /***********************************************************
+            For now the "suffix" backend has still precedence over the
+            "xattr" backend. Ultimately the order of those ifs will
+            change when xattr will be more mature. But what does "more
+            mature" means here?
+            
+            *   On Mac when it properly reads and writes
+                com.apple.LaunchServices.OpenWith. This will require
+                reverse engineering to see what they stuff in there.
+                Maybe a good starting point:
+                https://eclecticlight.co/2017/12/20/xattr-com-apple-launchservices-openwith-sets-a-custom-app-to-open-a-file/
+            
+            *   On Linux when our user.nextcloud.hydrate_exec is
+                adopted by at least KDE and Gnome the "user.nextcloud"
+                prefix might turn into "user.xdg" in the process since
+                it would be best to have a freedesktop.org spec for it.
+                When that time comes, it might still require detecting
+                at runtime if that's indeed supported in the user
+                session or even per sync folder (in case user would pick
+                a folder which wouldn't support xattr for some reason)
+            ***********************************************************/
 
-        //      if (is_vfs_plugin_available (VfsMode.XATTR)) {
-        //          return VfsMode.XATTR;
-        //      }
+            if (is_vfs_plugin_available (VfsMode.XATTR)) {
+                return VfsMode.XATTR;
+            }
 
-        //      return VfsMode.OFF;
-        //  }
+            return VfsMode.OFF;
+        }
     }
 
 

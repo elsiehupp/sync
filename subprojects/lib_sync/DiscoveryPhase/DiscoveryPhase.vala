@@ -140,14 +140,14 @@ public class DiscoveryPhase { //: GLib.Object {
     Must return a sorted list
     ***********************************************************/
     public GLib.List<string> selective_sync_block_list {
-        //  private get {
-        //      this.selective_sync_block_list.sort (GLib.strcmp);
-        //      return this.selective_sync_block_list;
-        //  }
-        //  public set {
-        //      value.sort (GLib.strcmp);
-        //      this.selective_sync_block_list = value;
-        //  }
+        private get {
+            this.selective_sync_block_list.sort (GLib.strcmp);
+            return this.selective_sync_block_list;
+        }
+        public set {
+            value.sort (GLib.strcmp);
+            this.selective_sync_block_list = value;
+        }
     }
 
 
@@ -155,14 +155,14 @@ public class DiscoveryPhase { //: GLib.Object {
     Must return a sorted list
     ***********************************************************/
     public GLib.List<string> selective_sync_allow_list {
-        //  private get {
-        //      this.selective_sync_allow_list.sort (GLib.strcmp);
-        //      return this.selective_sync_allow_list;
-        //  }
-        //  public set {
-        //      value.sort (GLib.strcmp);
-        //      this.selective_sync_allow_list = value;
-        //  }
+        private get {
+            this.selective_sync_allow_list.sort (GLib.strcmp);
+            return this.selective_sync_allow_list;
+        }
+        public set {
+            value.sort (GLib.strcmp);
+            this.selective_sync_allow_list = value;
+        }
     }
 
 

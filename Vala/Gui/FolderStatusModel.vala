@@ -173,9 +173,9 @@ public class FolderStatusModel { //: GLib.AbstractItemModel {
     /***********************************************************
     ***********************************************************/
     public AccountState account_state {
-        //  private get {
-        //      return this.account_state;
-        //  }
+        private get {
+            return this.account_state;
+        }
         //  public set {
         //      begin_reset_model ();
         //      this.dirty = false;
@@ -799,9 +799,9 @@ public class FolderStatusModel { //: GLib.AbstractItemModel {
     If the selective sync check boxes were changed
     ***********************************************************/
     public bool is_dirty {
-        //  public get {
-        //      return this.dirty;
-        //  }
+        public get {
+            return this.dirty;
+        }
     }
 
 

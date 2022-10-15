@@ -1419,10 +1419,10 @@ public class SyncEngine { //: GLib.Object {
     Check if we are allowed to propagate everything, and if we
     are not, adjust the instructions to recover
     ***********************************************************/
-    private void check_for_permission (GLib.List<SyncFileItem> sync_items);
+    //  private void check_for_permission (GLib.List<SyncFileItem> sync_items);
 
 
-    private Common.RemotePermissions get_permissions (string file);
+    //  private Common.RemotePermissions get_permissions (string file);
 
 
     /***********************************************************

@@ -17,34 +17,38 @@ public class ElidedLabel { //: Gtk.Label {
     /***********************************************************
     ***********************************************************/
     string text {
-        //  public get {
-        //      return this.text;
-        //  }
-        //  public set {
-        //      this.text = value;
-        //      Gtk.Label.on_signal_text (this.text);
-        //      update ();
-        //  }
+        public get {
+            return this.text;
+        }
+        public set {
+            this.text = value;
+            Gtk.Label.on_signal_text (this.text);
+            update ();
+        }
     }
 
 
     GLib.TextElideMode elide_mode {
-        //  public get {
-        //      return this.elide_mode;
-        //  }
-        //  public set {
-        //      this.elide_mode = value;
-        //      update ();
-        //  }
+        public get {
+            return this.elide_mode;
+        }
+        public set {
+            this.elide_mode = value;
+            update ();
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public ElidedLabel (string text = "", GLib.TextElideMode elide_mode = GLib.ElideNone, Gtk.Widget parent) {
-        //  base (text, parent);
-        //  this.elide_mode = elide_mode;
-        //  this.text = text;
+    public ElidedLabel (
+        string text = "",
+        GLib.TextElideMode elide_mode = GLib.ElideNone,
+        Gtk.Widget parent
+    ) {
+        base (text, parent);
+        this.elide_mode = elide_mode;
+        this.text = text;
     }
 
 

@@ -129,9 +129,9 @@ public class PUTFileJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public GLib.TimeSpan microseconds_since_start {
-        //  public get {
-        //      return GLib.TimeSpan (this.request_timer.elapsed ());
-        //  }
+        public get {
+            return GLib.TimeSpan (this.request_timer.elapsed ());
+        }
     }
 
 } // class PUTFileJob

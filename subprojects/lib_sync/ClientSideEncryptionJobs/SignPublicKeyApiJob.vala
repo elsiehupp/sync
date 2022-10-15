@@ -27,14 +27,14 @@ public class SignPublicKeyApiJob : AbstractNetworkJob {
     This function needs to be called before start () obviously.
     ***********************************************************/
     public Soup.Buffer csr {
-        //  internal get {
-        //      return this.csr;
-        //  }
-        //  public set {
-        //      string data = "csr=";
-        //      data += GLib.Uri.to_percent_encoding (value);
-        //      this.csr.data = data;
-        //  }
+        internal get {
+            return this.csr;
+        }
+        public set {
+            string data = "csr=";
+            data += GLib.Uri.to_percent_encoding (value);
+            this.csr.data = data;
+        }
     }
 
 

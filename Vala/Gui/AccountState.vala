@@ -104,29 +104,29 @@ public class AccountState { //: GLib.Object /*, GLib.SharedData*/ {
     private ConnectionValidator connection_validator;
 
     string notifications_etag_response_header {
-        //  /***********************************************************
-        //  Returns the ETag Response header from the last Notifications
-        //  API request with status_code 200.
-        //  ***********************************************************/
-        //  public get;
-        //  /***********************************************************
-        //  Saves the ETag Response header from the last Notifications
-        //  API request with status_code 200.
-        //  ***********************************************************/
-        //  public set;
+        /***********************************************************
+        Returns the ETag Response header from the last Notifications
+        API request with status_code 200.
+        ***********************************************************/
+        public get;
+        /***********************************************************
+        Saves the ETag Response header from the last Notifications
+        API request with status_code 200.
+        ***********************************************************/
+        public set;
     }
 
     string navigation_apps_etag_response_header {
-        //  /***********************************************************
-        //  Saves the ETag Response header from the last Navigation Apps
-        //  API request with status_code 200.
-        //  ***********************************************************/
-        //  public get;
-        //  /***********************************************************
-        //  Returns the ETag Response header from the last Navigation
-        //  Apps API request with status_code 200.
-        //  ***********************************************************/
-        //  public set;
+        /***********************************************************
+        Saves the ETag Response header from the last Navigation Apps
+        API request with status_code 200.
+        ***********************************************************/
+        public get;
+        /***********************************************************
+        Returns the ETag Response header from the last Navigation
+        Apps API request with status_code 200.
+        ***********************************************************/
+        public set;
     }
 
     /***********************************************************
@@ -153,26 +153,26 @@ public class AccountState { //: GLib.Object /*, GLib.SharedData*/ {
     public GLib.List<AccountApp> app_list { public get; private set; }
 
     public bool are_desktop_notifications_allowed {
-        //  /***********************************************************
-        //  Returns the notifications status retrieved by the
-        //  notificatons endpoint
-        //  https://github.com/nextcloud/desktop/issues/2318#issuecomment-680698429
-        //  ***********************************************************/
-        //  public get {
-        //      return this.are_desktop_notifications_allowed;
-        //  }
-        //  /***********************************************************
-        //  Set desktop notifications status retrieved by the
-        //  notificatons endpoint
-        //  ***********************************************************/
-        //  public set {
-        //      if (this.are_desktop_notifications_allowed == value) {
-        //          return;
-        //      }
+        /***********************************************************
+        Returns the notifications status retrieved by the
+        notificatons endpoint
+        https://github.com/nextcloud/desktop/issues/2318#issuecomment-680698429
+        ***********************************************************/
+        public get {
+            return this.are_desktop_notifications_allowed;
+        }
+        /***********************************************************
+        Set desktop notifications status retrieved by the
+        notificatons endpoint
+        ***********************************************************/
+        public set {
+            if (this.are_desktop_notifications_allowed == value) {
+                return;
+            }
 
-        //      this.are_desktop_notifications_allowed = value;
-        //      signal_desktop_notifications_allowed_changed ();
-        //  }
+            this.are_desktop_notifications_allowed = value;
+            signal_desktop_notifications_allowed_changed ();
+        }
     }
 
 
@@ -268,9 +268,9 @@ public class AccountState { //: GLib.Object /*, GLib.SharedData*/ {
     /***********************************************************
     ***********************************************************/
     public bool is_signed_out {
-        //  public get {
-        //      return this.state == State.SIGNED_OUT;
-        //  }
+        public get {
+            return this.state == State.SIGNED_OUT;
+        }
     }
 
 
@@ -330,9 +330,9 @@ public class AccountState { //: GLib.Object /*, GLib.SharedData*/ {
     /***********************************************************
     ***********************************************************/
     public bool is_connected {
-        //  public get {
-        //      return this.state == State.CONNECTED;
-        //  }
+        public get {
+            return this.state == State.CONNECTED;
+        }
     }
 
 

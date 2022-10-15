@@ -27,14 +27,14 @@ public class StorePrivateKeyApiJob : AbstractNetworkJob {
     This function needs to be called before start () obviously.
     ***********************************************************/
     public Soup.Buffer private_key {
-        //  internal get {
-        //      return this.private_key;
-        //  }
-        //  public set {
-        //      string data = "private_key=";
-        //      data += GLib.Uri.to_percent_encoding (value);
-        //      this.private_key.data = data;
-        //  }
+        internal get {
+            return this.private_key;
+        }
+        public set {
+            string data = "private_key=";
+            data += GLib.Uri.to_percent_encoding (value);
+            this.private_key.data = data;
+        }
     }
 
 

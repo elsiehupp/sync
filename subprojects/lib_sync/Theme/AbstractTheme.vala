@@ -368,36 +368,36 @@ public class Theme { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static Gtk.IconInfo folder_disabled_icon {
-        //  public get {
-        //      return theme_icon ("state-pause");
-        //  }
+        public get {
+            return theme_icon ("state-pause");
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public static Gtk.IconInfo folder_offline_icon {
-        //  public get {
-        //      return theme_icon ("state-offline", false);
-        //  }
+        public get {
+            return theme_icon ("state-offline", false);
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public static Gtk.IconInfo folder_offline_icon_for_tray {
-        //  public get {
-        //      return theme_icon ("state-offline", true);
-        //  }
+        public get {
+            return theme_icon ("state-offline", true);
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public static Gtk.IconInfo application_icon {
-        //  public get {
-        //      return theme_icon (APPLICATION_ICON_NAME + "-icon");
-        //  }
+        public get {
+            return theme_icon (APPLICATION_ICON_NAME + "-icon");
+        }
     }
 
 
@@ -445,9 +445,9 @@ public class Theme { //: GLib.Object {
     The Add-Button is removed accordingly.
     ***********************************************************/
     public static bool single_sync_folder {
-        //  public get {
-        //      return false;
-        //  }
+        public get {
+            return false;
+        }
     }
 
 
@@ -455,9 +455,9 @@ public class Theme { //: GLib.Object {
     When true, client works with multiple accounts.
     ***********************************************************/
     public static bool multi_account {
-        //  public get {
-        //      return true;
-        //  }
+        public get {
+            return true;
+        }
     }
 
 
@@ -473,9 +473,9 @@ public class Theme { //: GLib.Object {
     Defaults to Nextclouds client documentation website.
     ***********************************************************/
     public static string help_url {
-        //  public get {
-        //      return Common.Config.APPLICATION_HELP_URL;
-        //  }
+        public get {
+            return Common.Config.APPLICATION_HELP_URL;
+        }
     }
 
 
@@ -490,16 +490,16 @@ public class Theme { //: GLib.Object {
     is empty, this function will also return the empty string.
     ***********************************************************/
     public static string conflict_help_url {
-        //  public get {
-        //      var base_url = help_url;
-        //      if (base_url == "") {
-        //          return "";
-        //      }
-        //      if (!base_url.has_suffix ("/")) {
-        //          base_url += "/";
-        //      }
-        //      return base_url + "conflicts.html";
-        //  }
+        public get {
+            var base_url = help_url;
+            if (base_url == "") {
+                return "";
+            }
+            if (!base_url.has_suffix ("/")) {
+                base_url += "/";
+            }
+            return base_url + "conflicts.html";
+        }
     }
 
 
@@ -510,9 +510,9 @@ public class Theme { //: GLib.Object {
     force_override_server_url is true
     ***********************************************************/
     public static string override_server_url {
-        //  public get {
-        //      return Common.Config.APPLICATION_SERVER_URL;
-        //  }
+        public get {
+            return Common.Config.APPLICATION_SERVER_URL;
+        }
     }
 
 
@@ -522,9 +522,9 @@ public class Theme { //: GLib.Object {
     When true, the respective UI controls will be disabled
     ***********************************************************/
     public static bool force_override_server_url {
-        //  public get {
-        //      return Common.Config.APPLICATION_SERVER_URL_ENFORCE;
-        //  }
+        public get {
+            return Common.Config.APPLICATION_SERVER_URL_ENFORCE;
+        }
     }
 
 
@@ -535,9 +535,9 @@ public class Theme { //: GLib.Object {
     Status Protocol response
     ***********************************************************/
     public static bool enable_stapling_ocsp {
-        //  public get {
-        //      return Common.Config.APPLICATION_OCSP_STAPLING_ENABLED;
-        //  }
+        public get {
+            return Common.Config.APPLICATION_OCSP_STAPLING_ENABLED;
+        }
     }
 
 
@@ -547,9 +547,9 @@ public class Theme { //: GLib.Object {
     When true, trusting the untrusted certificate is not allowed
     ***********************************************************/
     public static bool forbid_bad_ssl {
-        //  public get {
-        //      return Common.Config.APPLICATION_FORBID_BAD_SSL;
-        //  }
+        public get {
+            return Common.Config.APPLICATION_FORBID_BAD_SSL;
+        }
     }
 
 
@@ -560,9 +560,9 @@ public class Theme { //: GLib.Object {
     this should be left empty.
     ***********************************************************/
     public static string force_config_auth_type {
-        //  public get {
-        //      return "";
-        //  }
+        public get {
+            return "";
+        }
     }
 
 
@@ -571,9 +571,9 @@ public class Theme { //: GLib.Object {
     time.
     ***********************************************************/
     public static string default_server_folder {
-        //  public get {
-        //      return "/";
-        //  }
+        public get {
+            return "/";
+        }
     }
 
 
@@ -582,9 +582,9 @@ public class Theme { //: GLib.Object {
     setup time.
     ***********************************************************/
     public static string default_client_folder {
-        //  public get {
-        //      return app_name;
-        //  }
+        public get {
+            return app_name;
+        }
     }
 
 
@@ -592,9 +592,9 @@ public class Theme { //: GLib.Object {
     Override to encforce a particular locale, i.e. "de" or "pt_BR"
     ***********************************************************/
     public static string enforced_locale {
-        //  public get {
-        //      return "";
-        //  }
+        public get {
+            return "";
+        }
     }
 
 
@@ -654,9 +654,9 @@ public class Theme { //: GLib.Object {
     @return color for the setup wizard
     ***********************************************************/
     public static Gdk.RGBA wizard_header_title_color {
-        //  public get {
-        //      return Gdk.RGBA (APPLICATION_WIZARD_HEADER_TITLE_COLOR);
-        //  }
+        public get {
+            return Gdk.RGBA (APPLICATION_WIZARD_HEADER_TITLE_COLOR);
+        }
     }
 
 
@@ -664,35 +664,35 @@ public class Theme { //: GLib.Object {
     @return color for the setup wizard.
     ***********************************************************/
     public static Gdk.RGBA wizard_header_background_color {
-        //  public get {
-        //      return Gdk.RGBA (APPLICATION_WIZARD_HEADER_BACKGROUND_COLOR);
-        //  }
+        public get {
+            return Gdk.RGBA (APPLICATION_WIZARD_HEADER_BACKGROUND_COLOR);
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public static Gdk.Pixbuf wizard_application_logo {
-        //  public get {
-        //      if (!Theme.is_branded) {
-        //          return new Gdk.Pixbuf (Theme.hidpi_filename (Theme.THEME_PREFIX + "colored/wizard-nextcloud.png"));
-        //      }
-        //  // #ifdef APPLICATION_WIZARD_USE_CUSTOM_LOGO
-        //      string logo_base_path = Theme.THEME_PREFIX + "colored/wizard_logo";
-        //      if (should_prefer_svg) {
-        //          var max_height = Theme.is_hidpi () ? 200 : 100;
-        //          var max_width = 2 * max_height;
-        //          var icon = new Gtk.IconInfo (logo_base_path + ".svg");
-        //          var size = icon.actual_size (Gdk.Rectangle (max_width, max_height));
-        //          return icon.pixmap (size);
-        //      } else {
-        //          return new Gdk.Pixbuf (hidpi_filename (logo_base_path + ".png"));
-        //      }
-        //  // #else
-        //      var size = Theme.is_hidpi () ? 200 : 100;
-        //      return application_icon.pixmap (size);
-        //  // #endif
-        //  }
+        public get {
+            if (!Theme.is_branded) {
+                return new Gdk.Pixbuf (Theme.hidpi_filename (Theme.THEME_PREFIX + "colored/wizard-nextcloud.png"));
+            }
+        // #ifdef APPLICATION_WIZARD_USE_CUSTOM_LOGO
+            string logo_base_path = Theme.THEME_PREFIX + "colored/wizard_logo";
+            if (should_prefer_svg) {
+                var max_height = Theme.is_hidpi () ? 200 : 100;
+                var max_width = 2 * max_height;
+                var icon = new Gtk.IconInfo (logo_base_path + ".svg");
+                var size = icon.actual_size (Gdk.Rectangle (max_width, max_height));
+                return icon.pixmap (size);
+            } else {
+                return new Gdk.Pixbuf (hidpi_filename (logo_base_path + ".png"));
+            }
+        // #else
+            var size = Theme.is_hidpi () ? 200 : 100;
+            return application_icon.pixmap (size);
+        // #endif
+        }
     }
 
 
@@ -700,22 +700,22 @@ public class Theme { //: GLib.Object {
     @return logo for the setup wizard.
     ***********************************************************/
     public static Gdk.Pixbuf wizard_header_logo {
-        //  public get {
-        //  // #ifdef APPLICATION_WIZARD_USE_CUSTOM_LOGO
-        //      string logo_base_path = Theme.THEME_PREFIX + "colored/wizard_logo";
-        //      if (should_prefer_svg) {
-        //          var max_height = 64;
-        //          var max_width = 2 * max_height;
-        //          var icon = new Gtk.IconInfo (logo_base_path + ".svg");
-        //          var size = icon.actual_size (Gdk.Rectangle (max_width, max_height));
-        //          return icon.pixmap (size);
-        //      } else {
-        //          return new Gdk.Pixbuf (hidpi_filename (logo_base_path + ".png"));
-        //      }
-        //  // #else
-        //      return application_icon.pixmap (64);
-        //  // #endif
-        //  }
+        public get {
+        // #ifdef APPLICATION_WIZARD_USE_CUSTOM_LOGO
+            string logo_base_path = Theme.THEME_PREFIX + "colored/wizard_logo";
+            if (should_prefer_svg) {
+                var max_height = 64;
+                var max_width = 2 * max_height;
+                var icon = new Gtk.IconInfo (logo_base_path + ".svg");
+                var size = icon.actual_size (Gdk.Rectangle (max_width, max_height));
+                return icon.pixmap (size);
+            } else {
+                return new Gdk.Pixbuf (hidpi_filename (logo_base_path + ".png"));
+            }
+        // #else
+            return application_icon.pixmap (64);
+        // #endif
+        }
     }
 
 
@@ -727,26 +727,26 @@ public class Theme { //: GLib.Object {
     @return banner for the setup wizard.
     ***********************************************************/
     public static Gdk.Pixbuf wizard_header_banner {
-        //  public get {
-        //      Gdk.RGBA c = wizard_header_background_color;
-        //      if (!c.is_valid) {
-        //          return new Gdk.Pixbuf ();
-        //      }
+        public get {
+            Gdk.RGBA c = wizard_header_background_color;
+            if (!c.is_valid) {
+                return new Gdk.Pixbuf ();
+            }
 
-        //      Gdk.Rectangle size = Gdk.Rectangle (750, 78);
-        //      var monitor = Gdk.Display.get_default ().get_default_screen ().get_primary_monitor ();
-        //      if (monitor) {
-        //          // Adjust the the size if there is a different DPI. (Issue #6156)
-        //          // Indeed, this size need to be big enough to for the banner height, and the wizard's width
-        //          var ratio = monitor.logical_dots_per_inch () / 96.0;
-        //          if (ratio > 1.0) {
-        //              size *= ratio;
-        //          }
-        //      }
-        //      Gdk.Pixbuf pix = new Gdk.Pixbuf (size);
-        //      pix.fill (wizard_header_background_color);
-        //      return pix;
-        //  }
+            Gdk.Rectangle size = Gdk.Rectangle (750, 78);
+            var monitor = Gdk.Display.get_default ().get_default_screen ().get_primary_monitor ();
+            if (monitor) {
+                // Adjust the the size if there is a different DPI. (Issue #6156)
+                // Indeed, this size need to be big enough to for the banner height, and the wizard's width
+                var ratio = monitor.logical_dots_per_inch () / 96.0;
+                if (ratio > 1.0) {
+                    size *= ratio;
+                }
+            }
+            Gdk.Pixbuf pix = new Gdk.Pixbuf (size);
+            pix.fill (wizard_header_background_color);
+            return pix;
+        }
     }
 //  #endif
 
@@ -754,24 +754,24 @@ public class Theme { //: GLib.Object {
     The SHA sum of the released git commit
     ***********************************************************/
     public static string git_sha1 {
-        //  public get {
-        //      string dev_string;
-        //  // #ifdef GIT_SHA1
-        //      string github_prefix =
-        //          "https://github.com/nextcloud/desktop/commit/";
-        //      string git_sha1 = GIT_SHA1;
-        //      dev_string = _("nextcloud_theme.about"
-        //                   + "<p><small>Built from Git revision <a href=\"%1\">%2</a>"
-        //                   + " on %3, %4 using Qt %5, %6</small></p>")
-        //                      .printf (github_prefix + git_sha1)
-        //                      .printf (git_sha1.left (6))
-        //                      .printf (__DATE__)
-        //                      .printf (__TIME__)
-        //                      .printf (q_version ())
-        //                      .printf (GLib.SslSocket.ssl_library_version_string ());
-        //  // #endif
-        //      return dev_string;
-        //  }
+        public get {
+            string dev_string;
+        // #ifdef GIT_SHA1
+            string github_prefix =
+                "https://github.com/nextcloud/desktop/commit/";
+            string git_sha1 = GIT_SHA1;
+            dev_string = _("nextcloud_theme.about"
+                         + "<p><small>Built from Git revision <a href=\"%1\">%2</a>"
+                         + " on %3, %4 using Qt %5, %6</small></p>")
+                            .printf (github_prefix + git_sha1)
+                            .printf (git_sha1.left (6))
+                            .printf (__DATE__)
+                            .printf (__TIME__)
+                            .printf (q_version ())
+                            .printf (GLib.SslSocket.ssl_library_version_string ());
+        // #endif
+            return dev_string;
+        }
     }
 
 
@@ -779,28 +779,28 @@ public class Theme { //: GLib.Object {
     About dialog contents
     ***********************************************************/
     public static string about {
-        //  public get {
-        //      //  return MIRALL_VERSION_STRING;
-        //      // Shorten Qt's OS name: "macOS Mojave (10.14)" . "macOS"
-        //      GLib.List<string> os_string_list = Utility.platform_name ().split (' ');
-        //      string os_name = os_string_list.at (0);
+        public get {
+            //  return MIRALL_VERSION_STRING;
+            // Shorten Qt's OS name: "macOS Mojave (10.14)" . "macOS"
+            GLib.List<string> os_string_list = Utility.platform_name ().split (' ');
+            string os_name = os_string_list.at (0);
 
-        //      string dev_string;
-        //      // : Example text: "<p>Nextcloud Desktop Client</p>"   (%1 is the application name)
-        //      dev_string = _("<p>%1 Desktop Client</p>")
-        //              .printf (Common.Config.APPLICATION_NAME);
+            string dev_string;
+            // : Example text: "<p>Nextcloud Desktop Client</p>"   (%1 is the application name)
+            dev_string = _("<p>%1 Desktop Client</p>")
+                    .printf (Common.Config.APPLICATION_NAME);
 
-        //      dev_string += _("<p>Version %1. For more information please click <a href='%2'>here</a>.</p>")
-        //              .printf (Common.NextcloudVersion.MIRALL_VERSION + " (%1)".printf (os_name))
-        //              .printf (help_url);
+            dev_string += _("<p>Version %1. For more information please click <a href='%2'>here</a>.</p>")
+                    .printf (Common.NextcloudVersion.MIRALL_VERSION + " (%1)".printf (os_name))
+                    .printf (help_url);
 
-        //      dev_string += _("<p><small>Using files plugin : %1</small></p>")
-        //                      .printf (Common.AbstractVfs.Mode.to_string (this.best_available_vfs_mode));
-        //      dev_string += "<br>%1"
-        //              .printf (GLib.SysInfo.product_type () % '-' % GLib.SysInfo.kernel_version ());
+            dev_string += _("<p><small>Using files plugin : %1</small></p>")
+                            .printf (Common.AbstractVfs.Mode.to_string (this.best_available_vfs_mode));
+            dev_string += "<br>%1"
+                    .printf (GLib.SysInfo.product_type () % '-' % GLib.SysInfo.kernel_version ());
 
-        //      return dev_string;
-        //  }
+            return dev_string;
+        }
     }
 
 
@@ -808,32 +808,30 @@ public class Theme { //: GLib.Object {
     Legal notice dialog version detail contents
     ***********************************************************/
     public static string about_details {
-        //  public get {
-        //      string dev_string;
-        //      dev_string = _("<p>Version %1. For more information please click <a href='%2'>here</a>.</p>")
-        //              .printf (Common.NextcloudVersion.MIRALL_VERSION_STRING)
-        //              .printf (help_url);
+        public get {
+            string dev_string;
+            dev_string = _("<p>Version %1. For more information please click <a href='%2'>here</a>.</p>")
+                    .printf (Common.NextcloudVersion.MIRALL_VERSION_STRING)
+                    .printf (help_url);
 
-        //      dev_string += _("<p>This release was supplied by %1</p>")
-        //              .printf (Common.Config.APPLICATION_VENDOR);
+            dev_string += _("<p>This release was supplied by %1</p>")
+                    .printf (Common.Config.APPLICATION_VENDOR);
 
-        //      dev_string += git_sha1;
+            dev_string += git_sha1;
 
-        //      return dev_string;
-        //  }
+            return dev_string;
+        }
     }
-
-
 
 
     /***********************************************************
     Check if mono icons are available
     ***********************************************************/
     public static bool mono_icons_available {
-        //  public get {
-        //      string theme_dir = Theme.THEME_PREFIX + "%1/".printf (Theme.systray_icon_flavor (true));
-        //      return new GLib.Dir (theme_dir).exists ();
-        //  }
+        public get {
+            string theme_dir = Theme.THEME_PREFIX + "%1/".printf (Theme.systray_icon_flavor (true));
+            return new GLib.Dir (theme_dir).exists ();
+        }
     }
 
 
@@ -841,9 +839,9 @@ public class Theme { //: GLib.Object {
     @brief Where to check for new Updates.
     ***********************************************************/
     public static string update_check_url {
-        //  public get {
-        //      return Common.Config.APPLICATION_UPDATE_URL;
-        //  }
+        public get {
+            return Common.Config.APPLICATION_UPDATE_URL;
+        }
     }
 
 
@@ -852,9 +850,9 @@ public class Theme { //: GLib.Object {
     dialog by default and default to nothing selected
     ***********************************************************/
     public static bool wizard_selective_sync_default_nothing {
-        //  public get {
-        //      return false;
-        //  }
+        public get {
+            return false;
+        }
     }
 
 
@@ -865,10 +863,10 @@ public class Theme { //: GLib.Object {
     every folder.
     ***********************************************************/
     public static int64 new_big_folder_size_limit {
-        //  public get {
-        //      // Default to 500MB
-        //      return 500;
-        //  }
+        public get {
+            // Default to 500MB
+            return 500;
+        }
     }
 
 
@@ -877,9 +875,9 @@ public class Theme { //: GLib.Object {
     synchronizing folders larger than X MB" in the account wizard
     ***********************************************************/
     public static bool wizard_hide_folder_size_limit_checkbox {
-        //  public get {
-        //      return false;
-        //  }
+        public get {
+            return false;
+        }
     }
 
 
@@ -888,9 +886,9 @@ public class Theme { //: GLib.Object {
     synchronizing external storages" in the account wizard
     ***********************************************************/
     public static bool wizard_hide_external_storage_confirmation_checkbox {
-        //  public get {
-        //      return false;
-        //  }
+        public get {
+            return false;
+        }
     }
 
 
@@ -900,18 +898,18 @@ public class Theme { //: GLib.Object {
     Allow link sharing and or user/group sharing
     ***********************************************************/
     public static bool link_sharing {
-        //  public get {
-        //      return true;
-        //  }
+        public get {
+            return true;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public static bool user_group_sharing {
-        //  public get {
-        //      return true;
-        //  }
+        public get {
+            return true;
+        }
     }
 
 
@@ -923,9 +921,9 @@ public class Theme { //: GLib.Object {
     Default returns false.
     ***********************************************************/
     public static bool force_system_network_proxy {
-        //  public get {
-        //      return false;
-        //  }
+        public get {
+            return false;
+        }
     }
 
 
@@ -949,9 +947,9 @@ public class Theme { //: GLib.Object {
     @return UserIdentifierType.USER_NAME, unless reimplemented
     ***********************************************************/
     public static UserIdentifierType user_identifier_type {
-        //  public get {
-        //      return UserIdentifierType.USER_NAME;
-        //  }
+        public get {
+            return UserIdentifierType.USER_NAME;
+        }
     }
 
 
@@ -966,9 +964,9 @@ public class Theme { //: GLib.Object {
     @return An empty string, unless reimplemented
     ***********************************************************/
     public static string custom_user_id {
-        //  public get {
-        //      return "";
-        //  }
+        public get {
+            return "";
+        }
     }
 
 
@@ -979,9 +977,9 @@ public class Theme { //: GLib.Object {
     @return An empty string, unless reimplemented
     ***********************************************************/
     public static string user_id_hint {
-        //  public get {
-        //      return "";
-        //  }
+        public get {
+            return "";
+        }
     }
 
 
@@ -992,9 +990,9 @@ public class Theme { //: GLib.Object {
     @return An empty string, unless reimplemented
     ***********************************************************/
     public static string wizard_url_postfix {
-        //  public get {
-        //      return "";
-        //  }
+        public get {
+            return "";
+        }
     }
 
 
@@ -1005,9 +1003,9 @@ public class Theme { //: GLib.Object {
     @return An empty string, unless reimplemented
     ***********************************************************/
     public static string wizard_url_hint {
-        //  public get {
-        //      return "";
-        //  }
+        public get {
+            return "";
+        }
     }
 
 
@@ -1023,9 +1021,9 @@ public class Theme { //: GLib.Object {
     Default: "/"
     ***********************************************************/
     public static string quota_base_folder {
-        //  public get {
-        //      return "/";
-        //  }
+        public get {
+            return "/";
+        }
     }
 
 
@@ -1035,18 +1033,18 @@ public class Theme { //: GLib.Object {
     un-branded owncloud servers.
     ***********************************************************/
     public static string oauth_client_id {
-        //  public get {
-        //      return "xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69";
-        //  }
+        public get {
+            return "xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69";
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public static string oauth_client_secret {
-        //  public get {
-        //      return "UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh";
-        //  }
+        public get {
+            return "UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh";
+        }
     }
 
 
@@ -1058,22 +1056,22 @@ public class Theme { //: GLib.Object {
     the GIT SHA1 and some important dependency versions.
     ***********************************************************/
     public static string version_switch_output {
-        //  public get {
-        //      string help_text;
-        //      help_text += app_name + " version " + version + "\n";
-        //  // #ifdef GIT_SHA1
-        //      help_text += "Git revision " + GIT_SHA1 + "\n";
-        //  // #endif
-        //      //  help_text += "Using Qt " + q_version () + ", built against Qt " + GLib.T_VERSION_STR + "\n";
+        public get {
+            string help_text;
+            help_text += app_name + " version " + version + "\n";
+        // #ifdef GIT_SHA1
+            help_text += "Git revision " + GIT_SHA1 + "\n";
+        // #endif
+            //  help_text += "Using Qt " + q_version () + ", built against Qt " + GLib.T_VERSION_STR + "\n";
 
-        //      if (!GLib.Application.platform_name () == "") {
-        //          help_text += "Using Qt platform plugin '" + GLib.Application.platform_name () + "'\n";
-        //      }
+            if (!GLib.Application.platform_name () == "") {
+                help_text += "Using Qt platform plugin '" + GLib.Application.platform_name () + "'\n";
+            }
 
-        //      help_text += "Using '" + GLib.SslSocket.ssl_library_version_string () + "'\n";
-        //      help_text += "Running on " + Utility.platform_name () + ", " + GLib.SysInfo.current_cpu_architecture () + "\n";
-        //      return help_text;
-        //  }
+            help_text += "Using '" + GLib.SslSocket.ssl_library_version_string () + "'\n";
+            help_text += "Running on " + Utility.platform_name () + ", " + GLib.SysInfo.current_cpu_architecture () + "\n";
+            return help_text;
+        }
     }
 	
 	/***********************************************************
@@ -1084,7 +1082,10 @@ public class Theme { //: GLib.Object {
     implementation for the client UI
     (actually 2019/09/13 only systray theming).
     ***********************************************************/
-    public static Gtk.IconInfo ui_theme_icon (string icon_name, bool ui_has_dark_background) {
+    public static Gtk.IconInfo ui_theme_icon (
+        string icon_name,
+        bool ui_has_dark_background
+    ) {
         //  string icon_path = Theme.THEME_PREFIX + (ui_has_dark_background ? "white/": "black/") + icon_name;
         //  string icn_path = icon_path.to_utf8 ().const_data ();
         //  return new Gtk.IconInfo (Gdk.Pixbuf (icon_path));
@@ -1228,18 +1229,18 @@ public class Theme { //: GLib.Object {
     options are manually enabled in the configuration file.
     ***********************************************************/
     public static bool show_virtual_files_option {
-        //  public get {
-        //      return new ConfigFile ().show_experimental_options () || Theme.best_available_vfs_mode == Common.AbstractVfs.WindowsCfApi;
-        //  }
+        public get {
+            return new ConfigFile ().show_experimental_options () || Theme.best_available_vfs_mode == Common.AbstractVfs.WindowsCfApi;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public static bool enforce_virtual_files_sync_folder {
-        //  public get {
-        //      return ENFORCE_VIRTUAL_FILES_SYNC_FOLDER && Theme.best_available_vfs_mode != Common.AbstractVfs.Off;
-        //  }
+        public get {
+            return ENFORCE_VIRTUAL_FILES_SYNC_FOLDER && Theme.best_available_vfs_mode != Common.AbstractVfs.Off;
+        }
     }
 
 
@@ -1247,9 +1248,9 @@ public class Theme { //: GLib.Object {
     @return color for the ErrorBox text.
     ***********************************************************/
     public static Gdk.RGBA error_box_text_color {
-        //  public get {
-        //      return Gdk.RGBA ("white");
-        //  }
+        public get {
+            return Gdk.RGBA ("white");
+        }
     }
 
 
@@ -1257,9 +1258,9 @@ public class Theme { //: GLib.Object {
     @return color for the ErrorBox background.
     ***********************************************************/
     public static Gdk.RGBA error_box_background_color {
-        //  public get {
-        //      return Gdk.RGBA ("red");
-        //  }
+        public get {
+            return Gdk.RGBA ("red");
+        }
     }
 
 
@@ -1267,9 +1268,9 @@ public class Theme { //: GLib.Object {
     @return color for the ErrorBox border.
     ***********************************************************/
     public static Gdk.RGBA error_box_border_color {
-        //  public get {
-        //      return Gdk.RGBA ("black");
-        //  }
+        public get {
+            return Gdk.RGBA ("black");
+        }
     }
 
 
@@ -1396,9 +1397,9 @@ public class Theme { //: GLib.Object {
 
 
     private static bool should_prefer_svg {
-        //  public get {
-        //      return Common.Config.APPLICATION_ICON_SET.to_upper () == "SVG";
-        //  }
+        public get {
+            return Common.Config.APPLICATION_ICON_SET.to_upper () == "SVG";
+        }
     }
 
 } // class Theme

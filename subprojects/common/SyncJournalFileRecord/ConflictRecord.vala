@@ -61,9 +61,9 @@ public class ConflictRecord { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool is_valid {
-        //  public get {
-        //      return path != "";
-        //  }
+        public get {
+            return path != "";
+        }
     }
 
 } // class ConflictRecord

@@ -15,35 +15,35 @@ public class GETFileJob : AbstractNetworkJob {
     GLib.OutputStream device;
     GLib.HashTable<string, string> headers;
     public new string error_string {
-        //  public get {
-        //      if (this.error_string != "") {
-        //          return this.error_string;
-        //      }
-        //      return base.error_string;
-        //  }
-        //  private set {
-        //      this.error_string = value;
-        //  }
+        public get {
+            if (this.error_string != "") {
+                return this.error_string;
+            }
+            return base.error_string;
+        }
+        private set {
+            this.error_string = value;
+        }
     }
 
     string expected_etag_for_resume;
-    int64 expected_content_length {
-        //  public get {
-        //      return -1;
-        //  }
-        //  public set {
-        //      this.expected_content_length = value;
-        //  }
+    public int64 expected_content_length {
+        public get {
+            return -1;
+        }
+        public set {
+            this.expected_content_length = value;
+        }
     }
 
 
     public int64 resume_start {
-        //  public get {
-        //      return -1;
-        //  }
-        //  private set {
-        //      this.resume_start = value;
-        //  }
+        public get {
+            return -1;
+        }
+        private set {
+            this.resume_start = value;
+        }
     }
 
     public SyncFileItem.Status error_status;
@@ -55,12 +55,12 @@ public class GETFileJob : AbstractNetworkJob {
     If this.bandwidth_quota will be used
     ***********************************************************/
     public bool bandwidth_limited {
-        //  public get {
-        //      return this.bandwidth_limited;
-        //  }
+        public get {
+            return this.bandwidth_limited;
+        }
         //  public set {
         //      this.bandwidth_limited = value;
-        //      GLib.Object.invoke_method (this, "on_signal_ready_read", GLib.QueuedConnection);
+        //      this.invoke_method ("on_signal_ready_read", GLib.QueuedConnection);
         //  }
     }
 

@@ -32,23 +32,23 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
     /***********************************************************
     ***********************************************************/
     UserStatus user_status {
-        //  public get {
-        //      return this.user_status;
-        //  }
-        //  public set {
-        //      if (!this.user_status_supported) {
-        //          signal_error (Error.USER_STATUS_NOT_SUPPORTED);
-        //          return;
-        //      }
+        public get {
+            return this.user_status;
+        }
+        public set {
+            if (!this.user_status_supported) {
+                signal_error (Error.USER_STATUS_NOT_SUPPORTED);
+                return;
+            }
 
-        //      if (this.online_status_job || this.message_job) {
-        //          GLib.debug ("Set online status job or set message job are already running.");
-        //          return;
-        //      }
+            if (this.online_status_job || this.message_job) {
+                GLib.debug ("Set online status job or set message job are already running.");
+                return;
+            }
 
-        //      user_status_online_status (value.state);
-        //      user_status_message (value);
-        //  }
+            user_status_online_status (value.state);
+            user_status_message (value);
+        }
     }
 
 

@@ -16,26 +16,26 @@ public class NavigationPaneHelper { //: GLib.Object {
     ***********************************************************/
     private FolderManager folder_man;
     public bool show_in_explorer_navigation_pane {
-        //  public get {
+        public get {
 
-        //  }
-        //  public set {
-        //      if (this.show_in_explorer_navigation_pane == value) {
-        //          return;
-        //      }
+        }
+        public set {
+            if (this.show_in_explorer_navigation_pane == value) {
+                return;
+            }
 
-        //      this.show_in_explorer_navigation_pane = value;
-        //      // Re-generate a new CLSID when enabling, possibly throwing away the old one.
-        //      // update_cloud_storage_registry will take care of removing any unknown CLSID our application owns from the registry.
-        //      foreach (FolderConnection folder_connection in this.folder_man.map ()) {
-        //          folder_connection.navigation_pane_clsid (value ? GLib.Uuid.create_uuid () { //: GLib.Uuid ());
-        //      }
-        //          
-        //      GLib.Timeout.add (
-        //          500,
-        //          this.on_signal_update_cloud_storage_registry_timer_timeout
-        //      );
-        //  }
+            this.show_in_explorer_navigation_pane = value;
+            // Re-generate a new CLSID when enabling, possibly throwing away the old one.
+            // update_cloud_storage_registry will take care of removing any unknown CLSID our application owns from the registry.
+            foreach (FolderConnection folder_connection in this.folder_man.map ()) {
+                folder_connection.navigation_pane_clsid (value ? GLib.Uuid.create_uuid () { //: GLib.Uuid ());
+            }
+                
+            GLib.Timeout.add (
+                500,
+                this.on_signal_update_cloud_storage_registry_timer_timeout
+            );
+        }
     }
 
     /***********************************************************

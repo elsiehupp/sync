@@ -199,7 +199,7 @@ public class IgnoreListTableWidget { //: Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private void setup_table_read_only_items ();
+    //  private void setup_table_read_only_items ();
 
 } // class IgnoreListTableWidget
 

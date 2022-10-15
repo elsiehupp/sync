@@ -47,21 +47,21 @@ public class OwncloudWizard { //: GLib.Wizard {
     GLib.List<string> setup_log;
 
     public string oc_url {
-        //  public get {
-        //      return field ("OcsUrl").to_string ().simplified ();
-        //  }
-        //  public set {
-        //      this.setup_page.server_url (value);
-        //  }
+        public get {
+            return field ("OcsUrl").to_string ().simplified ();
+        }
+        public set {
+            this.setup_page.server_url (value);
+        }
     }
 
     public bool registration {
-        //  public get {
-        //      return this.registration;
-        //  }
-        //  public set {
-        //      this.registration = value;
-        //  }
+        public get {
+            return this.registration;
+        }
+        public set {
+            this.registration = value;
+        }
     }
 
     //  friend class OwncloudSetupWizard;
@@ -268,12 +268,12 @@ public class OwncloudWizard { //: GLib.Wizard {
     /***********************************************************
     ***********************************************************/
     public AbstractCredentials credentials {
-        //  public get {
-        //      if (this.credentials_page) {
-        //          return this.credentials_page.credentials;
-        //      }
-        //      return null;
-        //  }
+        public get {
+            if (this.credentials_page) {
+                return this.credentials_page.credentials;
+            }
+            return null;
+        }
     }
 
 

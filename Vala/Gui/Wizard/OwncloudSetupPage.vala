@@ -95,9 +95,9 @@ public class OwncloudSetupPage { //: GLib.WizardPage {
     /***********************************************************
     ***********************************************************/
     public bool is_complete {
-        //  public get {
-        //      return this.instance.le_url.text () != "" && !this.checking;
-        //  }
+        public get {
+            return this.instance.le_url.text () != "" && !this.checking;
+        }
     }
 
 
@@ -171,23 +171,23 @@ public class OwncloudSetupPage { //: GLib.WizardPage {
     /***********************************************************
     ***********************************************************/
     public int next_id {
-        //  public get {
-        //      switch (this.auth_type) {
-        //      case DetermineAuthTypeJob.AuthType.BASIC:
-        //          return WizardCommon.Pages.PAGE_HTTP_CREDS;
-        //      case DetermineAuthTypeJob.AuthType.OAUTH:
-        //          return WizardCommon.Pages.PAGE_OAUTH_CREDS;
-        //      case DetermineAuthTypeJob.AuthType.LOGIN_FLOW_V2:
-        //          return WizardCommon.Pages.PAGE_FLOW2AUTH_CREDS;
-        //  //  #ifdef WITH_WEBENGINE
-        //      case DetermineAuthTypeJob.WEB_VIEW_FLOW:
-        //          return WizardCommon.Pages.PAGE_WEB_VIEW;
-        //  //  #endif WITH_WEBENGINE
-        //      case DetermineAuthTypeJob.NO_AUTH_TYPE:
-        //          return WizardCommon.Pages.PAGE_HTTP_CREDS;
-        //      }
-        //      GLib.assert_not_reached ();
-        //  }
+        public get {
+            switch (this.auth_type) {
+            case DetermineAuthTypeJob.AuthType.BASIC:
+                return WizardCommon.Pages.PAGE_HTTP_CREDS;
+            case DetermineAuthTypeJob.AuthType.OAUTH:
+                return WizardCommon.Pages.PAGE_OAUTH_CREDS;
+            case DetermineAuthTypeJob.AuthType.LOGIN_FLOW_V2:
+                return WizardCommon.Pages.PAGE_FLOW2AUTH_CREDS;
+        //  #ifdef WITH_WEBENGINE
+            case DetermineAuthTypeJob.WEB_VIEW_FLOW:
+                return WizardCommon.Pages.PAGE_WEB_VIEW;
+        //  #endif WITH_WEBENGINE
+            case DetermineAuthTypeJob.NO_AUTH_TYPE:
+                return WizardCommon.Pages.PAGE_HTTP_CREDS;
+            }
+            GLib.assert_not_reached ();
+        }
     }
 
 

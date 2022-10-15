@@ -30,9 +30,9 @@ public class RemoteInfo { //: GLib.Object {
     public string direct_download_cookies;
 
     public bool is_valid {
-        //  public get {
-        //      return name != null;
-        //  }
+        public get {
+            return name != null;
+        }
     }
 
 } // class RemoteInfo

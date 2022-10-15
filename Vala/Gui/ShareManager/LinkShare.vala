@@ -17,97 +17,97 @@ public class LinkShare : Share {
     /***********************************************************
     ***********************************************************/
     public string name {
-        //  /***********************************************************
-        //  Returns the name of the link share. Can be empty.
-        //  ***********************************************************/
-        //  public get {
-        //      return this.name;
-        //  }
-        //  /***********************************************************
-        //  Set the name of the link share.
+        /***********************************************************
+        Returns the name of the link share. Can be empty.
+        ***********************************************************/
+        public get {
+            return this.name;
+        }
+        /***********************************************************
+        Set the name of the link share.
 
-        //  Emits either signal_name_set () or on_signal_server_error ().
-        //  ***********************************************************/
-        //  public set {
-        //      create_share_job (LinkShare.on_signal_name_set).name (identifier, value);
-        //  }
+        Emits either signal_name_set () or on_signal_server_error ().
+        ***********************************************************/
+        public set {
+            create_share_job (LinkShare.on_signal_name_set).name (identifier, value);
+        }
     }
 
 
     public string token {
-        //  /***********************************************************
-        //  Returns the token of the link share.
-        //  ***********************************************************/
-        //  public get {
-        //      return this.token;
-        //  }
-        //  private set {
-        //      this.token = value;
-        //  }
+        /***********************************************************
+        Returns the token of the link share.
+        ***********************************************************/
+        public get {
+            return this.token;
+        }
+        private set {
+            this.token = value;
+        }
     }
 
 
     public string note {
-        //  /***********************************************************
-        //  Returns the note of the link share.
-        //  ***********************************************************/
-        //  public get {
-        //      return this.note;
-        //  }
-        //  /***********************************************************
-        //  Set the note of the link share.
-        //  ***********************************************************/
-        //  public set {
-        //      create_share_job (LinkShare.on_signal_link_share_note_set).note (identifier, value);
-        //  }
+        /***********************************************************
+        Returns the note of the link share.
+        ***********************************************************/
+        public get {
+            return this.note;
+        }
+        /***********************************************************
+        Set the note of the link share.
+        ***********************************************************/
+        public set {
+            create_share_job (LinkShare.on_signal_link_share_note_set).note (identifier, value);
+        }
     }
 
 
     public GLib.Date expire_date {
-        //  /***********************************************************
-        //  Get the expiration date
-        //  ***********************************************************/
-        //  public get {
-        //      return this.expire_date;
-        //  }
-        //  /***********************************************************
-        //  Set the expiration date
+        /***********************************************************
+        Get the expiration date
+        ***********************************************************/
+        public get {
+            return this.expire_date;
+        }
+        /***********************************************************
+        Set the expiration date
 
-        //  On on_signal_success the signal_expire_date_set signal is emitted
-        //  In case of a server error the on_signal_server_error signal is emitted.
-        //  ***********************************************************/
-        //  public set {
-        //      create_share_job (LinkShare.on_signal_expire_date_set).expire_date (identifier, value);
-        //  }
+        On on_signal_success the signal_expire_date_set signal is emitted
+        In case of a server error the on_signal_server_error signal is emitted.
+        ***********************************************************/
+        public set {
+            create_share_job (LinkShare.on_signal_expire_date_set).expire_date (identifier, value);
+        }
     }
 
 
     public GLib.Uri share_link {
-        //  /***********************************************************
-        //  Get the share link
-        //  ***********************************************************/
-        //  public get {
-        //      return this.share_link;
-        //  }
-        //  private set {
-        //      this.share_link = value;
-        //  }
+        /***********************************************************
+        Get the share link
+        ***********************************************************/
+        public get {
+            return this.share_link;
+        }
+        private set {
+            this.share_link = value;
+        }
     }
 
 
     public string label {
-        //  /***********************************************************
-        //  Returns the label of the link share.
-        //  ***********************************************************/
-        //  public get {
-        //      return this.label;
-        //  }
-        //  /***********************************************************
-        //  Set the label of the share link.
-        //  ***********************************************************/
-        //  public set {
-        //      create_share_job (LinkShare.on_signal_link_share_label_set).label (identifier, value);
-        //  }
+        /***********************************************************
+        Returns the label of the link share.
+        ***********************************************************/
+        public get {
+            return this.label;
+        }
+        /***********************************************************
+        Set the label of the share link.
+        ***********************************************************/
+        public set {
+            create_share_job (LinkShare.on_signal_link_share_label_set).label (identifier, value);
+        }
     }
 
 

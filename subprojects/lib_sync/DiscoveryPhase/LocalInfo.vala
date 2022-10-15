@@ -18,16 +18,16 @@ public class LocalInfo { //: GLib.Object {
     public time_t modtime = 0;
     public int64 size = 0;
     public uint64 inode = 0;
-    public ItemType type = CSync.ItemType.SKIP;
+    public CSync.ItemType type = CSync.ItemType.SKIP;
     public bool is_directory = false;
     public bool is_hidden = false;
     public bool is_virtual_file = false;
     public bool is_sym_link = false;
 
     public bool is_valid {
-        //  public get {
-        //      return name != null;
-        //  }
+        public get {
+            return name != null;
+        }
     }
 
 } // class LocalInfo

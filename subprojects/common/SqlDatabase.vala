@@ -33,17 +33,17 @@ public class SqliteDatabase { //: GLib.Object {
     Last error string
     ***********************************************************/
     public string error {
-        //      public get {
-        //          unowned string last_error = this.error;
-        //          /***********************************************************
-        //          Was commented out
-        //          ***********************************************************/
-        //          this.error = "";
-        //          return last_error;
-        //      }
-        //      private set {
-        //          error = value;
-        //      }
+        public get {
+            unowned string last_error = this.error;
+            /***********************************************************
+            Was commented out
+            ***********************************************************/
+            this.error = "";
+            return last_error;
+        }
+        private set {
+            error = value;
+        }
     }
 
 
@@ -74,9 +74,9 @@ public class SqliteDatabase { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool is_open {
-        //      public get {
-        //          return this.database != null;
-        //      }
+        public get {
+            return this.database != null;
+        }
     }
 
 

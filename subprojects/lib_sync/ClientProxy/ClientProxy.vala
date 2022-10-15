@@ -33,7 +33,7 @@ public class ClientProxy { //: GLib.Object {
     }
 
 
-    delegate void DestinationDelegate ();
+    public delegate void DestinationDelegate ();
 
 
     /***********************************************************
@@ -75,7 +75,7 @@ public class ClientProxy { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static string proxy_type_to_c_str (Soup.ProxyResolverDefault.ProxyType type) {
+    //  public static string proxy_type_to_c_str (Soup.ProxyResolverDefault.ProxyType type) {
         //  switch (type) {
         //  case Soup.ProxyResolverDefault.NoProxy:
         //      return "NoProxy";
@@ -92,7 +92,7 @@ public class ClientProxy { //: GLib.Object {
         //  default:
         //      return "NoProxy";
         //  }
-    }
+    //  }
 
 
     /***********************************************************

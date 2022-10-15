@@ -40,13 +40,13 @@ public class Account { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public unowned Account shared_this {
-        //  private get {
-        //      return this.shared_this;
-        //  }
-        //  public set {
-        //      this.shared_this = value;
-        //      set_up_user_status_connector ();
-        //  }
+        private get {
+            return this.shared_this;
+        }
+        public set {
+            this.shared_this = value;
+            set_up_user_status_connector ();
+        }
     }
 
     /***********************************************************
@@ -61,35 +61,35 @@ public class Account { //: GLib.Object {
     stored in credentials.user ().
     ***********************************************************/
     public unowned string dav_user {
-        //  public get {
-        //      return this.dav_user == "" && this.credentials != null ? this.credentials.user : this.dav_user;
-        //  }
-        //  public set {
-        //      if (this.dav_user == value) {
-        //          return;
-        //      }
-        //      this.dav_user = value;
-        //      signal_wants_account_saved (this);
-        //  }
+        public get {
+            return this.dav_user == "" && this.credentials != null ? this.credentials.user : this.dav_user;
+        }
+        public set {
+            if (this.dav_user == value) {
+                return;
+            }
+            this.dav_user = value;
+            signal_wants_account_saved (this);
+        }
     }
 
     /***********************************************************
     The name of the account as shown in the toolbar
     ***********************************************************/
     public string display_name {
-        //  public get {
-        //      string dn = "%1@%2".printf (this.credentials.user, this.url.host);
-        //      int port = this.url.port ();
-        //      if (port > 0 && port != 80 && port != 443) {
-        //          dn.append (':');
-        //          dn.append (string.number (port));
-        //      }
-        //      return dn;
-        //  }
-        //  public set {
-        //      this.display_name = value;
-        //      signal_account_changed_display_name ();
-        //  }
+        public get {
+            string dn = "%1@%2".printf (this.credentials.user, this.url.host);
+            int port = this.url.port ();
+            if (port > 0 && port != 80 && port != 443) {
+                dn.append (':');
+                dn.append (string.number (port));
+            }
+            return dn;
+        }
+        public set {
+            this.display_name = value;
+            signal_account_changed_display_name ();
+        }
     }
 
     /***********************************************************
@@ -102,13 +102,13 @@ public class Account { //: GLib.Object {
     ***********************************************************/
 //  #ifndef TOKEN_AUTH_ONLY
     public Gtk.Image avatar {
-        //  public get {
-        //      return this.avatar;
-        //  }
-        //  public set {
-        //      this.avatar = value;
-        //      signal_account_changed_avatar ();
-        //  }
+        public get {
+            return this.avatar;
+        }
+        public set {
+            this.avatar = value;
+            signal_account_changed_avatar ();
+        }
     }
 //  #endif
 
@@ -120,13 +120,13 @@ public class Account { //: GLib.Object {
     Server url of the account
     ***********************************************************/
     public GLib.Uri url {
-        //  public get {
-        //      return this.url;
-        //  }
-        //  public set {
-        //      this.url = value;
-        //      this.user_visible_url = value;
-        //  }
+        public get {
+            return this.url;
+        }
+        public set {
+            this.url = value;
+            this.user_visible_url = value;
+        }
     }
 
     /***********************************************************
@@ -143,13 +143,13 @@ public class Account { //: GLib.Object {
     The certificates of the account
     ***********************************************************/
     public GLib.List<GLib.TlsCertificate> approved_certificates {
-        //  public get {
-        //      return this.approved_certificates;
-        //  }
-        //  private set {
-        //      this.approved_certificates = value;
-        //      GLib.TlsConfiguration.default_configuration ().add_ca_certificates (value);
-        //  }
+        public get {
+            return this.approved_certificates;
+        }
+        private set {
+            this.approved_certificates = value;
+            GLib.TlsConfiguration.default_configuration ().add_ca_certificates (value);
+        }
     }
 
     /***********************************************************
@@ -160,16 +160,16 @@ public class Account { //: GLib.Object {
     Access the server capabilities
     ***********************************************************/
     public Capabilities capabilities {
-        //  public get {
-        //      return this.capabilities;
-        //  }
-        //  private set {
-        //      this.capabilities = value;
+        public get {
+            return this.capabilities;
+        }
+        private set {
+            this.capabilities = value;
 
-        //      set_up_user_status_connector ();
-        //      this.push_notifications_reconnect_timer_active = true;
-        //      try_setup_push_notifications ();
-        //  }
+            set_up_user_status_connector ();
+            this.push_notifications_reconnect_timer_active = true;
+            try_setup_push_notifications ();
+        }
     }
 
     /***********************************************************
@@ -179,30 +179,30 @@ public class Account { //: GLib.Object {
     capabilities have been received.
     ***********************************************************/
     public string server_version {
-        //  internal get {
-        //      return this.server_version;
-        //  }
-        //  public set {
-        //      if (this.server_version == value) {
-        //          return;
-        //      }
+        internal get {
+            return this.server_version;
+        }
+        public set {
+            if (this.server_version == value) {
+                return;
+            }
 
-        //      var old_server_version = this.server_version;
-        //      this.server_version = value;
-        //      signal_server_version_changed (this, old_server_version, value);
-        //  }
+            var old_server_version = this.server_version;
+            this.server_version = value;
+            signal_server_version_changed (this, old_server_version, value);
+        }
     }
 
     /***********************************************************
     Pluggable handler
     ***********************************************************/
     public AbstractSslErrorHandler ssl_error_handler {
-        //  private get {
-        //      return this.ssl_error_handler;
-        //  }
-        //  public set {
-        //      this.ssl_error_handler = value;
-        //  }
+        private get {
+            return this.ssl_error_handler;
+        }
+        public set {
+            this.ssl_error_handler = value;
+        }
     }
 
     /***********************************************************
@@ -213,9 +213,9 @@ public class Account { //: GLib.Object {
     Holds the accounts credentials
     ***********************************************************/
     public AbstractCredentials credentials {
-        //  public get {
-        //      return this.credentials;
-        //  }
+        public get {
+            return this.credentials;
+        }
         //  public set {
         //      // set active credential manager
         //      Soup.CookieJar jar = null;
@@ -431,9 +431,9 @@ public class Account { //: GLib.Object {
     @returns the (themeable) dav path for the account.
     ***********************************************************/
     public string dav_path {
-        //  public get {
-        //      return DAV_BASE_PATH + "/" + this.dav_user + "/";
-        //  }
+        public get {
+            return DAV_BASE_PATH + "/" + this.dav_user + "/";
+        }
     }
 
 
@@ -631,15 +631,15 @@ public class Account { //: GLib.Object {
     Will be 0 if the version is not available yet.
     ***********************************************************/
     public int server_version_int {
-        //  public get {
-        //      // FIXME: Use Qt 5.5 GLib.VersionNumber
-        //      string[] components = this.server_version.split (".");
-        //      return make_server_version (
-        //          int.parse (components[0]),
-        //          int.parse (components[1]),
-        //          int.parse (components[2])
-        //      );
-        //  }
+        public get {
+            // FIXME: Use Qt 5.5 GLib.VersionNumber
+            string[] components = this.server_version.split (".");
+            return make_server_version (
+                int.parse (components[0]),
+                int.parse (components[1]),
+                int.parse (components[2])
+            );
+        }
     }
 
 
@@ -663,26 +663,26 @@ public class Account { //: GLib.Object {
     limit.
     ***********************************************************/
     public bool server_version_unsupported {
-        //  public get {
-        //      if (server_version_int == 0) {
-        //          // not detected yet, assume it is fine.
-        //          return false;
-        //      }
-        //      return server_version_int < make_server_version (
-        //          Common.NextcloudVersion.NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_MAJOR,
-        //          Common.NextcloudVersion.NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_MINOR,
-        //          Common.NextcloudVersion.NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_PATCH
-        //      );
-        //  }
+        public get {
+            if (server_version_int == 0) {
+                // not detected yet, assume it is fine.
+                return false;
+            }
+            return server_version_int < make_server_version (
+                Common.NextcloudVersion.NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_MAJOR,
+                Common.NextcloudVersion.NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_MINOR,
+                Common.NextcloudVersion.NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_PATCH
+            );
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool is_username_prefill_supported {
-        //  public get {
-        //      return server_version_int >= make_server_version (USERNAME_PREFILL_SERVER_VERSION_MIN_SUPPORTED_MAJOR, 0, 0);
-        //  }
+        public get {
+            return server_version_int >= make_server_version (USERNAME_PREFILL_SERVER_VERSION_MIN_SUPPORTED_MAJOR, 0, 0);
+        }
     }
 
 
@@ -807,9 +807,9 @@ public class Account { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string cookie_jar_path {
-        //  public get {
-        //      return GLib.Environment.get_user_config_dir () + "/cookies" + this.identifier + ".db";
-        //  }
+        public get {
+            return GLib.Environment.get_user_config_dir () + "/cookies" + this.identifier + ".db";
+        }
     }
 
 
@@ -843,18 +843,18 @@ public class Account { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public Soup.Session network_access_manager {
-        //  public get {
-        //      return this.soup_session;
-        //  }
+        public get {
+            return this.soup_session;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public unowned Soup.Session shared_network_access_manager {
-        //  public get {
-        //      return this.soup_session;
-        //  }
+        public get {
+            return this.soup_session;
+        }
     }
 
 

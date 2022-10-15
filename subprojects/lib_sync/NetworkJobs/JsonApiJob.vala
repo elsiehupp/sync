@@ -37,9 +37,9 @@ public class JsonApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public string body {
-        //  private get {
-        //      return this.body;
-        //  }
+        private get {
+            return this.body;
+        }
         //  public set {
         //      this.body = value.to_json ();
         //      GLib.debug ("Set body for request:" + this.body);

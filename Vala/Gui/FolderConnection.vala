@@ -26,8 +26,8 @@ namespace Ui {
 ***********************************************************/
 public class FolderConnection { //: GLib.Object {
 
-    public class Map { //: GLib.HashTable<string, FolderConnection> { }
-    public class MapIterator { //: GLib.MapIterator<string, FolderConnection> { }
+    public class Map : GLib.HashTable<string, FolderConnection> { }
+    public class MapIterator : GLib.MapIterator<string, FolderConnection> { }
 
 
     /***********************************************************
@@ -142,9 +142,9 @@ public class FolderConnection { //: GLib.Object {
     menu will allow users to make existing files virtual.
     ***********************************************************/
     public bool virtual_files_enabled {
-        //  public get {
-        //      return this.definition.virtual_files_mode != Common.AbstractVfs.Off && !is_vfs_on_signal_off_switch_pending ();
-        //  }
+        public get {
+            return this.definition.virtual_files_mode != Common.AbstractVfs.Off && !is_vfs_on_signal_off_switch_pending ();
+        }
         //  public set {
         //      Common.VfsMode new_mode = this.definition.virtual_files_mode;
         //      if (value && this.definition.virtual_files_mode == Common.AbstractVfs.Off) {
@@ -212,12 +212,12 @@ public class FolderConnection { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public GLib.Uuid navigation_pane_clsid {
-        //  public get {
-        //      return this.definition.navigation_pane_clsid;
-        //  }
-        //  public set {
-        //      this.definition.navigation_pane_clsid = valie;
-        //  }
+        public get {
+            return this.definition.navigation_pane_clsid;
+        }
+        public set {
+            this.definition.navigation_pane_clsid = valie;
+        }
     }
 
 
@@ -226,32 +226,37 @@ public class FolderConnection { //: GLib.Object {
     Switch sync on or off
     ***********************************************************/
     public bool sync_paused {
-        //  public set {
-        //      if (value == this.definition.paused) {
-        //          return;
-        //      }
+        public get {
+            return this.definition.paused;
+        }
+        public set {
+            if (value == this.definition.paused) {
+                return;
+            }
 
-        //      this.definition.paused = value;
-        //      save_to_settings ();
+            this.definition.paused = value;
+            save_to_settings ();
 
-        //      if (!value) {
-        //          sync_state (LibSync.SyncResult.Status.NOT_YET_STARTED);
-        //      } else {
-        //          sync_state (LibSync.SyncResult.Status.PAUSED);
-        //      }
-        //      signal_sync_paused_changed (this, value);
-        //      signal_sync_state_change ();
-        //      signal_can_sync_changed ();
-        //  }
-        //  public get {
-        //      return this.definition.paused;
-        //  }
+            if (!value) {
+                sync_state (LibSync.SyncResult.Status.NOT_YET_STARTED);
+            } else {
+                sync_state (LibSync.SyncResult.Status.PAUSED);
+            }
+            signal_sync_paused_changed (this, value);
+            signal_sync_state_change ();
+            signal_can_sync_changed ();
+        }
     }
 
     /***********************************************************
     Create a new FolderConnection
     ***********************************************************/
-    public FolderConnection (FolderDefinition definition, AccountState account_state, Common.AbstractVfs vfs, GLib.Object parent = new GLib.Object ()) {
+    public FolderConnection (
+        FolderDefinition definition,
+        AccountState account_state,
+        Common.AbstractVfs vfs,
+        GLib.Object parent = new GLib.Object ()
+    ) {
         //  base (parent);
         //  this.account_state = account_state;
         //  this.definition = definition;
@@ -439,18 +444,20 @@ public class FolderConnection { //: GLib.Object {
     Short local path to display on the GUI (native separators)
     ***********************************************************/
     public string short_gui_local_path {
-        //  string p = this.definition.local_path;
-        //  string home = GLib.Dir.home_path;
-        //  if (!home.has_suffix ("/")) {
-        //      home.append ("/");
-        //  }
-        //  if (p.has_prefix (home)) {
-        //      p = p.mid (home.length);
-        //  }
-        //  if (p.length > 1 && p.has_suffix ("/")) {
-        //      p.chop (1);
-        //  }
-        //  return GLib.Dir.to_native_separators (p);
+        public get {
+            string p = this.definition.local_path;
+            string home = GLib.Dir.home_path;
+            if (!home.has_suffix ("/")) {
+                home.append ("/");
+            }
+            if (p.has_prefix (home)) {
+                p = p.mid (home.length);
+            }
+            if (p.length > 1 && p.has_suffix ("/")) {
+                p.chop (1);
+            }
+            return GLib.Dir.to_native_separators (p);
+        }
     }
 
 
@@ -488,9 +495,9 @@ public class FolderConnection { //: GLib.Object {
     Remote folder_connection path, usually without trailing "/", exception "/"
     ***********************************************************/
     public string remote_path {
-        //  public get {
-        //      return this.definition.target_path;
-        //  }
+        public get {
+            return this.definition.target_path;
+        }
     }
 
 
@@ -498,13 +505,13 @@ public class FolderConnection { //: GLib.Object {
     Remote folder_connection path, always with a trailing "/"
     ***********************************************************/
     public string remote_path_trailing_slash {
-        //  public get {
-        //      string result = remote_path;
-        //      if (!result.has_suffix ("/")) {
-        //          result += "/";
-        //      }
-        //      return result;
-        //  }
+        public get {
+            string result = remote_path;
+            if (!result.has_suffix ("/")) {
+                result += "/";
+            }
+            return result;
+        }
     }
 
 
@@ -637,19 +644,19 @@ public class FolderConnection { //: GLib.Object {
     folder_connection definition
     ***********************************************************/
     bool ignore_hidden_files {
-        //  public get {
-        //      return this.definition.ignore_hidden_files;
-        //  }
-        //  public set {
-        //      this.definition.ignore_hidden_files = value;
-        //  }
+        public get {
+            return this.definition.ignore_hidden_files;
+        }
+        public set {
+            this.definition.ignore_hidden_files = value;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public LibSync.SyncEngine sync_engine {
-        //  return;
+        public get; public set;
     }
 
 
@@ -844,9 +851,9 @@ public class FolderConnection { //: GLib.Object {
     Whether this folder_connection should show selective sync instance
     ***********************************************************/
     public bool supports_selective_sync {
-        //  public get {
-        //      return !this.virtual_files_enabled && !is_vfs_on_signal_off_switch_pending ();
-        //  }
+        public get {
+            return !this.virtual_files_enabled && !is_vfs_on_signal_off_switch_pending ();
+        }
     }
 
 
@@ -1592,7 +1599,7 @@ public class FolderConnection { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void connect_sync_root ();
+    //  private void connect_sync_root ();
 
 
     /***********************************************************

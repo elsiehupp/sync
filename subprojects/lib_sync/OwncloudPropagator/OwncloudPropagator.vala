@@ -92,13 +92,13 @@ public class OwncloudPropagator { //: GLib.Object {
     private PropagateRootDirectory propagate_root_directory_job;
 
     public SyncOptions sync_options {
-        //  public get {
-        //      return this.sync_options;
-        //  }
-        //  public set {
-        //      this.sync_options = sync_options;
-        //      this.chunk_size = sync_options.initial_chunk_size;
-        //  }
+        public get {
+            return this.sync_options;
+        }
+        public set {
+            this.sync_options = sync_options;
+            this.chunk_size = sync_options.initial_chunk_size;
+        }
     }
 
     private bool job_scheduled = false;
@@ -446,8 +446,8 @@ public class OwncloudPropagator { //: GLib.Object {
     and give up on the file.
     ***********************************************************/
     public bool has_case_clash_accessibility_problem (string relfile) {
-        //  //  Q_UNUSED (relfile);
-        //  return false;
+        //  Q_UNUSED (relfile);
+        return false;
     }
 
 
@@ -455,14 +455,14 @@ public class OwncloudPropagator { //: GLib.Object {
     Q_REQUIRED_RESULT
     ***********************************************************/
     public string full_local_path (string temporary_filename) {
-        //  return this.local_directory + temporary_filename;
+        return this.local_directory + temporary_filename;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public string local_path {
-        //  return this.local_directory;
+        return this.local_directory;
     }
 
 
@@ -475,14 +475,14 @@ public class OwncloudPropagator { //: GLib.Object {
     Q_REQUIRED_RESULT
     ***********************************************************/
     public string full_remote_path (string temporary_filename) {
-        //  return this.remote_folder + temporary_filename;
+        return this.remote_folder + temporary_filename;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public string remote_path {
-        //  return this.remote_folder;
+        return this.remote_folder;
     }
 
 
@@ -703,8 +703,7 @@ public class OwncloudPropagator { //: GLib.Object {
     /***********************************************************
     Map original path (as in the DB) to target final path
     ***********************************************************/
-    public string adjust_renamed_path (string original);
-    string OwncloudPropagator.adjust_renamed_path (string original) {
+    public string adjust_renamed_path (string original) {
         //  return adjust_renamed_path (this.renamed_directories, original);
     }
 
@@ -717,8 +716,7 @@ public class OwncloudPropagator { //: GLib.Object {
 
     Will also trigger a Common.AbstractVfs.convert_to_placeholder.
     ***********************************************************/
-    public Result<Common.AbstractVfs.ConvertToPlaceholderResult, string> update_metadata (SyncFileItem item);
-    Result<Common.AbstractVfs.ConvertToPlaceholderResult, string> OwncloudPropagator.update_metadata (SyncFileItem item) {
+    public Result<Common.AbstractVfs.ConvertToPlaceholderResult, string> update_metadata (SyncFileItem item) {
         //  return OwncloudPropagator.static_update_metadata (item, this.local_directory, sync_options.vfs, this.journal);
     }
 

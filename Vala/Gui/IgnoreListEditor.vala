@@ -75,9 +75,9 @@ public class IgnoreListEditor { //: Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     public bool ignore_hidden_files {
-        //  public get {
-        //      return !instance.sync_hidden_files_check_box.is_checked ();
-        //  }
+        public get {
+            return !instance.sync_hidden_files_check_box.is_checked ();
+        }
     }
 
 

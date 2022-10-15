@@ -24,18 +24,18 @@ public class ConflictDialog { //: Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     public string local_version_filename {
-        //  public get {
-        //      return this.solver.local_version_filename;
-        //  }
+        public get {
+            return this.solver.local_version_filename;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public string remote_version_filename {
-        //  public get {
-        //      return this.solver.remote_version_filename;
-        //  }
+        public get {
+            return this.solver.remote_version_filename;
+        }
     }
 
     private ConflictDialog instance;

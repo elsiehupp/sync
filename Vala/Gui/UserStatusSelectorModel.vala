@@ -172,17 +172,16 @@ public class UserStatusSelectorModel { //: GLib.Object {
 
 
     LibSync.UserStatus.OnlineStatus online_status {
-        //  public get {
-        //      return this.user_status.state;
-        //  }
-        //  public set {
-        //      if (value == this.user_status.state) {
-        //          return;
-        //      }
-
-        //      this.user_status.state (value);
-        //      signal_online_status_changed ();
-        //  }
+        public get {
+            return this.user_status.state;
+        }
+        public set {
+            if (value == this.user_status.state) {
+                return;
+            }
+            this.user_status.state (value);
+            signal_online_status_changed ();
+        }
     }
 
 
@@ -190,18 +189,18 @@ public class UserStatusSelectorModel { //: GLib.Object {
     Q_REQUIRED_RESULT
     ***********************************************************/
     public GLib.Uri online_icon {
-        //  public get {
-        //      return LibSync.Theme.status_online_image_source;
-        //  }
+        public get {
+            return LibSync.Theme.status_online_image_source;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public GLib.Uri away_icon {
-        //  public get {
-        //      return LibSync.Theme.status_away_image_source;
-        //  }
+        public get {
+            return LibSync.Theme.status_away_image_source;
+        }
     }
 
 
@@ -209,42 +208,42 @@ public class UserStatusSelectorModel { //: GLib.Object {
     Q_REQUIRED_RESULT
     ***********************************************************/
     public GLib.Uri dnd_icon {
-        //  public get {
-        //      return LibSync.Theme.status_do_not_disturb_image_source;
-        //  }
+        public get {
+            return LibSync.Theme.status_do_not_disturb_image_source;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public GLib.Uri invisible_icon {
-        //  public get {
-        //      return LibSync.Theme.status_invisible_image_source;
-        //  }
+        public get {
+            return LibSync.Theme.status_invisible_image_source;
+        }
     }
 
 
     public string user_status_message {
-        //  public get {
-        //      return this.user_status.message ();
-        //  }
-        //  public set {
-        //      this.user_status.message (value);
-        //      this.user_status.message_predefined (false);
-        //      signal_user_status_changed ();
-        //  }
+        public get {
+            return this.user_status.message ();
+        }
+        public set {
+            this.user_status.message (value);
+            this.user_status.message_predefined (false);
+            signal_user_status_changed ();
+        }
     }
 
 
     public string user_status_emoji {
-        //  public get {
-        //      return this.user_status.icon ();
-        //  }
-        //  public set {
-        //      this.user_status.icon (value);
-        //      this.user_status.message_predefined (false);
-        //      signal_user_status_changed ();
-        //  }
+        public get {
+            return this.user_status.icon ();
+        }
+        public set {
+            this.user_status.icon (value);
+            this.user_status.message_predefined (false);
+            signal_user_status_changed ();
+        }
     }
 
 

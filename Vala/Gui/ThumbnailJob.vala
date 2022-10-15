@@ -41,11 +41,11 @@ public class ThumbnailJob : LibSync.AbstractNetworkJob {
     will contain the image data in PNG. If the status code is different the content
     of reply is undefined.
     ***********************************************************/
-    void signal_job_finished (int status_code, string reply);
+    internal signal void signal_job_finished (int status_code, string reply);
 
     /***********************************************************
     ***********************************************************/
-    private override bool on_signal_finished () {
+    private bool on_signal_finished () {
         //  signal_job_finished (this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int (), this.reply.read_all ());
         //  return true;
     }

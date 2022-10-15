@@ -95,18 +95,18 @@ public class AbstractNetworkJob { //: GLib.Object {
     the jobs at exit)
     ***********************************************************/
     public GLib.InputStream input_stream {
-        //  public get {
-        //      return this.input_stream;
-        //  }
-        //  public set {
-        //      if (value != null) {
-        //          value.property ("do_not_handle_auth", true);
-        //      }
+        public get {
+            return this.input_stream;
+        }
+        public set {
+            //  if (value != null) {
+            //      value.property ("do_not_handle_auth", true);
+            //  }
 
-        //      GLib.InputStream old = this.input_stream;
-        //      this.input_stream = value;
-        //      old = null;
-        //  }
+            //  GLib.InputStream old = this.input_stream;
+            this.input_stream = value;
+            //  old = null;
+        }
     }
 
     public string path;
@@ -223,17 +223,17 @@ public class AbstractNetworkJob { //: GLib.Object {
     Returns an error message, if any.
     ***********************************************************/
     public string error_string {
-        //  public get {
-        //      if (this.timedout) {
-        //          return _("Connection timed out");
-        //      } else if (this.input_stream == null) {
-        //          return _("Unknown error : network input_stream was deleted");
-        //      } else if (this.input_stream.has_raw_header ("OC-ErrorString")) {
-        //          return this.input_stream.raw_header ("OC-ErrorString");
-        //      } else {
-        //          return network_reply_error_string (this.input_stream);
-        //      }
-        //  }
+        public get {
+            if (this.timedout) {
+                return _("Connection timed out");
+            } else if (this.input_stream == null) {
+                return _("Unknown error: network input_stream was deleted");
+            } else if (this.input_stream.has_raw_header ("OC-ErrorString")) {
+                return this.input_stream.raw_header ("OC-ErrorString");
+            } else {
+                return network_reply_error_string (this.input_stream);
+            }
+        }
     }
 
 
@@ -372,37 +372,37 @@ public class AbstractNetworkJob { //: GLib.Object {
     at it and thus not resend it in case of redirects.
     ***********************************************************/
     protected void adopt_request (GLib.InputStream input_stream) {
-        //  this.add_timer (input_stream);
-        //  this.input_stream = input_stream;
-        //  this.up_connections = input_stream;
-        //  this.new_reply_hook (input_stream);
+        this.add_timer (input_stream);
+        this.input_stream = input_stream;
+        this.up_connections = input_stream;
+        this.new_reply_hook (input_stream);
     }
 
 
     protected GLib.InputStream up_connections {
-        //  protected set {
-        //      value.signal_finished.connect (
-        //          this.on_signal_finished
-        //      );
-        //      value.encrypted.connect (
-        //          this.on_signal_network_activity
-        //      );
-        //      value.manager.signal_proxy_authentication_required.connect (
-        //          this.on_signal_network_activity
-        //      );
-        //      value.signal_ssl_errors.connect (
-        //          this.on_signal_network_activity
-        //      );
-        //      value.meta_data_changed.connect (
-        //          this.on_signal_network_activity
-        //      );
-        //      value.download_progress.connect (
-        //          this.on_signal_network_activity
-        //      );
-        //      value.signal_upload_progress.connect (
-        //          this.on_signal_network_activity
-        //      );
-        //  }
+        protected set {
+            value.signal_finished.connect (
+                this.on_signal_finished
+            );
+            value.encrypted.connect (
+                this.on_signal_network_activity
+            );
+            value.manager.signal_proxy_authentication_required.connect (
+                this.on_signal_network_activity
+            );
+            value.signal_ssl_errors.connect (
+                this.on_signal_network_activity
+            );
+            value.meta_data_changed.connect (
+                this.on_signal_network_activity
+            );
+            value.download_progress.connect (
+                this.on_signal_network_activity
+            );
+            value.signal_upload_progress.connect (
+                this.on_signal_network_activity
+            );
+        }
     }
 
 

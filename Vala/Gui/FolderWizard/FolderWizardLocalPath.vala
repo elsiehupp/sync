@@ -49,35 +49,37 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public override bool is_complete {
-        //  GLib.Uri server_url = this.account.url;
-        //  server_url.user_name (this.account.credentials ().user ());
-
-        //  string error_str = FolderManager.instance.check_path_validity_for_new_folder (
-        //      GLib.Dir.from_native_separators (this.instance.local_folder_line_edit.text ()), server_url);
-
-        //  bool is_ok = error_str = "";
-        //  GLib.List<string> warn_strings;
-        //  if (!is_ok) {
-        //      warn_strings += error_str;
-        //  }
-
-        //  this.instance.warn_label.word_wrap (true);
-        //  if (is_ok) {
-        //      this.instance.warn_label.hide ();
-        //      this.instance.warn_label = "";
-        //  } else {
-        //      this.instance.warn_label.show ();
-        //      string warnings = format_warnings (warn_strings);
-        //      this.instance.warn_label.on_signal_text (warnings);
-        //  }
-        //  return is_ok;
+    public new bool is_complete {
+        public get {
+            //  GLib.Uri server_url = this.account.url;
+            //  server_url.user_name (this.account.credentials ().user ());
+    
+            //  string error_str = FolderManager.instance.check_path_validity_for_new_folder (
+            //      GLib.Dir.from_native_separators (this.instance.local_folder_line_edit.text ()), server_url);
+    
+            //  bool is_ok = error_str = "";
+            //  GLib.List<string> warn_strings;
+            //  if (!is_ok) {
+            //      warn_strings += error_str;
+            //  }
+    
+            //  this.instance.warn_label.word_wrap (true);
+            //  if (is_ok) {
+            //      this.instance.warn_label.hide ();
+            //      this.instance.warn_label = "";
+            //  } else {
+            //      this.instance.warn_label.show ();
+            //      string warnings = format_warnings (warn_strings);
+            //      this.instance.warn_label.on_signal_text (warnings);
+            //  }
+            //  return is_ok;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public override void initialize_page () {
+    public new void initialize_page () {
         //  this.instance.warn_label.hide ();
     }
 

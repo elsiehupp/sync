@@ -12,9 +12,9 @@ public class SyncStatusSummary { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     unowned AccountState account_state {
-        //  private get {
-        //      return this.account_state;
-        //  }
+        private get {
+            return this.account_state;
+        }
         //  private set {
         //      if (!reload_needed (value)) {
         //          return;
@@ -36,73 +36,73 @@ public class SyncStatusSummary { //: GLib.Object {
     private double progress = 1.0;
 
     GLib.Uri sync_icon {
-        //  public get {
-        //      return this.sync_icon;
-        //  }
-        //  private set {
-        //      if (this.sync_icon == value) {
-        //          return;
-        //      }
+        public get {
+            return this.sync_icon;
+        }
+        private set {
+            if (this.sync_icon == value) {
+                return;
+            }
 
-        //      this.sync_icon = value;
-        //      signal_sync_icon_changed ();
-        //  }
+            this.sync_icon = value;
+            signal_sync_icon_changed ();
+        }
     }
 
     bool syncing {
-        //  public get {
-        //      return this.syncing;
-        //  }
-        //  private set {
-        //      if (value == this.syncing) {
-        //          return;
-        //      }
+        public get {
+            return this.syncing;
+        }
+        private set {
+            if (value == this.syncing) {
+                return;
+            }
 
-        //      this.syncing = value;
-        //      signal_syncing_changed ();
-        //  }
+            this.syncing = value;
+            signal_syncing_changed ();
+        }
     }
 
     string sync_status_string {
-        //  public get {
-        //      return this.sync_status_string;
-        //  }
-        //  private set {
-        //      if (this.sync_status_string == value) {
-        //          return;
-        //      }
+        public get {
+            return this.sync_status_string;
+        }
+        private set {
+            if (this.sync_status_string == value) {
+                return;
+            }
 
-        //      this.sync_status_string = value;
-        //      signal_sync_status_string_changed ();
-        //  }
+            this.sync_status_string = value;
+            signal_sync_status_string_changed ();
+        }
     }
 
     string sync_status_detail_string {
-        //  public get {
-        //      return this.sync_status_detail_string;
-        //  }
-        //  private set {
-        //      if (this.sync_status_detail_string == value) {
-        //          return;
-        //      }
+        public get {
+            return this.sync_status_detail_string;
+        }
+        private set {
+            if (this.sync_status_detail_string == value) {
+                return;
+            }
 
-        //      this.sync_status_detail_string = value;
-        //      signal_sync_status_detail_string_changed ();
-        //  }
+            this.sync_status_detail_string = value;
+            signal_sync_status_detail_string_changed ();
+        }
     }
 
     double sync_progress {
-        //  public get {
-        //      return this.progress;
-        //  }
-        //  private set {
-        //      if (this.progress == value) {
-        //          return;
-        //      }
+        public get {
+            return this.progress;
+        }
+        private set {
+            if (this.progress == value) {
+                return;
+            }
 
-        //      this.progress = value;
-        //      signal_sync_progress_changed ();
-        //  }
+            this.progress = value;
+            signal_sync_progress_changed ();
+        }
     }
 
 

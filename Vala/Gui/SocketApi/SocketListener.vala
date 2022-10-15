@@ -15,14 +15,16 @@ public class SocketListener { //: GLib.Object {
 
     private BloomFilter monitored_directories_bloom_filter;
 
-    public SocketListener (GLib.OutputStream socket) {
-        //  this.socket = socket;
+    public SocketListener (
+        GLib.OutputStream socket
+    ) {
+        this.socket = socket;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_send_message (string message, bool do_wait = false);
+    //  public void on_signal_send_message (string message, bool do_wait = false);
 
 
     /***********************************************************

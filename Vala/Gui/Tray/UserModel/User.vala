@@ -19,9 +19,9 @@ public class User { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     LibSync.Account account {
-        //  public get {
-        //      this.account_state.account;
-        //  }
+        public get {
+            this.account_state.account;
+        }
     }
     unowned AccountState account_state { public get; private set; }
     bool is_current_user { public get; public set; }
@@ -132,9 +132,9 @@ public class User { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string server {
-        //  public get {
-        //      return server_string (false);
-        //  }
+        public get {
+            return server_string (false);
+        }
     }
 
 
@@ -153,31 +153,33 @@ public class User { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public GLib.List<AccountApp> app_list {
-        //  return this.account_state.app_list;
+        public get {
+            return this.account_state.app_list;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool is_connected {
-        //  public get {
-        //      return (this.account_state.connection_status == AccountState.ConnectionValidator.Status.Connected);
-        //  }
+        public get {
+            return (this.account_state.connection_status == AccountState.ConnectionValidator.Status.Connected);
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public FolderConnection folder_connection {
-        //  public get {
-        //      foreach (FolderConnection folder_connection in FolderManager.instance.map ()) {
-        //          if (folder_connection.account_state == this.account_state) {
-        //              return folder_connection;
-        //          }
-        //      }
+        public get {
+            foreach (FolderConnection folder_connection in FolderManager.instance.map ()) {
+                if (folder_connection.account_state == this.account_state) {
+                    return folder_connection;
+                }
+            }
 
-        //      return null;
-        //  }
+            return null;
+        }
     }
 
 
@@ -193,13 +195,13 @@ public class User { //: GLib.Object {
     the simplest is missing login at startup), fall back to username
     ***********************************************************/
     public string name {
-        //  public get {
-        //      string name = this.account_state.account.dav_display_name ();
-        //      if (name == "") {
-        //          name = this.account_state.account.credentials ().user ();
-        //      }
-        //      return name;
-        //  }
+        public get {
+            string name = this.account_state.account.dav_display_name ();
+            if (name == "") {
+                name = this.account_state.account.credentials ().user ();
+            }
+            return name;
+        }
     }
 
 
@@ -259,7 +261,9 @@ public class User { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool has_activities {
-        //  return this.account_state.account.capabilities.has_activities;
+        public get {
+            return this.account_state.account.capabilities.has_activities;
+        }
     }
 
 
@@ -296,65 +300,66 @@ public class User { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string avatar_url {
-        //  if (avatar () == null) {
-        //      return "";
-        //  }
-
-        //  return "image://avatars/" + this.account_state.account.identifier;
+        public get {
+            if (avatar () == null) {
+                return "";
+            }
+            return "image://avatars/" + this.account_state.account.identifier;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool are_desktop_notifications_allowed {
-        //  public get {
-        //      return this.account_state.are_desktop_notifications_allowed;
-        //  }
+        public get {
+            return this.account_state.are_desktop_notifications_allowed;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public LibSync.UserStatus.OnlineStatus status {
-        //  public get {
-        //      return this.account_state.account.user_status_connector ().user_status ().state;
-        //  }
+        public get {
+            return this.account_state.account.user_status_connector ().user_status ().state;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public string status_message {
-        //  public get {
-        //      return this.account_state.account.user_status_connector ().user_status ().message ();
-        //  }
+        public get {
+            return this.account_state.account.user_status_connector ().user_status ().message ();
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public string status_icon {
-        //  public get {
-        //      return this.account_state.account.user_status_connector ().user_status ().state_icon ();
-        //  }
+        public get {
+            return this.account_state.account.user_status_connector ().user_status ().state_icon ();
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public string status_emoji {
-        //  public get {
-        //      return this.account_state.account.user_status_connector ().user_status ().icon ();
-        //  }
+        public get {
+            return this.account_state.account.user_status_connector ().user_status ().icon ();
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool server_has_user_status {
-        //  public get {
-        //      return this.account_state.account.capabilities.user_status ();
-        //  }
+        public get {
+            return this.account_state.account.capabilities.user_status ();
+        }
     }
 
 

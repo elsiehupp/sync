@@ -52,9 +52,9 @@ public class UploadDevice { //{ //: GLib.OutputStream {
     If this.bandwidth_quota will be used
     ***********************************************************/
     public bool bandwidth_limited {
-        //  public get {
-        //      return this.bandwidth_limited;
-        //  }
+        public get {
+            return this.bandwidth_limited;
+        }
         //  public set {
         //      this.bandwidth_limited = value;
         //      GLib.Object.invoke_method (this, "ready_read", GLib.QueuedConnection);
@@ -67,9 +67,9 @@ public class UploadDevice { //{ //: GLib.OutputStream {
     If upload is paused (read_data () will return 0)
     ***********************************************************/
     public bool choked {
-        //  public get {
-        //      return this.choked;
-        //  }
+        public get {
+            return this.choked;
+        }
         //  public set {
         //      this.choked = value;
         //      if (!this.choked) {

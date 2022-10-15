@@ -276,38 +276,38 @@ public class Capabilities { //: GLib.Object {
     Returns true if the server supports client side encryption
     ***********************************************************/
     public bool client_side_encryption_available {
-        //  public get {
-        //      var it = this.capabilities.const_find ("end-to-end-encryption");
-        //      if (it == this.capabilities.const_end ()) {
-        //          return false;
-        //      }
+        public get {
+            var it = this.capabilities.const_find ("end-to-end-encryption");
+            if (it == this.capabilities.const_end ()) {
+                return false;
+            }
     
-        //      var properties = (it).to_map ();
-        //      var enabled = properties.value ("enabled", false).to_bool ();
-        //      if (!enabled) {
-        //          return false;
-        //      }
+            var properties = (it).to_map ();
+            var enabled = properties.value ("enabled", false).to_bool ();
+            if (!enabled) {
+                return false;
+            }
     
-        //      var version = properties.value ("api-version", "1.0").to_byte_array ();
-        //      GLib.info ("E2EE API version: " + version);
-        //      var splitted_version = version.split ('.');
+            var version = properties.value ("api-version", "1.0").to_byte_array ();
+            GLib.info ("E2EE API version: " + version);
+            var splitted_version = version.split ('.');
     
-        //      bool ok = false;
-        //      var major = !splitted_version == "" ? splitted_version.at (0).to_int (ok) : 0;
-        //      if (!ok) {
-        //          GLib.warning ("Didn't understand version scheme (major), E2EE disabled.");
-        //          return false;
-        //      }
+            bool ok = false;
+            var major = !splitted_version == "" ? splitted_version.at (0).to_int (ok) : 0;
+            if (!ok) {
+                GLib.warning ("Didn't understand version scheme (major), E2EE disabled.");
+                return false;
+            }
     
-        //      ok = false;
-        //      var minor = splitted_version.size () > 1 ? splitted_version.at (1).to_int (ok) : 0;
-        //      if (!ok) {
-        //          GLib.warning ("Didn't understand version scheme (minor), E2EE disabled.");
-        //          return false;
-        //      }
+            ok = false;
+            var minor = splitted_version.size () > 1 ? splitted_version.at (1).to_int (ok) : 0;
+            if (!ok) {
+                GLib.warning ("Didn't understand version scheme (minor), E2EE disabled.");
+                return false;
+            }
     
-        //      return major == 1 && minor >= 1;
-        //  }
+            return major == 1 && minor >= 1;
+        }
     }
 
 
@@ -315,9 +315,9 @@ public class Capabilities { //: GLib.Object {
     Returns true if the capabilities are loaded already.
     ***********************************************************/
     public bool is_valid {
-        //  public get {
-        //      return this.capabilities != null;
-        //  }
+        public get {
+            return this.capabilities != null;
+        }
     }
 
 
@@ -325,9 +325,9 @@ public class Capabilities { //: GLib.Object {
     Returns true if the activity app is enabled.
     ***********************************************************/
     public bool has_activities {
-        //  public get {
-        //      return this.capabilities.contains ("activity");
-        //  }
+        public get {
+            return this.capabilities.contains ("activity");
+        }
     }
 
 
@@ -343,13 +343,13 @@ public class Capabilities { //: GLib.Object {
     Possible entries: "Adler32", "MD5", "SHA1"
     ***********************************************************/
     public GLib.List<string> supported_checksum_types {
-        //  public get {
-        //      unowned GLib.List<string> list = new GLib.List<string> ();
-        //      foreach (var t in this.capabilities["checksums"].to_map ()["supported_types"].to_list ()) {
-        //          list.push_back (t.to_byte_array ());
-        //      }
-        //      return list;
-        //  }
+        public get {
+            unowned GLib.List<string> list = new GLib.List<string> ();
+            foreach (var t in this.capabilities["checksums"].to_map ()["supported_types"].to_list ()) {
+                list.push_back (t.to_byte_array ());
+            }
+            return list;
+        }
     }
 
 
@@ -362,11 +362,11 @@ public class Capabilities { //: GLib.Object {
     Possible values : empty or any of the supported_types
     ***********************************************************/
     public string preferred_upload_checksum_type {
-        //  public get {
+        public get {
         //      return q_environment_variable ("OWNCLOUD_CONTENT_CHECKSUM_TYPE",
         //          this.capabilities.value ("checksums").to_map ()
         //          .value ("preferred_upload_type", "SHA1").to_string ()).to_utf8 ();
-        //  }
+        }
     }
 
 
@@ -377,17 +377,17 @@ public class Capabilities { //: GLib.Object {
     supported.
     ***********************************************************/
     public string upload_checksum_type {
-        //  public get {
-        //      string preferred = preferred_upload_checksum_type;
-        //      if (preferred != "") {
-        //          return preferred;
-        //      }
-        //      GLib.List<string> supported = supported_checksum_types;
-        //      if (supported != null) {
-        //          return supported.nth_data (0);
-        //      }
-        //      return "";
-        //  }
+        public get {
+            string preferred = preferred_upload_checksum_type;
+            if (preferred != "") {
+                return preferred;
+            }
+            GLib.List<string> supported = supported_checksum_types;
+            if (supported != null) {
+                return supported.nth_data (0);
+            }
+            return "";
+        }
     }
 
 
@@ -409,13 +409,13 @@ public class Capabilities { //: GLib.Object {
     Example: [503, 500]
     ***********************************************************/
     public GLib.List<int> http_error_codes_that_reset_failing_chunked_uploads {
-        //  public get {
-        //      unowned GLib.List<int> list = new GLib.List<int> ();
-        //      foreach (var t in this.capabilities["dav"].to_map ()["http_error_codes_that_reset_failing_chunked_uploads"].to_list ()) {
-        //          list.push_back (t.to_int ());
-        //      }
-        //      return list;
-        //  }
+        public get {
+            unowned GLib.List<int> list = new GLib.List<int> ();
+            foreach (var t in this.capabilities["dav"].to_map ()["http_error_codes_that_reset_failing_chunked_uploads"].to_list ()) {
+                list.push_back (t.to_int ());
+            }
+            return list;
+        }
     }
 
 
@@ -429,9 +429,9 @@ public class Capabilities { //: GLib.Object {
     Note that it just needs to be contained. The regular_expression [ab] is contained in "car".
     ***********************************************************/
     public string invalid_filename_regex {
-        //  public get {
-        //      return this.capabilities["dav"].to_map ()["invalid_filename_regex"].to_string ();
-        //  }
+        public get {
+            return this.capabilities["dav"].to_map ()["invalid_filename_regex"].to_string ();
+        }
     }
 
 
@@ -439,9 +439,9 @@ public class Capabilities { //: GLib.Object {
     return the list of filename that should not be uploaded
     ***********************************************************/
     public GLib.List<string> blocklisted_files {
-        //  public get {
-        //      return this.capabilities["files"].to_map ()["blocklisted_files"].to_string_list ();
-        //  }
+        public get {
+            return this.capabilities["files"].to_map ()["blocklisted_files"].to_string_list ();
+        }
     }
 
 
@@ -450,14 +450,14 @@ public class Capabilities { //: GLib.Object {
     should be uploaded.
     ***********************************************************/
     public bool upload_conflict_files {
-        //  public get {
+        public get {
         //      var env_is_set = !q_environment_variable_is_empty ("OWNCLOUD_UPLOAD_CONFLICT_FILES");
         //      int env_value = q_environment_variable_int_value ("OWNCLOUD_UPLOAD_CONFLICT_FILES");
         //      if (env_is_set)
         //          return env_value != 0;
     
         //      return this.capabilities["upload_conflict_files"].to_bool ();
-        //  }
+        }
     }
 
 

@@ -522,14 +522,14 @@ public class ProgressInfo { //: GLib.Object {
     and files-per-second speed.
     ***********************************************************/
     uint64 optimistic_eta {
-        //  private get {
-        //      // This assumes files and transfers finish as quickly as possible
-        //      // *but* note that max_per_second could be serious underestimate
-        //      // (if we never got to fully excercise transfer or files/second)
+        private get {
+            // This assumes files and transfers finish as quickly as possible
+            // *but* note that max_per_second could be serious underestimate
+            // (if we never got to fully excercise transfer or files/second)
 
-        //      return this.file_progress.remaining / this.max_files_per_second * 1000
-        //          + this.size_progress.remaining / this.max_bytes_per_second * 1000;
-        //  }
+            return this.file_progress.remaining / this.max_files_per_second * 1000
+                + this.size_progress.remaining / this.max_bytes_per_second * 1000;
+        }
     }
 
 

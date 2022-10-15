@@ -30,11 +30,11 @@ public class SyncJournalFileRecord { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool is_valid {
-        //  public get {
-        //      return this.path != ""
-        //          && (this.last_try_etag != "" || this.last_try_modtime != 0)
-        //          && this.last_try_time > 0;
-        //  }
+        public get {
+            return this.path != ""
+                && (this.last_try_etag != "" || this.last_try_modtime != 0)
+                && this.last_try_time > 0;
+        }
     }
 
 

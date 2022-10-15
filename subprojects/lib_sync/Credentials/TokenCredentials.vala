@@ -20,12 +20,12 @@ public class TokenCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    string user { public get; private set; }
+    //  string user { public get; private set; }
 
 
     /***********************************************************
     ***********************************************************/
-    new string password { public get; private set; }
+    //  new string password { public get; private set; }
 
     /***********************************************************
     The cookies
@@ -38,15 +38,19 @@ public class TokenCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public TokenCredentials (string user = "", string password = "", string token = "") {
-        //  this.user = user;
-        //  this.password = password;
-        //  this.token = token;
-        //  if (token == "") {
-        //      this.ready = false;
-        //  } else {
-        //      this.ready = true;
-        //  }
+    public TokenCredentials (
+        string user = "",
+        string password = "",
+        string token = ""
+    ) {
+        this.user = user;
+        this.password = password;
+        this.token = token;
+        if (token == "") {
+            this.ready = false;
+        } else {
+            this.ready = true;
+        }
     }
 
 

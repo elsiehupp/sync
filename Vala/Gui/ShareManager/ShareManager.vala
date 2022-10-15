@@ -245,8 +245,7 @@ public class ShareManager { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private unowned LinkShare parse_link_share (Json.Object data);
-    unowned LinkShare ShareManager.parse_link_share (Json.Object data) {
+    private unowned LinkShare parse_link_share (Json.Object data) {
         //  GLib.Uri url;
 
         //  // From own_cloud server 8.2 the url field is always set for public shares

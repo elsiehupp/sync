@@ -438,7 +438,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public virtual void do_start_upload ();
+    //  public virtual void do_start_upload ();
 
 
     /***********************************************************

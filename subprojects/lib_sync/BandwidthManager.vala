@@ -150,36 +150,36 @@ public class BandwidthManager { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool using_absolute_upload_limit {
-        //  public get {
-        //      return this.current_upload_limit > 0;
-        //  }
+        public get {
+            return this.current_upload_limit > 0;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool using_relative_upload_limit {
-        //  public get {
-        //      return this.current_upload_limit < 0;
-        //  }
+        public get {
+            return this.current_upload_limit < 0;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool using_absolute_download_limit {
-        //  public get {
-        //      return this.current_download_limit > 0;
-        //  }
+        public get {
+            return this.current_download_limit > 0;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool using_relative_download_limit {
-        //  public get {
-        //      return this.current_download_limit < 0;
-        //  }
+        public get {
+            return this.current_download_limit < 0;
+        }
     }
 
 

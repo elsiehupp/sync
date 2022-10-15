@@ -28,10 +28,10 @@ public class SyncResult { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    Status status {
-        //  public get {
-        //      return this.status;
-        //  }
+    public Status status {
+        public get {
+            return this.status;
+        }
         //  public set {
         //      this.status = value;
         //      this.sync_time = GLib.DateTime.current_date_time_utc ();
@@ -165,12 +165,12 @@ public class SyncResult { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string error_string {
-        //  public get {
-        //      if (this.errors.length () == 0) {
-        //          return "";
-        //      }
-        //      return this.errors.nth_data (0);
-        //  }
+        public get {
+            if (this.errors.length () == 0) {
+                return "";
+            }
+            return this.errors.nth_data (0);
+        }
     }
 
 
@@ -184,49 +184,49 @@ public class SyncResult { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string status_string {
-        //  public get {
-        //      switch (this.status) {
-        //      case Status.UNDEFINED:
-        //          return "Undefined";
-        //      case Status.NOT_YET_STARTED:
-        //          return "Not yet Started";
-        //      case Status.SYNC_RUNNING:
-        //          return "Sync Running";
-        //      case Status.SUCCESS:
-        //          return "Success";
-        //      case Status.ERROR:
-        //          return "Error";
-        //      case Status.SETUP_ERROR:
-        //          return "Setup_error";
-        //      case Status.SYNC_PREPARE:
-        //          return "Sync_prepare";
-        //      case Status.PROBLEM:
-        //          return "Success, some files were ignored.";
-        //      case Status.SYNC_ABORT_REQUESTED:
-        //          return "Sync Request aborted by user";
-        //      case Status.PAUSED:
-        //          return "Sync Paused";
-        //      }
-        //      return "";
-        //  }
+        public get {
+            switch (this.status) {
+            case Status.UNDEFINED:
+                return "Undefined";
+            case Status.NOT_YET_STARTED:
+                return "Not yet Started";
+            case Status.SYNC_RUNNING:
+                return "Sync Running";
+            case Status.SUCCESS:
+                return "Success";
+            case Status.ERROR:
+                return "Error";
+            case Status.SETUP_ERROR:
+                return "Setup_error";
+            case Status.SYNC_PREPARE:
+                return "Sync_prepare";
+            case Status.PROBLEM:
+                return "Success, some files were ignored.";
+            case Status.SYNC_ABORT_REQUESTED:
+                return "Sync Request aborted by user";
+            case Status.PAUSED:
+                return "Sync Paused";
+            }
+            return "";
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool has_unresolved_conflicts {
-        //  public get {
-        //      return this.number_of_new_conflict_items + this.number_of_old_conflict_items > 0;
-        //  }
+        public get {
+            return this.number_of_new_conflict_items + this.number_of_old_conflict_items > 0;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool has_locked_files {
-        //  public get {
-        //      return this.number_of_locked_items > 0;
-        //  }
+        public get {
+            return this.number_of_locked_items > 0;
+        }
     }
 
 

@@ -4,8 +4,8 @@ namespace LibSync {
 /***********************************************************
 @class Biometric
 
-Simple classes for safe (RAII) handling of OpenSSL
-data structures
+Simple classes for safe (RAII) handling of OpenSSL data
+structures
 ***********************************************************/
 public class Biometric { //: GLib.Object {
 
@@ -13,7 +13,7 @@ public class Biometric { //: GLib.Object {
     private Q_DISABLE_COPY (Biometric)
     ***********************************************************/
 
-    private BIO bio;
+    //  private BIO bio;
 
     public Biometric () {
         //  this.bio = new BIO_new (BIO_s_mem ());

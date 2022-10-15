@@ -30,13 +30,13 @@ public abstract class AbstractPropagateItemJob : AbstractPropagatorJob {
     It is displayed in the activity view.
     ***********************************************************/
     string restore_job_message {
-        //  protected get {
-        //      return this.item.is_restoration ? this.item.error_string: "";
-        //  }
-        //  protected set {
-        //      this.item.is_restoration = true;
-        //      this.item.error_string = value;
-        //  }
+        protected get {
+            return this.item.is_restoration ? this.item.error_string: "";
+        }
+        protected set {
+            this.item.is_restoration = true;
+            this.item.error_string = value;
+        }
     }
 
 
@@ -136,7 +136,7 @@ public abstract class AbstractPropagateItemJob : AbstractPropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public virtual void start ();
+    //  public virtual void start ();
 
 
 

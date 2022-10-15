@@ -18,9 +18,9 @@ public class Logger { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     string log_file {
-        //  public get {
-        //      return this.log_file_object.filename ();
-        //  }
+        public get {
+            return this.log_file_object.filename ();
+        }
         //  public set {
         //      GLib.MutexLocker locker = new GLib.MutexLocker (this.mutex);
         //      if (this.logstream != null) {
@@ -58,9 +58,9 @@ public class Logger { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static bool log_debug {
-        //  public get {
-        //      return Logger.log_debug;
-        //  }
+        public get {
+            return Logger.log_debug;
+        }
         //  public set {
         //      GLib.List<string> rules = new GLib.List<string> ();
         //      if (value) {
@@ -82,9 +82,9 @@ public class Logger { //: GLib.Object {
     private /*mutable*/ GLib.Mutex mutex;
 
     public static GLib.List<string> log_rules {
-        //  private get {
-        //      return this.log_rules;
-        //  }
+        private get {
+            return this.log_rules;
+        }
         //  public set {
         //      Logger.log_rules = value;
         //      string temporary;
@@ -222,7 +222,9 @@ public class Logger { //: GLib.Object {
     Returns where the automatic logdir would be
     ***********************************************************/
     public string temporary_folder_log_dir_path {
-        //  return GLib.Dir.temp ().file_path (APPLICATION_SHORTNAME + "-logdir");
+        public get {
+            return GLib.Dir.temp ().file_path (APPLICATION_SHORTNAME + "-logdir");
+        }
     }
 
 

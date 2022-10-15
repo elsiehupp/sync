@@ -63,19 +63,21 @@ public class PropagateDownloadEncrypted { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     private string root_path {
-        //  string result = this.propagator.remote_path;
-        //  if (result.has_prefix ("/")) {
-        //      return result.mid (1);
-        //  } else {
-        //      return result;
-        //  }
+        private get {
+            string result = this.propagator.remote_path;
+            if (result.has_prefix ("/")) {
+                return result.mid (1);
+            } else {
+                return result;
+            }
+        }
     }
 
 
     /***********************************************************
     TODO: Fix this. Exported in the wrong place.
     ***********************************************************/
-    public string create_download_temporary_filename (string previous);
+    //  public string create_download_temporary_filename (string previous);
 
 
     /***********************************************************

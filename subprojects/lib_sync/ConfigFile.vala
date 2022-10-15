@@ -93,9 +93,9 @@ public class ConfigFile { //: GLib.Object {
     ConfigFile.conf_dir = "";
     ***********************************************************/
     private static string conf_dir {
-        //  private get {
-        //      return ConfigFile.conf_dir;
-        //  }
+        private get {
+            return ConfigFile.conf_dir;
+        }
         //  public set {
         //      string dir_path = value;
         //      if (dir_path == "") {
@@ -134,27 +134,27 @@ public class ConfigFile { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static string config_path {
-        //  public get {
-        //      if (ConfigFile.conf_dir == "") {
-        //          // On Unix, use the AppConfigLocation for the settings, that's configurable with the XDG_CONFIG_HOME env variable.
-        //          ConfigFile.conf_dir = GLib.Environment.get_user_config_dir ();
-        //      }
-        //      string directory = ConfigFile.conf_dir;
+        public get {
+            if (ConfigFile.conf_dir == "") {
+                // On Unix, use the AppConfigLocation for the settings, that's configurable with the XDG_CONFIG_HOME env variable.
+                ConfigFile.conf_dir = GLib.Environment.get_user_config_dir ();
+            }
+            string directory = ConfigFile.conf_dir;
 
-        //      if (!directory.has_suffix ("/")) {
-        //          directory += "/";
-        //      }
-        //      return directory;
-        //  }
+            if (!directory.has_suffix ("/")) {
+                directory += "/";
+            }
+            return directory;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public static string config_file {
-        //  public get {
-        //      return ConfigFile.config_path + Theme.config_filename;
-        //  }
+        public get {
+            return ConfigFile.config_path + Theme.config_filename;
+        }
     }
 
 
@@ -252,19 +252,19 @@ public class ConfigFile { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static bool exists {
-        //  public get {
-        //      GLib.File file = GLib.File.new_for_path (ConfigFile.config_file);
-        //      return file.exists ();
-        //  }
+        public get {
+            GLib.File file = GLib.File.new_for_path (ConfigFile.config_file);
+            return file.exists ();
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public string default_connection {
-        //  public get {
-        //      return Theme.app_name;
-        //  }
+        public get {
+            return Theme.app_name;
+        }
     }
 
 
@@ -388,11 +388,11 @@ public class ConfigFile { //: GLib.Object {
 
 
     bool mono_icons {
-        //  public get {
+        public get {
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      bool mono_default = false; // On Mac we want bw by default
         //      return settings.set_value (MONO_ICONS_C, mono_default).to_bool ();
-        //  }
+        }
         //  public set {
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      settings.set_value (MONO_ICONS_C, use_mono_icons);
@@ -401,11 +401,11 @@ public class ConfigFile { //: GLib.Object {
 
 
     bool crash_reporter {
-        //  public get {
+        public get {
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      var fallback = settings.set_value (CRASH_REPORTER_C, true);
         //      return get_policy_setting (CRASH_REPORTER_C, fallback).to_bool ();
-        //  }
+        }
         //  public set {
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      settings.set_value (CRASH_REPORTER_C, value);
@@ -414,10 +414,10 @@ public class ConfigFile { //: GLib.Object {
 
 
     bool prompt_delete_files {
-        //  public get {
+        public get {
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      return settings.set_value (PROMPT_DELETE_C, false).to_bool ();
-        //  }
+        }
         //  public set {
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      settings.set_value (PROMPT_DELETE_C, value);
@@ -426,10 +426,10 @@ public class ConfigFile { //: GLib.Object {
 
 
     bool automatic_log_dir {
-        //  public get {
+        public get {
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      return settings.set_value (AUTOMATIC_LOG_DIR_C, false).to_bool ();
-        //  }
+        }
         //  public set {
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      settings.set_value (AUTOMATIC_LOG_DIR_C, value);
@@ -437,11 +437,11 @@ public class ConfigFile { //: GLib.Object {
     }
 
     string log_directory {
-        //  public get {
+        public get {
         //      string default_log_dir = config_path + "/logs";
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      return settings.set_value (LOG_DIR_C, default_log_dir).to_string ();
-        //  }
+        }
         //  public set {
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      settings.set_value (LOG_DIR_C, value);
@@ -451,10 +451,10 @@ public class ConfigFile { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     bool log_debug {
-        //  public get {
+        public get {
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      return settings.set_value (LOG_DEBUG_C, true).to_bool ();
-        //  }
+        }
         //  public set {
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      settings.set_value (LOG_DEBUG_C, value);
@@ -465,10 +465,10 @@ public class ConfigFile { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     int log_expire {
-        //  public get {
+        public get {
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      return settings.set_value (LOG_EXPIRE_C, 24).to_int ();
-        //  }
+        }
         //  public set {
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      settings.set_value (LOG_EXPIRE_C, value);
@@ -479,10 +479,10 @@ public class ConfigFile { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     bool log_flush {
-        //  public get {
+        public get {
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      return settings.set_value (LOG_FLUSH_C, false).to_bool ();
-        //  }
+        }
         //  public set {
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      settings.set_value (LOG_FLUSH_C, value);
@@ -581,8 +581,7 @@ public class ConfigFile { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public string proxy_password ();
-    string ConfigFile.proxy_password () {
+    public string proxy_password () {
         //  string pass_encoded = get_value (PROXY_PASS_C).to_byte_array ();
         //  var pass = string.from_utf8 (string.from_base64 (pass_encoded));
         //  pass_encoded = "";
@@ -612,8 +611,7 @@ public class ConfigFile { //: GLib.Object {
     /***********************************************************
     0 : no limit, 1 : manual, >0 : automatic
     ***********************************************************/
-    public int use_upload_limit ();
-    int ConfigFile.use_upload_limit () {
+    public int use_upload_limit () {
         //  return get_value (USE_UPLOAD_LIMIT_C, "", 0).to_int ();
     }
 
@@ -644,12 +642,12 @@ public class ConfigFile { //: GLib.Object {
     In kbyte/s
     ***********************************************************/
     public int upload_limit {
-        //  public get {
-        //      return get_value (UPLOAD_LIMIT_C, "", 10).to_int ();
-        //  }
-        //  public set {
-        //      set_value (UPLOAD_LIMIT_C, value);
-        //  }
+        public get {
+            return get_value (UPLOAD_LIMIT_C, "", 10).to_int ();
+        }
+        public set {
+            set_value (UPLOAD_LIMIT_C, value);
+        }
     }
 
 
@@ -658,12 +656,12 @@ public class ConfigFile { //: GLib.Object {
     In kbyte/s
     ***********************************************************/
     public int download_limit {
-        //  public get {
-        //      return get_value (DOWNLOAD_LIMIT_C, "", 80).to_int ();
-        //  }
-        //  public set {
-        //      set_value (DOWNLOAD_LIMIT_C, kbytes);
-        //  }
+        public get {
+            return get_value (DOWNLOAD_LIMIT_C, "", 80).to_int ();
+        }
+        public set {
+            set_value (DOWNLOAD_LIMIT_C, kbytes);
+        }
     }
 
 
@@ -679,30 +677,30 @@ public class ConfigFile { //: GLib.Object {
     [checked, size in MB]
     ***********************************************************/
     SizeLimit new_big_folder_size_limit {
-        //  public get {
-        //      var default_value = Theme.new_big_folder_size_limit;
-        //      var fallback = get_value (NEW_BIG_FOLDER_SIZE_LIMIT_C, "", default_value).to_long_long ();
-        //      var value = get_policy_setting (NEW_BIG_FOLDER_SIZE_LIMIT_C, fallback).to_long_long ();
-        //      bool use = value >= 0 && use_new_big_folder_size_limit ();
-        //      return q_make_pair (use, int64.max (0, value));
-        //  }
-        //  public set {
-        //      set_value (NEW_BIG_FOLDER_SIZE_LIMIT_C, value.mbytes);
-        //      set_value (USE_NEW_BIG_FOLDER_SIZE_LIMIT_C, value.is_checked);
-        //  }
+        public get {
+            var default_value = Theme.new_big_folder_size_limit;
+            var fallback = get_value (NEW_BIG_FOLDER_SIZE_LIMIT_C, "", default_value).to_long_long ();
+            var value = get_policy_setting (NEW_BIG_FOLDER_SIZE_LIMIT_C, fallback).to_long_long ();
+            bool use = value >= 0 && use_new_big_folder_size_limit ();
+            return q_make_pair (use, int64.max (0, value));
+        }
+        public set {
+            set_value (NEW_BIG_FOLDER_SIZE_LIMIT_C, value.mbytes);
+            set_value (USE_NEW_BIG_FOLDER_SIZE_LIMIT_C, value.is_checked);
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     bool confirm_external_storage {
-        //  public get {
-        //      var fallback = get_value (CONFIRM_EXTERNAL_STORAGE_C, "", true);
-        //      return get_policy_setting (CONFIRM_EXTERNAL_STORAGE_C, fallback).to_bool ();
-        //  }
-        //  public set {
-        //      set_value (CONFIRM_EXTERNAL_STORAGE_C, value);
-        //  }
+        public get {
+            var fallback = get_value (CONFIRM_EXTERNAL_STORAGE_C, "", true);
+            return get_policy_setting (CONFIRM_EXTERNAL_STORAGE_C, fallback).to_bool ();
+        }
+        public set {
+            set_value (CONFIRM_EXTERNAL_STORAGE_C, value);
+        }
     }
 
 
@@ -719,12 +717,12 @@ public class ConfigFile { //: GLib.Object {
     trash
     ***********************************************************/
     bool move_to_trash  {
-        //  public get {
-        //      return get_value (MOVE_TO_TRASH_C, "", false).to_bool ();
-        //  }
-        //  public set {
-        //      set_value (MOVE_TO_TRASH_C, value);
-        //  }
+        public get {
+            return get_value (MOVE_TO_TRASH_C, "", false).to_bool ();
+        }
+        public set {
+            set_value (MOVE_TO_TRASH_C, value);
+        }
     }
 
 
@@ -784,26 +782,13 @@ public class ConfigFile { //: GLib.Object {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     /***********************************************************
     ***********************************************************/
     bool optional_server_notifications {
-        //  public get {
+        public get {
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      return settings.set_value (OPTIONAL_SERVER_NOTIFICATIONS_C, true).to_bool ();
-        //  }
+        }
         //  public set {
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      settings.set_value (OPTIONAL_SERVER_NOTIFICATIONS_C, value);
@@ -815,11 +800,11 @@ public class ConfigFile { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     bool show_in_explorer_navigation_pane {
-        //  public get {
+        public get {
         //      bool default_value = false;
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      return settings.set_value (SHOW_IN_EXPLORER_NAVIGATION_PANE_C, default_value).to_bool ();
-        //  }
+        }
         //  public set {
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      settings.set_value (SHOW_IN_EXPLORER_NAVIGATION_PANE_C, value);
@@ -1017,8 +1002,7 @@ public class ConfigFile { //: GLib.Object {
     Used to throttle down desktop release rollout in order to keep the update servers alive at peak times.
     See: https://github.com/nextcloud/client_updater_server/pull/36
     ***********************************************************/
-    public int update_segment ();
-    int ConfigFile.update_segment () {
+    public int update_segment () {
         //  GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //  int segment = settings.set_value (UPDATE_SEGMENT_C, -1).to_int ();
 
@@ -1036,7 +1020,7 @@ public class ConfigFile { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string update_channel {
-        //  public get {
+        public get {
         //      string default_update_channel = "stable";
         //      string suffix = Common.NextcloudVersion.MIRALL_VERSION_SUFFIX;
         //      if (suffix.has_prefix ("daily")
@@ -1049,7 +1033,7 @@ public class ConfigFile { //: GLib.Object {
     
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      return settings.set_value (UPDATE_CHANNEL_C, default_update_channel).to_string ();
-        //  }
+        }
         //  public set {
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      settings.set_value (UPDATE_CHANNEL_C, value);
@@ -1063,9 +1047,9 @@ public class ConfigFile { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string certificate_path {
-        //  public get {
-        //      return retrieve_data ("", CERT_PATH).to_string ();
-        //  }
+        public get {
+            return retrieve_data ("", CERT_PATH).to_string ();
+        }
         //  public set {
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      settings.set_value (CERT_PATH, value);
@@ -1077,9 +1061,9 @@ public class ConfigFile { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     string certificate_password {
-        //  public get {
-        //      return retrieve_data ("", CERT_PASSWORD).to_string ();
-        //  }
+        public get {
+            return retrieve_data ("", CERT_PASSWORD).to_string ();
+        }
         //  public set {
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      settings.set_value (CERT_PASSWORD, value);
@@ -1093,10 +1077,10 @@ public class ConfigFile { //: GLib.Object {
     Updated by config_version_migration () at client startup.
     ***********************************************************/
     string client_version_string {
-        //  public get {
+        public get {
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      return settings.set_value (CLIENT_VERSION_C, "").to_string ();
-        //  }
+        }
         //  public set {
         //      GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         //      settings.set_value (CLIENT_VERSION_C, value);
@@ -1108,7 +1092,10 @@ public class ConfigFile { //: GLib.Object {
     Returns a new settings pre-set in a specific group.  The Settings will be created
     with the given parent. If no parent is specified, the caller must destroy the settings
     ***********************************************************/
-    public static GLib.Settings settings_with_group (string group, GLib.Object parent = new GLib.Object ()) {
+    public static GLib.Settings settings_with_group (
+        string group,
+        GLib.Object parent = new GLib.Object ()
+    ) {
         //  if (g_config_filename () == "") {
         //      // cache file name
         //      ConfigFile config;

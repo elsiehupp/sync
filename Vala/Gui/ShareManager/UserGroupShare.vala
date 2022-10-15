@@ -10,41 +10,41 @@ namespace Ui {
 public class UserGroupShare : Share {
 
     public string note {
-        //  public get {
-        //      return this.note;
-        //  }
-        //  public set {
-        //      var ocs_share_job = new OcsShareJob (this.account);
-        //      ocs_share_job.signal_finished.connect (
-        //          this.on_signal_link_share_note_set
-        //      );
-        //      ocs_share_job.signal_error.connect (
-        //          this.signal_note_error
-        //      );
-        //      ocs_share_job.note (identifier, value);
-        //  }
+        public get {
+            return this.note;
+        }
+        public set {
+            var ocs_share_job = new OcsShareJob (this.account);
+            ocs_share_job.signal_finished.connect (
+                this.on_signal_link_share_note_set
+            );
+            ocs_share_job.signal_error.connect (
+                this.signal_note_error
+            );
+            ocs_share_job.note (identifier, value);
+        }
     }
 
 
     public GLib.Date expire_date {
-        //  public get {
-        //      return this.expire_date;
-        //  }
-        //  public set {
-        //      if (this.expire_date == value) {
-        //          signal_expire_date_set ();
-        //          return;
-        //      }
+        public get {
+            return this.expire_date;
+        }
+        public set {
+            if (this.expire_date == value) {
+                signal_expire_date_set ();
+                return;
+            }
 
-        //      var ocs_share_job = new OcsShareJob (this.account);
-        //      ocs_share_job.signal_finished.connect (
-        //          this.on_signal_expire_date_set
-        //      );
-        //      ocs_share_job.signal_error.connect (
-        //          this.on_signal_ocs_error
-        //      );
-        //      ocs_share_job.expire_date (identifier, value);
-        //  }
+            var ocs_share_job = new OcsShareJob (this.account);
+            ocs_share_job.signal_finished.connect (
+                this.on_signal_expire_date_set
+            );
+            ocs_share_job.signal_error.connect (
+                this.on_signal_ocs_error
+            );
+            ocs_share_job.expire_date (identifier, value);
+        }
     }
 
 

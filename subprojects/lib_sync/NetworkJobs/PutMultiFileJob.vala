@@ -24,12 +24,12 @@ public class PutMultiFileJob : AbstractNetworkJob {
     private GLib.List<SingleUploadFileData?> devices;
 
     new string error_string {
-        //  public get {
-        //      this.error_string == "" ? AbstractNetworkJob.error_string : this.error_string;
-        //  }
-        //  protected set {
-        //      this.error_string = value;
-        //  }
+        public get {
+            this.error_string == "" ? base.error_string : this.error_string;
+        }
+        protected set {
+            this.error_string = value;
+        }
     }
 
     private GLib.Uri url;
@@ -117,7 +117,9 @@ public class PutMultiFileJob : AbstractNetworkJob {
     FIXME{ //: GLib.TimeSpan is microseconds, not milliseconds!
     ***********************************************************/
     public GLib.TimeSpan microseconds_since_start {
-        //  return this.request_timer.elapsed ();
+        public get {
+            //  return this.request_timer.elapsed ();
+        }
     }
 
 } // class PutMultiFileJob

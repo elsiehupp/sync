@@ -16,20 +16,20 @@ public class Result<T> { //: GLib.Object {
     class OptionalNoErrorData {}
 
     T result {
-        //  public get {
-        //      /***********************************************************
-        //      GLib.assert_true (!this.is_error)
-        //      ***********************************************************/
-        //      return this.result;
-        //  }
+        public get {
+            /***********************************************************
+            GLib.assert_true (!this.is_error)
+            ***********************************************************/
+            return this.result;
+        }
     }
     Error error {
-        //  public get {
-        //      /***********************************************************
-        //      GLib.assert_true (this.is_error);
-        //      ***********************************************************/
-        //      return this.error;
-        //  }
+        public get {
+            /***********************************************************
+            GLib.assert_true (this.is_error);
+            ***********************************************************/
+            return this.error;
+        }
     }
     bool is_error;
 
@@ -130,9 +130,9 @@ public class Result<T> { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool is_valid {
-        //  public get {
-        //      return !this.is_error;
-        //  }
+        public get {
+            return !this.is_error;
+        }
     }
 
 

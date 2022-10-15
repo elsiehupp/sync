@@ -51,50 +51,48 @@ public class UserModel { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public int current_user_id {
-        //  public get {
-        //      return this.current_user_id;
+        public get {
+            return this.current_user_id;
+        }
+        private set {
+            this.current_user_id = value;
+        }
+        //  construct {
+        //      this.current_user_id = 0;
         //  }
-        //  private set {
-        //      this.current_user_id = value;
-        //  }
-        //  //  construct {
-        //  //      this.current_user_id = 0;
-        //  //  }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public static User current_user {
-        //  public get {
-        //      if (UserModel.current_user_id < 0 || UserModel.current_user_id >= UserModel.users.length ()) {
-        //          return null;
-        //      }
-
-        //      return UserModel.users[this.current_user_id];
-        //  }
+        public get {
+            if (UserModel.current_user_id < 0 || UserModel.current_user_id >= UserModel.users.length ()) {
+                return null;
+            }
+            return UserModel.users[this.current_user_id];
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public string current_user_server {
-        //  public get {
-        //      if (this.current_user_id < 0 || this.current_user_id >= this.users.size ()) {
-        //          return "";
-        //      }
-
-        //      return this.users[this.current_user_id].server;
-        //  }
+        public get {
+            if (this.current_user_id < 0 || this.current_user_id >= this.users.size ()) {
+                return "";
+            }
+            return this.users[this.current_user_id].server;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public int number_of_users {
-        //  public get {
-        //      return this.users.size ();
-        //  }
+        public get {
+            return this.users.size ();
+        }
     }
 
     private bool init = true;
@@ -443,26 +441,24 @@ public class UserModel { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public ActivityListModel current_activity_model {
-        //  public get {
-        //      if (current_user_id < 0 || current_user_id >= this.users.size ()) {
-        //          return null;
-        //      }
-
-        //      return this.users[current_user_id].activity_model ();
-        //  }
+        public get {
+            if (current_user_id < 0 || current_user_id >= this.users.size ()) {
+                return null;
+            }
+            return this.users[current_user_id].activity_model ();
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public GLib.List<AccountApp> app_list {
-        //  public get {
-        //      if (this.current_user_id < 0 || this.current_user_id >= this.users.length ()) {
-        //          return null;
-        //      }
-
-        //      return new GLib.Variant (this.users.nth_data (this.current_user_id).app_list;
-        //  }
+        public get {
+            if (this.current_user_id < 0 || this.current_user_id >= this.users.length ()) {
+                return null;
+            }
+            return new GLib.Variant (this.users.nth_data (this.current_user_id).app_list;
+        }
     }
 
 

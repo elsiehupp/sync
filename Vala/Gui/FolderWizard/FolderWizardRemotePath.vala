@@ -65,7 +65,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     /***********************************************************
     ***********************************************************/
     public bool is_complete {
-        //  public get {
+        public get {
         //      if (!this.instance.folder_tree_widget.current_item ())
         //          return false;
 
@@ -95,7 +95,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
 
         //      on_signal_show_warning (format_warnings (warn_strings));
         //      return true;
-        //  }
+        }
     }
 
     /***********************************************************
