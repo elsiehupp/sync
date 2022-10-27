@@ -98,7 +98,7 @@ public class VfsOff : AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
-    public override bool stat_type_virtual_file (CSync.CSync.FileStat csync_file_stat, void *stat_data) {
+    public override bool stat_type_virtual_file (CSync.FileStat csync_file_stat, void *stat_data) {
         //  return false;
     }
 

@@ -28,7 +28,7 @@ public class NavigationPaneHelper { //: GLib.Object {
             // Re-generate a new CLSID when enabling, possibly throwing away the old one.
             // update_cloud_storage_registry will take care of removing any unknown CLSID our application owns from the registry.
             foreach (FolderConnection folder_connection in this.folder_man.map ()) {
-                folder_connection.navigation_pane_clsid (value ? GLib.Uuid.create_uuid () { //: GLib.Uuid ());
+                folder_connection.navigation_pane_clsid (value ? GLib.Uuid.create_uuid () : GLib.Uuid ());
             }
                 
             GLib.Timeout.add (

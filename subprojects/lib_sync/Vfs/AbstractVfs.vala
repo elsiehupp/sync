@@ -208,7 +208,7 @@ public abstract class AbstractVfs { //: GLib.Object {
     Returning true means that type was fully determined.
     Q_REQUIRED_RESULT
     ***********************************************************/
-    public abstract bool stat_type_virtual_file (CSync.CSync.FileStat csync_file_stat, void *stat_data);
+    public abstract bool stat_type_virtual_file (CSync.FileStat csync_file_stat, void *stat_data);
 
 
     /***********************************************************

@@ -462,7 +462,9 @@ public class OwncloudPropagator { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string local_path {
-        return this.local_directory;
+        public get {
+            return this.local_directory;
+        }
     }
 
 
@@ -482,7 +484,9 @@ public class OwncloudPropagator { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string remote_path {
-        return this.remote_folder;
+        public get {
+            return this.remote_folder;
+        }
     }
 
 

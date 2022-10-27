@@ -457,7 +457,7 @@ public class UserModel { //: GLib.Object {
             if (this.current_user_id < 0 || this.current_user_id >= this.users.length ()) {
                 return null;
             }
-            return new GLib.Variant (this.users.nth_data (this.current_user_id).app_list;
+            return new GLib.Variant (this.users.nth_data (this.current_user_id).app_list);
         }
     }
 

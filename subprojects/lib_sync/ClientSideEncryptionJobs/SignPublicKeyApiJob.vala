@@ -31,9 +31,9 @@ public class SignPublicKeyApiJob : AbstractNetworkJob {
             return this.csr;
         }
         public set {
-            string data = "csr=";
-            data += GLib.Uri.to_percent_encoding (value);
-            this.csr.data = data;
+            //  string data = "csr=";
+            //  data += GLib.Uri.to_percent_encoding (value);
+            //  this.csr.data = data;
         }
     }
 

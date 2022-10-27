@@ -40,7 +40,12 @@ public class SetEncryptionFlagApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public SetEncryptionFlagApiJob (Account account, string file_identifier, FlagAction flag_action = Set, GLib.Object parent = new GLib.Object ()) {
+    public SetEncryptionFlagApiJob (
+        Account account,
+        string file_identifier,
+        FlagAction flag_action = FlagAction.SET,
+        GLib.Object parent = new GLib.Object ()
+    ) {
         //  base (account, E2EE_BASE_URL + "encrypted/" + file_identifier, parent);
         //  this.file_identifier = file_identifier;
         //  this.flag_action = flag_action;

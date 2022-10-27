@@ -1,4 +1,5 @@
 [wrap-git]
+directory = gpseq_lib
 url = git@gitlab.com:kosmospredanie/gpseq.git
 revision = 0.3.3
 

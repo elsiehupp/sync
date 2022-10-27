@@ -263,7 +263,7 @@ public class SyncResult { //: GLib.Object {
         //          this.first_item_error = item;
         //      }
         //  } else if (item.status == SyncFileItem.Status.CONFLICT) {
-        //      if (item.instruction == CSync.CSync.SyncInstructions.CONFLICT) {
+        //      if (item.instruction == CSync.SyncInstructions.CONFLICT) {
         //          this.number_of_new_conflict_items++;
         //          if (this.first_new_conflict_item == null) {
         //              this.first_new_conflict_item = item;

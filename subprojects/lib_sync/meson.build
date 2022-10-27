@@ -156,6 +156,14 @@ srcs = files([
     'Vfs/VfsXAttr/XattrVfsPluginFactory.vala',
     'Vfs/VfsXAttr/XAttrWrapper.vala',
 
+    'Vfs/AbstractVfs.vala',
+    'Vfs/ItemAvailability.vala',
+    'Vfs/PinState.vala',
+    'Vfs/SetupParameters.vala',
+    'Vfs/VfsError.vala',
+    'Vfs/VfsMode.vala',
+    'Vfs/VfsOff.vala',
+
     'WordList.vala'
 ])
 

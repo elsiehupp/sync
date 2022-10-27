@@ -34,7 +34,7 @@ public class TokenCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    new bool ready { private set; public get; }
+    override bool ready { private set; public get; }
 
     /***********************************************************
     ***********************************************************/
@@ -56,14 +56,14 @@ public class TokenCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public string auth_type_string () {
+    public override string auth_type_string () {
         //  return "token";
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public new Soup.Session create_access_manager () {
+    public override Soup.Session create_access_manager () {
         //  Soup.ClientContext soup_context = new TokenCredentialsAccessManager (this);
 
         //  soup_context.authentication_required.connect (
@@ -76,14 +76,14 @@ public class TokenCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public new void ask_from_user () {
+    public override void ask_from_user () {
         //  signal_asked ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public new void fetch_from_keychain () {
+    public override void fetch_from_keychain () {
         //  this.was_fetched = true;
         //  signal_fetched ();
     }
@@ -91,7 +91,7 @@ public class TokenCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public new bool still_valid (GLib.InputStream reply) {
+    public override bool still_valid (GLib.InputStream reply) {
         //  return ( (reply.error != GLib.InputStream.AuthenticationRequiredError)
         //      // returned if user/password or token are incorrect
         //      && (reply.error != GLib.InputStream.OperationCanceledError
@@ -101,12 +101,12 @@ public class TokenCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public new void persist () { }
+    public override void persist () { }
 
 
     /***********************************************************
     ***********************************************************/
-    public void invalidate_token () {
+    public override void invalidate_token () {
         //  GLib.info ("Invalidating token");
         //  this.ready = false;
         //  this.account.clear_cookie_jar ();
@@ -118,7 +118,7 @@ public class TokenCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public new void forget_sensitive_data () {
+    public override void forget_sensitive_data () {
         //  invalidate_token ();
     }
 

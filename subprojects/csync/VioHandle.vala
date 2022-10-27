@@ -15,7 +15,7 @@ libcsync -- a library to sync a directory with another
 ***********************************************************/
 public class VioHandle { //: GLib.Object {
 
-    public Posix.Dir *directory;
+    public Posix.Dir directory;
     public string path;
 
     public static VioHandle open_directory (string name) {

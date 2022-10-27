@@ -36,13 +36,6 @@ srcs = files([
 
     'Utility.vala',
     'Version.vala',
-
-    'Vfs/AbstractVfs.vala',
-    'Vfs/ItemAvailability.vala',
-    'Vfs/PinState.vala',
-    'Vfs/SetupParameters.vala',
-    'Vfs/VfsMode.vala',
-    'Vfs/VfsOff.vala'
 ])
 
 # Dependences
@@ -65,7 +58,7 @@ deps = [
     # subproject('lib_sync').get_variable ('lib_sync_dep'),
     # 'ShellIntegration',
     # 'Testing',
-    # subproject('gpseq_lib').get_variable ('gpseq_dep')
+    subproject('gpseq_lib').get_variable ('gpseq_dep')
 ]
 
 common_lib = library(

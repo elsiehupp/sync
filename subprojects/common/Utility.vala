@@ -540,8 +540,8 @@ public class Utility { //: GLib.Object {
     public static bool fs_case_preserving_override {
         public get {
             string env = GLib.Environment.get_variable ("OWNCLOUD_TEST_CASE_PRESERVING");
-            if (!env == "") {
-                return env.to_int ();
+            if (env != "") {
+                return bool.parse (env);
             }
             return Utility.is_windows () || Utility.is_mac ();
         }

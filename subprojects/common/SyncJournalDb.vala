@@ -1263,9 +1263,9 @@ public class SyncJournalDb { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string database_file_path {
-        //  public get {
-        //      return this.database_file;
-        //  }
+        public get {
+            return this.database_file;
+        }
     }
 
 
@@ -1735,11 +1735,6 @@ public class SyncJournalDb { //: GLib.Object {
     }
 
 
-    public void avoid_renames_on_signal_next_sync (string path) {
-        //  avoid_renames_on_signal_next_sync (path.to_utf8 ());
-    }
-
-
     /***********************************************************
     ***********************************************************/
     public void avoid_renames_on_signal_next_sync (string path) {
@@ -1815,23 +1810,23 @@ public class SyncJournalDb { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public enum SelectiveSyncListType {
-        //  /***********************************************************
-        //  The block list is the list of folders that are unselected in the selective sync dialog.
-        //  For the sync engine, those folders are considered as if they were not there, so the local
-        //  folders will be deleted
-        //  ***********************************************************/
-        //  SELECTIVE_SYNC_BLOCKLIST = 1,
-        //  /***********************************************************
-        //  When a shared folder has a size bigger than a configured size, it is by default not sync'ed
-        //  Unless it is in the allow list, in which case the folder is sync'ed and all its children.
-        //  If a folder is both on the block and the allow list, the block list wins
-        //  ***********************************************************/
-        //  SELECTIVE_SYNC_ALLOWLIST = 2,
-        //  /***********************************************************
-        //  List of big sync folders that have not been confirmed by the user yet and that the UI
-        //  should notify about
-        //  ***********************************************************/
-        //  SELECTIVE_SYNC_UNDECIDEDLIST = 3
+        /***********************************************************
+        The block list is the list of folders that are unselected in the selective sync dialog.
+        For the sync engine, those folders are considered as if they were not there, so the local
+        folders will be deleted
+        ***********************************************************/
+        SELECTIVE_SYNC_BLOCKLIST = 1,
+        /***********************************************************
+        When a shared folder has a size bigger than a configured size, it is by default not sync'ed
+        Unless it is in the allow list, in which case the folder is sync'ed and all its children.
+        If a folder is both on the block and the allow list, the block list wins
+        ***********************************************************/
+        SELECTIVE_SYNC_ALLOWLIST = 2,
+        /***********************************************************
+        List of big sync folders that have not been confirmed by the user yet and that the UI
+        should notify about
+        ***********************************************************/
+        SELECTIVE_SYNC_UNDECIDEDLIST = 3
     }
 
 
@@ -1936,13 +1931,6 @@ public class SyncJournalDb { //: GLib.Object {
     adjusted to retain the invalid etag via this.etag_storage_filter.
     ***********************************************************/
     public void schedule_path_for_remote_discovery (string filename) {
-        //  schedule_path_for_remote_discovery (filename.to_utf8 ());
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void schedule_path_for_remote_discovery (string filename) {
         //  GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
 
         //  if (!check_connect ()) {
@@ -2041,10 +2029,10 @@ public class SyncJournalDb { //: GLib.Object {
     Returns whether the database is currently openend.
     ***********************************************************/
     public bool is_open {
-        //  public get {
-        //      GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
-        //      return this.database.is_open;
-        //  }
+        public get {
+            GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
+            return this.database.is_open;
+        }
     }
 
 
@@ -2100,55 +2088,55 @@ public class SyncJournalDb { //: GLib.Object {
     The data-fingerprint used to detect backup
     ***********************************************************/
     string data_fingerprint {
-        //  set {
-        //      GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
-        //      if (!check_connect ()) {
-        //          return;
-        //      }
+        set {
+            //  GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
+            //  if (!check_connect ()) {
+            //      return;
+            //  }
 
-        //      PreparedSqlQuery data_fingerprint_query_1 = this.query_manager.get_for_key_sql_and_database (
-        //          PreparedSqlQueryManager.Key.SET_DATA_FINGERPRINT_QUERY1,
-        //          "DELETE FROM datafingerprint;",
-        //          this.database
-        //      );
-        //      PreparedSqlQuery data_fingerprint_query_2 = this.query_manager.get_for_key_sql_and_database (
-        //          PreparedSqlQueryManager.Key.SET_DATA_FINGERPRINT_QUERY2,
-        //          "INSERT INTO datafingerprint (fingerprint) VALUES (?1);",
-        //          this.database
-        //      );
-        //      if (data_fingerprint_query_1 == null || data_fingerprint_query_2 == null) {
-        //          return;
-        //      }
+            //  PreparedSqlQuery data_fingerprint_query_1 = this.query_manager.get_for_key_sql_and_database (
+            //      PreparedSqlQueryManager.Key.SET_DATA_FINGERPRINT_QUERY1,
+            //      "DELETE FROM datafingerprint;",
+            //      this.database
+            //  );
+            //  PreparedSqlQuery data_fingerprint_query_2 = this.query_manager.get_for_key_sql_and_database (
+            //      PreparedSqlQueryManager.Key.SET_DATA_FINGERPRINT_QUERY2,
+            //      "INSERT INTO datafingerprint (fingerprint) VALUES (?1);",
+            //      this.database
+            //  );
+            //  if (data_fingerprint_query_1 == null || data_fingerprint_query_2 == null) {
+            //      return;
+            //  }
 
-        //      data_fingerprint_query_1.exec ();
+            //  data_fingerprint_query_1.exec ();
 
-        //      data_fingerprint_query_2.bind_value (1, value);
-        //      data_fingerprint_query_2.exec ();
-        //  }
-        //  get {
-        //      GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
-        //      if (!check_connect ()) {
-        //          return "";
-        //      }
+            //  data_fingerprint_query_2.bind_value (1, value);
+            //  data_fingerprint_query_2.exec ();
+        }
+        get {
+            //  GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
+            //  if (!check_connect ()) {
+            //      return "";
+            //  }
 
-        //      PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
-        //          PreparedSqlQueryManager.Key.GET_DATA_FINGERPRINT_QUERY,
-        //          "SELECT fingerprint FROM datafingerprint",
-        //          this.database
-        //      );
-        //      if (query == null) {
-        //          return "";
-        //      }
+            //  PreparedSqlQuery query = this.query_manager.get_for_key_sql_and_database (
+            //      PreparedSqlQueryManager.Key.GET_DATA_FINGERPRINT_QUERY,
+            //      "SELECT fingerprint FROM datafingerprint",
+            //      this.database
+            //  );
+            //  if (query == null) {
+            //      return "";
+            //  }
 
-        //      if (!query.exec ()) {
-        //          return "";
-        //      }
+            //  if (!query.exec ()) {
+            //      return "";
+            //  }
 
-        //      if (!query.next ().has_data) {
-        //          return "";
-        //      }
-        //      return query.byte_array_value (0);
-        //  }
+            //  if (!query.next ().has_data) {
+            //      return "";
+            //  }
+            //  return query.byte_array_value (0);
+        }
     }
 
 
@@ -2338,11 +2326,11 @@ public class SyncJournalDb { //: GLib.Object {
     Important: Not all vfs plugins store the pin states in the
     database, prefer to use AbstractVfs.pin_state () etc.
     ***********************************************************/
-    public PinStateInterface internal_pin_states {
-        //  public get {
-        //      return this;
-        //  }
-    }
+    //  public PinStateInterface internal_pin_states {
+    //      public get {
+    //          return this;
+    //      }
+    //  }
 
 
     /***********************************************************

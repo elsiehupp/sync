@@ -308,7 +308,7 @@ public class HttpCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     public virtual bool ssl_is_trusted () {
-        //  return false;
+        return false;
     }
 
 
@@ -376,7 +376,7 @@ public class HttpCredentials : AbstractCredentials {
     /***********************************************************
     To fetch the user name as early as possible
     ***********************************************************/
-    public void account (Account account) {
+    public override void account (Account account) {
         //  AbstractCredentials.account (account);
         //  if (this.user == "") {
         //      fetch_user ();
@@ -394,7 +394,7 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public bool retry_if_needed (AbstractNetworkJob job_to_retry) {
+    public override bool retry_if_needed (AbstractNetworkJob job_to_retry) {
         //  if (job_to_retry.input_stream == null || !job_to_retry.input_stream.property (NEED_RETRY_C).to_bool ())
         //      return false;
         //  if (this.is_renewing_oauth_token) {

@@ -381,9 +381,9 @@ public class SyncFileStatusTracker { //: GLib.Object {
 
         //  /***********************************************************
         //  ***********************************************************/
-        //  // The SyncEngine won't notify us at all for CSync.CSync.ExcludedFiles.Type.EXCLUDE_SILENT
-        //  // and CSync.CSync.ExcludedFiles.Type.EXCLUDE_AND_REMOVE excludes. Even though it's possible
-        //  // that the status of CSync.CSync.ExcludedFiles.Type.LIST excludes will change if the user
+        //  // The SyncEngine won't notify us at all for CSync.ExcludedFiles.Type.EXCLUDE_SILENT
+        //  // and CSync.ExcludedFiles.Type.EXCLUDE_AND_REMOVE excludes. Even though it's possible
+        //  // that the status of CSync.ExcludedFiles.Type.LIST excludes will change if the user
         //  // update the exclude list at runtime and doing it statically here removes
         //  // our ability to notify changes through the signal_file_status_changed signal,
         //  // it's an acceptable compromize to treat all exclude types the same.
