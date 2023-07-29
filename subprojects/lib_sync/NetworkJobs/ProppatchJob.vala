@@ -44,8 +44,8 @@ public class ProppatchJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public ProppatchJob.for_account (Account account, string path, GLib.Object parent = new GLib.Object ()) {
-        //  base (account, path, parent);
+    public ProppatchJob.for_account (Account account, string path) {
+        //  base (account, path);
     }
 
 

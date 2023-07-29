@@ -28,7 +28,7 @@ public class TestDownloadingConflictFile : AbstractTestSyncConflict {
         //  GLib.assert_true (conflict_record.initial_base_path == "A/a1");
 
         //  // Now with server headers
-        //  GLib.Object parent;
+
         //  var a2FileId = fake_folder.remote_modifier ().find ("A/a2").file_identifier;
         //  fake_folder.set_server_override (this.override_delegate_downloading_conflict_file);
 
@@ -46,7 +46,7 @@ public class TestDownloadingConflictFile : AbstractTestSyncConflict {
 
     private GLib.InputStream override_delegate_downloading_conflict_file (Soup.Operation operation, Soup.Request request, GLib.OutputStream device) {
         //  if (operation == Soup.GetOperation) {
-        //      var reply = new FakeGetReply (fake_folder.remote_modifier (), operation, request, parent);
+        //      var reply = new FakeGetReply (fake_folder.remote_modifier (), operation, request);
         //      reply.set_raw_header ("OC-Conflict", "1");
         //      reply.set_raw_header ("OC-ConflictBaseFileId", a2FileId);
         //      reply.set_raw_header ("OC-ConflictBaseMtime", "1234");

@@ -209,7 +209,7 @@ public class OwncloudPropagator { //: GLib.Object {
         //          // this is an item in a directory which is going to be removed.
         //          var del_dir_job = (PropagateDirectory)directories_to_remove.nth_data (0);
 
-        //          var is_new_directory = item.is_directory () &&
+        //          var is_new_directory = item.is_directory &&
         //                  (item.instruction == CSync.SyncInstructions.NEW || item.instruction == CSync.SyncInstructions.TYPE_CHANGE);
 
         //          if (item.instruction == CSync.SyncInstructions.REMOVE || is_new_directory) {
@@ -256,7 +256,7 @@ public class OwncloudPropagator { //: GLib.Object {
         //          directories.pop ();
         //      }
 
-        //      if (item.is_directory ()) {
+        //      if (item.is_directory) {
         //          start_directory_propagation (item,
         //                                    directories,
         //                                    directories_to_remove,
@@ -504,7 +504,7 @@ public class OwncloudPropagator { //: GLib.Object {
         //  case CSync.SyncInstructions.NEW:
         //  case CSync.SyncInstructions.TYPE_CHANGE:
         //  case CSync.SyncInstructions.CONFLICT:
-        //      if (item.is_directory ()) {
+        //      if (item.is_directory) {
         //          // CONFLICT has this.direction == None
         //          if (item.direction != SyncFileItem.Direction.UP) {
         //              var propagate_local_mkdir_job = new PropagateLocalMkdir (this, item);

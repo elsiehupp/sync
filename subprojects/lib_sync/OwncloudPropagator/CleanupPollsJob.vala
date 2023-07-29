@@ -28,10 +28,9 @@ public class CleanupPollsJob { //: GLib.Object {
         Account account,
         Common.SyncJournalDb journal,
         string local_path,
-        Common.AbstractVfs vfs,
-        GLib.Object parent = new GLib.Object ()
+        Common.AbstractVfs vfs
     ) {
-        //  base (parent);
+        //  base ();
         //  this.poll_infos = poll_infos;
         //  this.account = account;
         //  this.journal = journal;

@@ -34,7 +34,7 @@ public class WebFlowCredentialsDialog { //: Gtk.Dialog {
     //  /***********************************************************
     //  ***********************************************************/
     //  public WebFlowCredentialsDialog (LibSync.Account account, bool use_flow2, Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
         //  this.use_flow2 = use_flow2;
         //  this.flow_2_auth_widget = null;
     //  //  #ifdef WITH_WEBENGINE

@@ -17,8 +17,8 @@ public class WebFlowCredentialsAccessManager : LibSync.Soup.ClientContext {
 
     //  /***********************************************************
     //  ***********************************************************/
-    //  public WebFlowCredentialsAccessManager (WebFlowCredentials credentials, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    //  public WebFlowCredentialsAccessManager (WebFlowCredentials credentials) {
+        //  base ();
         //  this.credentials = credentials;
     //  }
 

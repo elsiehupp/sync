@@ -46,7 +46,7 @@ public class Systray { //: GLib.SystemTrayIcon {
 
         //  /***********************************************************
         //  ***********************************************************/
-        //  public override Soup.ClientContext create (GLib.Object parent) {
+        //  public override Soup.ClientContext create () {
         //      return new Soup.ClientContext (parent);
         //  }
     //  }

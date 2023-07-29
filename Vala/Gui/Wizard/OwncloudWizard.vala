@@ -115,7 +115,7 @@ public class OwncloudWizard { //: GLib.Wizard {
     /***********************************************************
     ***********************************************************/
     public OwncloudWizard (Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
         //  this.account = null;
         //  this.registration = false;
         //  this.welcome_page = new WelcomePage (this);

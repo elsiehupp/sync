@@ -134,8 +134,8 @@ public class ConnectionValidator { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public ConnectionValidator (unowned AccountState account_state, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public ConnectionValidator (unowned AccountState account_state) {
+        //  base ();
         //  this.account_state = account_state;
         //  this.account = account_state.account;
         //  this.is_checking_server_and_auth = false;

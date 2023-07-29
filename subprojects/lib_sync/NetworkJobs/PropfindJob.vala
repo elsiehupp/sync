@@ -34,8 +34,8 @@ public class PropfindJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public PropfindJob.for_account (Account account, string path, GLib.Object parent = new GLib.Object ()) {
-        //  base (account, path, parent);
+    public PropfindJob.for_account (Account account, string path) {
+        //  base (account, path);
     }
 
 

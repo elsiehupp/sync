@@ -28,10 +28,9 @@ public class MoveJob : AbstractNetworkJob {
     public MoveJob.for_path (
         Account account,
         string path,
-        string destination,
-        GLib.Object parent = new GLib.Object ()
+        string destination
     ) {
-        //  base (account, path, parent);
+        //  base (account, path);
         //  this.destination = destination;
     }
 
@@ -41,10 +40,9 @@ public class MoveJob : AbstractNetworkJob {
         Account account,
         GLib.Uri url,
         string destination,
-        GLib.HashTable<string, string> extra_headers,
-        GLib.Object parent
+        GLib.HashTable<string, string> extra_headers
     ) {
-        //  base (account, "", parent);
+        //  base (account, "");
         //  this.destination = destination;
         //  this.url = url;
         //  this.extra_headers = extra_headers;

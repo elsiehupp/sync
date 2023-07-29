@@ -31,7 +31,7 @@ public class GLib.ProgressIndicator { //: Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public GLib.ProgressIndicator (Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
         //  set_size_policy (GLib.SizePolicy.Fixed, GLib.SizePolicy.Fixed);
         //  set_focus_policy (GLib.NoFocus);
     }

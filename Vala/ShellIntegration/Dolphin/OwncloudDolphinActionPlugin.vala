@@ -22,8 +22,10 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
 
     /***********************************************************
     ***********************************************************/
-    public OwncloudDolphinPluginAction (GLib.Object parent, GLib.List<GLib.Variant> list) {
-        //  base (parent);
+    public OwncloudDolphinPluginAction (
+        GLib.List<GLib.Variant> list
+    ) {
+        //  base ();
     }
 
 

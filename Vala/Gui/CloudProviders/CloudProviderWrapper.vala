@@ -117,8 +117,8 @@ public class CloudProviderWrapper { //: GLib.Object {
 
     //  /***********************************************************
     //  ***********************************************************/
-    //  public CloudProviderWrapper (GLib.Object parent = new GLib.Object (), FolderConnection folder_connection = null, int folder_identifier = 0, CloudProvidersProviderExporter* cloudprovider = null) {
-        //  base (parent);
+    //  public CloudProviderWrapper (FolderConnection folder_connection = null, int folder_identifier = 0, CloudProvidersProviderExporter* cloudprovider = null) {
+        //  base ();
         //  this.folder_connection = folder_connection;
         //  GMenuModel model;
         //  GActionGroup action_group;

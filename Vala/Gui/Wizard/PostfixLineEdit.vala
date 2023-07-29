@@ -61,7 +61,7 @@ public class PostfixLineEdit { //: Gtk.LineEdit {
     //  /***********************************************************
     //  ***********************************************************/
     //  public PostfixLineEdit (Gtk.Widget parent) {
-        //  base (parent);
+        //  base ();
     //  }
 
 

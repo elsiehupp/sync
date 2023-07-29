@@ -106,8 +106,8 @@ public class KirigamiWheelEvent { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public KirigamiWheelEvent (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public KirigamiWheelEvent () {
+        //  base ();
     }
 
 

@@ -61,7 +61,7 @@ public class ShareDialog { //: Gtk.Dialog {
         //  OwncloudGui.ShareDialogStartPage start_page,
         //  Gtk.Widget parent = new Gtk.Widget ()
     ) {
-        //  base (parent);
+        //  base ();
         //  this.instance = new ShareDialog ();
         //  this.account_state = account_state;
         //  this.share_path = share_path;
@@ -121,7 +121,7 @@ public class ShareDialog { //: Gtk.Dialog {
         //      return;
         //  }
 
-        //  if (new GLib.FileInfo (this.local_path).is_file ()) {
+        //  if (new GLib.FileInfo (this.local_path).is_file) {
         //      var thumbnail_job = new ThumbnailJob (this.share_path, this.account_state.account, this);
         //      thumbnail_job.signal_job_finished.connect (
         //          this.on_signal_thumbnail_fetched

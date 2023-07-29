@@ -18,8 +18,8 @@ public class FakeGetWithDataReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakeGetWithDataReply (FileInfo remote_root_file_info, string data, Soup.Operation operation, Soup.Request request, GLib.Object parent) {
-        //  base (parent);
+    public FakeGetWithDataReply (FileInfo remote_root_file_info, string data, Soup.Operation operation, Soup.Request request) {
+        //  base ();
         //  set_request (request);
         //  set_url (request.url);
         //  set_operation (operation);

@@ -29,7 +29,7 @@ public class SslButton { //: Gtk.ToolButton {
     //  /***********************************************************
     //  ***********************************************************/
     //  public SslButton (Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
         //  popup_mode (Gtk.ToolButton.Instant_popup);
         //  auto_raise (true);
 

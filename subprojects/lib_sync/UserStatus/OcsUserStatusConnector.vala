@@ -54,8 +54,8 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
 
     /***********************************************************
     ***********************************************************/
-    public OcsUserStatusConnector (Account account, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public OcsUserStatusConnector (Account account) {
+        //  base ();
         //  this.account = account;
         //  GLib.assert (this.account);
         //  this.user_status_supported = this.account.capabilities.user_status ();

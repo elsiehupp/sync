@@ -21,7 +21,7 @@ public class SslErrorDialog { //: Gtk.Dialog {
     //  /***********************************************************
     //  ***********************************************************/
     //  public SslErrorDialog (LibSync.Account account, Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
         //  this.all_trusted = false;
         //  this.instance = new SslErrorDialog ();
         //  this.account = account;

@@ -22,7 +22,7 @@ public class IgnoreListTableWidget { //: Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public IgnoreListTableWidget (Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
         //  this.instance = new IgnoreListTableWidget ();
         //  window_flags (window_flags () & ~GLib.WindowContextHelpButtonHint);
         //  instance.up_ui (this);

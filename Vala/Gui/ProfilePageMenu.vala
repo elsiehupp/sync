@@ -18,7 +18,7 @@ public class ProfilePageMenu { //: Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public ProfilePageMenu (LibSync.Account account, string share_with_user_id, Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
         //  this.profile_connector = account;
         //  this.profile_connector.hovercard_fetched.connect (
         //      this.on_signal_hovercard_fetched

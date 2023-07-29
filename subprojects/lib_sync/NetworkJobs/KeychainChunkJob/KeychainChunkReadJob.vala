@@ -22,8 +22,8 @@ public class KeychainChunkReadJob : AbstractKeychainChunkJob {
 
     /***********************************************************
     ***********************************************************/
-    public ReadJob.for_account (Account account, string key, bool keychain_migration, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public ReadJob.for_account (Account account, string key, bool keychain_migration) {
+        //  base ();
         //  this.account = account;
         //  this.key = key;
 
@@ -36,8 +36,8 @@ public class KeychainChunkReadJob : AbstractKeychainChunkJob {
 
     /***********************************************************
     ***********************************************************/
-    public ReadJob (string key, GLib.Object parent = new GLib.Object ()) {
-        //  base (null, key, false, parent);
+    public ReadJob (string key) {
+        //  base (null, key, false);
     }
 
 

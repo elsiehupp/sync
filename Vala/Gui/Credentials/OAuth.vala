@@ -61,8 +61,8 @@ public class OAuth { //: GLib.Object {
 
     //  /***********************************************************
     //  ***********************************************************/
-    //  public OAuth (LibSync.Account account, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    //  public OAuth (LibSync.Account account) {
+        //  base ();
         //  this.account = account;
     //  }
 

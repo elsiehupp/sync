@@ -384,8 +384,8 @@ public class Account { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private Account (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    private Account () {
+        //  base ();
         //  this.capabilities = new Capabilities (GLib.HashTable<string, GLib.Variant> (str_hash, str_equal));
         //  this.http2_supported = false;
         //  this.push_notifications = null;

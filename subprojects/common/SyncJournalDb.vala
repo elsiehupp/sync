@@ -421,8 +421,8 @@ public class SyncJournalDb { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public SyncJournalDb (string db_file_path, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public SyncJournalDb (string db_file_path) {
+        //  base ();
         //  this.database_file = db_file_path;
         //  this.transaction = 0;
         //  this.metadata_table_is_empty = false;
@@ -2028,12 +2028,12 @@ public class SyncJournalDb { //: GLib.Object {
     /***********************************************************
     Returns whether the database is currently openend.
     ***********************************************************/
-    public bool is_open {
-        public get {
-            GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
-            return this.database.is_open;
-        }
-    }
+    //  public bool is_open {
+    //      public get {
+    //          GLib.MutexLocker mutex_locker = new GLib.MutexLocker (this.mutex);
+    //          return this.database.is_open;
+    //      }
+    //  }
 
 
     /***********************************************************

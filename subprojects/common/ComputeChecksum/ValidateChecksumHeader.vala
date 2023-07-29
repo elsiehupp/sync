@@ -27,8 +27,8 @@ public class ValidateChecksumHeader : AbstractComputeChecksum {
 
     /***********************************************************
     ***********************************************************/
-    public ValidateChecksumHeader (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public ValidateChecksumHeader () {
+        //  base ();
     }
 
 

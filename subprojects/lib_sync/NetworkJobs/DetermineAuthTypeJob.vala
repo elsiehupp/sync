@@ -59,8 +59,8 @@ public class DetermineAuthTypeJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public DetermineAuthTypeJob.for_account (Account account, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public DetermineAuthTypeJob.for_account (Account account) {
+        //  base ();
         //  this.account = account;
     }
 

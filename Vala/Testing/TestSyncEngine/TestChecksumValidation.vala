@@ -14,7 +14,6 @@ public class TestChecksumValidation : AbstractTestSyncEngine {
     ***********************************************************/
     private TestChecksumValidation () {
         //  FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        //  GLib.Object parent;
 
         //  string checksum_value;
         //  string content_md5_value;
@@ -71,7 +70,7 @@ public class TestChecksumValidation : AbstractTestSyncEngine {
 
     private GLib.InputStream override_delegate_checksum_validation (Soup.Operation operation, Soup.Request request, GLib.OutputStream device) {
         //  if (operation == Soup.GetOperation) {
-        //      var reply = new FakeGetReply (fake_folder.remote_modifier (), operation, request, parent);
+        //      var reply = new FakeGetReply (fake_folder.remote_modifier (), operation, request);
         //      if (!checksum_value == null)
         //          reply.set_raw_header ("OC-Checksum", checksum_value);
         //      if (!content_md5_value == null)

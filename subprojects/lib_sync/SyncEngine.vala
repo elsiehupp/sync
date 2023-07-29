@@ -784,7 +784,7 @@ public class SyncEngine { //: GLib.Object {
         //  if (Common.Utility.is_conflict_file (item.file)) {
         //      this.seen_conflict_files.insert (item.file);
         //  }
-        //  if (item.instruction == CSync.SyncInstructions.UPDATE_METADATA && !item.is_directory ()) {
+        //  if (item.instruction == CSync.SyncInstructions.UPDATE_METADATA && !item.is_directory) {
         //      // For directories, metadata-only updates will be done after all their files are propagated.
 
         //      // Update the database now already :  New remote fileid or Etag or Remote_perm
@@ -882,7 +882,7 @@ public class SyncEngine { //: GLib.Object {
 
         //  on_signal_new_item (item);
 
-        //  if (item.is_directory ()) {
+        //  if (item.is_directory) {
         //      on_signal_folder_discovered (item.etag == "", item.file);
         //  }
     }

@@ -108,8 +108,8 @@ public class Logger { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private Logger (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    private Logger () {
+        //  base ();
         //  q_message_pattern ("%{time yyyy-MM-dd hh:mm:ss:zzz} [ %{type} %{category} %{file}:%{line} "
         //                      + "]%{if-debug}\t[ %{function} ]%{endif}:\t%{message}");
         //  this.crash_log.resize (CRASH_LOG_SIZE);

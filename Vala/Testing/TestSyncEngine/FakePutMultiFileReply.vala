@@ -19,8 +19,8 @@ public class FakePutMultiFileReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakePutMultiFileReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, string content_type, string put_payload, GLib.Object parent) {
-        //  base (parent);
+    public FakePutMultiFileReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, string content_type, string put_payload) {
+        //  base ();
         //  set_request (request);
         //  set_url (request.url);
         //  set_operation (operation);

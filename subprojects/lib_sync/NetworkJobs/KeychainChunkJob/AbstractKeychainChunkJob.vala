@@ -52,8 +52,8 @@ public abstract class AbstractKeychainChunkJob { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public AbstractKeychainChunkJob (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public AbstractKeychainChunkJob () {
+        //  base ();
         //  this.error = Secret.Collection.NoError;
         //  this.service_name = Theme.app_name;
     }

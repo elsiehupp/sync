@@ -35,8 +35,8 @@ public class UserAppsModel { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private UserAppsModel (GLib.Object parent) {
-        //  base (parent);
+    private UserAppsModel () {
+        //  base ();
     }
 
 

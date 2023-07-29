@@ -73,8 +73,8 @@ public class ComputeChecksum : AbstractComputeChecksum {
 
     /***********************************************************
     ***********************************************************/
-    public ComputeChecksum (GLib.Object parent = new GLib.Object ()) {
-        //      base (parent);
+    public ComputeChecksum () {
+        //      base ();
     }
 
 

@@ -92,7 +92,7 @@ public class ShareUserGroupWidget { //: Gtk.Widget {
         string private_link_url,
         Gtk.Widget parent = new Gtk.Widget ()
     ) {
-        //  base (parent);
+        //  base ();
         //  this.instance = new ShareUserGroupWidget ();
         //  this.account = account;
         //  this.share_path = share_path;
@@ -106,7 +106,7 @@ public class ShareUserGroupWidget { //: Gtk.Widget {
         //  this.instance.up_ui (this);
 
         //  //  Is this a file or folder?
-        //  this.is_file = new GLib.FileInfo (local_path).is_file ();
+        //  this.is_file = new GLib.FileInfo (local_path).is_file;
 
         //  this.completer = new GLib.Completer (this);
         //  this.completer_model = new ShareeModel (this.account,

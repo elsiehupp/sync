@@ -18,7 +18,7 @@ public class FolderStatusView { //: GLib.TreeView {
     /***********************************************************
     ***********************************************************/
     public FolderStatusView (Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
     }
 
 

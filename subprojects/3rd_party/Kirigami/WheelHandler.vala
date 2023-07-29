@@ -56,8 +56,8 @@ public class WheelHandler { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public WheelHandler (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public WheelHandler () {
+        //  base ();
     }
 
 

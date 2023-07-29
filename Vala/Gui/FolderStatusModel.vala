@@ -254,8 +254,8 @@ public class FolderStatusModel { //: GLib.AbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    public FolderStatusModel (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public FolderStatusModel () {
+        //  base ();
         //  this.account_state = null;
     }
 

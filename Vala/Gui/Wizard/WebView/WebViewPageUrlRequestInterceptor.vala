@@ -7,8 +7,8 @@ public class WebViewPageUrlRequestInterceptor { //: GLib.WebEngineUrlRequestInte
 
     /***********************************************************
     ***********************************************************/
-    public WebViewPageUrlRequestInterceptor (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public WebViewPageUrlRequestInterceptor () {
+        //  base ();
     }
 
 

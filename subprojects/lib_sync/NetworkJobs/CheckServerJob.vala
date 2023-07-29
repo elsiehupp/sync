@@ -65,8 +65,8 @@ public class CheckServerJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public CheckServerJob.for_account (Account account, GLib.Object parent = new GLib.Object ()) {
-        //  base (account, STATUS_PHP_C, parent);
+    public CheckServerJob.for_account (Account account) {
+        //  base (account, STATUS_PHP_C);
         //  this.subdir_fallback = false;
         //  this.permanent_redirects = 0;
         //  this.ignore_credential_failure = true;

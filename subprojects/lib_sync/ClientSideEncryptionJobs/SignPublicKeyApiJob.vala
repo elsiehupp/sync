@@ -48,8 +48,8 @@ public class SignPublicKeyApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public SignPublicKeyApiJob (Account account, string path, GLib.Object parent = new GLib.Object ()) {
-        //  base (account, path, parent);
+    public SignPublicKeyApiJob (Account account, string path) {
+        //  base (account, path);
     }
 
 

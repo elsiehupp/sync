@@ -44,10 +44,9 @@ public class ShareManager { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public ShareManager (
-        LibSync.Account account,
-        GLib.Object parent = new GLib.Object ()
+        LibSync.Account account
     ) {
-        //  base (parent);
+        //  base ();
         //  this.account = account;
     }
 

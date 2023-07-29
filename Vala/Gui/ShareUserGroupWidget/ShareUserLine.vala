@@ -49,7 +49,7 @@ public class ShareUserLine { //: Gtk.Widget {
         bool is_file,
         Gtk.Widget parent = new Gtk.Widget ()
     ) {
-        //  base (parent);
+        //  base ();
         //  this.instance = new ShareUserLine ();
         //  this.account = account;
         //  this.share = share;

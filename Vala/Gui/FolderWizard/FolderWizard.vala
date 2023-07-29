@@ -50,7 +50,7 @@ public class FolderWizard { //: GLib.Wizard {
     FolderConnection wizard itself
     ***********************************************************/
     public FolderWizard (LibSync.Account account, Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
         //  this.folder_wizard_source_page = new FolderWizardLocalPath (account);
         //  this.folder_wizard_target_page = null;
         //  this.folder_wizard_selective_sync_page = new FolderWizardSelectiveSync (account);

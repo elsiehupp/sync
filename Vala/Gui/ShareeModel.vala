@@ -48,8 +48,8 @@ public class ShareeModel { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public ShareeModel (LibSync.Account account, string type, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public ShareeModel (LibSync.Account account, string type) {
+        //  base ();
         //  this.account = account;
         //  this.type = type;
     }

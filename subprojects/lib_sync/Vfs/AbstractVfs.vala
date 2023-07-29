@@ -69,8 +69,8 @@ public abstract class AbstractVfs { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected AbstractVfs (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    protected AbstractVfs () {
+        //  base ();
     }
 
 

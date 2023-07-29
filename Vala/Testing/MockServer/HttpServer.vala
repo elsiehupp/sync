@@ -18,8 +18,8 @@ public class HttpServer { //: GLib.TcpServer {
 
     /***********************************************************
     ***********************************************************/
-    public HttpServer (int16 port, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public HttpServer (int16 port) {
+        //  base ();
         //  listen (GLib.HostAddress.Any, port);
     }
 

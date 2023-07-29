@@ -27,7 +27,7 @@ public class AuthenticationDialog { //: Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     public AuthenticationDialog (string realm, string domain, Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
         //  this.user = new Gtk.LineEdit ();
         //  this.password = new Gtk.LineEdit ();
         //  this.window_title (_("Authentication Required"));

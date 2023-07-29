@@ -44,10 +44,9 @@ public class PutMultiFileJob : AbstractNetworkJob {
     public PutMultiFileJob.for_account (
         Account account,
         GLib.Uri url,
-        GLib.List<SingleUploadFileData?> devices,
-        GLib.Object parent = new GLib.Object ()
+        GLib.List<SingleUploadFileData?> devices
     ) {
-        //  base (account, {}, parent);
+        //  base (account, {});
         //  this.devices = std.move (devices);
         //  this.url = url;
         //  this.body.content_type (Soup.Multipart.Related_type);

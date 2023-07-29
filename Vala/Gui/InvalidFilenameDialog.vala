@@ -46,7 +46,7 @@ public class InvalidFilenameDialog { //: Gtk.Dialog {
     //  /***********************************************************
     //  ***********************************************************/
     //  public InvalidFilenameDialog (LibSync.Account account, FolderConnection folder_connection, string file_path, Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
         //  this.instance = new InvalidFilenameDialog ();
         //  this.account = account;
         //  this.folder_connection = folder_connection;

@@ -46,7 +46,7 @@ public class ElidedLabel { //: Gtk.Label {
         GLib.TextElideMode elide_mode = GLib.ElideNone,
         Gtk.Widget parent
     ) {
-        base (text, parent);
+        base (text);
         this.elide_mode = elide_mode;
         this.text = text;
     }

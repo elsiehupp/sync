@@ -23,7 +23,7 @@ public class NetworkSettings { //: Gtk.Widget {
     //  /***********************************************************
     //  ***********************************************************/
     //  public NetworkSettings (Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
         //  this.instance = new NetworkSettings ();
         //  this.instance.up_ui (this);
 

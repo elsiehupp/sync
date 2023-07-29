@@ -20,7 +20,7 @@ public class TestLateAbortHard : AbstractTestChunkingNg {
         //  set_chunk_size (fake_folder.sync_engine, 1 * 1000 * 1000);
 
         //  // Make the MOVE never reply, but trigger a client-on_signal_abort and apply the change remotely
-        //  GLib.Object parent;
+
         //  string move_checksum_header;
         //  int n_get = 0;
         //  int response_delay = 100000; // bigger than on_signal_abort-wait timeout
@@ -97,7 +97,7 @@ public class TestLateAbortHard : AbstractTestChunkingNg {
         //  if (request.attribute (Soup.Request.CustomVerbAttribute) == "MOVE") {
         //      GLib.Timeout.add (50, fake_folder.sync_engine.on_signal_abort);
         //      move_checksum_header = request.raw_header ("OC-Checksum");
-        //      return new DelayedReply<FakeChunkMoveReply> (response_delay, fake_folder.upload_state (), fake_folder.remote_modifier (), operation, request, parent);
+        //      return new DelayedReply<FakeChunkMoveReply> (response_delay, fake_folder.upload_state (), fake_folder.remote_modifier (), operation, request);
         //  } else if (operation == Soup.GetOperation) {
         //      n_get++;
         //  }

@@ -76,8 +76,8 @@ public class ProgressDispatcher { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private ProgressDispatcher (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    private ProgressDispatcher () {
+        //  base ();
     }
 
 

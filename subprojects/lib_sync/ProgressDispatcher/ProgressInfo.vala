@@ -408,7 +408,7 @@ public class ProgressInfo { //: GLib.Object {
     total amount of time
     ***********************************************************/
     public static inline bool is_size_dependent (SyncFileItem item) {
-        //  return !item.is_directory ()
+        //  return !item.is_directory
         //      && (item.instruction == CSync.SyncInstructions.CONFLICT
         //          || item.instruction == CSync.SyncInstructions.SYNC
         //          || item.instruction == CSync.SyncInstructions.NEW

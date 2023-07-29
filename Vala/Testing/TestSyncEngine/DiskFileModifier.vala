@@ -22,7 +22,7 @@ public class DiskFileModifier : AbstractFileModifier {
     ***********************************************************/
     public override void remove (string relative_path) {
         //  GLib.FileInfo file_info = new GLib.FileInfo (this.root_directory.file_path (relative_path));
-        //  if (file_info.is_file ()) {
+        //  if (file_info.is_file) {
         //      GLib.assert_true (this.root_directory.remove (relative_path));
         //  } else {
         //      GLib.assert_true (new GLib.Dir ( file_info.file_path ).remove_recursively ());

@@ -31,8 +31,8 @@ public class DiscoverySingleLocalDirectoryJob { //: GLib.Object /*, GLib.Runnabl
 
     /***********************************************************
     ***********************************************************/
-    public DiscoverySingleLocalDirectoryJob.for_account (unowned Account account, string local_path, Common.AbstractVfs vfs, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public DiscoverySingleLocalDirectoryJob.for_account (unowned Account account, string local_path, Common.AbstractVfs vfs) {
+        //  base ();
         //  this.local_path = local_path;
         //  this.account = account;
         //  this.vfs = vfs;

@@ -74,10 +74,9 @@ public class DiscoverySingleDirectoryJob { //: GLib.Object {
     ***********************************************************/
     public DiscoverySingleDirectoryJob.for_account (
         Account account,
-        string path,
-        GLib.Object parent = new GLib.Object ()
+        string path
     ) {
-        //  base (parent);
+        //  base ();
         //  this.sub_path = path;
         //  this.account = account;
         //  this.ignored_first = false;

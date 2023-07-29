@@ -33,8 +33,8 @@ public class EncryptFolderJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public EncryptFolderJob.for_account (Account account, Common.SyncJournalDb journal, string path, string file_identifier, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public EncryptFolderJob.for_account (Account account, Common.SyncJournalDb journal, string path, string file_identifier) {
+        //  base ();
         //  this.account = account;
         //  this.journal = journal;
         //  this.path = path;

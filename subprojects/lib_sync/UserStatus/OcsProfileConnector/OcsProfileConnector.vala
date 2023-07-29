@@ -15,8 +15,8 @@ public class OcsProfileConnector { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public OcsProfileConnector.for_account (Account account, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public OcsProfileConnector.for_account (Account account) {
+        //  base ();
         //  this.account = account;
     }
 

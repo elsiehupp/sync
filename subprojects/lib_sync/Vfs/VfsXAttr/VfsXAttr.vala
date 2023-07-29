@@ -12,8 +12,8 @@ public class VfsXAttr : Common.AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
-    public VfsXAttr (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public VfsXAttr () {
+        //  base ();
     }
 
 

@@ -87,8 +87,8 @@ public class JsonApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public JsonApiJob.for_account (Account account, string path, GLib.Object parent = new GLib.Object ()) {
-        //  base (account, path, parent);
+    public JsonApiJob.for_account (Account account, string path) {
+        //  base (account, path);
     }
 
 

@@ -4313,8 +4313,8 @@ public class EmojiModel { //: GLib.Object {
 
     //  /***********************************************************
     //  ***********************************************************/
-    //  public EmojiModel (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    //  public EmojiModel () {
+        //  base ();
     //  }
 
 

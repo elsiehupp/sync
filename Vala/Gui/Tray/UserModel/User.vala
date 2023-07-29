@@ -67,8 +67,8 @@ public class User { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public User (unowned AccountState account, bool is_current = false, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public User (unowned AccountState account, bool is_current = false) {
+        //  base ();
         //  this.account_state = account;
         //  this.is_current_user = is_current;
         //  this.activity_model = new ActivityListModel (this.account_state, this);

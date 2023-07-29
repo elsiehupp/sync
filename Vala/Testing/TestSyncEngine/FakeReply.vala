@@ -11,7 +11,7 @@ public class FakeReply { //: GLib.InputStream {
 
     /***********************************************************
     ***********************************************************/
-    public FakeReply (GLib.Object parent = new GLib.Object ()) {
+    public FakeReply () {
         //  set_raw_header ("Date", GLib.DateTime.current_date_time_utc ().to_string (GLib.RFC2822Date));
     }
 

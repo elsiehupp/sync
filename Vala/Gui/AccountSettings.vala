@@ -27,8 +27,8 @@ public class AccountSettings { //: Gtk.Widget {
 
         //  public FolderStatusModel model;
 
-        //  public MouseCursorChanger (GLib.Object parent) {
-        //      base (parent);
+        //  public MouseCursorChanger () {
+        //      base ();
         //  }
 
 
@@ -96,7 +96,7 @@ public class AccountSettings { //: Gtk.Widget {
     //  /***********************************************************
     //  ***********************************************************/
     //  public AccountSettings (AccountState account_state, Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
         //  this.instance = new AccountSettings ();
         //  this.was_disabled_before = false;
         //  this.account_state = account_state;

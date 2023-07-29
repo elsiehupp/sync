@@ -24,10 +24,9 @@ public class AccountApp { //: GLib.Object {
         string name,
         GLib.Uri url,
         string identifier,
-        GLib.Uri icon_url,
-        GLib.Object parent = new GLib.Object ()
+        GLib.Uri icon_url
     ) {
-        //  base (parent);
+        //  base ();
         //  this.name = name;
         //  this.url = url;
         //  this.identifier = identifier;

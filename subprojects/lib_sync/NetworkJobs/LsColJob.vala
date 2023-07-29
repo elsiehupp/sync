@@ -37,15 +37,15 @@ public class LscolJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public LscolJob.for_path (Account account, string path, GLib.Object parent = new GLib.Object ()) {
-        //  base (account, path, parent);
+    public LscolJob.for_path (Account account, string path) {
+        //  base (account, path);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public LscolJob.for_url (Account account, GLib.Uri url, GLib.Object parent = new GLib.Object ()) {
-        //  base (account, "", parent);
+    public LscolJob.for_url (Account account, GLib.Uri url) {
+        //  base (account, "");
         //  this.url = url;
     }
 

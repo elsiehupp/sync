@@ -12,8 +12,8 @@ public class ExternalWebEnginePage { //: GLib.WebEnginePage {
 
     /***********************************************************
     ***********************************************************/
-    public ExternalWebEnginePage (GLib.WebEngineProfile profile, GLib.Object parent = new GLib.Object ()) {
-        //  base (profile, parent);
+    public ExternalWebEnginePage (GLib.WebEngineProfile profile) {
+        //  base (profile);
 
     }
 

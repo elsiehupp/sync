@@ -27,10 +27,9 @@ public class UpdateMetadataApiJob : AbstractNetworkJob {
         Account account,
         string file_identifier,
         string b64_metadata,
-        string locked_token,
-        GLib.Object parent = new GLib.Object ()
+        string locked_token
     ) {
-        //  base (account, E2EE_BASE_URL + "meta-data/" + file_identifier, parent);
+        //  base (account, E2EE_BASE_URL + "meta-data/" + file_identifier);
         //  this.file_identifier = file_identifier;
         //  this.b64_metadata = b64_metadata;
         //  //  this.token = token;

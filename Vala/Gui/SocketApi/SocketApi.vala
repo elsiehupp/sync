@@ -70,8 +70,8 @@ public class SocketApi { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public SocketApi (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public SocketApi () {
+        //  base ();
         //  string socket_path;
 
         //  q_register_meta_type<SocketListener> ("SocketListener*");
@@ -886,7 +886,7 @@ public class SocketApi { //: GLib.Object {
         //  // If the parent doesn't accept new files, go to the root of the sync folder_connection
         //  GLib.FileInfo file_info = new GLib.FileInfo (local_file);
         //  var parent_record = parent_dir.journal_record ();
-        //  if ((file_info.is_file () && !parent_record.remote_permissions.has_permission (Common.RemotePermissions.Permissions.CAN_ADD_FILE))
+        //  if ((file_info.is_file && !parent_record.remote_permissions.has_permission (Common.RemotePermissions.Permissions.CAN_ADD_FILE))
         //      || (file_info.is_dir () && !parent_record.remote_permissions.has_permission (Common.RemotePermissions.Permissions.CAN_ADD_SUB_DIRECTORIES))) {
         //      default_dir_and_name = new GLib.FileInfo (default_dir_and_name).filename ();
         //  }
@@ -972,7 +972,7 @@ public class SocketApi { //: GLib.Object {
         //  fetch_private_link_url (
         //      file_data.folder_connection.account_state.account,
         //      file_data.server_relative_path,
-        //      record.numeric_file_id (),
+        //      record.numeric_file_id,
         //      this,
         //      target_fun);
     }
@@ -1029,7 +1029,7 @@ public class SocketApi { //: GLib.Object {
         //  // If sharing is globally disabled, do not show any sharing entries.
         //  // If there is no permission to share for this file, add a disabled entry saying so
         //  if (is_on_signal_the_server && !record.remote_permissions == null && !record.remote_permissions.has_permission (Common.RemotePermissions.Permissions.CAN_RESHARE)) {
-        //      listener.on_signal_send_message ("MENU_ITEM:DISABLED:d:" + (!record.is_directory () ? _("Resharing this file is not allowed") : _("Resharing this folder_connection is not allowed")));
+        //      listener.on_signal_send_message ("MENU_ITEM:DISABLED:d:" + (!record.is_directory ? _("Resharing this file is not allowed") : _("Resharing this folder_connection is not allowed")));
         //  } else {
         //      listener.on_signal_send_message ("MENU_ITEM:SHARE" + flag_string + _("Share options"));
 
@@ -1121,7 +1121,7 @@ public class SocketApi { //: GLib.Object {
         //          var parent_record = parent_dir.journal_record ();
         //          bool can_add_to_dir =
         //              !parent_record.is_valid // We're likely at the root of the sync folder_connection, got to assume we can add there
-        //              || (file_info.is_file () && parent_record.remote_permissions.has_permission (Common.RemotePermissions.Permissions.CAN_ADD_FILE))
+        //              || (file_info.is_file && parent_record.remote_permissions.has_permission (Common.RemotePermissions.Permissions.CAN_ADD_FILE))
         //              || (file_info.is_dir () && parent_record.remote_permissions.has_permission (Common.RemotePermissions.Permissions.CAN_ADD_SUB_DIRECTORIES));
         //          bool can_change_file =
         //              !is_on_signal_the_server
@@ -1297,7 +1297,7 @@ public class SocketApi { //: GLib.Object {
 
         //  if (file_data.folder_connection != null && file_data.folder_connection.account_state.is_connected) {
         //      var record = file_data.journal_record ();
-        //      var mime_match_mode = record.is_virtual_file () ? GLib.MimeDatabase.Match_extension { //: GLib.MimeDatabase.Match_default;
+        //      var mime_match_mode = record.is_virtual_file ? GLib.MimeDatabase.Match_extension { //: GLib.MimeDatabase.Match_default;
 
         //      GLib.MimeDatabase database;
         //      GLib.MimeType type = database.mime_type_for_file (local_file, mime_match_mode);

@@ -21,8 +21,8 @@ public class DeleteApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public DeleteApiJob.for_account (Account account, string path, GLib.Object parent = new GLib.Object ()) {
-        //  base (account, path, parent);
+    public DeleteApiJob.for_account (Account account, string path) {
+        //  base (account, path);
     }
 
 

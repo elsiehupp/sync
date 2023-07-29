@@ -15,8 +15,8 @@ public class VfsOff : AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
-    public VfsOff (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public VfsOff () {
+        //  base ();
     }
 
 

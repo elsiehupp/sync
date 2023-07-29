@@ -40,7 +40,7 @@ public class WebView { //: Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public WebView (Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
         //  this.instance;
         //  this.instance.up_ui (this);
         //  GLib.WebEngineUrlScheme.register_scheme (new GLib.WebEngineUrlScheme ("nc"));

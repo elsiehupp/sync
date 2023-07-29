@@ -14,8 +14,8 @@ public class AvatarEventFilter { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public AvatarEventFilter (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public AvatarEventFilter () {
+        //  base ();
     }
 
 

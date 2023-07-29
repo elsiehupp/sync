@@ -30,10 +30,9 @@ public class GETEncryptedFileJob : GETFileJob {
         GLib.HashTable<string, string> headers,
         string expected_etag_for_resume,
         int64 resume_start,
-        EncryptedFile encrypted_info,
-        GLib.Object parent = new GLib.Object ()
+        EncryptedFile encrypted_info
     ) {
-        //  base (account, path, device, headers, expected_etag_for_resume, resume_start, parent);
+        //  base (account, path, device, headers, expected_etag_for_resume, resume_start);
         //  this.encrypted_file_info = encrypted_info;
     }
 
@@ -47,10 +46,9 @@ public class GETEncryptedFileJob : GETFileJob {
         GLib.HashTable<string, string> headers,
         string expected_etag_for_resume,
         int64 resume_start,
-        EncryptedFile encrypted_info,
-        GLib.Object parent = new GLib.Object ()
+        EncryptedFile encrypted_info
     ) {
-        //  base (account, url, device, headers, expected_etag_for_resume, resume_start, parent);
+        //  base (account, url, device, headers, expected_etag_for_resume, resume_start);
         //  this.encrypted_file_info = encrypted_info;
     }
 

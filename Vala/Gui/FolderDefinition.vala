@@ -15,50 +15,50 @@ namespace Ui {
 ***********************************************************/
 public class FolderDefinition { //: GLib.Object {
 
-    //  /***********************************************************
-    //  The name of the folder in the instance and internally
-    //  ***********************************************************/
-    //  public string alias;
+    /***********************************************************
+    The name of the folder in the instance and internally
+    ***********************************************************/
+    public string alias;
 
-    //  /***********************************************************
-    //  path on local machine (always trailing /)
-    //  ***********************************************************/
-    //  public string local_path;
+    /***********************************************************
+    path on local machine (always trailing /)
+    ***********************************************************/
+    public string local_path;
 
-    //  /***********************************************************
-    //  path to the journal, usually relative to local_path
-    //  ***********************************************************/
-    //  public string journal_path;
+    /***********************************************************
+    path to the journal, usually relative to local_path
+    ***********************************************************/
+    public string journal_path;
 
-    //  /***********************************************************
-    //  path on remote (usually no trailing /, exception "/")
-    //  ***********************************************************/
-    //  public string target_path;
+    /***********************************************************
+    path on remote (usually no trailing /, exception "/")
+    ***********************************************************/
+    public string target_path;
 
-    //  /***********************************************************
-    //  whether the folder is paused
-    //  ***********************************************************/
-    //  public bool paused = false;
+    /***********************************************************
+    whether the folder is paused
+    ***********************************************************/
+    public bool paused = false;
 
-    //  /***********************************************************
-    //  whether the folder syncs hidden files
-    //  ***********************************************************/
-    //  public bool ignore_hidden_files = false;
+    /***********************************************************
+    whether the folder syncs hidden files
+    ***********************************************************/
+    public bool ignore_hidden_files = false;
 
-    //  /***********************************************************
-    //  Which virtual files setting the folder uses
-    //  ***********************************************************/
-    //  public Common.VfsMode virtual_files_mode = Common.AbstractVfs.Off;
+    /***********************************************************
+    Which virtual files setting the folder uses
+    ***********************************************************/
+    public Common.VfsMode virtual_files_mode = Common.AbstractVfs.Off;
 
-    //  /***********************************************************
-    //  The CLSID where this folder appears in registry for the Explorer navigation pane entry.
-    //  ***********************************************************/
-    //  public GLib.Uuid navigation_pane_clsid;
+    /***********************************************************
+    The CLSID where this folder appears in registry for the Explorer navigation pane entry.
+    ***********************************************************/
+    public GLib.Uuid navigation_pane_clsid;
 
-    //  /***********************************************************
-    //  Whether the vfs mode shall silently be updated if possible
-    //  ***********************************************************/
-    //  public bool upgrade_vfs_mode = false;
+    /***********************************************************
+    Whether the vfs mode shall silently be updated if possible
+    ***********************************************************/
+    public bool upgrade_vfs_mode = false;
 
     //  /***********************************************************
     //  Saves the folder definition into the current settings group.
@@ -127,17 +127,17 @@ public class FolderDefinition { //: GLib.Object {
     //  }
 
 
-    //  /***********************************************************
-    //  The highest version in the settings that on_signal_load () can read
+    /***********************************************************
+    The highest version in the settings that on_signal_load () can read
 
-    //  Version 1: initial version (default if value absent in settings)
-    //  Version 2: introduction of metadata_parent hash in 2.6.0
-        //         (version remains readable by 2.5.1)
-    //  Version 3: introduction of new windows vfs mode in 2.6.0
-    //  ***********************************************************/
-    //  public static int max_settings_version () {
-        //  return 3;
-    //  }
+    Version 1: initial version (default if value absent in settings)
+    Version 2: introduction of metadata_parent hash in 2.6.0
+               (version remains readable by 2.5.1)
+    Version 3: introduction of new windows vfs mode in 2.6.0
+    ***********************************************************/
+    public static int max_settings_version () {
+        return 3;
+    }
 
 
     //  /***********************************************************

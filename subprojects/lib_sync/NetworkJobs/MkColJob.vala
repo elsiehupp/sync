@@ -29,10 +29,9 @@ public class MkColJob : AbstractNetworkJob {
     ***********************************************************/
     public MkColJob.for_account (
         Account account,
-        string path,
-        GLib.Object parent = new GLib.Object ()
+        string path
     ) {
-        //  base (account, path, parent);
+        //  base (account, path);
     }
 
 
@@ -41,10 +40,9 @@ public class MkColJob : AbstractNetworkJob {
     public MkColJob.for_url (
         Account account,
         GLib.Uri url,
-        GLib.HashTable<string, string> extra_headers,
-        GLib.Object parent
+        GLib.HashTable<string, string> extra_headers
     ) {
-        //  base (account, "", parent);
+        //  base (account, "");
         //  this.url = url;
         //  this.extra_headers = extra_headers;
     }
@@ -55,10 +53,9 @@ public class MkColJob : AbstractNetworkJob {
     public MkColJob.for_path (
         Account account,
         string path,
-        GLib.HashTable<string, string> extra_headers,
-        GLib.Object parent = new GLib.Object ()
+        GLib.HashTable<string, string> extra_headers
     ) {
-        //  base (account, path, parent);
+        //  base (account, path);
         //  this.extra_headers = extra_headers;
     }
 

@@ -30,8 +30,8 @@ public class RemoteWipe { //: GLib.Object {
 
     //  /***********************************************************
     //  ***********************************************************/
-    //  public RemoteWipe (LibSync.Account account, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    //  public RemoteWipe (LibSync.Account account) {
+        //  base ();
         //  this.account = account;
         //  this.app_password = "";
         //  this.account_removed = false;

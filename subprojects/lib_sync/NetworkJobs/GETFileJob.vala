@@ -95,10 +95,9 @@ public class GETFileJob : AbstractNetworkJob {
         GLib.OutputStream device,
         GLib.HashTable<string, string> headers,
         string expected_etag_for_resume,
-        int64 resume_start,
-        GLib.Object parent = new GLib.Object ()
+        int64 resume_start
     ) {
-        //  base (account, path, parent);
+        //  base (account, path);
         //  this.device = device;
         //  this.headers = headers;
         //  this.expected_etag_for_resume = expected_etag_for_resume;
@@ -125,10 +124,9 @@ public class GETFileJob : AbstractNetworkJob {
         GLib.OutputStream device,
         GLib.HashTable<string, string> headers,
         string expected_etag_for_resume,
-        int64 resume_start,
-        GLib.Object parent = new GLib.Object ()
+        int64 resume_start
     ) {
-        //  base (account, url.to_encoded (), parent);
+        //  base (account, url.to_encoded ());
         //  this.device = device;
         //  this.headers = headers;
         //  this.expected_etag_for_resume = expected_etag_for_resume;

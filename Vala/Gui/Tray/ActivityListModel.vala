@@ -85,10 +85,9 @@ public class ActivityListModel { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public ActivityListModel (
-        //  AccountState account_state = null,
-        //  GLib.Object parent
+        //  AccountState account_state = null
     ) {
-        //  base (parent);
+        //  base ();
         //  this.account_state = account_state;
         //  this.currently_fetching = false;
         //  this.display_actions = true;

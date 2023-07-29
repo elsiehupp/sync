@@ -7,7 +7,7 @@
 namespace Occ {
 namespace Common {
 
-class NextcloudVersion { //: GLib.Object {
+public class NextcloudVersion { //: GLib.Object {
 
     public const int MIRALL_VERSION_MAJOR = 3;
     public const int MIRALL_VERSION_MINOR = 4;

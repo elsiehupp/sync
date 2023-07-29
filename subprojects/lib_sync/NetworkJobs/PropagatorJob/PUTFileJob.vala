@@ -45,10 +45,9 @@ public class PUTFileJob : AbstractNetworkJob {
         string path,
         GLib.OutputStream device,
         GLib.HashTable<string, string> headers,
-        int chunk,
-        GLib.Object parent = new GLib.Object ()
+        int chunk
     ) {
-        //  base (account, path, parent);
+        //  base (account, path);
         //  this.device = device.release ();
         //  this.headers = headers;
         //  this.chunk = chunk;
@@ -63,10 +62,9 @@ public class PUTFileJob : AbstractNetworkJob {
         GLib.Uri url,
         GLib.OutputStream device,
         GLib.HashTable<string, string> headers,
-        int chunk,
-        GLib.Object parent = new GLib.Object ()
+        int chunk
     ) {
-        //  base (account, "", parent);
+        //  base (account, "");
         //  this.device = device.release ();
         //  this.headers = headers;
         //  this.url = url;

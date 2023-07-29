@@ -26,7 +26,7 @@ public class IgnoreListEditor { //: Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     public IgnoreListEditor (Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
         //  this.instance = new IgnoreListEditor ();
         //  window_flags (window_flags () & ~GLib.WindowContextHelpButtonHint);
         //  instance.up_ui (this);

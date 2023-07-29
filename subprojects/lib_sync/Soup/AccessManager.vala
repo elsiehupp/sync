@@ -12,8 +12,8 @@ public class AccessManager { //: Soup.Session {
 
     /***********************************************************
     ***********************************************************/
-    public AccessManager (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public AccessManager () {
+        //  base ();
 
         //  cookie_jar (new CookieJar ());
     }

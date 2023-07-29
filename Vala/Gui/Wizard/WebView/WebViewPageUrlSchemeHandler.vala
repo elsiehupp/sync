@@ -9,8 +9,8 @@ public class WebViewPageUrlSchemeHandler { //: GLib.WebEngineUrlSchemeHandler {
 
     /***********************************************************
     ***********************************************************/
-    public WebViewPageUrlSchemeHandler (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public WebViewPageUrlSchemeHandler () {
+        //  base ();
     }
 
 

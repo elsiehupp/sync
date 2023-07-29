@@ -36,7 +36,7 @@ public class LogBrowser { //: Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     public LogBrowser (Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
         //  window_flags (window_flags () & ~GLib.WindowContextHelpButtonHint);
         //  object_name ("LogBrowser"); // for save/restore_geometry ()
         //  window_title (_("Log Output"));

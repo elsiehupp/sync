@@ -12,8 +12,8 @@ public class PropagateRemoteDeleteEncrypted : AbstractPropagateRemoteDeleteEncry
 
     /***********************************************************
     ***********************************************************/
-    public PropagateRemoteDeleteEncrypted (OwncloudPropagator propagator, SyncFileItem item, GLib.Object parent) {
-        //  base (propagator, item, parent);
+    public PropagateRemoteDeleteEncrypted (OwncloudPropagator propagator, SyncFileItem item) {
+        //  base (propagator, item);
 
     }
 

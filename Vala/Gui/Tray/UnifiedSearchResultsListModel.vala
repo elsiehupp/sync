@@ -95,8 +95,8 @@ public class UnifiedSearchResultsListModel { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public UnifiedSearchResultsListModel (AccountState account_state, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public UnifiedSearchResultsListModel (AccountState account_state) {
+        //  base ();
         //  this.account_state = account_state;
     }
 

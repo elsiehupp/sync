@@ -254,10 +254,9 @@ public class FolderConnection { //: GLib.Object {
     public FolderConnection (
         FolderDefinition definition,
         AccountState account_state,
-        Common.AbstractVfs vfs,
-        GLib.Object parent = new GLib.Object ()
+        Common.AbstractVfs vfs
     ) {
-        //  base (parent);
+        //  base ();
         //  this.account_state = account_state;
         //  this.definition = definition;
         //  this.last_sync_duration = 0;
@@ -1128,10 +1127,10 @@ public class FolderConnection { //: GLib.Object {
 
         //          var pin_state = this.vfs.pin_state (relative_path.to_string ());
         //          if (pin_state) {
-        //              if (pin_state == PinState.ALWAYS_LOCAL && record.is_virtual_file ()) {
+        //              if (pin_state == PinState.ALWAYS_LOCAL && record.is_virtual_file) {
         //                  spurious = false;
         //              }
-        //              if (pin_state == Common.ItemAvailability.ONLINE_ONLY && record.is_file ()) {
+        //              if (pin_state == Common.ItemAvailability.ONLINE_ONLY && record.is_file) {
         //                  spurious = false;
         //              }
         //          }
@@ -1179,7 +1178,7 @@ public class FolderConnection { //: GLib.Object {
         //      GLib.info ("Did not find file in database.");
         //      return;
         //  }
-        //  if (!record.is_virtual_file ()) {
+        //  if (!record.is_virtual_file) {
         //      GLib.info ("The file is not virtual.");
         //      return;
         //  }

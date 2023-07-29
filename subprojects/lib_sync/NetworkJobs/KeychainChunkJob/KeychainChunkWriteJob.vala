@@ -18,8 +18,8 @@ public class KeychainChunkWriteJob : AbstractKeychainChunkJob {
     /***********************************************************
     KeychainChunkWriteJob
     ***********************************************************/
-    public KeychainChunkWriteJob.for_account (Account account, string key, string data, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public KeychainChunkWriteJob.for_account (Account account, string key, string data) {
+        //  base ();
         //  this.account = account;
         //  this.key = key;
 
@@ -31,8 +31,8 @@ public class KeychainChunkWriteJob : AbstractKeychainChunkJob {
 
     /***********************************************************
     ***********************************************************/
-    public KeychainChunkWriteJob (string key, string data, GLib.Object parent = new GLib.Object ()) {
-        //  base (null, key, data, parent);
+    public KeychainChunkWriteJob (string key, string data) {
+        //  base (null, key, data);
     }
 
 

@@ -21,8 +21,8 @@ public class QtLocalPeer { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public QtLocalPeer (GLib.Object parent = new GLib.Object (), string app_id = "") {
-        //  base (parent);
+    public QtLocalPeer (string app_id = "") {
+        //  base ();
         //  this.identifier = app_id;
         //  if (identifier == "") {
         //      identifier = GLib.Application.application_file_path;  //  ### On win, check if this returns .../argv[0] without casefolding; .\MYAPP == .\myapp on Win

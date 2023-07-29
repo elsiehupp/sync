@@ -12,7 +12,7 @@ public class DefaultPluginFactory<PluginClass> : AbstractPluginFactory {
 
     /***********************************************************
     ***********************************************************/
-    public override GLib.Object create (GLib.Object parent) {
+    public override GLib.Object create () {
         //  return new PluginClass (parent);
     }
 

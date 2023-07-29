@@ -29,8 +29,8 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
 
     /***********************************************************
     ***********************************************************/
-    public PropagateRemoteDeleteEncryptedRootFolder (OwncloudPropagator propagator, SyncFileItem item, GLib.Object parent) {
-        //  base (propagator, item, parent);
+    public PropagateRemoteDeleteEncryptedRootFolder (OwncloudPropagator propagator, SyncFileItem item) {
+        //  base (propagator, item);
     }
 
 

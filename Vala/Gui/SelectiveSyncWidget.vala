@@ -41,7 +41,7 @@ public class SelectiveSyncWidget { //: Gtk.Widget {
     //  /***********************************************************
     //  ***********************************************************/
     //  public SelectiveSyncWidget (LibSync.Account account, Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
         //  this.account = account;
         //  this.inserting = false;
         //  this.folder_tree = new GLib.TreeWidget (this);

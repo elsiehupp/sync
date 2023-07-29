@@ -23,9 +23,9 @@ public class FakePayloadReply : FakeReply {
         //  Soup.Operation operation,
         //  Soup.Request request,
         //  string body,
-        //  int delay = 0,
-        //  GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+        //  int delay = 0
+    ) {
+        //  base ();
         //  this.body = body;
         //  set_request (request);
         //  set_url (request.url);

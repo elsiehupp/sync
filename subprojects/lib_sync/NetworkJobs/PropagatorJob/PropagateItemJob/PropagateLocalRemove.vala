@@ -49,7 +49,7 @@ public class PropagateLocalRemove : AbstractPropagateItemJob {
         //          return;
         //      }
         //  } else {
-        //      if (this.item.is_directory ()) {
+        //      if (this.item.is_directory) {
         //          if (new GLib.Dir (filename).exists () && !remove_recursively ("")) {
         //              on_signal_done (SyncFileItem.Status.NORMAL_ERROR, this.error);
         //              return;
@@ -63,7 +63,7 @@ public class PropagateLocalRemove : AbstractPropagateItemJob {
         //      }
         //  }
         //  this.propagator.report_progress (this.item, 0);
-        //  this.propagator.journal.delete_file_record (this.item.original_file, this.item.is_directory ());
+        //  this.propagator.journal.delete_file_record (this.item.original_file, this.item.is_directory);
         //  this.propagator.journal.commit ("Local remove");
         //  on_signal_done (SyncFileItem.Status.SUCCESS);
     }

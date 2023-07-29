@@ -21,8 +21,8 @@ public class SimpleNetworkJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public SimpleNetworkJob.for_account (Account account, GLib.Object parent = new GLib.Object ()) {
-        //  base (account, "", parent);
+    public SimpleNetworkJob.for_account (Account account) {
+        //  base (account, "");
     }
 
 

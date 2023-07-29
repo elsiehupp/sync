@@ -19,8 +19,8 @@ public class FakePostReply { //: GLib.InputStream {
     /***********************************************************
     ***********************************************************/
     public FakePostReply (Soup.Operation operation, Soup.Request request,
-        //  GLib.OutputStream payload_, GLib.Object parent) {
-        //  base (parent);
+        //  GLib.OutputStream payload_) {
+        //  base ();
         //  payload = std.move (payload_);
         //  set_request (request);
         //  set_url (request.url);

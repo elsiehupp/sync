@@ -22,7 +22,7 @@ public class FolderCreationDialog { //: Gtk.Dialog {
     //  /***********************************************************
     //  ***********************************************************/
     //  public FolderCreationDialog (string destination, Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
         //  instance = new FolderCreationDialog ();
         //  this.destination = destination;
         //  instance.up_ui (this);

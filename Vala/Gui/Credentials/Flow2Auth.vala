@@ -82,8 +82,8 @@ public class Flow2Auth { //: GLib.Object {
 
     //  /***********************************************************
     //  ***********************************************************/
-    //  public Flow2Auth (LibSync.Account account, GLib.Object parent) {
-        //  base (parent);
+    //  public Flow2Auth (LibSync.Account account) {
+        //  base ();
         //  this.account = account;
         //  this.is_busy = false;
         //  this.has_token = false;

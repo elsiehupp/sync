@@ -29,10 +29,9 @@ public class GetOrCreatePublicLinkShare { //: GLib.Object {
     ***********************************************************/
     public GetOrCreatePublicLinkShare (
         LibSync.Account account,
-        string local_file,
-        GLib.Object parent
+        string local_file
     ) {
-        //  base (parent);
+        //  base ();
         //  this.account = account;
         //  this.share_manager = account;
         //  this.local_file = local_file;

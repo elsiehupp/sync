@@ -11,8 +11,8 @@ public class WebEnginePage { //: GLib.WebEnginePage {
 
     /***********************************************************
     ***********************************************************/
-    public WebEnginePage (GLib.WebEngineProfile profile, GLib.Object parent = new GLib.Object ()) {
-        //  base (profile, parent);
+    public WebEnginePage (GLib.WebEngineProfile profile) {
+        //  base (profile);
     }
 
 

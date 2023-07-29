@@ -28,8 +28,8 @@ public class DirectEditor { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public DirectEditor (string identifier, string name, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public DirectEditor (string identifier, string name) {
+        //  base ();
         //  this.identifier = identifier;
         //  this.name = name;
     }

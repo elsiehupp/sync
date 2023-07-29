@@ -327,7 +327,7 @@ public class FakeFolder { //: GLib.Object {
     ***********************************************************/
     private static void from_disk (GLib.Dir directory, FileInfo template_file_info) {
         //  foreach (GLib.FileInfo disk_child in directory.entry_info_list (GLib.Dir.AllEntries | GLib.Dir.NoDotAndDotDot)) {
-        //      if (disk_child.is_directory ()) {
+        //      if (disk_child.is_directory) {
         //          GLib.Dir sub_directory = directory;
         //          sub_directory.cd (disk_child.filename ());
         //          FileInfo sub_file_info = template_file_info.children[disk_child.filename ()] = FileInfo ( disk_child.filename ());

@@ -16,8 +16,8 @@ public class DelayedReply<OriginalReply> : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public DelayedReply (uint64 delay_milliseconds, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public DelayedReply (uint64 delay_milliseconds) {
+        //  base ();
         //  this.delay_milliseconds = delay_milliseconds;
     }
 

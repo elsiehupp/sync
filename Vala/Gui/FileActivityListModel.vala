@@ -15,8 +15,8 @@ public class FileActivityListModel : ActivityListModel {
 
     /***********************************************************
     ***********************************************************/
-    public FileActivityListModel (GLib.Object parent = new GLib.Object ()) {
-        //  base (null, parent);
+    public FileActivityListModel () {
+        //  base (null);
         //  display_actions (false);
     }
 

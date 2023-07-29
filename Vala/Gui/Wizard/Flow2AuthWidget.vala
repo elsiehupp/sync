@@ -28,7 +28,7 @@ public class Flow2AuthWidget { //: Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public Flow2AuthWidget (Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
         //  this.progress_indicator = new GLib.ProgressIndicator (this);
         //  Flow2AuthWidget.instance.setupUi (this);
 

@@ -149,14 +149,14 @@ public class SyncFileItem { //: GLib.Object {
     /***********************************************************
     Variable useful for everybody
     ***********************************************************/
-    public CSync.ItemType type = BITFIELD (3);
+    public CSync.ItemType type; // = BITFIELD (3);
 
     public Direction direction;
 
     /***********************************************************
     Variable useful for everybody
     ***********************************************************/
-    public bool server_has_ignored_files = BITFIELD (1);
+    public bool server_has_ignored_files; // = BITFIELD (1);
 
     /***********************************************************
     Whether there's an entry in the blocklist table.
@@ -166,7 +166,7 @@ public class SyncFileItem { //: GLib.Object {
 
     Variable useful for everybody
     ***********************************************************/
-    public bool has_blocklist_entry = BITFIELD (1);
+    public bool has_blocklist_entry; // = BITFIELD (1);
 
     /***********************************************************
     If true and NormalError, this error may be blocklisted
@@ -176,33 +176,33 @@ public class SyncFileItem { //: GLib.Object {
 
     Variable useful for everybody
     ***********************************************************/
-    public bool error_may_be_blocklisted = BITFIELD (1);
+    public bool error_may_be_blocklisted; // = BITFIELD (1);
 
     /***********************************************************
     Variable useful to report to the user
     ***********************************************************/
-    public Status status = BITFIELD (4);
+    public Status status; // = BITFIELD (4);
 
     /***********************************************************
     The original operation was forbidden, and this is a restoration
 
     Variable useful to report to the user
     ***********************************************************/
-    public bool is_restoration = BITFIELD (1);
+    public bool is_restoration; // = BITFIELD (1);
 
     /***********************************************************
     The file is removed or ignored because it is in the selective sync list
 
     Variable useful to report to the user
     ***********************************************************/
-    public bool is_selective_sync = BITFIELD (1);
+    public bool is_selective_sync; // = BITFIELD (1);
 
     /***********************************************************
     The file is E2EE or the content of the directory should be E2EE
 
     Variable useful to report to the user
     ***********************************************************/
-    public bool is_encrypted = BITFIELD (1);
+    public bool is_encrypted; // = BITFIELD (1);
 
     /***********************************************************
     Variable useful to report to the user
@@ -407,8 +407,10 @@ public class SyncFileItem { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public bool is_directory () {
-        //  return this.type == CSync.ItemType.DIRECTORY;
+    public bool is_directory {
+        public get {
+            return this.type == CSync.ItemType.DIRECTORY;
+        }
     }
 
 

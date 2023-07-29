@@ -24,8 +24,8 @@ public class ServerNotificationHandler { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public ServerNotificationHandler (AccountState account_state, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public ServerNotificationHandler (AccountState account_state) {
+        //  base ();
         //  this.account_state = account_state;
     }
 

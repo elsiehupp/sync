@@ -1093,15 +1093,14 @@ public class ConfigFile { //: GLib.Object {
     with the given parent. If no parent is specified, the caller must destroy the settings
     ***********************************************************/
     public static GLib.Settings settings_with_group (
-        string group,
-        GLib.Object parent = new GLib.Object ()
+        string group
     ) {
         //  if (g_config_filename () == "") {
         //      // cache file name
         //      ConfigFile config;
         //      *g_config_filename () = config.ConfigFile.config_file;
         //  }
-        //  GLib.Settings settings = new GLib.Settings (g_config_filename (), GLib.Settings.IniFormat, parent);
+        //  GLib.Settings settings = new GLib.Settings (g_config_filename (), GLib.Settings.IniFormat);
         //  settings.begin_group (group);
         //  return settings;
     }

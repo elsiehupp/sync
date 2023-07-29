@@ -32,7 +32,7 @@ public class WebViewPage : AbstractCredentialsWizardPage {
     //  /***********************************************************
     //  ***********************************************************/
     //  public WebViewPage (Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
         //  this.oc_wizard = (OwncloudWizard)parent;
 
         //  GLib.info ("Time for a webview!");

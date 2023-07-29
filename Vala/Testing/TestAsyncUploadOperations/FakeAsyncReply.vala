@@ -13,8 +13,8 @@ public class FakeAsyncReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakeAsyncReply (string poll_location, Soup.Operation operation, Soup.Request request, GLib.Object parent) {
-        //  base (parent);
+    public FakeAsyncReply (string poll_location, Soup.Operation operation, Soup.Request request) {
+        //  base ();
         //  this.poll_location = poll_location;
         //  set_request (request);
         //  set_url (request.url);

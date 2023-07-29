@@ -32,8 +32,8 @@ public class SettingsDialog { //: Gtk.Dialog {
 
         //  /***********************************************************
         //  ***********************************************************/
-        //  public ToolButtonAction (Gtk.IconInfo icon, string text, GLib.Object parent) {
-        //      base (parent);
+        //  public ToolButtonAction (Gtk.IconInfo icon, string text) {
+        //      base ();
         //      on_signal_text (text);
         //      icon (icon);
         //  }
@@ -103,7 +103,7 @@ public class SettingsDialog { //: Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     public SettingsDialog (OwncloudGui gui, Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
         //  this.instance = new SettingsDialog ();
         //  this.gui = gui;
         //  LibSync.ConfigFile config;

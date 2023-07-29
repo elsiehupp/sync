@@ -31,8 +31,8 @@ public abstract class AbstractUserStatusConnector { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected AbstractUserStatusConnector (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    protected AbstractUserStatusConnector () {
+        //  base ();
     }
 
     /***********************************************************

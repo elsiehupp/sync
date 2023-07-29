@@ -18,8 +18,8 @@ public class IconJob { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public IconJob.for_account (Account account, GLib.Uri url, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public IconJob.for_account (Account account, GLib.Uri url) {
+        //  base ();
         //  Soup.Request request = new Soup.Request (url);
         //  request.attribute (Soup.Request.FollowRedirectsAttribute, true);
         //  var reply = account.send_raw_request ("GET", url, request);

@@ -153,7 +153,7 @@ public class PropagateRemoteMove : AbstractPropagateItemJob {
     /***********************************************************
     ***********************************************************/
     public new JobParallelism parallelism () {
-        //  return this.item.is_directory () ? JobParallelism.WAIT_FOR_FINISHED : JobParallelism.FULL_PARALLELISM;
+        //  return this.item.is_directory ? JobParallelism.WAIT_FOR_FINISHED : JobParallelism.FULL_PARALLELISM;
     }
 
 
@@ -266,7 +266,7 @@ public class PropagateRemoteMove : AbstractPropagateItemJob {
         //      return;
         //  }
 
-        //  if (this.item.is_directory ()) {
+        //  if (this.item.is_directory) {
         //      this.propagator.renamed_directories.insert (this.item.file, this.item.rename_target);
         //      if (!adjust_selective_sync (this.propagator.journal, this.item.file, this.item.rename_target)) {
         //          on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error writing metadata to the database"));

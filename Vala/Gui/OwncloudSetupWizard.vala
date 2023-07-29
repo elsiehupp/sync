@@ -47,8 +47,8 @@ public class OwncloudSetupWizard { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private OwncloudSetupWizard (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    private OwncloudSetupWizard () {
+        //  base ();
         //  this.oc_wizard = new OwncloudWizard ();
         //  this.remote_folder;
 

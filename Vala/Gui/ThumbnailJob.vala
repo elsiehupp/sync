@@ -19,8 +19,8 @@ public class ThumbnailJob : LibSync.AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public ThumbnailJob (string path, LibSync.Account account, GLib.Object parent = new GLib.Object ()) {
-        //  base (account, "index.php/apps/files/api/v1/thumbnail/150/150/" + path, parent);
+    public ThumbnailJob (string path, LibSync.Account account) {
+        //  base (account, "index.php/apps/files/api/v1/thumbnail/150/150/" + path);
         //  ignore_credential_failure (true);
     }
 

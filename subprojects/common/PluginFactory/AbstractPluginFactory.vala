@@ -12,7 +12,7 @@ public abstract class AbstractPluginFactory { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public abstract GLib.Object create (GLib.Object parent);
+    public abstract GLib.Object create ();
 
     /***********************************************************
     Return the expected name of a plugin, for use with GLib.PluginLoader

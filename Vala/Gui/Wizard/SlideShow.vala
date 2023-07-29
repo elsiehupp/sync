@@ -87,7 +87,7 @@ public class SlideShow { //: Gtk.Widget {
     //  /***********************************************************
     //  ***********************************************************/
     //  public SlideShow (Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
         //  this.current_slide = 0;
         //  this.interval = 3500;
         //  this.size_policy (GLib.SizePolicy.Minimum, GLib.SizePolicy.Minimum);

@@ -85,7 +85,7 @@ public class OwncloudGui { //: GLib.Object {
     //  /***********************************************************
     //  ***********************************************************/
     //  public OwncloudGui (Application parent) {
-        //  base (parent);
+        //  base ();
         //  this.tray = null;
         //  this.settings_dialog = null;
         //  this.log_browser = null;
@@ -693,7 +693,7 @@ public class OwncloudGui { //: GLib.Object {
         //      share_dialog = this.share_dialogs[local_path];
         //  } else {
         //      GLib.info ("Opening share dialog " + share_path + local_path + max_sharing_permissions);
-        //      share_dialog = new ShareDialog (account_state, share_path, local_path, max_sharing_permissions, file_record.numeric_file_id (), start_page);
+        //      share_dialog = new ShareDialog (account_state, share_path, local_path, max_sharing_permissions, file_record.numeric_file_id, start_page);
         //      share_dialog.attribute (GLib.WA_DeleteOnClose, true);
 
         //      this.share_dialogs[local_path] = share_dialog;

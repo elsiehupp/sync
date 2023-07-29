@@ -53,8 +53,8 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : AbstractNetworkJo
 
     /***********************************************************
     ***********************************************************/
-    protected AbstractPropagateRemoteDeleteEncrypted (OwncloudPropagator propagator, SyncFileItem item, GLib.Object parent) {
-        //  base (parent);
+    protected AbstractPropagateRemoteDeleteEncrypted (OwncloudPropagator propagator, SyncFileItem item) {
+        //  base ();
         //  this.network_error = GLib.InputStream.NoError;
         //  this.propagator = propagator;
         //  this.item = item;
@@ -199,7 +199,7 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : AbstractNetworkJo
         //      return;
         //  }
 
-        //  this.propagator.journal.delete_file_record (this.item.original_file, this.item.is_directory ());
+        //  this.propagator.journal.delete_file_record (this.item.original_file, this.item.is_directory);
         //  this.propagator.journal.commit ("Remote Remove");
 
         //  unlock_folder ();

@@ -117,7 +117,7 @@ public class ShareLinkWidget { //: Gtk.Widget {
 
         //  //  Is this a file or folder?
         //  GLib.FileInfo file_info = new GLib.FileInfo (local_path);
-        //  this.is_file = file_info.is_file ();
+        //  this.is_file = file_info.is_file;
 
         //  this.enable_share_link.clicked.connect (
         //      this.on_signal_create_share_link
@@ -357,7 +357,7 @@ public class ShareLinkWidget { //: Gtk.Widget {
         //  Share.Permissions max_sharing_permissions,
         //  Gtk.Widget parent = new Gtk.Widget ()
     //  ) {
-        //  base (parent);
+        //  base ();
         //  this.account = account;
         //  this.share_path = share_path;
         //  this.local_path = local_path;

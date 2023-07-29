@@ -19,8 +19,8 @@ public class LockEncryptFolderApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public LockEncryptFolderApiJob (Account account, string file_identifier, GLib.Object parent = new GLib.Object ()) {
-        //  base (account, E2EE_BASE_URL + "lock/" + file_identifier, parent);
+    public LockEncryptFolderApiJob (Account account, string file_identifier) {
+        //  base (account, E2EE_BASE_URL + "lock/" + file_identifier);
         //  this.file_identifier = file_identifier;
     }
 

@@ -115,8 +115,8 @@ public class SyncStatusSummary { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public SyncStatusSummary (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public SyncStatusSummary () {
+        //  base ();
         //  FolderManager folder_man = FolderManager.instance;
         //  this.syncing = false;
         //  this.sync_icon = LibSync.Theme.sync_status_ok;

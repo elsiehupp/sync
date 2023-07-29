@@ -123,7 +123,7 @@ public class GeneralSettings { //: Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public GeneralSettings (Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
         //  this.instance = new GeneralSettings ();
         //  this.instance.up_ui (this);
 

@@ -238,7 +238,7 @@ public class SyncResult { //: GLib.Object {
         //      this.found_files_not_synced = true;
         //  }
 
-        //  if (item.is_directory () && (
+        //  if (item.is_directory && (
         //      item.instruction == CSync.SyncInstructions.NEW
         //      || item.instruction == CSync.SyncInstructions.TYPE_CHANGE
         //      || item.instruction == CSync.SyncInstructions.REMOVE

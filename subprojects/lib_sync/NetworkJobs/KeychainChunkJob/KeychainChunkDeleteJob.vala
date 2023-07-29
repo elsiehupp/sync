@@ -16,8 +16,8 @@ public class KeychainChunkDeleteJob : AbstractKeychainChunkJob {
 
     /***********************************************************
     ***********************************************************/
-    public KeychainChunkDeleteJob.for_account (Account account, string key, bool keychain_migration, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public KeychainChunkDeleteJob.for_account (Account account, string key, bool keychain_migration) {
+        //  base ();
         //  this.account = account;
         //  this.key = key;
 
@@ -27,8 +27,8 @@ public class KeychainChunkDeleteJob : AbstractKeychainChunkJob {
 
     /***********************************************************
     ***********************************************************/
-    public KeychainChunkDeleteJob (string key, GLib.Object parent = new GLib.Object ()) {
-        //  base (null, key, false, parent);
+    public KeychainChunkDeleteJob (string key) {
+        //  base (null, key, false);
     }
 
 

@@ -11,8 +11,8 @@ public class TokenCredentialsAccessManager { //: Soup.ClientContext {
 
     //  public friend class TokenCredentials;
 
-    public TokenCredentialsAccessManager (TokenCredentials credentials, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public TokenCredentialsAccessManager (TokenCredentials credentials) {
+        //  base ();
         //  this.credentials = credentials;
     }
 

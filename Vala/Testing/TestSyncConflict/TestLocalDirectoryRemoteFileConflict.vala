@@ -51,7 +51,7 @@ public class TestLocalDirectoryRemoteFileConflict : AbstractTestSyncConflict {
         //  GLib.assert_true (fake_folder.current_local_state ().find ("Z").size == 63);
         //  GLib.assert_true (conflicts[2].contains ("Z"));
         //  GLib.assert_true (conflicts[2] == conflict_records[2]);
-        //  GLib.assert_true (new GLib.FileInfo (fake_folder.local_path + conflicts[2]).is_directory ());
+        //  GLib.assert_true (new GLib.FileInfo (fake_folder.local_path + conflicts[2]).is_directory);
         //  GLib.assert_true (GLib.File.exists (fake_folder.local_path + conflicts[2] + "/foo"));
 
         //  // 2)
@@ -59,7 +59,7 @@ public class TestLocalDirectoryRemoteFileConflict : AbstractTestSyncConflict {
         //  GLib.assert_true (fake_folder.current_local_state ().find ("A/a1").size == 5);
         //  GLib.assert_true (conflicts[0].contains ("A/a1"));
         //  GLib.assert_true (conflicts[0] == conflict_records[0]);
-        //  GLib.assert_true (new GLib.FileInfo (fake_folder.local_path + conflicts[0]).is_directory ());
+        //  GLib.assert_true (new GLib.FileInfo (fake_folder.local_path + conflicts[0]).is_directory);
         //  GLib.assert_true (GLib.File.exists (fake_folder.local_path + conflicts[0] + "/bar"));
 
         //  // 3)
@@ -67,7 +67,7 @@ public class TestLocalDirectoryRemoteFileConflict : AbstractTestSyncConflict {
         //  GLib.assert_true (fake_folder.current_local_state ().find ("B").size == 31);
         //  GLib.assert_true (conflicts[1].contains ("B"));
         //  GLib.assert_true (conflicts[1] == conflict_records[1]);
-        //  GLib.assert_true (new GLib.FileInfo (fake_folder.local_path + conflicts[1]).is_directory ());
+        //  GLib.assert_true (new GLib.FileInfo (fake_folder.local_path + conflicts[1]).is_directory);
         //  GLib.assert_true (GLib.File.exists (fake_folder.local_path + conflicts[1] + "/zzz"));
 
         //  // The contents of the conflict directories will only be uploaded after

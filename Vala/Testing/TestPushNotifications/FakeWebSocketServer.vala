@@ -24,8 +24,8 @@ public class FakeWebSocketServer { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public FakeWebSocketServer (uint16 port = 12345, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public FakeWebSocketServer (uint16 port = 12345) {
+        //  base ();
         //  this.web_socket_server = new GLib.WebSocketServer ("Fake Server", GLib.WebSocketServer.NonSecureMode, this);
         //  if (!this.web_socket_server.listen (GLib.HostAddress.Any, port)) {
         //      Q_UNREACHABLE ();

@@ -17,7 +17,7 @@ public class SyncJournalFileRecord { //: GLib.Object {
     public string path;
     public uint64 inode = 0;
     public int64 modtime = 0;
-    public CSync.ItemType type = CSync.ItemType.SKIP;
+    //  public CSync.ItemType type = CSync.ItemType.SKIP;
     public string etag;
     public string file_id;
     public int64 file_size = 0;
@@ -29,13 +29,13 @@ public class SyncJournalFileRecord { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public bool is_valid {
-        public get {
-            return this.path != ""
-                && (this.last_try_etag != "" || this.last_try_modtime != 0)
-                && this.last_try_time > 0;
-        }
-    }
+    //  public bool is_valid {
+    //      public get {
+    //          return this.path != ""
+    //              && (this.last_try_etag != "" || this.last_try_modtime != 0)
+    //              && this.last_try_time > 0;
+    //      }
+    //  }
 
 
     /***********************************************************
@@ -45,44 +45,54 @@ public class SyncJournalFileRecord { //: GLib.Object {
 
     It is used in the construction of private links.
     ***********************************************************/
-    public string numeric_file_id () {
-        //  /***********************************************************
-        //  Use the identifier up until the first non-numeric character
-        //  ***********************************************************/
-        //  for (int i = 0; i < this.file_id.length; ++i) {
-        //      if (this.file_id[i] < '0' || this.file_id[i] > '9') {
-        //          return this.file_id.left (i);
-        //      }
-        //  }
-        //  return this.file_id;
+    public string numeric_file_id {
+        public get {
+            //  /***********************************************************
+            //  Use the identifier up until the first non-numeric character
+            //  ***********************************************************/
+            //  for (int i = 0; i < this.file_id.length; ++i) {
+            //      if (this.file_id[i] < '0' || this.file_id[i] > '9') {
+            //          return this.file_id.left (i);
+            //      }
+            //  }
+            //  return this.file_id;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public GLib.DateTime mod_date_time () {
-        //  return Utility.q_date_time_from_time_t (this.modtime);
+    public GLib.DateTime mod_date_time {
+        public get {
+            //  return Utility.q_date_time_from_time_t (this.modtime);
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool is_directory () {
-        //  return this.type == ItemType.DIRECTORY;
+    public bool is_directory {
+        public get {
+            //  return this.type == ItemType.DIRECTORY;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool is_file () {
-        //  return this.type == ItemType.FILE || this.type == ItemType.VIRTUAL_FILE_DEHYDRATION;
+    public bool is_file {
+        public get {
+            //  return this.type == ItemType.FILE || this.type == ItemType.VIRTUAL_FILE_DEHYDRATION;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool is_virtual_file () {
-        //  return this.type == ItemType.VIRTUAL_FILE || this.type == ItemType.VIRTUAL_FILE_DOWNLOAD;
+    public bool is_virtual_file {
+        public get {
+            //  return this.type == ItemType.VIRTUAL_FILE || this.type == ItemType.VIRTUAL_FILE_DOWNLOAD;
+        }
     }
 
 

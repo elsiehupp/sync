@@ -26,8 +26,8 @@ public class PropagateDownloadEncrypted { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateDownloadEncrypted (OwncloudPropagator propagator, string local_parent_path, SyncFileItem item, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public PropagateDownloadEncrypted (OwncloudPropagator propagator, string local_parent_path, SyncFileItem item) {
+        //  base ();
         //  this.propagator = propagator;
         //  this.local_parent_path = local_parent_path;
         //  this.item = item;

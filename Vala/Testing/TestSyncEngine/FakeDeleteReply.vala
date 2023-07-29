@@ -5,8 +5,8 @@ public class FakeDeleteReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakeDeleteReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, GLib.Object parent) {
-        //  base (parent);
+    public FakeDeleteReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request) {
+        //  base ();
         //  set_request (request);
         //  set_url (request.url);
         //  set_operation (operation);

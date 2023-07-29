@@ -17,10 +17,11 @@ public class FakeErrorReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakeErrorReply (Soup.Operation operation, Soup.Request request,
-        //  GLib.Object parent, int http_error_code, string body = ""
+    public FakeErrorReply (
+        Soup.Operation operation, Soup.Request request,
+        int http_error_code, string body = ""
     ) {
-        //  base (parent);
+        //  base ();
         //  this.body = body;
         //  set_request (request);
         //  set_url (request.url);

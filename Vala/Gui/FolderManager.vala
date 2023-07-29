@@ -223,8 +223,8 @@ public class FolderManager { //: GLib.Object {
 
     //  /***********************************************************
     //  ***********************************************************/
-    //  private FolderManager (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    //  private FolderManager () {
+        //  base ();
         //  this.navigation_pane_helper = this;
         //  //  GLib.assert_true (!this.instance);
         //  this.instance = this;

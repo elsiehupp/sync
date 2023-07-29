@@ -15,8 +15,8 @@ public class FakeDesktopServicesUrlHandler { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public FakeDesktopServicesUrlHandler (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public FakeDesktopServicesUrlHandler () {
+        //  base ();
     }
 
 

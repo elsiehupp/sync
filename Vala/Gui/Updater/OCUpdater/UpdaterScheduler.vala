@@ -19,8 +19,8 @@ public class UpdaterScheduler { //: GLib.Object {
 
     //  /***********************************************************
     //  ***********************************************************/
-    //  public UpdaterScheduler (GLib.Object parent) {
-        //  base (parent);
+    //  public UpdaterScheduler () {
+        //  base ();
 
         //  var updater = (OCUpdater) AbstractUpdater.instance;
         //  // Note: the sparkle-updater is not an OCUpdater

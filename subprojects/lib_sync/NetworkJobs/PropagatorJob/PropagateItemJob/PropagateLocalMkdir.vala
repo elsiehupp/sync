@@ -48,7 +48,7 @@ public class PropagateLocalMkdir : AbstractPropagateItemJob {
         //  // When turning something that used to be a file into a directory
         //  // we need to delete the file first.
         //  GLib.FileInfo file_info = GLib.File.new_for_path (new_directory_string);
-        //  if (file_info.exists () && file_info.is_file ()) {
+        //  if (file_info.exists () && file_info.is_file) {
         //      if (this.delete_existing_file) {
         //          string remove_error;
         //          if (!FileSystem.remove (new_directory_string, remove_error)) {

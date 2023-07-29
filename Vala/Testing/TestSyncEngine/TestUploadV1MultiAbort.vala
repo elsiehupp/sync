@@ -20,7 +20,6 @@ public class TestUploadV1MultiAbort : AbstractTestSyncEngine {
         //  options.min_chunk_size = 10;
         //  fake_folder.sync_engine.set_sync_options (options);
 
-        //  GLib.Object parent;
         //  int number_of_put = 0;
         //  fake_folder.set_server_override (this.override_delegate);
 
@@ -35,7 +34,7 @@ public class TestUploadV1MultiAbort : AbstractTestSyncEngine {
     private GLib.InputStream override_delegate (Soup.Operation operation, Soup.Request request, GLib.OutputStream device) {
         //  if (operation == Soup.PutOperation) {
         //      ++number_of_put;
-        //      return new FakeHangingReply (operation, request, parent);
+        //      return new FakeHangingReply (operation, request);
         //  }
         //  return null;
     }

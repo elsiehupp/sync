@@ -27,15 +27,15 @@ public class KeychainChunkDeleteJob2 : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public KeychainChunkDeleteJob2.for_path (Account account, string path, GLib.Object parent = new GLib.Object ()) {
-        //  base (account, path, parent);
+    public KeychainChunkDeleteJob2.for_path (Account account, string path) {
+        //  base (account, path);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public KeychainChunkDeleteJob2.for_url (Account account, GLib.Uri url, GLib.Object parent) {
-        //  base (account, "", parent);
+    public KeychainChunkDeleteJob2.for_url (Account account, GLib.Uri url) {
+        //  base (account, "");
         //  this.url = url;
     }
 

@@ -20,8 +20,8 @@ public class CloudProviderManager { //: GLib.Object {
 
     //  /***********************************************************
     //  ***********************************************************/
-    //  public CloudProviderManager (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    //  public CloudProviderManager () {
+        //  base ();
         //  this.folder_index = 0;
         //  g_bus_own_name (G_BUS_TYPE_SESSION, LIBCLOUDPROVIDERS_DBUS_BUS_NAME, G_BUS_NAME_OWNER_FLAGS_NONE, null, on_signal_name_acquired, null, this, null);
     //  }

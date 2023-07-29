@@ -44,7 +44,7 @@ public class ConflictDialog { //: Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     public ConflictDialog (Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
         //  this.instance = new ConflictDialog ();
         //  this.solver = new ConflictSolver (this);
         //  this.instance.up_ui (this);

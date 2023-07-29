@@ -13,8 +13,8 @@ public class GlobalWheelFilter { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public GlobalWheelFilter (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public GlobalWheelFilter () {
+        //  base ();
     }
 
 

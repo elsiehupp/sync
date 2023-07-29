@@ -24,7 +24,7 @@ public class TestInsufficientRemoteStorage : AbstractTestSyncEngine {
         //  // Produce an error based on upload size
         //  int remote_quota = 1000;
         //  int n507 = 0, number_of_put = 0;
-        //  GLib.Object parent;
+
         //  fake_folder.set_server_override (this.override_delegate_insufficient_remote_storage);
 
         //  fake_folder.local_modifier.insert ("A/big", 800);

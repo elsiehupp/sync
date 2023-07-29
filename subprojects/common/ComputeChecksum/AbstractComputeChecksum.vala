@@ -29,8 +29,8 @@ public abstract class AbstractComputeChecksum { //: GLib.Object {
 
     protected static bool enabled;
 
-    protected AbstractComputeChecksum (GLib.Object parent = new GLib.Object ()) {
-        //      base (parent);
+    protected AbstractComputeChecksum () {
+        //      base ();
     }
 
     /***********************************************************

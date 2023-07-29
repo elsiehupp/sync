@@ -125,7 +125,7 @@ public class HeaderBanner { //: Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public HeaderBanner (Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
         //  size_policy (GLib.SizePolicy.Expanding, GLib.SizePolicy.Fixed);
         //  background_role (Gtk.Palette.Base);
         //  title_label = new Gtk.Label (this);

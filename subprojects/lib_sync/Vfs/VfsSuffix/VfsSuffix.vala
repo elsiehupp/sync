@@ -12,8 +12,8 @@ public class VfsSuffix : Common.AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
-    public VfsSuffix (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public VfsSuffix () {
+        //  base ();
     }
 
 
@@ -211,7 +211,7 @@ public class VfsSuffix : Common.AbstractVfs {
 
 
     private static void record_filter (GLib.List<string> to_wipe, Common.SyncJournalFileRecord record) {
-        //  if (!record.is_virtual_file () && record.path.has_suffix (APPLICATION_DOTVIRTUALFILE_SUFFIX)) {
+        //  if (!record.is_virtual_file && record.path.has_suffix (APPLICATION_DOTVIRTUALFILE_SUFFIX)) {
         //      to_wipe.append (record.path);
         //  }
     }

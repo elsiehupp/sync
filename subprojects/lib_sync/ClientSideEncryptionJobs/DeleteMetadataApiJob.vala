@@ -23,11 +23,10 @@ public class DeleteMetadataApiJob : AbstractNetworkJob {
     ***********************************************************/
     public DeleteMetadataApiJob (
         Account account,
-        string file_identifier,
-        GLib.Object parent = new GLib.Object ()
+        string file_identifier
     ) {
 
-        //  base (account, E2EE_BASE_URL + "meta-data/" + file_identifier, parent);
+        //  base (account, E2EE_BASE_URL + "meta-data/" + file_identifier);
         //  this.file_identifier = file_identifier;
     }
 

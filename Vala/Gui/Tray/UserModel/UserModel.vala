@@ -104,8 +104,8 @@ public class UserModel { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private UserModel (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    private UserModel () {
+        //  base ();
         //  // TODO: Remember selected user from last quit via settings file
         //  if (AccountManager.instance.accounts.size () > 0) {
         //      build_user_list ();

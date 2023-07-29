@@ -20,10 +20,9 @@ public class RequestEtagJob : AbstractNetworkJob {
     ***********************************************************/
     public RequestEtagJob.for_account (
         Account account,
-        string path,
-        GLib.Object parent = new GLib.Object ()
+        string path
     ) {
-        //  base (account, path, parent);
+        //  base (account, path);
     }
 
 

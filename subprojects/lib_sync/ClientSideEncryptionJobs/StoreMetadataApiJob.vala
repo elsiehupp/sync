@@ -25,11 +25,10 @@ public class StoreMetadataApiJob : AbstractNetworkJob {
     public StoreMetadataApiJob (
         Account account,
         string file_identifier,
-        string b64_metadata,
-        GLib.Object parent = new GLib.Object ()
+        string b64_metadata
     ) {
 
-        //  base (account, E2EE_BASE_URL + "meta-data/" + file_identifier, parent);
+        //  base (account, E2EE_BASE_URL + "meta-data/" + file_identifier);
         //  this.file_identifier = file_identifier;
         //  this.b64_metadata = b64_metadata;
     }

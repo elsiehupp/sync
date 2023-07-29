@@ -13,8 +13,8 @@ public class FakePutReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakePutReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, string put_payload, GLib.Object parent) {
-        //  base (parent);
+    public FakePutReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, string put_payload) {
+        //  base ();
         //  set_request (request);
         //  set_url (request.url);
         //  set_operation (operation);

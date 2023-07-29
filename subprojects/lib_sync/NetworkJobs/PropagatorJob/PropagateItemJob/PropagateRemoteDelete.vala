@@ -93,7 +93,7 @@ public class PropagateRemoteDelete : AbstractPropagateItemJob {
     /***********************************************************
     ***********************************************************/
     public new bool is_likely_finished_quickly () {
-        //  return !this.item.is_directory ();
+        //  return !this.item.is_directory;
     }
 
 
@@ -132,7 +132,7 @@ public class PropagateRemoteDelete : AbstractPropagateItemJob {
         //      return;
         //  }
 
-        //  this.propagator.journal.delete_file_record (this.item.original_file, this.item.is_directory ());
+        //  this.propagator.journal.delete_file_record (this.item.original_file, this.item.is_directory);
         //  this.propagator.journal.commit ("Remote Remove");
 
         //  on_signal_done (SyncFileItem.Status.SUCCESS);

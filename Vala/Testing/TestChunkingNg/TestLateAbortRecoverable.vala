@@ -21,7 +21,7 @@ public class TestLateAbortRecoverable : AbstractTestChunkingNg {
         //  set_chunk_size (fake_folder.sync_engine, 1 * 1000 * 1000);
 
         //  // Make the MOVE never reply, but trigger a client-on_signal_abort and apply the change remotely
-        //  GLib.Object parent;
+
         //  int response_delay = 200; // smaller than on_signal_abort-wait timeout
         //  fake_folder.set_server_override (this.override_delegate_abort_recoverable);
 
@@ -40,7 +40,7 @@ public class TestLateAbortRecoverable : AbstractTestChunkingNg {
     private GLib.InputStream override_delegate_abort_recoverable (Soup.Operation operation, Soup.Request request, GLib.OutputStream device) {
         //  if (request.attribute (Soup.Request.CustomVerbAttribute) == "MOVE") {
         //      GLib.Timeout.add (50, fake_folder.sync_engine.on_signal_abort);
-        //      return new DelayedReply<FakeChunkMoveReply> (response_delay, fake_folder.upload_state (), fake_folder.remote_modifier (), operation, request, parent);
+        //      return new DelayedReply<FakeChunkMoveReply> (response_delay, fake_folder.upload_state (), fake_folder.remote_modifier (), operation, request);
         //  }
         //  return null;
     }

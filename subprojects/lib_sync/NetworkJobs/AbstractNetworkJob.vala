@@ -144,8 +144,8 @@ public class AbstractNetworkJob { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public AbstractNetworkJob.for_account (Account account, string path, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public AbstractNetworkJob.for_account (Account account, string path) {
+        //  base ();
         //  this.timedout = false;
         //  this.follow_redirects = true;
         //  this.account = account;

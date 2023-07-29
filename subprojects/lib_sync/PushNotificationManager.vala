@@ -91,8 +91,8 @@ public class PushNotificationManager { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public PushNotificationManager (Account account, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public PushNotificationManager (Account account) {
+        //  base ();
         //  this.account = account;
         //  this.reconnect_timer_interval = 20 * 1000;
         //  this.is_ready = false;

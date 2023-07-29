@@ -18,8 +18,8 @@ public class CookieJar { //: Soup.CookieJar {
 
     /***********************************************************
     ***********************************************************/
-    public CookieJar (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public CookieJar () {
+        //  base ();
     }
 
 

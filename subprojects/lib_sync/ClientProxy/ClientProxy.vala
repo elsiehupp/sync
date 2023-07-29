@@ -14,8 +14,8 @@ public class ClientProxy { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public ClientProxy (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public ClientProxy () {
+        //  base ();
     }
 
 

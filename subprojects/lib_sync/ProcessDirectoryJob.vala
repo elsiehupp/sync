@@ -280,10 +280,9 @@ public class ProcessDirectoryJob { //: GLib.Object {
     public ProcessDirectoryJob.root_job (
         //  DiscoveryPhase data,
         //  Common.PinState base_pin_state,
-        //  int64 last_sync_timestamp,
-        //  GLib.Object parent
+        //  int64 last_sync_timestamp
     ) {
-        //  base (parent);
+        //  base ();
         //  this.last_sync_timestamp = last_sync_timestamp;
         //  this.discovery_data = data;
         //  compute_pin_state (base_pin_state);
@@ -356,7 +355,7 @@ public class ProcessDirectoryJob { //: GLib.Object {
         //              this.dir_item.instruction = CSync.SyncInstructions.NEW;
         //              this.dir_item.direction = this.dir_item.direction == SyncFileItem.Direction.UP ? SyncFileItem.Direction.DOWN : SyncFileItem.Direction.UP;
         //          }
-        //          if (this.child_modified && this.dir_item.instruction == CSync.SyncInstructions.TYPE_CHANGE && !this.dir_item.is_directory ()) {
+        //          if (this.child_modified && this.dir_item.instruction == CSync.SyncInstructions.TYPE_CHANGE && !this.dir_item.is_directory) {
         //              // Replacing a directory by a file is a conflict, if the directory had modified children
         //              this.dir_item.instruction = CSync.SyncInstructions.CONFLICT;
         //              if (this.dir_item.direction == SyncFileItem.Direction.UP) {
@@ -462,7 +461,7 @@ public class ProcessDirectoryJob { //: GLib.Object {
         //  var path_u8 = this.current_folder.original.to_utf8 ();
         //  if (!this.discovery_data.statedatabase.list_files_in_path (path_u8, (record) => {
         //          var name = path_u8 == "" ? record.path : string.from_utf8 (record.path.const_data () + (path_u8.size () + 1));
-        //          if (record.is_virtual_file () && is_vfs_with_suffix ()) {
+        //          if (record.is_virtual_file && is_vfs_with_suffix ()) {
         //              chop_virtual_file_suffix (name);
         //          }
         //          var database_entry = entries[name].database_entry;
@@ -529,7 +528,7 @@ public class ProcessDirectoryJob { //: GLib.Object {
         //          }
         //          if (e.local_entry.is_valid) {
         //              path.local = PathTuple.path_append (this.current_folder.local, e.local_entry.name);
-        //          } else if (e.database_entry.is_virtual_file ()) {
+        //          } else if (e.database_entry.is_virtual_file) {
         //              // We don't have a local entry - but it should be at this path
         //              path.local = add_virtual_file_suffix (path.local);
         //          }
@@ -769,7 +768,7 @@ public class ProcessDirectoryJob { //: GLib.Object {
         //  // VFS suffixed files on the server are ignored
         //  if (is_vfs_with_suffix ()) {
         //      if (has_virtual_file_suffix (server_entry.name)
-        //          || (local_entry.is_virtual_file && !database_entry.is_virtual_file () && has_virtual_file_suffix (database_entry.path))) {
+        //          || (local_entry.is_virtual_file && !database_entry.is_virtual_file && has_virtual_file_suffix (database_entry.path))) {
         //          item.instruction = CSync.SyncInstructions.IGNORE;
         //          item.error_string = _("File has extension reserved for virtual files.");
         //          this.child_ignored = true;
@@ -857,13 +856,13 @@ public class ProcessDirectoryJob { //: GLib.Object {
 
         //  // The file is known in the database already
         //  if (database_entry.is_valid) {
-        //      bool is_database_entry_an_e2Ee_placeholder = database_entry.is_virtual_file () && !database_entry.e2e_mangled_name () = "";
+        //      bool is_database_entry_an_e2Ee_placeholder = database_entry.is_virtual_file && !database_entry.e2e_mangled_name () = "";
         //      GLib.assert (!is_database_entry_an_e2Ee_placeholder || server_entry.size >= Constants.E2EE_TAG_SIZE);
         //      bool is_virtual_e2Ee_placeholder = is_database_entry_an_e2Ee_placeholder && server_entry.size >= Constants.E2EE_TAG_SIZE;
         //      int64 size_on_signal_server = is_virtual_e2Ee_placeholder ? server_entry.size - Constants.E2EE_TAG_SIZE : server_entry.size;
         //      bool meta_data_size_needs_update_for_e2Ee_file_placeholder = is_virtual_e2Ee_placeholder && database_entry.file_size == server_entry.size;
 
-        //      if (server_entry.is_directory != database_entry.is_directory ()) {
+        //      if (server_entry.is_directory != database_entry.is_directory) {
         //          // If the type of the entity changed, it's like NEW, but
         //          // needs to delete the other entity first.
         //          item.instruction = CSync.SyncInstructions.TYPE_CHANGE;
@@ -882,7 +881,7 @@ public class ProcessDirectoryJob { //: GLib.Object {
         //          item.modtime = server_entry.modtime;
         //          item.size = size_on_signal_server;
         //          if (server_entry.is_directory) {
-        //              //  ENFORCE (database_entry.is_directory ());
+        //              //  ENFORCE (database_entry.is_directory);
         //              item.instruction = CSync.SyncInstructions.UPDATE_METADATA;
         //          } else if (!local_entry.is_valid && this.query_local != PARENT_NOT_CHANGED) {
         //              // Deleted locally, changed on server
@@ -895,7 +894,7 @@ public class ProcessDirectoryJob { //: GLib.Object {
         //          item.modtime = server_entry.modtime;
         //          item.size = size_on_signal_server;
         //          if (server_entry.is_directory) {
-        //              //  ENFORCE (database_entry.is_directory ());
+        //              //  ENFORCE (database_entry.is_directory);
         //              item.instruction = CSync.SyncInstructions.UPDATE_METADATA;
         //          } else if (!local_entry.is_valid && this.query_local != PARENT_NOT_CHANGED) {
         //              // Deleted locally, changed on server
@@ -969,7 +968,7 @@ public class ProcessDirectoryJob { //: GLib.Object {
         //  if (this.discovery_data != null
         //      && this.discovery_data.sync_options.vfs
         //      && this.discovery_data.sync_options.vfs.mode () != Common.AbstractVfs.Off
-        //      && database_entry.is_directory ()
+        //      && database_entry.is_directory
         //      && database_entry.is_e2e_encrypted
         //  ) {
         //      int64 local_folder_size = 0;
@@ -987,7 +986,7 @@ public class ProcessDirectoryJob { //: GLib.Object {
 
 
     private void post_process_server_new () /*mutable*/ {
-        //  if (item.is_directory ()) {
+        //  if (item.is_directory) {
         //      this.pending_async_jobs++;
         //      this.discovery_data.check_selective_sync_new_folder (
         //          path.server,
@@ -1031,10 +1030,10 @@ public class ProcessDirectoryJob { //: GLib.Object {
 
 
     private void list_files_callback (int64 local_folder_size, Common.SyncJournalFileRecord record) {
-        //  if (record.is_file ()) {
+        //  if (record.is_file) {
         //      // add Constants.E2EE_TAG_SIZE so we will know the size of E2EE file on the server
         //      local_folder_size += record.file_size + Constants.E2EE_TAG_SIZE;
-        //  } else if (record.is_virtual_file ()) {
+        //  } else if (record.is_virtual_file) {
         //      // just a virtual file, so, the size must contain Constants.E2EE_TAG_SIZE if it was not corrected already
         //      local_folder_size += record.file_size;
         //  }
@@ -1076,7 +1075,7 @@ public class ProcessDirectoryJob { //: GLib.Object {
         //  this.discovery_data.find_and_cancel_deleted_job (original_path);
 
         //  post_process_rename (path);
-        //  process_file_finalize (item, path, item.is_directory (), item.instruction == CSync.SyncInstructions.RENAME ? NORMAL_QUERY : PARENT_DOES_NOT_EXIST, this.query_server);
+        //  process_file_finalize (item, path, item.is_directory, item.instruction == CSync.SyncInstructions.RENAME ? NORMAL_QUERY : PARENT_DOES_NOT_EXIST, this.query_server);
     }
 
 
@@ -1106,7 +1105,7 @@ public class ProcessDirectoryJob { //: GLib.Object {
         //  // Some things prohibit rename detection entirely.
         //  // Since we don't do the same checks again in reconcile, we can't
         //  // just skip the candidate, but have to give up completely.
-        //  if (base_record.is_directory () != item.is_directory ()) {
+        //  if (base_record.is_directory != item.is_directory) {
         //      GLib.info ();
         //      done = true;
         //      return;
@@ -1136,7 +1135,7 @@ public class ProcessDirectoryJob { //: GLib.Object {
 
         //  string original_path_adjusted = this.discovery_data.adjust_renamed_path (original_path, SyncFileItem.Direction.UP);
 
-        //  if (!base_record.is_directory ()) {
+        //  if (!base_record.is_directory) {
         //      CSync.FileStat buf;
         //      if (csync_vio_local_stat (this.discovery_data.local_directory + original_path_adjusted, buf)) {
         //          GLib.info ("Local file does not exist anymore. " + original_path_adjusted);
@@ -1156,7 +1155,7 @@ public class ProcessDirectoryJob { //: GLib.Object {
         //  }
 
         //  // Renames of virtuals are possible
-        //  if (base_record.is_virtual_file ()) {
+        //  if (base_record.is_virtual_file) {
         //      item.type = ItemType.VIRTUAL_FILE;
         //  }
 
@@ -1200,7 +1199,7 @@ public class ProcessDirectoryJob { //: GLib.Object {
         //      || item.instruction == CSync.SyncInstructions.RENAME || item.instruction == CSync.SyncInstructions.TYPE_CHANGE;
 
         //  // Decay server modifications to UPDATE_METADATA if the local virtual exists
-        //  bool has_local_virtual = local_entry.is_virtual_file || (this.query_local == PARENT_NOT_CHANGED && database_entry.is_virtual_file ());
+        //  bool has_local_virtual = local_entry.is_virtual_file || (this.query_local == PARENT_NOT_CHANGED && database_entry.is_virtual_file);
         //  bool virtual_file_download = item.type == ItemType.VIRTUAL_FILE_DOWNLOAD;
         //  if (server_modified && !virtual_file_download && has_local_virtual) {
         //      item.instruction = CSync.SyncInstructions.UPDATE_METADATA;
@@ -1208,7 +1207,7 @@ public class ProcessDirectoryJob { //: GLib.Object {
         //      item.type = ItemType.VIRTUAL_FILE;
         //  }
 
-        //  if (database_entry.is_virtual_file () && (!local_entry.is_valid || local_entry.is_virtual_file) && !virtual_file_download) {
+        //  if (database_entry.is_virtual_file && (!local_entry.is_valid || local_entry.is_virtual_file) && !virtual_file_download) {
         //      item.type = ItemType.VIRTUAL_FILE;
         //  }
 
@@ -1259,12 +1258,12 @@ public class ProcessDirectoryJob { //: GLib.Object {
         //  item.inode = local_entry.inode;
 
         //  if (database_entry.is_valid) {
-        //      bool type_change = local_entry.is_directory != database_entry.is_directory ();
+        //      bool type_change = local_entry.is_directory != database_entry.is_directory;
         //      if (!type_change && local_entry.is_virtual_file) {
         //          if (no_server_entry) {
         //              item.instruction = CSync.SyncInstructions.REMOVE;
         //              item.direction = SyncFileItem.Direction.DOWN;
-        //          } else if (!database_entry.is_virtual_file () && is_vfs_with_suffix ()) {
+        //          } else if (!database_entry.is_virtual_file && is_vfs_with_suffix ()) {
         //              // If we find what looks to be a spurious "abc.owncloud" the base_record file "abc"
         //              // might have been renamed to that. Make sure that the base_record file is not
         //              // deleted from the server.
@@ -1297,7 +1296,7 @@ public class ProcessDirectoryJob { //: GLib.Object {
         //              item.direction = SyncFileItem.Direction.DOWN;
         //          }
         //      } else if (!type_change && is_vfs_with_suffix ()
-        //          && database_entry.is_virtual_file () && !local_entry.is_virtual_file
+        //          && database_entry.is_virtual_file && !local_entry.is_virtual_file
         //          && database_entry.inode == local_entry.inode
         //          && database_entry.modtime == local_entry.modtime
         //          && local_entry.size == 1) {
@@ -1313,7 +1312,7 @@ public class ProcessDirectoryJob { //: GLib.Object {
         //              item.previous_size = 1;
         //          }
         //      } else if (server_modified
-        //          || (is_vfs_with_suffix () && database_entry.is_virtual_file ())) {
+        //          || (is_vfs_with_suffix () && database_entry.is_virtual_file)) {
         //          // There's a local change and a server change : Conflict!
         //          // Alternatively, this might be a suffix-file that's virtual in the database but
         //          // not locally. These also become conflicts. For in-place placeholders that's
@@ -1411,7 +1410,7 @@ public class ProcessDirectoryJob { //: GLib.Object {
 
         //  // Check local permission if we are allowed to put move the file here
         //  // Technically we should use the permissions from the server, but we'll assume it is the same
-        //  var move_perms = check_move_permissions (base_record.remote_permissions, original_path, item.is_directory ());
+        //  var move_perms = check_move_permissions (base_record.remote_permissions, original_path, item.is_directory);
         //  if (!move_perms.source_ok || !move_perms.destination_ok) {
         //      GLib.info (
         //          "Move without permission to rename base_record file, "
@@ -1456,7 +1455,7 @@ public class ProcessDirectoryJob { //: GLib.Object {
         //      // We must query the server to know if the etag has not changed
         //      this.pending_async_jobs++;
         //      string server_original_path = this.discovery_data.remote_folder + this.discovery_data.adjust_renamed_path (original_path, SyncFileItem.Direction.DOWN);
-        //      if (base_record.is_virtual_file () && is_vfs_with_suffix ())
+        //      if (base_record.is_virtual_file && is_vfs_with_suffix ())
         //          chop_virtual_file_suffix (server_original_path);
         //      var request_etag_job = new RequestEtagJob (this.discovery_data.account, server_original_path, this);
         //      request_etag_job.signal_finished_with_result.connect (
@@ -1471,10 +1470,10 @@ public class ProcessDirectoryJob { //: GLib.Object {
 
 
     private void on_signal_finalize () {
-        //  bool recurse = item.is_directory () || local_entry.is_directory || server_entry.is_directory;
+        //  bool recurse = item.is_directory || local_entry.is_directory || server_entry.is_directory;
         //  // Even if we have a local directory : If the remote is a file that's propagated as a
         //  // conflict we don't need to recurse into it. (local c1.owncloud, c1/ ; remote : c1)
-        //  if (item.instruction == CSync.SyncInstructions.CONFLICT && !item.is_directory ()) {
+        //  if (item.instruction == CSync.SyncInstructions.CONFLICT && !item.is_directory) {
         //      recurse = false;
         //  }
         //  if (this.query_local != NORMAL_QUERY && this.query_server != NORMAL_QUERY) {
@@ -1489,7 +1488,7 @@ public class ProcessDirectoryJob { //: GLib.Object {
     private void on_signal_request_etag_job_finished_with_result (
         //  Result<T, HttpError><string> etag
     ) /*mutable*/ {
-        //  if (!etag || (etag != base_record.etag && !item.is_directory ()) || this.discovery_data.is_renamed (original_path)) {
+        //  if (!etag || (etag != base_record.etag && !item.is_directory) || this.discovery_data.is_renamed (original_path)) {
         //      GLib.info ("Can't rename because the etag has changed or the directory is gone " + original_path);
         //      // Can't be a rename, leave it as a new.
         //      post_process_local_new ();
@@ -1499,7 +1498,7 @@ public class ProcessDirectoryJob { //: GLib.Object {
         //      process_rename (path);
         //      recurse_query_server = etag == base_record.etag ? PARENT_NOT_CHANGED : NORMAL_QUERY;
         //  }
-        //  process_file_finalize (item, path, item.is_directory (), NORMAL_QUERY, recurse_query_server);
+        //  process_file_finalize (item, path, item.is_directory, NORMAL_QUERY, recurse_query_server);
         //  this.pending_async_jobs--;
         //  GLib.Timeout.add (0, this.discovery_data.on_signal_schedule_more_jobs);
     }
@@ -1634,12 +1633,12 @@ public class ProcessDirectoryJob { //: GLib.Object {
         //      return false;
         //  }
 
-        //  if (base_record.is_directory () != item.is_directory ()) {
+        //  if (base_record.is_directory != item.is_directory) {
         //      GLib.info ("Not a move, types don't match " + base_record.type + item.type + local_entry.type);
         //      return false;
         //  }
         //  // Directories and virtual files don't need size/mtime equality
-        //  if (!local_entry.is_directory && !base_record.is_virtual_file ()
+        //  if (!local_entry.is_directory && !base_record.is_virtual_file
         //      && (base_record.modtime != local_entry.modtime || base_record.file_size != local_entry.size)) {
         //      GLib.info (
         //          "Not a move, mtime or size differs, "
@@ -1694,7 +1693,7 @@ public class ProcessDirectoryJob { //: GLib.Object {
         //  }
 
         //  // A conflict with a virtual should lead to virtual file download
-        //  if (database_entry.is_virtual_file () || local_entry.is_virtual_file)
+        //  if (database_entry.is_virtual_file || local_entry.is_virtual_file)
         //      item.type = ItemType.VIRTUAL_FILE_DOWNLOAD;
 
         //  // If there's no content hash, use heuristics
@@ -1794,11 +1793,11 @@ public class ProcessDirectoryJob { //: GLib.Object {
 
         //  GLib.info ("Discovered " + item.file + item.instruction + item.direction + item.type);
 
-        //  if (item.is_directory () && item.instruction == CSync.SyncInstructions.SYNC)
+        //  if (item.is_directory && item.instruction == CSync.SyncInstructions.SYNC)
         //      item.instruction = CSync.SyncInstructions.UPDATE_METADATA;
         //  bool removed = item.instruction == CSync.SyncInstructions.REMOVE;
         //  if (check_permissions (item)) {
-        //      if (item.is_restoration && item.is_directory ())
+        //      if (item.is_restoration && item.is_directory)
         //          recurse = true;
         //  } else {
         //      recurse = false;
@@ -1846,12 +1845,12 @@ public class ProcessDirectoryJob { //: GLib.Object {
         //      if (perms == null) {
         //          // No permissions set
         //          return true;
-        //      } else if (item.is_directory () && !perms.has_permission (Common.RemotePermissions.Permissions.CAN_ADD_SUB_DIRECTORIES)) {
+        //      } else if (item.is_directory && !perms.has_permission (Common.RemotePermissions.Permissions.CAN_ADD_SUB_DIRECTORIES)) {
         //          GLib.warning ("check_for_permission: ERROR " + item.file);
         //          item.instruction = CSync.SyncInstructions.ERROR;
         //          item.error_string = _("Not allowed because you don't have permission to add subfolders to that folder");
         //          return false;
-        //      } else if (!item.is_directory () && !perms.has_permission (Common.RemotePermissions.Permissions.CAN_ADD_FILE)) {
+        //      } else if (!item.is_directory && !perms.has_permission (Common.RemotePermissions.Permissions.CAN_ADD_FILE)) {
         //          GLib.warning ("check_for_permission: ERROR " + item.file);
         //          item.instruction = CSync.SyncInstructions.ERROR;
         //          item.error_string = _("Not allowed because you don't have permission to add files in that folder");
@@ -1976,7 +1975,7 @@ public class ProcessDirectoryJob { //: GLib.Object {
         //  item.original_file = path.original;
         //  item.inode = local_entry.inode;
         //  item.is_selective_sync = true;
-        //  if (database_entry.is_valid && ( (database_entry.modtime == local_entry.modtime && database_entry.file_size == local_entry.size) || (local_entry.is_directory && database_entry.is_directory ()))) {
+        //  if (database_entry.is_valid && ( (database_entry.modtime == local_entry.modtime && database_entry.file_size == local_entry.size) || (local_entry.is_directory && database_entry.is_directory))) {
         //      item.instruction = CSync.SyncInstructions.REMOVE;
         //      item.direction = SyncFileItem.Direction.DOWN;
         //  } else {
@@ -1986,9 +1985,9 @@ public class ProcessDirectoryJob { //: GLib.Object {
         //      this.child_ignored = true;
         //  }
 
-        //  GLib.info ("Discovered (blocklisted) " + item.file + item.instruction + item.direction + item.is_directory ());
+        //  GLib.info ("Discovered (blocklisted) " + item.file + item.instruction + item.direction + item.is_directory);
 
-        //  if (item.is_directory () && item.instruction != CSync.SyncInstructions.IGNORE) {
+        //  if (item.is_directory && item.instruction != CSync.SyncInstructions.IGNORE) {
         //      var process_directory_job = new ProcessDirectoryJob (path, item, NORMAL_QUERY, IN_BLOCK_LIST, this.last_sync_timestamp, this);
         //      process_directory_job.signal_finished.connect (
         //          this.on_signal_sub_job_finished

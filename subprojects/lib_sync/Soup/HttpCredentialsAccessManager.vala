@@ -18,8 +18,8 @@ public class HttpCredentialsAccessManager { //: Soup.ClientContext {
     private HttpCredentials credentials { private get; construct; }
 
 
-    public HttpCredentialsAccessManager (HttpCredentials credentials, GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public HttpCredentialsAccessManager (HttpCredentials credentials) {
+        //  base ();
         //  this.credentials = credentials;
     }
 

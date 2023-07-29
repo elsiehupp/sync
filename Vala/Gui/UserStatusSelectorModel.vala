@@ -107,8 +107,8 @@ public class UserStatusSelectorModel { //: GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public UserStatusSelectorModel (GLib.Object parent = new GLib.Object ()) {
-        //  base (parent);
+    public UserStatusSelectorModel () {
+        //  base ();
         //  this.date_time_provider = new GLib.DateTime ();
         //  this.user_status.icon ("😀");
     }
@@ -117,10 +117,9 @@ public class UserStatusSelectorModel { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public UserStatusSelectorModel.with_connector (
-        //  LibSync.AbstractUserStatusConnector user_status_connector,
-        //  GLib.Object parent = new GLib.Object ()
+        //  LibSync.AbstractUserStatusConnector user_status_connector
     ) {
-        //  base (parent);
+        //  base ();
         //  this.user_status_connector = user_status_connector;
         //  this.user_status = new LibSync.UserStatus ("no-identifier", "", "😀", LibSync.UserStatus.OnlineStatus.ONLINE, false, {});
         //  this.date_time_provider = new GLib.DateTime ();
@@ -133,10 +132,9 @@ public class UserStatusSelectorModel { //: GLib.Object {
     ***********************************************************/
     public UserStatusSelectorModel.with_connector_and_provider (
         //  LibSync.AbstractUserStatusConnector user_status_connector,
-        //  GLib.DateTime date_time_provider = new GLib.DateTime (),
-        //  GLib.Object parent = new GLib.Object ()
+        //  GLib.DateTime date_time_provider = new GLib.DateTime ()
     ) {
-        //  base (parent);
+        //  base ();
         //  this.user_status_connector = user_status_connector;
         //  this.date_time_provider = std.move (date_time_provider);
         //  this.user_status = new LibSync.UserStatus ();
@@ -149,10 +147,9 @@ public class UserStatusSelectorModel { //: GLib.Object {
     ***********************************************************/
     public UserStatusSelectorModel.with_user_status_and_provider (
         //  LibSync.UserStatus user_status,
-        //  GLib.DateTime date_time_provider,
-        //  GLib.Object parent = new GLib.Object ()
+        //  GLib.DateTime date_time_provider
     ) {
-        //  base (parent);
+        //  base ();
         //  this.user_status = user_status;
         //  this.date_time_provider = std.move (date_time_provider);
         //  this.user_status.icon ("😀");
@@ -162,10 +159,9 @@ public class UserStatusSelectorModel { //: GLib.Object {
     /***********************************************************
     ***********************************************************/
     public UserStatusSelectorModel.with_user_status (
-        //  LibSync.UserStatus user_status,
-        //  GLib.Object parent = new GLib.Object ()
+        //  LibSync.UserStatus user_status
     ) {
-        //  base (parent);
+        //  base ();
         //  this.user_status = user_status;
         //  this.user_status.icon ("😀");
     }

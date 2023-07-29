@@ -21,7 +21,7 @@ public class AddCertificateDialog { //: Gtk.Dialog {
     //  /***********************************************************
     //  ***********************************************************/
     //  public AddCertificateDialog (Gtk.Widget parent = new Gtk.Widget ()) {
-        //  base (parent);
+        //  base ();
         //  this.instance = new AddCertificateDialog ();
         //  instance.up_ui (this);
         //  instance.label_error_certif.on_signal_text ("");

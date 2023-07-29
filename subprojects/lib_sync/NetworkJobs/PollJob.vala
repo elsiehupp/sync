@@ -31,10 +31,9 @@ public class PollJob : AbstractNetworkJob {
         string path,
         SyncFileItem item,
         Common.SyncJournalDb journal,
-        string local_path,
-        GLib.Object parent
+        string local_path
     ) {
-        //  base (account, path, parent);
+        //  base (account, path);
         //  this.journal = journal;
         //  this.local_path = local_path;
         //  this.item = item;
