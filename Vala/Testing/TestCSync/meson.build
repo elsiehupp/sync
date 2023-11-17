@@ -9,7 +9,7 @@ srcs = files([
 deps = [
     meson.get_compiler('vala').find_library('posix'),
     # dependency('gio-2.0'),
-    # dependency('gtk+-3.0'),
+    # dependency('gtk4'),
     # dependency('granite'),
     # dependency('gee-0.8'),
     # dependency('json-glib-1.0'),
