@@ -1,5 +1,5 @@
-# elementary OS Odin STABLE
-FROM ubuntu:focal
+# elementary OS 7.1 ???
+FROM ubuntu:jammy
 
 ENV DEBIAN_FRONTEND=noninteractive
 
