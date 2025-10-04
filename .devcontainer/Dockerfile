@@ -13,7 +13,7 @@ RUN apt-get update && \
     apt-get update && \
     apt-get -y dist-upgrade && \
     apt-get install --no-install-recommends -y elementary-sdk elementary-icon-theme && \
-        apt-get install -y elementary-sdk git vala-language-server libjson-glib-dev libsecret-1-dev libsoup2.4-dev libgnutls28-dev libgee-0.8-dev libsqlite3-dev libgtk-4-dev && \
+        apt-get install -y elementary-sdk git openssh-client vala-language-server libjson-glib-dev libsecret-1-dev libsoup2.4-dev libgnutls28-dev libgee-0.8-dev libsqlite3-dev libgtk-4-dev && \
     apt-get -y autoremove && \
     apt-get autoclean && \
     rm -rf /var/lib/apt/lists/*
