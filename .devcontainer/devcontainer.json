@@ -11,7 +11,10 @@
                 "editor.tabSize": 4,
                 "git.alwaysSignOff": true,
                 "vala.debugMode": true,
-                "vala.languageServerPath": "/usr/bin/vala-language-server"
+                "vala.languageServerPath": "/usr/bin/vala-language-server",
+                "files.exclude" : {
+                    "/tmp/*" : true
+                }
             },
             "extensions": [
                 "prince781.vala",
